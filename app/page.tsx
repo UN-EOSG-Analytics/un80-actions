@@ -19,10 +19,18 @@ export default function Home() {
                 </header>
 
                 {/* Content */}
-                <section>
-                    <p className="text-muted-foreground leading-relaxed">
+                <section className="mb-8">
+                    <p className="text-muted-foreground leading-relaxed mb-6">
                         A modern, responsive foundation for United Nations web applications.
                     </p>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <a
+                            href="/dashboard"
+                            className="inline-flex items-center justify-center px-6 py-3 bg-foreground text-background rounded-lg font-medium hover:opacity-90 transition-opacity"
+                        >
+                            View Dashboard
+                        </a>
+                    </div>
                 </section>
             </div>
         </main>
