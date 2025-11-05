@@ -26,6 +26,34 @@ def decode_excel_header(header: str) -> str:
 
 df.columns = [decode_excel_header(c) for c in df.columns]
 
+# Rename columns to clean standard names
+column_mapping = {
+    "NO.": "action_number",
+    "Report": "report",
+    "WP-#": "work_package_number",
+    "Main W-Package": "work_package_name",
+    "Doc Para": "document_paragraph",
+    "Indicative Activity": "indicative_activity",
+    "Big Ticket": "big_ticket",
+    "WP Lead(s)": "work_package_leads",
+    "First Milestone": "first_milestone",
+    "M/S Approval (first step)": "ms_approval",
+    "M/S Body": "ms_body",
+    "Legal Consideration": "legal_consideration",
+    "UN Budget": "un_budget",
+}
+
+# Detect and print unmapped columns
+unmapped_columns = [col for col in df.columns if col not in column_mapping]
+if unmapped_columns:
+    print("⚠️  Unmapped columns detected (not renamed):")
+    for col in unmapped_columns:
+        print(f"   - '{col}'")
+    print()
+
+# Rename only the columns in the mapping (keep all columns)
+df = df.rename(columns=column_mapping)
+
 # Ensure output folder exists
 output_path.parent.mkdir(parents=True, exist_ok=True)
 
