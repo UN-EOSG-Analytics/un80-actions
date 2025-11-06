@@ -1,7 +1,10 @@
 import type { NextConfig } from 'next'
 
 // Set to your repository name for GitHub Pages, or '' for custom domain
-const basePath = process.env.BASE_PATH || '/un-website-boilerplate'
+// In development, use empty string to avoid basePath issues
+const basePath = process.env.NODE_ENV === 'production' 
+    ? (process.env.BASE_PATH || '/un-website-boilerplate')
+    : ''
 
 // NOTE: use basePath variable for Image src 
 // https://nextjs.org/docs/app/api-reference/config/next-config-js/basePath#images
