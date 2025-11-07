@@ -25,7 +25,8 @@ import {
 import { fetchActions } from "@/lib/actions";
 import type { Actions } from "@/types/action";
 import { useEffect } from "react";
-import { Package, CheckCircle, ListChecks, ClipboardCheck, ChevronDown, Users, FileText } from "lucide-react";
+import { Package, CheckCircle, ListChecks, ClipboardCheck, ChevronDown, Users, FileText, User, Folder } from "lucide-react";
+import Image from "next/image";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
@@ -302,10 +303,20 @@ export default function WorkPackagesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Main Container - Left-aligned with consistent padding */}
-      <div className="max-w-[1421px] mx-auto px-[101px] py-8">
+      <div className="max-w-[1421px] mx-auto px-[101px] pt-16 pb-8">
         {/* Header Section */}
-        <header className="mb-4">
-          <h1 className="text-[48px] font-bold text-black leading-[24px] mb-6">
+        <header className="mb-4 relative">
+          <div className="absolute -top-8 right-0">
+            <Image
+              src={`${basePath}/images/UN_Logo_Horizontal_Black_English.svg`}
+              alt="United Nations Logo"
+              width={200}
+              height={60}
+              className="h-auto"
+              priority
+            />
+          </div>
+          <h1 className="text-[48px] font-bold text-black leading-[24px] mb-6 mt-20">
             UN80 Initiative Dashboard
           </h1>
           <div className="text-[14px] text-black leading-[24px] max-w-[1093px]">
@@ -327,13 +338,13 @@ export default function WorkPackagesPage() {
             {/* Work packages completed */}
             <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="relative flex flex-col items-center justify-center w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 shadow-sm border border-[#0076A4]/10 transition-all hover:shadow-lg hover:border-[#0076A4]/50 hover:scale-[1.02] cursor-pointer">
-                    <Package className="absolute top-3 right-3 w-5 h-5 text-[#0076A4]" />
-                    <p className="text-[14px] font-bold text-[#0076A4] text-center leading-[24px] mb-2">
-                      Work packages completed
-                    </p>
-                    <p className="text-[32px] font-bold text-[#0076A4] text-center leading-[24px]">
+                  <div className="relative flex flex-col items-start justify-start w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
+                    <Package className="w-5 h-5 text-[#0076A4] mb-2" />
+                    <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px] mb-3">
                       {stats.completed}/{stats.total}
+                    </p>
+                    <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
+                      Work packages completed
                     </p>
                   </div>
                 </TooltipTrigger>
@@ -345,13 +356,13 @@ export default function WorkPackagesPage() {
               {/* Actions completed */}
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="relative flex flex-col items-center justify-center w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 shadow-sm border border-[#0076A4]/10 transition-all hover:shadow-lg hover:border-[#0076A4]/50 hover:scale-[1.02] cursor-pointer">
-                    <CheckCircle className="absolute top-3 right-3 w-5 h-5 text-[#0076A4]" />
-                    <p className="text-[14px] font-bold text-[#0076A4] text-center leading-[24px] mb-2">
-                      Actions completed
-                    </p>
-                    <p className="text-[32px] font-bold text-[#0076A4] text-center leading-[24px]">
+                  <div className="relative flex flex-col items-start justify-start w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
+                    <CheckCircle className="w-5 h-5 text-[#0076A4] mb-2" />
+                    <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px] mb-3">
                       {stats.completedActions}/{stats.totalActions}
+                    </p>
+                    <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
+                      Actions completed
                     </p>
                   </div>
                 </TooltipTrigger>
@@ -363,13 +374,13 @@ export default function WorkPackagesPage() {
               {/* Actions leads assigned */}
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="relative flex flex-col items-center justify-center w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 shadow-sm border border-[#0076A4]/10 transition-all hover:shadow-lg hover:border-[#0076A4]/50 hover:scale-[1.02] cursor-pointer">
-                    <ListChecks className="absolute top-3 right-3 w-5 h-5 text-[#0076A4]" />
-                    <p className="text-[14px] font-bold text-[#0076A4] text-center leading-[24px] mb-2">
-                      Actions leads assigned
-                    </p>
-                    <p className="text-[32px] font-bold text-[#0076A4] text-center leading-[24px]">
+                  <div className="relative flex flex-col items-start justify-start w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
+                    <ListChecks className="w-5 h-5 text-[#0076A4] mb-2" />
+                    <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px] mb-3">
                       0
+                    </p>
+                    <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
+                      Actions leads assigned
                     </p>
                   </div>
                 </TooltipTrigger>
@@ -381,13 +392,13 @@ export default function WorkPackagesPage() {
               {/* Actions support assigned */}
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="relative flex flex-col items-center justify-center w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 shadow-sm border border-[#0076A4]/10 transition-all hover:shadow-lg hover:border-[#0076A4]/50 hover:scale-[1.02] cursor-pointer">
-                    <ClipboardCheck className="absolute top-3 right-3 w-5 h-5 text-[#0076A4]" />
-                    <p className="text-[14px] font-bold text-[#0076A4] text-center leading-[24px] mb-2">
-                      Actions support assigned
-                    </p>
-                    <p className="text-[32px] font-bold text-[#0076A4] text-center leading-[24px]">
+                  <div className="relative flex flex-col items-start justify-start w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
+                    <ClipboardCheck className="w-5 h-5 text-[#0076A4] mb-2" />
+                    <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px] mb-3">
                       0
+                    </p>
+                    <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
+                      Actions support assigned
                     </p>
                   </div>
                 </TooltipTrigger>
@@ -399,22 +410,22 @@ export default function WorkPackagesPage() {
               {/* Card 5 - Next Upcoming Milestone */}
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="relative flex flex-col justify-center w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 shadow-sm border border-[#0076A4]/10 transition-all hover:shadow-lg hover:border-[#0076A4]/50 hover:scale-[1.02] cursor-pointer">
-                    <Users className="absolute top-3 right-3 w-5 h-5 text-[#0076A4]" />
-                    <p className="text-[14px] font-bold text-[#0076A4] text-center leading-[24px] mb-3">
+                  <div className="relative flex flex-col items-start justify-start w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
+                    <Users className="w-5 h-5 text-[#0076A4] mb-3" />
+                    <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px] mb-3">
                       Next upcoming milestone:
                     </p>
                     {nextMilestone ? (
-                      <div className="flex flex-col gap-2 items-center">
-                        <p className="text-[16px] font-bold text-[#0076A4] text-center leading-[20px]">
+                      <div className="flex flex-col gap-2 items-start">
+                        <p className="text-[16px] font-bold text-[#0076A4] text-left leading-[20px]">
                           {nextMilestone.date}
                         </p>
-                        <p className="text-[12px] font-medium text-[#0076A4] text-center leading-[16px] line-clamp-3">
+                        <p className="text-[12px] font-medium text-[#0076A4] text-left leading-[16px] line-clamp-3">
                           {nextMilestone.indicativeActivity}
                         </p>
                       </div>
                     ) : (
-                      <p className="text-[16px] font-medium text-[#0076A4] text-center leading-[20px]">
+                      <p className="text-[16px] font-medium text-[#0076A4] text-left leading-[20px]">
                         No upcoming milestones
                       </p>
                     )}
@@ -458,7 +469,7 @@ export default function WorkPackagesPage() {
           {/* Filters Row */}
           <div className="flex gap-[8px] items-center mb-3 flex-wrap">
             <Select value={selectedWorkPackage} onValueChange={setSelectedWorkPackage}>
-              <SelectTrigger className="w-[235px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white shadow-xs transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
+              <SelectTrigger className="w-[235px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
                 <SelectValue placeholder="Select Work Package" />
               </SelectTrigger>
               <SelectContent>
@@ -471,7 +482,7 @@ export default function WorkPackagesPage() {
             </Select>
 
             <Select value={selectedLead} onValueChange={setSelectedLead}>
-              <SelectTrigger className="w-[235px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white shadow-xs transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
+              <SelectTrigger className="w-[235px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
                 <SelectValue placeholder="Select Work Package Lead" />
               </SelectTrigger>
               <SelectContent>
@@ -484,7 +495,7 @@ export default function WorkPackagesPage() {
             </Select>
 
             <Select value={selectedWorkstream} onValueChange={setSelectedWorkstream}>
-              <SelectTrigger className="w-[235px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white shadow-xs transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
+              <SelectTrigger className="w-[235px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
                 <SelectValue placeholder="Select Workstream" />
               </SelectTrigger>
               <SelectContent>
@@ -505,12 +516,12 @@ export default function WorkPackagesPage() {
                 placeholder="Search for work package"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-[40px] text-[16px] border-slate-300 rounded-[6px] pl-[12px] pr-[56px] py-[8px] text-slate-400 bg-white shadow-xs transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4] focus:ring-2 focus:ring-[#0076A4]/20"
+                className="w-full h-[40px] text-[16px] border-slate-300 rounded-[6px] pl-[12px] pr-[56px] py-[8px] text-slate-400 bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4] focus:ring-2 focus:ring-[#0076A4]/20"
               />
             </div>
             <Button
               onClick={handleResetFilters}
-              className="bg-[#0076A4] hover:bg-[#006a94] text-white px-4 py-2 h-[40px] rounded-[6px] text-[14px] font-medium shrink-0 shadow-sm transition-all hover:shadow-md"
+              className="bg-[#0076A4] hover:bg-[#006a94] text-white px-4 py-2 h-[40px] rounded-[6px] text-[14px] font-medium shrink-0 transition-all"
             >
               Reset
             </Button>
@@ -530,83 +541,109 @@ export default function WorkPackagesPage() {
                   open={isOpen}
                   onOpenChange={() => toggleCollapsible(collapsibleKey)}
                 >
-                  <div className="mb-4 last:mb-0">
-                    <CollapsibleTrigger className="w-full flex items-center justify-between px-0 py-0 hover:no-underline border border-slate-200 bg-slate-50 rounded-[6px] px-6 py-4 shadow-sm transition-all hover:shadow-md hover:border-[#0076A4]/30">
-                      <div className="flex items-center gap-[18px] w-full pr-4 flex-wrap">
-                        <p className="flex-1 text-[16px] font-medium text-slate-900 leading-[24px] text-left min-w-0">
-                          {wp.number ? `Work Package ${wp.number}: ${wp.name}` : `Work Package: ${wp.name}`}
+                  <div className="mb-12 last:mb-0">
+                    <CollapsibleTrigger className="w-full flex flex-col items-start px-0 py-0 hover:no-underline bg-slate-50 rounded-[6px] px-6 py-4 transition-all hover:bg-slate-100 border-0 relative">
+                      <div className="text-left min-w-0 mb-2 pr-8">
+                        <p className="text-[16px] font-medium text-slate-900 leading-[24px] inline">
+                          {wp.name}
                         </p>
-                        {/* Workstream Labels */}
-                        <div className="flex gap-2 flex-wrap">
-                          {wp.report.includes('WS2') && (
-                            <Badge className="bg-gray-300 text-gray-700 px-3 py-1 h-auto rounded-[6px] text-[12px] font-medium border-0 shadow-sm">
-                              WS2
-                            </Badge>
-                          )}
-                          {wp.report.includes('WS3') && (
-                            <Badge className="bg-gray-600 text-white px-3 py-1 h-auto rounded-[6px] text-[12px] font-medium border-0 shadow-sm">
-                              WS3
-                            </Badge>
-                          )}
-                        </div>
-                        {/* Work Package Leads as Badges */}
-                        {wp.leads.length > 0 && (
-                          <div className="flex gap-2 flex-wrap">
-                            {wp.leads.map((lead, leadIdx) => (
-                              <Badge
-                                key={leadIdx}
-                                className="bg-[#0076a4] text-white px-3 py-1 h-auto rounded-[6px] text-[12px] font-medium border-0 shadow-sm transition-all hover:bg-[#006a94] hover:shadow-md"
-                              >
+                        {wp.number && (
+                          <span className="text-[16px] font-medium text-gray-400 leading-[24px] ml-2">
+                            , Work Package {wp.number}
+                          </span>
+                        )}
+                        {!wp.number && (
+                          <span className="text-[16px] font-medium text-gray-400 leading-[24px] ml-2">
+                            , Work Package
+                          </span>
+                        )}
+                      </div>
+                      {/* Work Package Leads - Underneath the text */}
+                      {wp.leads.length > 0 && (
+                        <div className="flex flex-col gap-1 mb-2">
+                          {wp.leads.map((lead, leadIdx) => (
+                            <div key={leadIdx} className="flex items-center gap-2">
+                              <User className="w-4 h-4 text-gray-600" />
+                              <p className="text-[14px] text-gray-600 leading-[20px]">
                                 {lead}
-                              </Badge>
-                            ))}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {/* Workstream Labels - Underneath the text */}
+                      <div className="flex flex-col gap-1">
+                        {wp.report.includes('WS2') && (
+                          <div className="flex items-center gap-2">
+                            <Folder className="w-4 h-4 text-gray-600" />
+                            <p className="text-[14px] text-gray-600 leading-[20px]">
+                              WS2
+                            </p>
+                          </div>
+                        )}
+                        {wp.report.includes('WS3') && (
+                          <div className="flex items-center gap-2">
+                            <Folder className="w-4 h-4 text-gray-600" />
+                            <p className="text-[14px] text-gray-600 leading-[20px]">
+                              WS3
+                            </p>
                           </div>
                         )}
                       </div>
                       <ChevronDown
-                        className={`w-5 h-5 text-slate-600 transition-transform shrink-0 ${
+                        className={`w-5 h-5 text-slate-600 transition-transform shrink-0 absolute top-4 right-4 ${
                           isOpen ? "transform rotate-180" : ""
                         }`}
                       />
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="px-0 pb-0 pt-4">
+                    <CollapsibleContent className="px-0 pb-4 pt-4 pl-6">
                       {wp.actions.length > 0 ? (
                         <div className="flex flex-col gap-3">
+                          {/* Header */}
+                          <h3 className="text-[16px] font-bold text-slate-900 leading-[24px] mb-2">
+                            Indicative activities
+                          </h3>
                           {/* Display each indicative_activity in its own box */}
                           {wp.actions.map((action, idx) => (
                             <div
                               key={idx}
-                              className="bg-white border border-slate-200 rounded-[6px] p-4 shadow-sm transition-all hover:shadow-md hover:border-[#0076A4]/30"
+                              className="bg-white border border-slate-200 rounded-[6px] p-4 transition-all hover:border-[#0076A4]/30"
                             >
                               {/* Indicative Activity Text */}
                               <p className="text-[14px] font-medium text-slate-900 leading-[20px] mb-3">
                                 {action.text}
                               </p>
                               
-                              {/* Workstream Labels */}
-                              <div className="flex gap-2 flex-wrap mb-3">
+                              {/* Workstream Labels - Icon + Text */}
+                              <div className="flex flex-col gap-1 mb-3">
                                 {action.report === 'WS2' && (
-                                  <Badge className="bg-gray-300 text-gray-700 px-3 py-1 h-auto rounded-[6px] text-[12px] font-medium border-0 shadow-sm">
-                                    WS2
-                                  </Badge>
+                                  <div className="flex items-center gap-2">
+                                    <Folder className="w-4 h-4 text-gray-600" />
+                                    <p className="text-[14px] text-gray-600 leading-[20px]">
+                                      WS2
+                                    </p>
+                                  </div>
                                 )}
                                 {action.report === 'WS3' && (
-                                  <Badge className="bg-gray-600 text-white px-3 py-1 h-auto rounded-[6px] text-[12px] font-medium border-0 shadow-sm">
-                                    WS3
-                                  </Badge>
+                                  <div className="flex items-center gap-2">
+                                    <Folder className="w-4 h-4 text-gray-600" />
+                                    <p className="text-[14px] text-gray-600 leading-[20px]">
+                                      WS3
+                                    </p>
+                                  </div>
                                 )}
                               </div>
                               
-                              {/* Work Package Leads as Badges */}
+                              {/* Work Package Leads - Icon + Text */}
                               {action.leads.length > 0 && (
-                                <div className="flex gap-2 flex-wrap">
+                                <div className="flex flex-col gap-1">
                                   {action.leads.map((lead, leadIdx) => (
-                                    <Badge
-                                      key={leadIdx}
-                                      className="bg-[#0076a4] text-white px-3 py-1 h-auto rounded-[6px] text-[12px] font-medium border-0 shadow-sm transition-all hover:bg-[#006a94] hover:shadow-md"
-                                    >
-                                      {lead}
-                                    </Badge>
+                                    <div key={leadIdx} className="flex items-center gap-2">
+                                      <User className="w-4 h-4 text-gray-600" />
+                                      <p className="text-[14px] text-gray-600 leading-[20px]">
+                                        {lead}
+                                      </p>
+                                    </div>
                                   ))}
                                 </div>
                               )}

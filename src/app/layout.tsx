@@ -21,8 +21,8 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={`${roboto.className} antialiased`}>
-            <body>
+        <html lang="en" className={`${roboto.className} antialiased`} style={{ fontFamily: roboto.style.fontFamily }}>
+            <body style={{ fontFamily: roboto.style.fontFamily }}>
                 {children}
                 <GoogleAnalytics gaId="G-XYZ" />
             </body>
