@@ -133,6 +133,7 @@ export default function WorkPackagesPage() {
           text: string;
           documentParagraph: string;
           leads: string[];
+          report: string;
         }>;
       }
     >();
@@ -173,7 +174,7 @@ export default function WorkPackagesPage() {
       
       // Add indicative activity if not already included
       if (action.indicative_activity) {
-        const existingAction = wp.actions.find(a => a.text === action.indicative_activity);
+        const existingAction = wp.actions.find(a => a.text === action.indicative_activity && a.report === action.report);
         if (!existingAction) {
           // Parse leads for this specific action
           const actionLeads = action.work_package_leads
@@ -184,6 +185,7 @@ export default function WorkPackagesPage() {
             text: action.indicative_activity,
             documentParagraph: action.document_paragraph || '',
             leads: actionLeads,
+            report: action.report,
           });
         } else {
           // Merge leads if action already exists
@@ -325,7 +327,7 @@ export default function WorkPackagesPage() {
             {/* Work packages completed */}
             <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="relative flex flex-col items-center justify-center w-[280px] h-[200px] bg-[#C5EFFF] rounded-lg px-4 py-6 shadow-sm border border-[#0076A4]/10 transition-all hover:shadow-lg hover:border-[#0076A4]/50 hover:scale-[1.02] cursor-pointer">
+                  <div className="relative flex flex-col items-center justify-center w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 shadow-sm border border-[#0076A4]/10 transition-all hover:shadow-lg hover:border-[#0076A4]/50 hover:scale-[1.02] cursor-pointer">
                     <Package className="absolute top-3 right-3 w-5 h-5 text-[#0076A4]" />
                     <p className="text-[14px] font-bold text-[#0076A4] text-center leading-[24px] mb-2">
                       Work packages completed
@@ -343,7 +345,7 @@ export default function WorkPackagesPage() {
               {/* Actions completed */}
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="relative flex flex-col items-center justify-center w-[280px] h-[200px] bg-[#C5EFFF] rounded-lg px-4 py-6 shadow-sm border border-[#0076A4]/10 transition-all hover:shadow-lg hover:border-[#0076A4]/50 hover:scale-[1.02] cursor-pointer">
+                  <div className="relative flex flex-col items-center justify-center w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 shadow-sm border border-[#0076A4]/10 transition-all hover:shadow-lg hover:border-[#0076A4]/50 hover:scale-[1.02] cursor-pointer">
                     <CheckCircle className="absolute top-3 right-3 w-5 h-5 text-[#0076A4]" />
                     <p className="text-[14px] font-bold text-[#0076A4] text-center leading-[24px] mb-2">
                       Actions completed
@@ -361,7 +363,7 @@ export default function WorkPackagesPage() {
               {/* Actions leads assigned */}
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="relative flex flex-col items-center justify-center w-[280px] h-[200px] bg-[#C5EFFF] rounded-lg px-4 py-6 shadow-sm border border-[#0076A4]/10 transition-all hover:shadow-lg hover:border-[#0076A4]/50 hover:scale-[1.02] cursor-pointer">
+                  <div className="relative flex flex-col items-center justify-center w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 shadow-sm border border-[#0076A4]/10 transition-all hover:shadow-lg hover:border-[#0076A4]/50 hover:scale-[1.02] cursor-pointer">
                     <ListChecks className="absolute top-3 right-3 w-5 h-5 text-[#0076A4]" />
                     <p className="text-[14px] font-bold text-[#0076A4] text-center leading-[24px] mb-2">
                       Actions leads assigned
@@ -379,7 +381,7 @@ export default function WorkPackagesPage() {
               {/* Actions support assigned */}
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="relative flex flex-col items-center justify-center w-[280px] h-[200px] bg-[#C5EFFF] rounded-lg px-4 py-6 shadow-sm border border-[#0076A4]/10 transition-all hover:shadow-lg hover:border-[#0076A4]/50 hover:scale-[1.02] cursor-pointer">
+                  <div className="relative flex flex-col items-center justify-center w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 shadow-sm border border-[#0076A4]/10 transition-all hover:shadow-lg hover:border-[#0076A4]/50 hover:scale-[1.02] cursor-pointer">
                     <ClipboardCheck className="absolute top-3 right-3 w-5 h-5 text-[#0076A4]" />
                     <p className="text-[14px] font-bold text-[#0076A4] text-center leading-[24px] mb-2">
                       Actions support assigned
@@ -397,7 +399,7 @@ export default function WorkPackagesPage() {
               {/* Card 5 - Next Upcoming Milestone */}
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="relative flex flex-col justify-center w-[280px] h-[200px] bg-[#C5EFFF] rounded-lg px-4 py-6 shadow-sm border border-[#0076A4]/10 transition-all hover:shadow-lg hover:border-[#0076A4]/50 hover:scale-[1.02] cursor-pointer">
+                  <div className="relative flex flex-col justify-center w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 shadow-sm border border-[#0076A4]/10 transition-all hover:shadow-lg hover:border-[#0076A4]/50 hover:scale-[1.02] cursor-pointer">
                     <Users className="absolute top-3 right-3 w-5 h-5 text-[#0076A4]" />
                     <p className="text-[14px] font-bold text-[#0076A4] text-center leading-[24px] mb-3">
                       Next upcoming milestone:
@@ -528,12 +530,25 @@ export default function WorkPackagesPage() {
                   open={isOpen}
                   onOpenChange={() => toggleCollapsible(collapsibleKey)}
                 >
-                  <div className="border border-slate-200 bg-slate-50 rounded-[6px] px-6 py-4 mb-4 last:mb-0 shadow-sm transition-all hover:shadow-md hover:border-[#0076A4]/30">
-                    <CollapsibleTrigger className="w-full flex items-center justify-between px-0 py-0 hover:no-underline">
+                  <div className="mb-4 last:mb-0">
+                    <CollapsibleTrigger className="w-full flex items-center justify-between px-0 py-0 hover:no-underline border border-slate-200 bg-slate-50 rounded-[6px] px-6 py-4 shadow-sm transition-all hover:shadow-md hover:border-[#0076A4]/30">
                       <div className="flex items-center gap-[18px] w-full pr-4 flex-wrap">
                         <p className="flex-1 text-[16px] font-medium text-slate-900 leading-[24px] text-left min-w-0">
                           {wp.number ? `Work Package ${wp.number}: ${wp.name}` : `Work Package: ${wp.name}`}
                         </p>
+                        {/* Workstream Labels */}
+                        <div className="flex gap-2 flex-wrap">
+                          {wp.report.includes('WS2') && (
+                            <Badge className="bg-gray-300 text-gray-700 px-3 py-1 h-auto rounded-[6px] text-[12px] font-medium border-0 shadow-sm">
+                              WS2
+                            </Badge>
+                          )}
+                          {wp.report.includes('WS3') && (
+                            <Badge className="bg-gray-600 text-white px-3 py-1 h-auto rounded-[6px] text-[12px] font-medium border-0 shadow-sm">
+                              WS3
+                            </Badge>
+                          )}
+                        </div>
                         {/* Work Package Leads as Badges */}
                         {wp.leads.length > 0 && (
                           <div className="flex gap-2 flex-wrap">
@@ -567,6 +582,20 @@ export default function WorkPackagesPage() {
                               <p className="text-[14px] font-medium text-slate-900 leading-[20px] mb-3">
                                 {action.text}
                               </p>
+                              
+                              {/* Workstream Labels */}
+                              <div className="flex gap-2 flex-wrap mb-3">
+                                {action.report === 'WS2' && (
+                                  <Badge className="bg-gray-300 text-gray-700 px-3 py-1 h-auto rounded-[6px] text-[12px] font-medium border-0 shadow-sm">
+                                    WS2
+                                  </Badge>
+                                )}
+                                {action.report === 'WS3' && (
+                                  <Badge className="bg-gray-600 text-white px-3 py-1 h-auto rounded-[6px] text-[12px] font-medium border-0 shadow-sm">
+                                    WS3
+                                  </Badge>
+                                )}
+                              </div>
                               
                               {/* Work Package Leads as Badges */}
                               {action.leads.length > 0 && (
