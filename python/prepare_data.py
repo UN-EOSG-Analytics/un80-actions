@@ -31,7 +31,7 @@ for col in date_columns:
         df[col] = df[col].dt.strftime("%Y-%m-%d").fillna("")
 
 # Process list columns (semicolon-separated strings)
-list_columns = ["work_package_leads", "un_budget"]
+list_columns = ["work_package_leads", "un_budget", "ms_body"]
 
 for col in list_columns:
     if col in df.columns:

@@ -13,7 +13,9 @@
     ],
     "first_milestone":"2026-02-28",
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision (programme and peacekeeping budgets) required. Decisions of the governing bodies (including the executive boards) of the relevant agencies, funds and programmes required.",
     "un_budget":[
       "PKM 2026\/27",
@@ -35,7 +37,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -55,7 +59,10 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":"GA; SC",
+    "ms_body":[
+      "GA",
+      "SC"
+    ],
     "legal_consideration":"GA decision (including on programme budget) and Security Council decision could be required.",
     "un_budget":[
 
@@ -75,7 +82,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -95,7 +104,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -116,7 +127,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -137,7 +150,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -158,7 +173,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -179,7 +196,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -200,7 +219,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -221,7 +242,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -242,7 +265,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -264,7 +289,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -286,7 +313,9 @@
     ],
     "first_milestone":"2025-10-31",
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -308,7 +337,9 @@
     ],
     "first_milestone":"2025-10-31",
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -330,7 +361,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -352,7 +385,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -373,7 +408,9 @@
     ],
     "first_milestone":null,
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision required.",
     "un_budget":[
 
@@ -394,7 +431,10 @@
     ],
     "first_milestone":null,
     "ms_approval":true,
-    "ms_body":"SG; UNU",
+    "ms_body":[
+      "SG",
+      "UNU"
+    ],
     "legal_consideration":"UNU Council and SG decisions required.",
     "un_budget":[
 
@@ -415,7 +455,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -435,7 +477,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -455,7 +499,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -475,7 +521,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -495,7 +543,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -516,7 +566,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -537,7 +589,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -558,7 +612,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -578,7 +634,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -598,7 +656,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -618,7 +678,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -638,7 +700,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -658,7 +722,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -678,7 +744,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -698,7 +766,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -718,7 +788,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -738,7 +810,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -758,7 +832,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -778,7 +854,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -798,7 +876,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -818,7 +898,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -839,7 +921,9 @@
     ],
     "first_milestone":"2025-12-31",
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision (programme budget) required.",
     "un_budget":[
       "RB 2026 Rev"
@@ -860,7 +944,9 @@
     ],
     "first_milestone":"2025-12-31",
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision (programme budget) required.",
     "un_budget":[
       "RB 2026 Rev"
@@ -881,7 +967,9 @@
     ],
     "first_milestone":"2025-12-31",
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision (programme budget) required",
     "un_budget":[
       "RB 2026 Rev"
@@ -902,7 +990,9 @@
     ],
     "first_milestone":"2025-12-31",
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision (programme budget) could be required.",
     "un_budget":[
       "RB 2026 Rev"
@@ -923,7 +1013,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -944,7 +1036,9 @@
     ],
     "first_milestone":null,
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision (programme budget) is required.",
     "un_budget":[
 
@@ -965,7 +1059,9 @@
     ],
     "first_milestone":"2026-02-28",
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision (programme budget) is required",
     "un_budget":[
       "RB 2027"
@@ -986,7 +1082,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1007,7 +1105,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1028,7 +1128,9 @@
     ],
     "first_milestone":"2025-12-31",
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision (programme budget) required.",
     "un_budget":[
       "RB 2026 Rev"
@@ -1049,7 +1151,9 @@
     ],
     "first_milestone":"2025-12-31",
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision (programme budget) required.",
     "un_budget":[
       "RB 2026 Rev"
@@ -1070,7 +1174,9 @@
     ],
     "first_milestone":"2025-12-31",
     "ms_approval":true,
-    "ms_body":"SC",
+    "ms_body":[
+      "SC"
+    ],
     "legal_consideration":"Security Council decision required.",
     "un_budget":[
       "RB 2026 Rev"
@@ -1091,7 +1197,9 @@
     ],
     "first_milestone":"2025-12-31",
     "ms_approval":true,
-    "ms_body":"SC",
+    "ms_body":[
+      "SC"
+    ],
     "legal_consideration":"Exchange of letters between SG and PSC required.",
     "un_budget":[
       "RB 2026 Rev"
@@ -1111,7 +1219,9 @@
     ],
     "first_milestone":"2026-02-28",
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decisions (including on programme budget) required.",
     "un_budget":[
       "RB 2027"
@@ -1131,7 +1241,9 @@
     ],
     "first_milestone":"2026-02-28",
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision (programme budget) is required",
     "un_budget":[
       "RB 2027"
@@ -1151,7 +1263,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1172,7 +1286,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision (programme budget) could be required.",
     "un_budget":[
 
@@ -1193,7 +1309,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision (programme budget) could be required.",
     "un_budget":[
 
@@ -1214,7 +1332,9 @@
     ],
     "first_milestone":null,
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision (programme budget) is required.",
     "un_budget":[
 
@@ -1234,7 +1354,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1254,7 +1376,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1274,7 +1398,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1294,7 +1420,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1314,7 +1442,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1334,7 +1464,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1354,7 +1486,9 @@
     ],
     "first_milestone":"2026-02-28",
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1374,7 +1508,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1394,7 +1530,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1414,7 +1552,9 @@
     ],
     "first_milestone":"2026-02-28",
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision (programme budget) is required",
     "un_budget":[
       "RB 2027"
@@ -1434,7 +1574,9 @@
     ],
     "first_milestone":"2026-02-28",
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
       "RB 2027"
@@ -1454,7 +1596,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1474,7 +1618,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1494,7 +1640,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1514,7 +1662,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1534,7 +1684,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1554,7 +1706,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1574,7 +1728,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1595,7 +1751,9 @@
     ],
     "first_milestone":"2026-02-28",
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
       "RB 2027"
@@ -1616,7 +1774,9 @@
     ],
     "first_milestone":"2026-02-28",
     "ms_approval":false,
-    "ms_body":"SG",
+    "ms_body":[
+      "SG"
+    ],
     "legal_consideration":"SG direction required.",
     "un_budget":[
       "RB 2027"
@@ -1638,7 +1798,9 @@
     ],
     "first_milestone":"2026-02-28",
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision required.",
     "un_budget":[
 
@@ -1660,7 +1822,9 @@
     ],
     "first_milestone":"2026-02-28",
     "ms_approval":true,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision required.",
     "un_budget":[
       "RB 2027"
@@ -1682,7 +1846,9 @@
     ],
     "first_milestone":"2026-02-28",
     "ms_approval":false,
-    "ms_body":"GA",
+    "ms_body":[
+      "GA"
+    ],
     "legal_consideration":"GA decision (including on programme budget) could be required.",
     "un_budget":[
 
@@ -1703,7 +1869,10 @@
     ],
     "first_milestone":"2026-12-31",
     "ms_approval":true,
-    "ms_body":"ECOSOC; SPECIALIZED AGENCIES",
+    "ms_body":[
+      "ECOSOC",
+      "SPECIALIZED AGENCIES"
+    ],
     "legal_consideration":"ECOSOC decision required. Consent of the Cosponsoring Organizations required. (Cosponsoring Organizations could require decision by their governing bodies.)",
     "un_budget":[
 
@@ -1723,7 +1892,9 @@
     ],
     "first_milestone":null,
     "ms_approval":false,
-    "ms_body":null,
+    "ms_body":[
+
+    ],
     "legal_consideration":null,
     "un_budget":[
 
@@ -1744,7 +1915,10 @@
     ],
     "first_milestone":"2026-02-28",
     "ms_approval":true,
-    "ms_body":"GA; ECOSOC",
+    "ms_body":[
+      "GA",
+      "ECOSOC"
+    ],
     "legal_consideration":"ECOSOC and GA (programme budget) decisions required.",
     "un_budget":[
       "RB 2027"
