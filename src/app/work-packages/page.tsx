@@ -56,6 +56,7 @@ interface NextMilestone {
 
 export default function WorkPackagesPage() {
   const [actions, setActions] = useState<Actions>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedWorkPackage, setSelectedWorkPackage] = useState<string>("");
   const [selectedLead, setSelectedLead] = useState<string>("");
@@ -63,25 +64,33 @@ export default function WorkPackagesPage() {
   const [openCollapsibles, setOpenCollapsibles] = useState<Set<string>>(new Set());
   const [isAdvancedFilterOpen, setIsAdvancedFilterOpen] = useState<boolean>(false);
   const [stats, setStats] = useState<WorkPackageStats>({
-    total: 30,
-    completed: 2,
+    total: 0,
+    completed: 0,
     totalActions: 0,
     completedActions: 0,
   });
   const [nextMilestone, setNextMilestone] = useState<NextMilestone | null>(null);
   const [progressPercentage, setProgressPercentage] = useState<number>(0);
 
-  // Convert Excel serial date to readable date format
-  const excelDateToDate = (serial: string): Date | null => {
-    if (!serial || serial.trim() === '') return null;
-    const serialNum = parseInt(serial);
-    if (isNaN(serialNum)) return null;
-    // Excel epoch starts on January 1, 1900
-    const excelEpoch = new Date(1900, 0, 1);
-    // Excel incorrectly treats 1900 as a leap year, so subtract 1 day for dates after Feb 28, 1900
-    const days = serialNum - (serialNum > 59 ? 1 : 0) - 1;
-    const result = new Date(excelEpoch.getTime() + days * 24 * 60 * 60 * 1000);
-    return result;
+  // Convert date string (ISO format or Excel serial) to Date object
+  const parseDate = (dateStr: string | null): Date | null => {
+    if (!dateStr || dateStr.trim() === '') return null;
+    
+    // Try parsing as ISO date string first (e.g., "2026-02-28")
+    const isoDate = new Date(dateStr);
+    if (!isNaN(isoDate.getTime())) {
+      return isoDate;
+    }
+    
+    // Try parsing as Excel serial number
+    const serialNum = parseInt(dateStr);
+    if (!isNaN(serialNum) && serialNum > 0) {
+      const excelEpoch = new Date(1900, 0, 1);
+      const days = serialNum - (serialNum > 59 ? 1 : 0) - 1;
+      return new Date(excelEpoch.getTime() + days * 24 * 60 * 60 * 1000);
+    }
+    
+    return null;
   };
 
   // Format date to DD/MM/YYYY
@@ -93,9 +102,11 @@ export default function WorkPackagesPage() {
   };
 
       useEffect(() => {
+        setIsLoading(true);
         fetchActions()
           .then((data) => {
             setActions(data);
+            setIsLoading(false);
             // Calculate stats from data
             const uniqueWPs = new Set(
               data.map((a) => `${a.report}-${a.work_package_number}`)
@@ -109,17 +120,21 @@ export default function WorkPackagesPage() {
 
             // Calculate next upcoming milestone
             const today = new Date();
+            today.setHours(0, 0, 0, 0); // Normalize to start of day for consistent comparison
             const milestones = data
-              .filter(a => a.first_milestone && a.first_milestone.trim() !== '' && a.indicative_activity)
+              .filter(a => a.first_milestone && a.indicative_activity)
               .map(a => {
-                const milestoneDate = excelDateToDate(a.first_milestone);
+                const milestoneDate = parseDate(a.first_milestone);
                 return milestoneDate ? {
                   date: milestoneDate,
                   indicativeActivity: a.indicative_activity,
                 } : null;
               })
-              .filter((m): m is { date: Date; indicativeActivity: string } => m !== null)
-              .filter(m => m.date >= today)
+              .filter((m): m is { date: Date; indicativeActivity: string } => {
+                if (!m) return false;
+                m.date.setHours(0, 0, 0, 0); // Normalize to start of day
+                return m.date >= today;
+              })
               .sort((a, b) => a.date.getTime() - b.date.getTime());
 
             if (milestones.length > 0) {
@@ -146,6 +161,7 @@ export default function WorkPackagesPage() {
           })
           .catch((error) => {
             console.error("Failed to fetch actions:", error);
+            setIsLoading(false);
           });
       }, []);
 
@@ -158,6 +174,7 @@ export default function WorkPackagesPage() {
         number: string;
         name: string;
         leads: string[];
+        goal: string | null;
         actions: Array<{
           text: string;
           documentParagraph: string;
@@ -171,9 +188,9 @@ export default function WorkPackagesPage() {
       // Use work_package_number as key to combine across reports
       const key = action.work_package_number || 'empty';
       if (!wpMap.has(key)) {
-        // Parse leads - they use semicolons or commas as separators
-        const leads = action.work_package_leads
-          ? action.work_package_leads.split(/[;,]/).map(lead => lead.trim()).filter(lead => lead.length > 0)
+        // work_package_leads is already an array
+        const leads = Array.isArray(action.work_package_leads) 
+          ? action.work_package_leads.filter(lead => lead && lead.trim().length > 0)
           : [];
         
         wpMap.set(key, {
@@ -181,6 +198,7 @@ export default function WorkPackagesPage() {
           number: action.work_package_number || '',
           name: action.work_package_name,
           leads: leads,
+          goal: action.work_package_goal || null,
           actions: [],
         });
       }
@@ -192,8 +210,8 @@ export default function WorkPackagesPage() {
       }
       
       // Merge leads from all reports
-      const newLeads = action.work_package_leads
-        ? action.work_package_leads.split(/[;,]/).map(lead => lead.trim()).filter(lead => lead.length > 0)
+      const newLeads = Array.isArray(action.work_package_leads)
+        ? action.work_package_leads.filter(lead => lead && lead.trim().length > 0)
         : [];
       newLeads.forEach(lead => {
         if (!wp.leads.includes(lead)) {
@@ -201,13 +219,18 @@ export default function WorkPackagesPage() {
         }
       });
       
+      // Update goal if not set or if this action has a goal
+      if (action.work_package_goal && !wp.goal) {
+        wp.goal = action.work_package_goal;
+      }
+      
       // Add indicative activity if not already included
       if (action.indicative_activity) {
         const existingAction = wp.actions.find(a => a.text === action.indicative_activity && a.report === action.report);
         if (!existingAction) {
-          // Parse leads for this specific action
-          const actionLeads = action.work_package_leads
-            ? action.work_package_leads.split(/[;,]/).map(lead => lead.trim()).filter(lead => lead.length > 0)
+          // work_package_leads is already an array
+          const actionLeads = Array.isArray(action.work_package_leads)
+            ? action.work_package_leads.filter(lead => lead && lead.trim().length > 0)
             : [];
           
           wp.actions.push({
@@ -218,8 +241,8 @@ export default function WorkPackagesPage() {
           });
         } else {
           // Merge leads if action already exists
-          const actionLeads = action.work_package_leads
-            ? action.work_package_leads.split(/[;,]/).map(lead => lead.trim()).filter(lead => lead.length > 0)
+          const actionLeads = Array.isArray(action.work_package_leads)
+            ? action.work_package_leads.filter(lead => lead && lead.trim().length > 0)
             : [];
           actionLeads.forEach(lead => {
             if (!existingAction.leads.includes(lead)) {
@@ -254,10 +277,10 @@ export default function WorkPackagesPage() {
       if (action.report) {
         uniqueWorkstreams.add(action.report);
       }
-      if (action.work_package_leads) {
-        action.work_package_leads.split(/[;,]/).forEach(lead => {
-          const trimmed = lead.trim();
-          if (trimmed.length > 0) {
+      if (Array.isArray(action.work_package_leads)) {
+        action.work_package_leads.forEach(lead => {
+          const trimmed = lead?.trim();
+          if (trimmed && trimmed.length > 0) {
             uniqueLeadsSet.add(trimmed);
           }
         });
@@ -546,8 +569,8 @@ export default function WorkPackagesPage() {
           {/* Search Bar */}
           <div className="w-full max-w-[818px]">
             <div className="flex gap-3 items-start mb-4 flex-nowrap">
-              <div className="flex gap-3 items-start flex-1">
-                <div className="flex-1 relative">
+              <div className="flex gap-3 items-start">
+                <div className="relative w-[600px]">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#009EDB] pointer-events-none z-10" />
                   <Input
                     type="text"
@@ -559,7 +582,7 @@ export default function WorkPackagesPage() {
                 </div>
                 <Button
                   onClick={handleResetFilters}
-                  className="bg-[#009EDB] hover:bg-[#0088c4] text-white px-5 py-2 h-[44px] rounded-[8px] text-[14px] font-semibold shrink-0 transition-all shadow-sm hover:shadow-md flex items-center gap-2"
+                  className="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 h-[44px] rounded-[8px] text-[14px] font-semibold shrink-0 transition-all shadow-sm hover:shadow-md flex items-center gap-2"
                 >
                   <span>Reset</span>
                 </Button>
@@ -568,7 +591,7 @@ export default function WorkPackagesPage() {
           </div>
 
           {/* Advanced Filtering Collapsible */}
-          <div className="mb-4 w-full max-w-[818px]">
+          <div className="mb-4 w-[600px]">
             <Collapsible open={isAdvancedFilterOpen} onOpenChange={setIsAdvancedFilterOpen}>
               <div className="flex items-center gap-2">
                 <CollapsibleTrigger className="flex items-center gap-2 text-[14px] font-medium text-slate-700 hover:text-[#009EDB] transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50">
@@ -581,12 +604,12 @@ export default function WorkPackagesPage() {
                 </CollapsibleTrigger>
               </div>
               <CollapsibleContent className="mt-3">
-                <div className="flex gap-3 items-center flex-nowrap w-full bg-slate-50/50 p-4 rounded-[8px] border border-slate-200">
+                <div className="flex gap-3 items-center flex-nowrap">
                   <Select value={selectedWorkPackage} onValueChange={setSelectedWorkPackage}>
-                    <SelectTrigger className="w-[267px] h-[40px] text-[14px] border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20">
+                    <SelectTrigger className="w-[190px] h-[40px] text-[14px] border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20">
                       <SelectValue placeholder="Select Work Package" />
                     </SelectTrigger>
-                    <SelectContent className="rounded-[8px] border-slate-200 shadow-lg bg-white p-1 min-w-[267px]">
+                    <SelectContent className="rounded-[8px] border-slate-200 shadow-lg bg-white p-1 min-w-[190px]">
                       {uniqueWorkPackages.map((wp) => (
                         <SelectItem 
                           key={wp} 
@@ -600,10 +623,10 @@ export default function WorkPackagesPage() {
                   </Select>
 
                   <Select value={selectedLead} onValueChange={setSelectedLead}>
-                    <SelectTrigger className="w-[267px] h-[40px] text-[14px] border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20">
+                    <SelectTrigger className="w-[190px] h-[40px] text-[14px] border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20">
                       <SelectValue placeholder="Select Work Package Lead" />
                     </SelectTrigger>
-                    <SelectContent className="rounded-[8px] border-slate-200 shadow-lg bg-white p-1 min-w-[267px]">
+                    <SelectContent className="rounded-[8px] border-slate-200 shadow-lg bg-white p-1 min-w-[190px]">
                       {uniqueLeads.map((lead) => (
                         <SelectItem 
                           key={lead} 
@@ -617,10 +640,10 @@ export default function WorkPackagesPage() {
                   </Select>
 
                   <Select value={selectedWorkstream} onValueChange={setSelectedWorkstream}>
-                    <SelectTrigger className="w-[267px] h-[40px] text-[14px] border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20">
+                    <SelectTrigger className="w-[190px] h-[40px] text-[14px] border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20">
                       <SelectValue placeholder="Select Workstream" />
                     </SelectTrigger>
-                    <SelectContent className="rounded-[8px] border-slate-200 shadow-lg bg-white p-1 min-w-[267px]">
+                    <SelectContent className="rounded-[8px] border-slate-200 shadow-lg bg-white p-1 min-w-[190px]">
                       {uniqueWorkstreams.map((ws) => (
                         <SelectItem 
                           key={ws} 
@@ -745,25 +768,14 @@ export default function WorkPackagesPage() {
                           </TooltipContent>
                         </Tooltip>
                       )}
-                      {/* Goal for first Work Package */}
-                      {index === 0 && (
+                      {/* Goal from work package data */}
+                      {wp.goal && (
                         <div className="mt-4 pr-8 text-left pl-4 py-2">
                           <p className="text-[13px] font-semibold text-[#009EDB] uppercase tracking-wide mb-1">
                             Goal
                           </p>
                           <p className="text-[14px] text-slate-800 leading-[22px] mt-2 italic">
-                            We make peace operations leaner and more effective by assigning civilian tasks to the entities best equipped to deliver them, ensuring seamless transitions and lasting stability.
-                          </p>
-                        </div>
-                      )}
-                      {/* Goal for New Humanitarian Compact Work Package */}
-                      {wp.name.toLowerCase().includes('humanitarian compact') && (
-                        <div className="mt-4 pr-8 text-left pl-4 py-2">
-                          <p className="text-[13px] font-semibold text-[#009EDB] uppercase tracking-wide mb-1">
-                            Goal
-                          </p>
-                          <p className="text-[14px] text-slate-800 leading-[22px] mt-2 italic">
-                            Rebuild trust in humanitarian action through faster, simpler, and more united response that reaches millions more people with the same resources.
+                            {wp.goal}
                           </p>
                         </div>
                       )}
