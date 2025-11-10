@@ -30,11 +30,39 @@ for col in date_columns:
         # Format as ISO 8601 date string (YYYY-MM-DD)
         df[col] = df[col].dt.strftime("%Y-%m-%d").fillna("")
 
+# Process list columns (semicolon-separated strings)
+list_columns = ["work_package_leads", "un_budget", "ms_body"]
+
+for col in list_columns:
+    if col in df.columns:
+        df[col] = df[col].apply(
+            lambda x: [item.strip() for item in str(x).split(";") if item.strip()]
+            if pd.notna(x) and str(x).strip()
+            else []
+        )
+
+# Clean all string columns (squish whitespace, strip, handle nulls)
+for col in df.columns:
+    # Skip columns we've already processed or that aren't object type
+    if (
+        col not in date_columns
+        and col not in list_columns
+        and df[col].dtype == "object"
+    ):
+        df[col] = df[col].apply(
+            lambda x: " ".join(str(x).split())
+            if pd.notna(x) and str(x).strip()
+            else None
+        )
+
 # Replace empty strings with None for proper null handling in JSON
 df = df.replace("", None)
 
 # Sort by work_package_number then action_number ascending
 df = df.sort_values(by=["work_package_number", "action_number"], ascending=[True, True])
+
+
+## Export ##
 
 # Ensure output folder exists
 output_path.parent.mkdir(parents=True, exist_ok=True)
