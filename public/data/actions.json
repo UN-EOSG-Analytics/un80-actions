@@ -11,7 +11,7 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "first_milestone":"2026-02-28",
+    "first_milestone":"2026-02-27",
     "ms_approval":true,
     "ms_body":[
       "GA"
@@ -49,6 +49,94 @@
   {
     "report":"WS3",
     "work_package_number":"10",
+    "work_package_name":"Senior management coordination forums",
+    "document_paragraph":"61",
+    "action_number":"43",
+    "indicative_activity":"Review top management fora to ease the coordination burden for senior leaders and ensure coherent action across pillar, incl. CEB, IASC, UNSDG, EC",
+    "big_ticket":true,
+    "work_package_leads":[
+      "USG Policy"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"10",
+    "work_package_name":"Senior management coordination forums",
+    "document_paragraph":"61",
+    "action_number":"44",
+    "indicative_activity":"Consider proposals to unify administrative backend support and streamline duplicative agendas without affecting core substantive competencies",
+    "big_ticket":true,
+    "work_package_leads":[
+      "USG Policy"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"10",
+    "work_package_name":"Senior management coordination forums",
+    "document_paragraph":"63",
+    "action_number":"46",
+    "indicative_activity":"Bring together all Headquarters coordination on country-specific, cross-pillar approaches to crisis prevention and centre capacities around the Regional Monthly Review platform",
+    "big_ticket":true,
+    "work_package_leads":[
+      "USG Policy"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"10",
+    "work_package_name":"Senior management coordination forums",
+    "document_paragraph":"63",
+    "action_number":"47",
+    "indicative_activity":"Review existing interagency task forces and working groups",
+    "big_ticket":true,
+    "work_package_leads":[
+      "USG Policy"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"11",
     "work_package_name":"Special envoy review",
     "document_paragraph":"60",
     "action_number":"45",
@@ -71,36 +159,15 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"11",
+    "work_package_number":"12",
     "work_package_name":"Regional integrated platforms",
     "document_paragraph":"66",
     "action_number":"48",
     "indicative_activity":"Establish lean Regional Integrated Platforms to unite regional leaders across all pillars around joint plans, strategies, crisis response and resource mobilization for cross-cutting issues",
     "big_ticket":true,
     "work_package_leads":[
-      "ASG DCO"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"11",
-    "work_package_name":"Regional integrated platforms",
-    "document_paragraph":"66",
-    "action_number":"50",
-    "indicative_activity":"Harmonize how UN system entities organize their regional work",
-    "big_ticket":true,
-    "work_package_leads":[
-      "ASG DCO"
+      "ASG DCO",
+      "DSG"
     ],
     "first_milestone":null,
     "ms_approval":false,
@@ -116,6 +183,29 @@
   {
     "report":"WS3",
     "work_package_number":"12",
+    "work_package_name":"Regional integrated platforms",
+    "document_paragraph":"66",
+    "action_number":"50",
+    "indicative_activity":"Harmonize how UN system entities organize their regional work",
+    "big_ticket":true,
+    "work_package_leads":[
+      "ASG DCO",
+      "DSG"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"13",
     "work_package_name":"Shared platform initiative",
     "document_paragraph":"30",
     "action_number":"19",
@@ -123,7 +213,7 @@
     "big_ticket":true,
     "work_package_leads":[
       "USG OCHA",
-      "ASG DCO"
+      "DSG"
     ],
     "first_milestone":null,
     "ms_approval":false,
@@ -138,7 +228,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"12",
+    "work_package_number":"13",
     "work_package_name":"Shared platform initiative",
     "document_paragraph":"72",
     "action_number":"57",
@@ -146,122 +236,7 @@
     "big_ticket":true,
     "work_package_leads":[
       "USG OCHA",
-      "ASG DCO"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"13",
-    "work_package_name":"Unified services roadmap",
-    "document_paragraph":"83",
-    "action_number":"63",
-    "indicative_activity":"Prepare a Unified Services Roadmap, based on existing reform commitments and two models: some services will be provided by consolidated entities, and others through marketplaces of providers.",
-    "big_ticket":true,
-    "work_package_leads":[
-      "Chair HLCM",
-      "ED WFP"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"13",
-    "work_package_name":"Unified services roadmap",
-    "document_paragraph":"84",
-    "action_number":"64",
-    "indicative_activity":"Integrate supply chains, taking the New Humanitarian Compact as the concrete starting point",
-    "big_ticket":true,
-    "work_package_leads":[
-      "Chair HLCM",
-      "ED WFP"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"13",
-    "work_package_name":"Unified services roadmap",
-    "document_paragraph":"84",
-    "action_number":"65",
-    "indicative_activity":"Conduct assessment for integration of basic information and communication technology services, as well as payroll, human resources, finance, and enterprise resource planning (ERP) systems",
-    "big_ticket":true,
-    "work_package_leads":[
-      "Chair HLCM",
-      "ED WFP"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"13",
-    "work_package_name":"Unified services roadmap",
-    "document_paragraph":"85",
-    "action_number":"66",
-    "indicative_activity":"Accelerate the move toward a unified service backbone at country level; eliminate costly duplication on the ground",
-    "big_ticket":true,
-    "work_package_leads":[
-      "Chair HLCM",
-      "ED WFP"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"13",
-    "work_package_name":"Unified services roadmap",
-    "document_paragraph":"86",
-    "action_number":"67",
-    "indicative_activity":"Harmonize most indirect and programme support costs",
-    "big_ticket":true,
-    "work_package_leads":[
-      "Chair HLCM",
-      "ED WFP"
+      "DSG"
     ],
     "first_milestone":null,
     "ms_approval":false,
@@ -277,6 +252,126 @@
   {
     "report":"WS3",
     "work_package_number":"14",
+    "work_package_name":"Unified services roadmap",
+    "document_paragraph":"83",
+    "action_number":"63",
+    "indicative_activity":"Prepare a Unified Services Roadmap, based on existing reform commitments and two models: some services will be provided by consolidated entities, and others through marketplaces of providers.",
+    "big_ticket":true,
+    "work_package_leads":[
+      "Chair HLCM",
+      "ED WFP",
+      "Co-Chairs BIG"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"14",
+    "work_package_name":"Unified services roadmap",
+    "document_paragraph":"84",
+    "action_number":"64",
+    "indicative_activity":"Integrate supply chains, taking the New Humanitarian Compact as the concrete starting point",
+    "big_ticket":true,
+    "work_package_leads":[
+      "Chair HLCM",
+      "ED WFP",
+      "Co-Chairs BIG"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"14",
+    "work_package_name":"Unified services roadmap",
+    "document_paragraph":"84",
+    "action_number":"65",
+    "indicative_activity":"Conduct assessment for integration of basic information and communication technology services, as well as payroll, human resources, finance, and enterprise resource planning (ERP) systems",
+    "big_ticket":true,
+    "work_package_leads":[
+      "Chair HLCM",
+      "ED WFP",
+      "Co-Chairs BIG"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"14",
+    "work_package_name":"Unified services roadmap",
+    "document_paragraph":"85",
+    "action_number":"66",
+    "indicative_activity":"Accelerate the move toward a unified service backbone at country level; eliminate costly duplication on the ground",
+    "big_ticket":true,
+    "work_package_leads":[
+      "Chair HLCM",
+      "ED WFP",
+      "Co-Chairs BIG"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"14",
+    "work_package_name":"Unified services roadmap",
+    "document_paragraph":"86",
+    "action_number":"67",
+    "indicative_activity":"Harmonize most indirect and programme support costs",
+    "big_ticket":true,
+    "work_package_leads":[
+      "Chair HLCM",
+      "ED WFP",
+      "Co-Chairs BIG"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"15",
     "work_package_name":"Technology",
     "document_paragraph":"78",
     "action_number":"61",
@@ -300,7 +395,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"14",
+    "work_package_number":"15",
     "work_package_name":"Technology",
     "document_paragraph":"79",
     "action_number":"62",
@@ -311,7 +406,7 @@
       "Chair DTN",
       "SG ITU"
     ],
-    "first_milestone":"2025-10-31",
+    "first_milestone":"2025-10-30",
     "ms_approval":false,
     "ms_body":[
 
@@ -324,7 +419,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"15",
+    "work_package_number":"16",
     "work_package_name":"Data",
     "document_paragraph":"94",
     "action_number":"73",
@@ -335,7 +430,7 @@
       "USG DESA",
       "ED UNICEF"
     ],
-    "first_milestone":"2025-10-31",
+    "first_milestone":"2025-10-30",
     "ms_approval":false,
     "ms_body":[
 
@@ -348,7 +443,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"15",
+    "work_package_number":"16",
     "work_package_name":"Data",
     "document_paragraph":"95",
     "action_number":"74",
@@ -372,7 +467,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"15",
+    "work_package_number":"16",
     "work_package_name":"Data",
     "document_paragraph":"96",
     "action_number":"75",
@@ -396,7 +491,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"16",
+    "work_package_number":"17",
     "work_package_name":"Training and research",
     "document_paragraph":"89",
     "action_number":"68",
@@ -404,7 +499,7 @@
     "big_ticket":true,
     "work_package_leads":[
       "ASG UNITAR",
-      "USG UNU"
+      "Rector UNU"
     ],
     "first_milestone":null,
     "ms_approval":true,
@@ -419,7 +514,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"16",
+    "work_package_number":"17",
     "work_package_name":"Training and research",
     "document_paragraph":"90",
     "action_number":"69",
@@ -427,7 +522,7 @@
     "big_ticket":true,
     "work_package_leads":[
       "ASG UNITAR",
-      "USG UNU"
+      "Rector UNU"
     ],
     "first_milestone":null,
     "ms_approval":true,
@@ -443,7 +538,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"16",
+    "work_package_number":"17",
     "work_package_name":"Training and research",
     "document_paragraph":"91",
     "action_number":"72",
@@ -451,7 +546,7 @@
     "big_ticket":true,
     "work_package_leads":[
       "ASG UNITAR",
-      "USG UNU"
+      "Rector UNU"
     ],
     "first_milestone":null,
     "ms_approval":false,
@@ -466,14 +561,15 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"17",
-    "work_package_name":"Funding mechanism review",
+    "work_package_number":"18",
+    "work_package_name":"Funding mechanisms",
     "document_paragraph":"99",
     "action_number":"76",
     "indicative_activity":"Launch a pooled funding review, including a review of administrative agent, secretariat, governance and support cost models, as well as partnership arrangements, to ensure pooled funding is consistently cheaper and more attractive than fragmented approaches",
     "big_ticket":true,
     "work_package_leads":[
-      "SA Reform"
+      "SA Reform",
+      "ASG DCO"
     ],
     "first_milestone":null,
     "ms_approval":false,
@@ -488,14 +584,15 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"17",
-    "work_package_name":"Funding mechanism review",
+    "work_package_number":"18",
+    "work_package_name":"Funding mechanisms",
     "document_paragraph":"100",
     "action_number":"77",
     "indicative_activity":"Rationalize the portfolio of pooled funds, with particular focus on the Central Emergency Response Fund, the Peacebuilding Fund, the Joint SDG Fund, and the Country-Based Pooled Funds",
     "big_ticket":true,
     "work_package_leads":[
-      "SA Reform"
+      "SA Reform",
+      "ASG DCO"
     ],
     "first_milestone":null,
     "ms_approval":false,
@@ -510,36 +607,15 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"17",
-    "work_package_name":"Funding mechanism review",
+    "work_package_number":"18",
+    "work_package_name":"Funding mechanisms",
     "document_paragraph":"101",
     "action_number":"78",
     "indicative_activity":"Prepare a proposal on how core funding can become consistently cheaper and more attractive than fragmented approaches, including options to strengthen visibility for core contributors and partners",
     "big_ticket":true,
     "work_package_leads":[
-      "SA Reform"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS2",
-    "work_package_number":"17",
-    "work_package_name":"Funding mechanism review",
-    "document_paragraph":"53.1",
-    "action_number":"91",
-    "indicative_activity":"Rapidly map existing Funding Compact review mechanisms, and propose options for elevating conversations to system-wide management mechanism at least once per year.",
-    "big_ticket":true,
-    "work_package_leads":[
-      "SA Reform"
+      "SA Reform",
+      "ASG DCO"
     ],
     "first_milestone":null,
     "ms_approval":false,
@@ -555,10 +631,33 @@
   {
     "report":"WS2",
     "work_package_number":"18",
+    "work_package_name":"Funding mechanisms",
+    "document_paragraph":"53.1",
+    "action_number":"91",
+    "indicative_activity":"Map existing Funding Compact review mechanisms and integrate discussion into a system-wide management mechanism at least once per year",
+    "big_ticket":true,
+    "work_package_leads":[
+      "SA Reform",
+      "ASG DCO"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS2",
+    "work_package_number":"19",
     "work_package_name":"Mandate creation support",
     "document_paragraph":"23.2",
     "action_number":"80",
-    "indicative_activity":"Run one-off survey on Member States' perspectives on existing gaps across mandating bodies; Once identified, leverage existing team supporting Member States to map any gaps in operational and substantive support",
+    "indicative_activity":"Prepare an action plan to improve staff support to Member State during mandate creation, based on mapping of existing capacities per mandating bodies and Member State priorities",
     "big_ticket":true,
     "work_package_leads":[
       "USG Policy",
@@ -577,11 +676,11 @@
   },
   {
     "report":"WS2",
-    "work_package_number":"18",
+    "work_package_number":"19",
     "work_package_name":"Mandate creation support",
     "document_paragraph":"23.3",
     "action_number":"81",
-    "indicative_activity":"Establish a network of focal points of support teams and secretariats for different mandating bodies; Leverage registries and AI tools to create cross-body transparency",
+    "indicative_activity":"Prepare an action plan (as part of item 80) to Strengthen support by UN entities to coordinate and promote greater visibility across mandating bodies",
     "big_ticket":true,
     "work_package_leads":[
       "USG Policy",
@@ -600,81 +699,15 @@
   },
   {
     "report":"WS2",
-    "work_package_number":"18",
+    "work_package_number":"19",
     "work_package_name":"Mandate creation support",
     "document_paragraph":"29.4",
     "action_number":"83",
-    "indicative_activity":"Immediately setup web page to clarify existing process. In parallel, quickly review and resource existing OPBFB plans to improve process",
+    "indicative_activity":"Prepare an action plan to complement the estimates of programme budget implications (PBI) for new mandates with additional info related to activities across the UN System",
     "big_ticket":true,
     "work_package_leads":[
       "USG Policy",
       "USG DGACM"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS2",
-    "work_package_number":"19",
-    "work_package_name":"UN budget \/ programme management",
-    "document_paragraph":"44.1",
-    "action_number":"88",
-    "indicative_activity":"Launch a review to develop proposals for how to assign new mandated tasks based on comparative advantage and for how to ensure strategic programme and budget management that supports system-wide coherence, in particular with regard to the UN Secretariat.",
-    "big_ticket":true,
-    "work_package_leads":[
-      "CDC"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS2",
-    "work_package_number":"19",
-    "work_package_name":"UN budget \/ programme management",
-    "document_paragraph":"44.2",
-    "action_number":"89",
-    "indicative_activity":"Update budget formulation guidance for 2027, then remove obsolete or irrelevant citations (target reduction by 20%), establish an up-to-date database of active mandates based on cross-entity peer reviews to curb duplicate citing.",
-    "big_ticket":true,
-    "work_package_leads":[
-      "CDC"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS2",
-    "work_package_number":"19",
-    "work_package_name":"UN budget \/ programme management",
-    "document_paragraph":"60.4",
-    "action_number":"92",
-    "indicative_activity":"As part of programme budget 2027 preparations, develop process for an annual “output consolidation list” using evidence of duplication, recurring business and inactive items, then table SG recommendations under Rule 105.6 with the proposed programme budget (list of outputs to terminate, with rationale and savings).",
-    "big_ticket":true,
-    "work_package_leads":[
-      "CDC"
     ],
     "first_milestone":null,
     "ms_approval":false,
@@ -707,7 +740,7 @@
     "un_budget":[
 
     ],
-    "work_package_goal":"Rebuild trust in humanitarian action through faster, simpler, and more united response that reaches millions more people with the same resources."
+    "work_package_goal":null
   },
   {
     "report":"WS3",
@@ -795,7 +828,7 @@
     "un_budget":[
 
     ],
-    "work_package_goal":null
+    "work_package_goal":"Rebuild trust in humanitarian action through faster, simpler, and more united response that reaches millions more people with the same resources."
   },
   {
     "report":"WS3",
@@ -888,10 +921,76 @@
   {
     "report":"WS2",
     "work_package_number":"20",
+    "work_package_name":"UN budget \/ programme management",
+    "document_paragraph":"44.1",
+    "action_number":"88",
+    "indicative_activity":"Develop action plan to strengthen internal strategic oversight of the UN system division of labour at all levels to ensure effective, efficient programmatic and operational support, building on existing reforms",
+    "big_ticket":true,
+    "work_package_leads":[
+      "CDC"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS2",
+    "work_package_number":"20",
+    "work_package_name":"UN budget \/ programme management",
+    "document_paragraph":"44.2",
+    "action_number":"89",
+    "indicative_activity":"As part of the standard budget guidance process, develop an action plan to ensure UN entities systematically review mandate citations in their programmes, incl. based on comparative advantage",
+    "big_ticket":true,
+    "work_package_leads":[
+      "CDC"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS2",
+    "work_package_number":"20",
+    "work_package_name":"UN budget \/ programme management",
+    "document_paragraph":"60.4",
+    "action_number":"92",
+    "indicative_activity":"Prepare proposals by the SG as per Rule 105.6 of ST\/SGB\/2018\/3 for the “GA, with justification, a list of outputs from the previous period which, in the judgement of the SG, can be discontinued”",
+    "big_ticket":true,
+    "work_package_leads":[
+      "CDC"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS2",
+    "work_package_number":"21",
     "work_package_name":"System-wide results management",
     "document_paragraph":"67",
     "action_number":"93",
-    "indicative_activity":"Initiate a task force to build a UN system-wide results-chain model that is viable for UN Secretariat and non-UN Secretariat entities, based on a review of best practice guidance, and propose for CEB endorsement.",
+    "indicative_activity":"Develop an action plan to strengthen and harmonize management for results mechanisms across the UN system, including how results are measured and communicated",
     "big_ticket":true,
     "work_package_leads":[
       "SA Reform"
@@ -909,7 +1008,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"21",
+    "work_package_number":"22",
     "work_package_name":"Prevention, peacebuilding, peace support",
     "document_paragraph":"15",
     "action_number":"1",
@@ -919,7 +1018,7 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "first_milestone":"2025-12-31",
+    "first_milestone":"2025-12-30",
     "ms_approval":true,
     "ms_body":[
       "GA"
@@ -932,7 +1031,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"21",
+    "work_package_number":"22",
     "work_package_name":"Prevention, peacebuilding, peace support",
     "document_paragraph":"20",
     "action_number":"10",
@@ -942,7 +1041,7 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "first_milestone":"2025-12-31",
+    "first_milestone":"2025-12-30",
     "ms_approval":true,
     "ms_body":[
       "GA"
@@ -955,7 +1054,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"21",
+    "work_package_number":"22",
     "work_package_name":"Prevention, peacebuilding, peace support",
     "document_paragraph":"20",
     "action_number":"11",
@@ -965,7 +1064,7 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "first_milestone":"2025-12-31",
+    "first_milestone":"2025-12-30",
     "ms_approval":true,
     "ms_body":[
       "GA"
@@ -978,7 +1077,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"21",
+    "work_package_number":"22",
     "work_package_name":"Prevention, peacebuilding, peace support",
     "document_paragraph":"16",
     "action_number":"2",
@@ -988,7 +1087,7 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "first_milestone":"2025-12-31",
+    "first_milestone":"2025-12-30",
     "ms_approval":true,
     "ms_body":[
       "GA"
@@ -1001,7 +1100,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"21",
+    "work_package_number":"22",
     "work_package_name":"Prevention, peacebuilding, peace support",
     "document_paragraph":"17",
     "action_number":"3",
@@ -1024,7 +1123,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"21",
+    "work_package_number":"22",
     "work_package_name":"Prevention, peacebuilding, peace support",
     "document_paragraph":"66",
     "action_number":"49",
@@ -1047,7 +1146,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"21",
+    "work_package_number":"22",
     "work_package_name":"Prevention, peacebuilding, peace support",
     "document_paragraph":"67",
     "action_number":"52",
@@ -1057,7 +1156,7 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "first_milestone":"2026-02-28",
+    "first_milestone":"2026-02-27",
     "ms_approval":true,
     "ms_body":[
       "GA"
@@ -1070,7 +1169,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"21",
+    "work_package_number":"22",
     "work_package_name":"Prevention, peacebuilding, peace support",
     "document_paragraph":"68",
     "action_number":"55",
@@ -1093,7 +1192,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"21",
+    "work_package_number":"22",
     "work_package_name":"Prevention, peacebuilding, peace support",
     "document_paragraph":"73",
     "action_number":"58",
@@ -1116,7 +1215,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"21",
+    "work_package_number":"22",
     "work_package_name":"Prevention, peacebuilding, peace support",
     "document_paragraph":"19",
     "action_number":"6",
@@ -1126,7 +1225,7 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "first_milestone":"2025-12-31",
+    "first_milestone":"2025-12-30",
     "ms_approval":true,
     "ms_body":[
       "GA"
@@ -1139,7 +1238,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"21",
+    "work_package_number":"22",
     "work_package_name":"Prevention, peacebuilding, peace support",
     "document_paragraph":"19",
     "action_number":"7",
@@ -1149,7 +1248,7 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "first_milestone":"2025-12-31",
+    "first_milestone":"2025-12-30",
     "ms_approval":true,
     "ms_body":[
       "GA"
@@ -1162,7 +1261,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"21",
+    "work_package_number":"22",
     "work_package_name":"Prevention, peacebuilding, peace support",
     "document_paragraph":"20",
     "action_number":"8",
@@ -1172,7 +1271,7 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "first_milestone":"2025-12-31",
+    "first_milestone":"2025-12-30",
     "ms_approval":true,
     "ms_body":[
       "SC"
@@ -1185,7 +1284,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"21",
+    "work_package_number":"22",
     "work_package_name":"Prevention, peacebuilding, peace support",
     "document_paragraph":"20",
     "action_number":"9",
@@ -1195,7 +1294,7 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "first_milestone":"2025-12-31",
+    "first_milestone":"2025-12-30",
     "ms_approval":true,
     "ms_body":[
       "SC"
@@ -1208,7 +1307,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"22",
+    "work_package_number":"23",
     "work_package_name":"Disarmament",
     "document_paragraph":"18",
     "action_number":"5",
@@ -1217,7 +1316,7 @@
     "work_package_leads":[
       "USG ODA"
     ],
-    "first_milestone":"2026-02-28",
+    "first_milestone":"2026-02-27",
     "ms_approval":true,
     "ms_body":[
       "GA"
@@ -1230,7 +1329,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":"22",
+    "work_package_number":"23",
     "work_package_name":"Disarmament",
     "document_paragraph":"67",
     "action_number":"53",
@@ -1239,7 +1338,7 @@
     "work_package_leads":[
       "USG ODA"
     ],
-    "first_milestone":"2026-02-28",
+    "first_milestone":"2026-02-27",
     "ms_approval":true,
     "ms_body":[
       "GA"
@@ -1253,494 +1352,7 @@
   {
     "report":"WS3",
     "work_package_number":"24",
-    "work_package_name":"Environment",
-    "document_paragraph":"47",
-    "action_number":"35",
-    "indicative_activity":"Undertake a thorough assessment of current arrangements and make proposals on possible structural changes and programme realignments on environmental issues",
-    "big_ticket":false,
-    "work_package_leads":[
-      "USG UNEP"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"25",
-    "work_package_name":"Other UN Secretariat development realignments",
-    "document_paragraph":"40",
-    "action_number":"30",
-    "indicative_activity":"Realign macroeconomic analysis capacities across DESA, UNCTAD, and the Regional Commissions to create a unified \"single entry point\" for Member States, anchored in joint mechanisms",
-    "big_ticket":false,
-    "work_package_leads":[
-      "USG DESA",
-      "USG ECA"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-      "GA"
-    ],
-    "legal_consideration":"GA decision (programme budget) could be required.",
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"25",
-    "work_package_name":"Other UN Secretariat development realignments",
-    "document_paragraph":"41",
-    "action_number":"31",
-    "indicative_activity":"Realign UN Secretariat support for LDCs, LLDCs and SIDS across DESA, UNCTAD and OHRLLS",
-    "big_ticket":false,
-    "work_package_leads":[
-      "USG DESA",
-      "USG ECA"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-      "GA"
-    ],
-    "legal_consideration":"GA decision (programme budget) could be required.",
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"25",
-    "work_package_name":"Other UN Secretariat development realignments",
-    "document_paragraph":"51",
-    "action_number":"38",
-    "indicative_activity":"Abolish the Special Coordinator for Development in the Sahel post and its associated office (functions and responsibilities are absorbed and performed by existing entities)",
-    "big_ticket":false,
-    "work_package_leads":[
-      "USG DESA",
-      "USG ECA"
-    ],
-    "first_milestone":null,
-    "ms_approval":true,
-    "ms_body":[
-      "GA"
-    ],
-    "legal_consideration":"GA decision (programme budget) is required.",
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS2",
-    "work_package_number":"26",
-    "work_package_name":"Mandate registries and tools",
-    "document_paragraph":"23.1",
-    "action_number":"79",
-    "indicative_activity":"For UN Secretariat, refine mandates.un.org to serve as sustainable registry; Other entities to build out similar registries for resolutions \/ decisions of their mandating bodies.",
-    "big_ticket":false,
-    "work_package_leads":[
-      "USG Policy"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS2",
-    "work_package_number":"26",
-    "work_package_name":"Mandate registries and tools",
-    "document_paragraph":"23.4",
-    "action_number":"82",
-    "indicative_activity":"Focus on 1) extending mandates.un.org to help assess trends in resolution length, periodicity, similarity, etc.) and 2) building fine-tuned AI models that embed all existing UN resolution and decision texts, as well associated agreed drafting guidance and frameworks., incl. to help show “related mandates” and “similar paragraphs” during drafting",
-    "big_ticket":false,
-    "work_package_leads":[
-      "USG Policy"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS2",
-    "work_package_number":"27",
-    "work_package_name":"SG reports",
-    "document_paragraph":"38.2",
-    "action_number":"84",
-    "indicative_activity":"Issue tighter word-limit guidance and timeline for implementation",
-    "big_ticket":false,
-    "work_package_leads":[
-      "CDC"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS2",
-    "work_package_number":"27",
-    "work_package_name":"SG reports",
-    "document_paragraph":"38.3",
-    "action_number":"85",
-    "indicative_activity":"Map reports with similar content per organ; Merge regional variants into one report, prioritizing entity-specific reports; Enable a small inter-entity substantive board to oversee mergers of reports across entities.",
-    "big_ticket":false,
-    "work_package_leads":[
-      "CDC"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS2",
-    "work_package_number":"27",
-    "work_package_name":"SG reports",
-    "document_paragraph":"38.4",
-    "action_number":"86",
-    "indicative_activity":"Constitute a cross-departmental working group on reporting formats for different types of information requests, incl. consideration of proposed standard language guidance for operative paragraphs",
-    "big_ticket":false,
-    "work_package_leads":[
-      "CDC"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS2",
-    "work_package_number":"27",
-    "work_package_name":"SG reports",
-    "document_paragraph":"38.5",
-    "action_number":"87",
-    "indicative_activity":"Display per-report download counts prominently on ODS and Digital Library. Publish a combined usage dashboard by body\/topic\/time.",
-    "big_ticket":false,
-    "work_package_leads":[
-      "CDC"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"4",
-    "work_package_name":"UNCT reconfiguration",
-    "document_paragraph":"54",
-    "action_number":"39",
-    "indicative_activity":"Propose a model to reconfigure country teams via system-wide working group, chaired by the Deputy Secretary-General",
-    "big_ticket":true,
-    "work_package_leads":[
-      "DSG"
-    ],
-    "first_milestone":"2026-02-28",
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":"Transform scattered country teams into integrated, empowered platforms that deliver one coherent offer aligned with national priorities"
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"4",
-    "work_package_name":"UNCT reconfiguration",
-    "document_paragraph":"55",
-    "action_number":"40",
-    "indicative_activity":"Strengthen and recalibrate the Resident Coordinator system to better leverage knowledge hubs, expertise-on-demand, and non-resident entities",
-    "big_ticket":true,
-    "work_package_leads":[
-      "DSG"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"5",
-    "work_package_name":"Regional reset",
-    "document_paragraph":"50",
-    "action_number":"36",
-    "indicative_activity":"Establish a system-wide working group, chaired by the Deputy Secretary-General, to develop proposals on how to advance a reset of regional capacities for sustainable development, incl. on how to institutionalize Regional Integrated Platforms",
-    "big_ticket":true,
-    "work_package_leads":[
-      "DSG"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"5",
-    "work_package_name":"Regional reset",
-    "document_paragraph":"51",
-    "action_number":"37",
-    "indicative_activity":"Systematize the practice of hosting regional capacities within the Regional Economic Commissions, starting with DCO regional directors and teams",
-    "big_ticket":true,
-    "work_package_leads":[
-      "DSG"
-    ],
-    "first_milestone":"2026-02-28",
-    "ms_approval":true,
-    "ms_body":[
-      "GA"
-    ],
-    "legal_consideration":"GA decision (programme budget) is required",
-    "un_budget":[
-      "RB 2027"
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"6",
-    "work_package_name":"Joint knowledge hubs",
-    "document_paragraph":"45",
-    "action_number":"33",
-    "indicative_activity":"Establish Joint Knowledge Hubs to pool knowledge on key issues spread across UN development system entities and avoid duplications, including finding the best placed entities to co-leads (through joint mechanisms)",
-    "big_ticket":true,
-    "work_package_leads":[
-      "USG DESA"
-    ],
-    "first_milestone":"2026-02-28",
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-      "RB 2027"
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"7",
-    "work_package_name":"Expertise-on-demand mechanism",
-    "document_paragraph":"46",
-    "action_number":"34",
-    "indicative_activity":"Create a pro-active mechanism UN system-wide expertise on demand, particularly from specialized agencies and non-resident entities",
-    "big_ticket":true,
-    "work_package_leads":[
-      "SG ITU"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"7",
-    "work_package_name":"Expertise-on-demand mechanism",
-    "document_paragraph":"68",
-    "action_number":"54",
-    "indicative_activity":"Consolidate expertise across all pillars at the regional level as an extension of the expertise-on-demand mechanism outlined in the sustainable development pillar",
-    "big_ticket":true,
-    "work_package_leads":[
-      "SG ITU"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"8",
-    "work_package_name":"Human rights group",
-    "document_paragraph":"58",
-    "action_number":"42",
-    "indicative_activity":"Establish a Human Rights Group comprising entities from across the UN system, led by the High Commissioner for Human Rights",
-    "big_ticket":true,
-    "work_package_leads":[
-      "HC OHCHR"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"9",
-    "work_package_name":"Senior management coordination forums",
-    "document_paragraph":"61",
-    "action_number":"43",
-    "indicative_activity":"Review top management fora to ease the coordination burden for senior leaders and ensure coherent action across pillar, incl. CEB, IASC, UNSDG, EC",
-    "big_ticket":true,
-    "work_package_leads":[
-      "USG Policy"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"9",
-    "work_package_name":"Senior management coordination forums",
-    "document_paragraph":"61",
-    "action_number":"44",
-    "indicative_activity":"Consider proposals to unify administrative backend support and streamline duplicative agendas without affecting core substantive competencies",
-    "big_ticket":true,
-    "work_package_leads":[
-      "USG Policy"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"9",
-    "work_package_name":"Senior management coordination forums",
-    "document_paragraph":"63",
-    "action_number":"46",
-    "indicative_activity":"Bring together all Headquarters coordination on country-specific, cross-pillar approaches to crisis prevention and centre capacities around the Regional Monthly Review platform",
-    "big_ticket":true,
-    "work_package_leads":[
-      "USG Policy"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":"9",
-    "work_package_name":"Senior management coordination forums",
-    "document_paragraph":"63",
-    "action_number":"47",
-    "indicative_activity":"Review existing interagency task forces and working groups",
-    "big_ticket":true,
-    "work_package_leads":[
-      "USG Policy"
-    ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":null,
-    "work_package_name":"Drugs, crime, counter-terrorism",
+    "work_package_name":"Drugs, crime, counterterrorism",
     "document_paragraph":"22",
     "action_number":"12",
     "indicative_activity":"Reinforce cooperation on counterterrorism and violent extremism, with clearer reporting lines, joint planning, and resource mobilization.",
@@ -1749,7 +1361,7 @@
       "USG UNODC",
       "USG OCT"
     ],
-    "first_milestone":"2026-02-28",
+    "first_milestone":"2026-02-27",
     "ms_approval":false,
     "ms_body":[
 
@@ -1762,8 +1374,8 @@
   },
   {
     "report":"WS3",
-    "work_package_number":null,
-    "work_package_name":"Drugs, crime, counter-terrorism",
+    "work_package_number":"24",
+    "work_package_name":"Drugs, crime, counterterrorism",
     "document_paragraph":"22",
     "action_number":"13",
     "indicative_activity":"The Director overseeing the UNODC Terrorism Prevention Branch would also report to the Under-Secretary-General for Counter-Terrorism.",
@@ -1772,7 +1384,7 @@
       "USG UNODC",
       "USG OCT"
     ],
-    "first_milestone":"2026-02-28",
+    "first_milestone":"2026-02-27",
     "ms_approval":false,
     "ms_body":[
       "SG"
@@ -1785,47 +1397,23 @@
   },
   {
     "report":"WS3",
-    "work_package_number":null,
-    "work_package_name":"UNDP\/UNOPS",
-    "document_paragraph":"37",
-    "action_number":"26",
-    "indicative_activity":"Conduct a thorough assessment of the benefits of a merger between UNDP and UNOPS; analysis to be presented to the Executive Boards in February 2026",
-    "big_ticket":true,
+    "work_package_number":"24",
+    "work_package_name":"Drugs, crime, counterterrorism",
+    "document_paragraph":"18",
+    "action_number":"4",
+    "indicative_activity":"Integrate the UN Interregional Crime and Justice Research Institute (UNICRI) into the UN Office on Drugs and Crime (UNODC)",
+    "big_ticket":false,
     "work_package_leads":[
-      "DSG",
-      "Administrator UNDP",
-      "ED UNOPS"
+      "USG UNODC",
+      "USG OCT"
     ],
-    "first_milestone":"2026-02-28",
+    "first_milestone":"2026-02-27",
     "ms_approval":true,
     "ms_body":[
-      "GA"
+      "GA",
+      "ECOSOC"
     ],
-    "legal_consideration":"GA decision required.",
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":null,
-    "work_package_name":"UNFPA\/UN Women",
-    "document_paragraph":"38",
-    "action_number":"27",
-    "indicative_activity":"Conduct a thorough assessment of the benefits of a merger of UNFPA and UN Women and their respective mandates",
-    "big_ticket":true,
-    "work_package_leads":[
-      "DSG",
-      "ED UNFPA",
-      "ED UN Women"
-    ],
-    "first_milestone":"2026-02-28",
-    "ms_approval":true,
-    "ms_body":[
-      "GA"
-    ],
-    "legal_consideration":"GA decision required.",
+    "legal_consideration":"ECOSOC and GA (programme budget) decisions required.",
     "un_budget":[
       "RB 2027"
     ],
@@ -1833,31 +1421,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":null,
-    "work_package_name":"UNFPA\/UN Women",
-    "document_paragraph":"38",
-    "action_number":"28",
-    "indicative_activity":"Conduct a thorough assessment to consider options to optimize normative functions of UNFPA on population statistics and related activities, including those currently undertaken by DESA",
-    "big_ticket":true,
-    "work_package_leads":[
-      "DSG",
-      "ED UNFPA",
-      "ED UN Women"
-    ],
-    "first_milestone":"2026-02-28",
-    "ms_approval":false,
-    "ms_body":[
-      "GA"
-    ],
-    "legal_consideration":"GA decision (including on programme budget) could be required.",
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
-  },
-  {
-    "report":"WS3",
-    "work_package_number":null,
+    "work_package_number":"25",
     "work_package_name":"UNAIDS",
     "document_paragraph":"39",
     "action_number":"29",
@@ -1867,7 +1431,7 @@
       "DSG",
       "ED UNAIDS"
     ],
-    "first_milestone":"2026-12-31",
+    "first_milestone":"2026-12-30",
     "ms_approval":true,
     "ms_body":[
       "ECOSOC",
@@ -1881,7 +1445,7 @@
   },
   {
     "report":"WS3",
-    "work_package_number":null,
+    "work_package_number":"26",
     "work_package_name":"Other merger review",
     "document_paragraph":"42",
     "action_number":"32",
@@ -1903,25 +1467,523 @@
   },
   {
     "report":"WS3",
-    "work_package_number":null,
-    "work_package_name":"Drugs, crime, counter-terrorism",
-    "document_paragraph":"18",
-    "action_number":"4",
-    "indicative_activity":"Integrate the UN Interregional Crime and Justice Research Institute (UNICRI) into the UN Office on Drugs and Crime (UNODC)",
+    "work_package_number":"27",
+    "work_package_name":"Environment",
+    "document_paragraph":"47",
+    "action_number":"35",
+    "indicative_activity":"Undertake a thorough assessment of current arrangements and make proposals on possible structural changes and programme realignments on environmental issues",
     "big_ticket":false,
     "work_package_leads":[
-      "USG UNODC",
-      "USG OCT"
+      "USG UNEP",
+      "ES UNFCCC"
     ],
-    "first_milestone":"2026-02-28",
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"28",
+    "work_package_name":"Other UN Secretariat development realignments",
+    "document_paragraph":"40",
+    "action_number":"30",
+    "indicative_activity":"Realign macroeconomic analysis capacities across DESA, UNCTAD, and the Regional Commissions to create a unified \"single entry point\" for Member States, anchored in joint mechanisms",
+    "big_ticket":false,
+    "work_package_leads":[
+      "USG DESA",
+      "ES ECA",
+      "SG UNCTAD"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+      "GA"
+    ],
+    "legal_consideration":"GA decision (programme budget) could be required.",
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"28",
+    "work_package_name":"Other UN Secretariat development realignments",
+    "document_paragraph":"41",
+    "action_number":"31",
+    "indicative_activity":"Realign UN Secretariat support for LDCs, LLDCs and SIDS across DESA, UNCTAD and OHRLLS",
+    "big_ticket":false,
+    "work_package_leads":[
+      "USG DESA",
+      "ES ECA",
+      "SG UNCTAD"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+      "GA"
+    ],
+    "legal_consideration":"GA decision (programme budget) could be required.",
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"28",
+    "work_package_name":"Other UN Secretariat development realignments",
+    "document_paragraph":"51",
+    "action_number":"38",
+    "indicative_activity":"Abolish the Special Coordinator for Development in the Sahel post and its associated office (functions and responsibilities are absorbed and performed by existing entities)",
+    "big_ticket":false,
+    "work_package_leads":[
+      "USG DESA",
+      "ES ECA",
+      "SG UNCTAD"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+      "SG"
+    ],
+    "legal_consideration":"SG decision required.",
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS2",
+    "work_package_number":"29",
+    "work_package_name":"Mandate registries and tools",
+    "document_paragraph":"23.1",
+    "action_number":"79",
+    "indicative_activity":"For the UN Secretariat, refine mandates.un.org to serve as sustainable registry; Other entities to build out similar registries for their mandating bodies",
+    "big_ticket":false,
+    "work_package_leads":[
+      "USG Policy"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS2",
+    "work_package_number":"29",
+    "work_package_name":"Mandate registries and tools",
+    "document_paragraph":"23.4",
+    "action_number":"82",
+    "indicative_activity":"Develop tools to assist in research for mandate creation",
+    "big_ticket":false,
+    "work_package_leads":[
+      "USG Policy"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"3",
+    "work_package_name":"UNDP \/ UNOPS",
+    "document_paragraph":"37",
+    "action_number":"26",
+    "indicative_activity":"Conduct a thorough assessment of the benefits of a merger between UNDP and UNOPS; analysis to be presented to the Executive Boards in February 2026",
+    "big_ticket":true,
+    "work_package_leads":[
+      "DSG",
+      "Administrator UNDP",
+      "ED UNOPS"
+    ],
+    "first_milestone":"2026-02-27",
     "ms_approval":true,
     "ms_body":[
-      "GA",
-      "ECOSOC"
+      "GA"
     ],
-    "legal_consideration":"ECOSOC and GA (programme budget) decisions required.",
+    "legal_consideration":"GA decision required.",
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS2",
+    "work_package_number":"30",
+    "work_package_name":"SG reports",
+    "document_paragraph":"38.2",
+    "action_number":"84",
+    "indicative_activity":"Assess trends in word-limit compliance and develop an action plan for improvements (as part of item 86)",
+    "big_ticket":false,
+    "work_package_leads":[
+      "CDC"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS2",
+    "work_package_number":"30",
+    "work_package_name":"SG reports",
+    "document_paragraph":"38.3",
+    "action_number":"85",
+    "indicative_activity":"Assess trends and patterns in report overlap and fragmentation, and develop an action plan for improvement (as part of item 86)",
+    "big_ticket":false,
+    "work_package_leads":[
+      "CDC"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS2",
+    "work_package_number":"30",
+    "work_package_name":"SG reports",
+    "document_paragraph":"38.4",
+    "action_number":"86",
+    "indicative_activity":"Constitute a cross-departmental working group to develop an action plan for improvements in reporting format options for different types of information requests",
+    "big_ticket":false,
+    "work_package_leads":[
+      "CDC"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS2",
+    "work_package_number":"30",
+    "work_package_name":"SG reports",
+    "document_paragraph":"38.5",
+    "action_number":"87",
+    "indicative_activity":"Display per-report download counts on UN ODS and UN Digital Library pages for each document",
+    "big_ticket":false,
+    "work_package_leads":[
+      "CDC"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS1",
+    "work_package_number":"31",
+    "work_package_name":"UN Secretariat efficiencies and improvement",
+    "document_paragraph":null,
+    "action_number":"94",
+    "indicative_activity":"Implement residual actions from Phase I of the Working Group on Efficiencies, as per Rev. estimates for programme budget 2026 and support account for 25\/26, not included in or relevant for WP#14",
+    "big_ticket":false,
+    "work_package_leads":[
+      "USG DMSPC",
+      "USG DOS"
+    ],
+    "first_milestone":null,
+    "ms_approval":true,
+    "ms_body":[
+      "GA"
+    ],
+    "legal_consideration":"GA decision (programme budget) required.",
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS1",
+    "work_package_number":"31",
+    "work_package_name":"UN Secretariat efficiencies and improvement",
+    "document_paragraph":null,
+    "action_number":"95",
+    "indicative_activity":"Implement residual actions from Phase II of the Working Group on Efficiencies, not to be included in or relevant for WP#14",
+    "big_ticket":false,
+    "work_package_leads":[
+      "USG DMSPC",
+      "USG DOS"
+    ],
+    "first_milestone":null,
+    "ms_approval":true,
+    "ms_body":[
+      "GA"
+    ],
+    "legal_consideration":"GA decision (programme budget) required.",
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"4",
+    "work_package_name":"UNFPA \/ UN Women",
+    "document_paragraph":"38",
+    "action_number":"27",
+    "indicative_activity":"Conduct a thorough assessment of the benefits of a merger of UNFPA and UN Women and their respective mandates",
+    "big_ticket":true,
+    "work_package_leads":[
+      "DSG",
+      "ED UNFPA",
+      "ED UN Women"
+    ],
+    "first_milestone":"2026-02-27",
+    "ms_approval":true,
+    "ms_body":[
+      "GA"
+    ],
+    "legal_consideration":"GA decision required.",
     "un_budget":[
       "RB 2027"
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"4",
+    "work_package_name":"UNFPA \/ UN Women",
+    "document_paragraph":"38",
+    "action_number":"28",
+    "indicative_activity":"Conduct a thorough assessment to consider options to optimize normative functions of UNFPA on population statistics and related activities, including those currently undertaken by DESA",
+    "big_ticket":true,
+    "work_package_leads":[
+      "DSG",
+      "ED UNFPA",
+      "ED UN Women"
+    ],
+    "first_milestone":"2026-02-27",
+    "ms_approval":false,
+    "ms_body":[
+      "GA"
+    ],
+    "legal_consideration":"GA decision (including on programme budget) could be required.",
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"5",
+    "work_package_name":"UNCT reconfiguration",
+    "document_paragraph":"54",
+    "action_number":"39",
+    "indicative_activity":"Propose a model to reconfigure country teams via system-wide working group, chaired by the Deputy Secretary-General",
+    "big_ticket":true,
+    "work_package_leads":[
+      "DSG"
+    ],
+    "first_milestone":"2026-02-27",
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":"Transform scattered country teams into integrated, empowered platforms that deliver one coherent offer aligned with national priorities"
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"5",
+    "work_package_name":"UNCT reconfiguration",
+    "document_paragraph":"55",
+    "action_number":"40",
+    "indicative_activity":"Strengthen and recalibrate the Resident Coordinator system to better leverage knowledge hubs, expertise-on-demand, and non-resident entities",
+    "big_ticket":true,
+    "work_package_leads":[
+      "DSG"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"6",
+    "work_package_name":"Regional reset",
+    "document_paragraph":"50",
+    "action_number":"36",
+    "indicative_activity":"Establish a system-wide working group, chaired by the Deputy Secretary-General, to develop proposals on how to advance a reset of regional capacities for sustainable development, incl. on how to institutionalize Regional Integrated Platforms",
+    "big_ticket":true,
+    "work_package_leads":[
+      "DSG"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"6",
+    "work_package_name":"Regional reset",
+    "document_paragraph":"51",
+    "action_number":"37",
+    "indicative_activity":"Systematize the practice of hosting regional capacities within the Regional Economic Commissions, starting with DCO regional directors and teams",
+    "big_ticket":true,
+    "work_package_leads":[
+      "DSG"
+    ],
+    "first_milestone":"2026-02-27",
+    "ms_approval":true,
+    "ms_body":[
+      "GA"
+    ],
+    "legal_consideration":"GA decision (programme budget) is required",
+    "un_budget":[
+      "RB 2027"
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"7",
+    "work_package_name":"Joint knowledge hubs",
+    "document_paragraph":"45",
+    "action_number":"33",
+    "indicative_activity":"Establish Joint Knowledge Hubs to pool knowledge on key issues spread across UN development system entities and avoid duplications, including finding the best placed entities to co-leads (through joint mechanisms)",
+    "big_ticket":true,
+    "work_package_leads":[
+      "USG DESA",
+      "SG UNCTAD"
+    ],
+    "first_milestone":"2026-02-27",
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+      "RB 2027"
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"8",
+    "work_package_name":"Expertise-on-demand mechanism",
+    "document_paragraph":"46",
+    "action_number":"34",
+    "indicative_activity":"Create a pro-active mechanism UN system-wide expertise on demand, particularly from specialized agencies and non-resident entities",
+    "big_ticket":true,
+    "work_package_leads":[
+      "SG ITU"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"8",
+    "work_package_name":"Expertise-on-demand mechanism",
+    "document_paragraph":"68",
+    "action_number":"54",
+    "indicative_activity":"Consolidate expertise across all pillars at the regional level as an extension of the expertise-on-demand mechanism outlined in the sustainable development pillar",
+    "big_ticket":true,
+    "work_package_leads":[
+      "SG ITU"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
+    ],
+    "work_package_goal":null
+  },
+  {
+    "report":"WS3",
+    "work_package_number":"9",
+    "work_package_name":"Human rights group",
+    "document_paragraph":"58",
+    "action_number":"42",
+    "indicative_activity":"Establish a Human Rights Group comprising entities from across the UN system, led by the High Commissioner for Human Rights",
+    "big_ticket":true,
+    "work_package_leads":[
+      "HC OHCHR"
+    ],
+    "first_milestone":null,
+    "ms_approval":false,
+    "ms_body":[
+
+    ],
+    "legal_consideration":null,
+    "un_budget":[
+
     ],
     "work_package_goal":null
   }
