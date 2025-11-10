@@ -27,6 +27,7 @@ import type { Actions } from "@/types/action";
 import { useEffect } from "react";
 import { Package, CheckCircle, ListChecks, ClipboardCheck, ChevronDown, Users, FileText, User, Folder, Briefcase, Search, Layers, Briefcase as BriefcaseIcon, ListTodo } from "lucide-react";
 import Image from "next/image";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell } from "recharts";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
@@ -271,27 +272,75 @@ export default function WorkPackagesPage() {
     };
   }, [actions, workPackages]);
 
-  // Get unique values for filters
+  // Helper function to filter work packages based on selected filters (excluding the filter being computed)
+  const getFilteredWorkPackagesForOptions = useMemo(() => {
+    let filtered = workPackages;
+
+    // Apply lead filter (if selected) when computing work packages and workstreams
+    if (selectedLead) {
+      filtered = filtered.filter((wp) => wp.leads.includes(selectedLead));
+    }
+
+    // Apply workstream filter (if selected) when computing work packages and leads
+    if (selectedWorkstream) {
+      filtered = filtered.filter((wp) => wp.report.includes(selectedWorkstream));
+    }
+
+    // Apply work package filter (if selected) when computing leads and workstreams
+    if (selectedWorkPackage) {
+      const wpMatch = selectedWorkPackage.match(/^(\d+):/);
+      if (wpMatch) {
+        const wpNumber = wpMatch[1];
+        filtered = filtered.filter((wp) => wp.number === wpNumber);
+      } else {
+        filtered = filtered.filter((wp) => !wp.number && wp.name === selectedWorkPackage);
+      }
+    }
+
+    return filtered;
+  }, [workPackages, selectedLead, selectedWorkstream, selectedWorkPackage]);
+
+  // Get unique values for filters (filtered based on other selections)
   const uniqueWorkPackages = useMemo(() => {
-    return Array.from(new Set(workPackages.map(wp => 
+    return Array.from(new Set(getFilteredWorkPackagesForOptions.map(wp => 
       wp.number ? `${wp.number}: ${wp.name}` : wp.name
     ))).sort();
-  }, [workPackages]);
+  }, [getFilteredWorkPackagesForOptions]);
 
   const uniqueLeads = useMemo(() => {
     const leads = new Set<string>();
-    workPackages.forEach(wp => {
+    getFilteredWorkPackagesForOptions.forEach(wp => {
       wp.leads.forEach(lead => leads.add(lead));
     });
     return Array.from(leads).sort();
-  }, [workPackages]);
+  }, [getFilteredWorkPackagesForOptions]);
 
   const uniqueWorkstreams = useMemo(() => {
     const workstreams = new Set<string>();
-    workPackages.forEach(wp => {
+    getFilteredWorkPackagesForOptions.forEach(wp => {
       wp.report.forEach(ws => workstreams.add(ws));
     });
     return Array.from(workstreams).sort();
+  }, [getFilteredWorkPackagesForOptions]);
+
+  // Calculate chart data: count work packages per lead
+  const chartData = useMemo(() => {
+    const leadCounts = new Map<string, number>();
+    
+    workPackages.forEach(wp => {
+      wp.leads.forEach(lead => {
+        const currentCount = leadCounts.get(lead) || 0;
+        leadCounts.set(lead, currentCount + 1);
+      });
+    });
+
+    return Array.from(leadCounts.entries())
+      .map(([lead, count]) => ({
+        lead,
+        count,
+      }))
+      .sort((a, b) => b.count - a.count) // Sort by count descending
+      .slice(0, 15); // Show top 15 leads
   }, [workPackages]);
 
   // Filter work packages based on search and filters
@@ -334,6 +383,25 @@ export default function WorkPackagesPage() {
 
     return filtered;
   }, [workPackages, searchQuery, selectedWorkPackage, selectedLead, selectedWorkstream]);
+
+  // Clear filters if selected value is no longer available
+  useEffect(() => {
+    if (selectedWorkPackage && !uniqueWorkPackages.includes(selectedWorkPackage)) {
+      setSelectedWorkPackage("");
+    }
+  }, [selectedWorkPackage, uniqueWorkPackages]);
+
+  useEffect(() => {
+    if (selectedLead && !uniqueLeads.includes(selectedLead)) {
+      setSelectedLead("");
+    }
+  }, [selectedLead, uniqueLeads]);
+
+  useEffect(() => {
+    if (selectedWorkstream && !uniqueWorkstreams.includes(selectedWorkstream)) {
+      setSelectedWorkstream("");
+    }
+  }, [selectedWorkstream, uniqueWorkstreams]);
 
   const handleResetFilters = () => {
     setSearchQuery("");
@@ -476,34 +544,34 @@ export default function WorkPackagesPage() {
           </h2>
           
           {/* Search Bar */}
-          <div className="w-[818px]">
-            <div className="flex gap-[8px] items-start mb-3 flex-wrap">
-              <div className="flex gap-[8px] items-start flex-1">
+          <div className="w-full max-w-[818px]">
+            <div className="flex gap-3 items-start mb-4 flex-nowrap">
+              <div className="flex gap-3 items-start flex-1">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#009EDB] pointer-events-none z-10" />
                   <Input
                     type="text"
                     placeholder="Search for work package"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-[40px] text-[16px] border-0 border-b border-slate-300 rounded-none pl-[32px] pr-[56px] py-[8px] text-slate-400 bg-white transition-all hover:border-b-[#0076A4]/50 focus:border-b-[#0076A4] focus:ring-0"
+                    className="w-full h-[44px] text-[15px] border border-slate-300 rounded-[8px] pl-[40px] pr-4 py-[10px] text-slate-700 bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20 focus:ring-offset-0"
                   />
                 </div>
                 <Button
                   onClick={handleResetFilters}
-                  className="bg-[#0076A4] hover:bg-[#006a94] text-white px-4 py-2 h-[40px] rounded-[6px] text-[14px] font-medium shrink-0 transition-all"
+                  className="bg-[#009EDB] hover:bg-[#0088c4] text-white px-5 py-2 h-[44px] rounded-[8px] text-[14px] font-semibold shrink-0 transition-all shadow-sm hover:shadow-md flex items-center gap-2"
                 >
-                  Reset
+                  <span>Reset</span>
                 </Button>
               </div>
             </div>
           </div>
 
           {/* Advanced Filtering Collapsible */}
-          <div className="mb-3 w-[818px]">
+          <div className="mb-4 w-full max-w-[818px]">
             <Collapsible open={isAdvancedFilterOpen} onOpenChange={setIsAdvancedFilterOpen}>
               <div className="flex items-center gap-2">
-                <CollapsibleTrigger className="flex items-center gap-2 text-[14px] text-slate-700 hover:text-slate-900 transition-colors">
+                <CollapsibleTrigger className="flex items-center gap-2 text-[14px] font-medium text-slate-700 hover:text-[#009EDB] transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50">
                   <span>Advanced filtering</span>
                   <ChevronDown
                     className={`w-4 h-4 text-slate-600 transition-transform ${
@@ -513,14 +581,18 @@ export default function WorkPackagesPage() {
                 </CollapsibleTrigger>
               </div>
               <CollapsibleContent className="mt-3">
-                <div className="flex gap-[8px] items-center flex-nowrap w-full">
+                <div className="flex gap-3 items-center flex-nowrap w-full bg-slate-50/50 p-4 rounded-[8px] border border-slate-200">
                   <Select value={selectedWorkPackage} onValueChange={setSelectedWorkPackage}>
-                    <SelectTrigger className="w-[267px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
+                    <SelectTrigger className="w-[267px] h-[40px] text-[14px] border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20">
                       <SelectValue placeholder="Select Work Package" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-[8px] border-slate-200 shadow-lg bg-white p-1 min-w-[267px]">
                       {uniqueWorkPackages.map((wp) => (
-                        <SelectItem key={wp} value={wp}>
+                        <SelectItem 
+                          key={wp} 
+                          value={wp}
+                          className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-[highlighted]:bg-[#E0F5FF] transition-colors"
+                        >
                           {wp}
                         </SelectItem>
                       ))}
@@ -528,12 +600,16 @@ export default function WorkPackagesPage() {
                   </Select>
 
                   <Select value={selectedLead} onValueChange={setSelectedLead}>
-                    <SelectTrigger className="w-[267px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
+                    <SelectTrigger className="w-[267px] h-[40px] text-[14px] border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20">
                       <SelectValue placeholder="Select Work Package Lead" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-[8px] border-slate-200 shadow-lg bg-white p-1 min-w-[267px]">
                       {uniqueLeads.map((lead) => (
-                        <SelectItem key={lead} value={lead}>
+                        <SelectItem 
+                          key={lead} 
+                          value={lead}
+                          className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-[highlighted]:bg-[#E0F5FF] transition-colors"
+                        >
                           {lead}
                         </SelectItem>
                       ))}
@@ -541,12 +617,16 @@ export default function WorkPackagesPage() {
                   </Select>
 
                   <Select value={selectedWorkstream} onValueChange={setSelectedWorkstream}>
-                    <SelectTrigger className="w-[267px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
+                    <SelectTrigger className="w-[267px] h-[40px] text-[14px] border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20">
                       <SelectValue placeholder="Select Workstream" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-[8px] border-slate-200 shadow-lg bg-white p-1 min-w-[267px]">
                       {uniqueWorkstreams.map((ws) => (
-                        <SelectItem key={ws} value={ws}>
+                        <SelectItem 
+                          key={ws} 
+                          value={ws}
+                          className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-[highlighted]:bg-[#E0F5FF] transition-colors"
+                        >
                           {ws}
                         </SelectItem>
                       ))}
@@ -558,9 +638,11 @@ export default function WorkPackagesPage() {
           </div>
         </section>
 
-        {/* Work Packages Collapsible */}
-        <section className="w-[818px]">
-          <div className="w-full space-y-4">
+        {/* Work Packages and Chart Section */}
+        <section className="flex gap-6 items-start">
+          {/* Work Packages Collapsible */}
+          <div className="flex-1 max-w-[818px]">
+            <div className="w-full space-y-4">
             {filteredWorkPackages.map((wp, index) => {
               const collapsibleKey = `${wp.report.join('-')}-${wp.number || 'empty'}-${index}`;
               const isOpen = openCollapsibles.has(collapsibleKey);
@@ -665,16 +747,22 @@ export default function WorkPackagesPage() {
                       )}
                       {/* Goal for first Work Package */}
                       {index === 0 && (
-                        <div className="mt-3 pr-8 text-left">
-                          <p className="text-[14px] text-slate-700 leading-[20px] italic text-left">
+                        <div className="mt-4 pr-8 text-left pl-4 py-2">
+                          <p className="text-[13px] font-semibold text-[#009EDB] uppercase tracking-wide mb-1">
+                            Goal
+                          </p>
+                          <p className="text-[14px] text-slate-800 leading-[22px] mt-2 italic">
                             We make peace operations leaner and more effective by assigning civilian tasks to the entities best equipped to deliver them, ensuring seamless transitions and lasting stability.
                           </p>
                         </div>
                       )}
                       {/* Goal for New Humanitarian Compact Work Package */}
                       {wp.name.toLowerCase().includes('humanitarian compact') && (
-                        <div className="mt-3 pr-8 text-left">
-                          <p className="text-[14px] text-slate-700 leading-[20px] italic text-left">
+                        <div className="mt-4 pr-8 text-left pl-4 py-2">
+                          <p className="text-[13px] font-semibold text-[#009EDB] uppercase tracking-wide mb-1">
+                            Goal
+                          </p>
+                          <p className="text-[14px] text-slate-800 leading-[22px] mt-2 italic">
                             Rebuild trust in humanitarian action through faster, simpler, and more united response that reaches millions more people with the same resources.
                           </p>
                         </div>
@@ -766,6 +854,52 @@ export default function WorkPackagesPage() {
                 </Collapsible>
               );
             })}
+            </div>
+          </div>
+
+          {/* Chart Section */}
+          <div className="w-[320px] flex-shrink-0 mt-0 border-l border-slate-200 pl-6" style={{ marginLeft: 'calc((4 * 280px + 3 * 16px) - 818px - 320px - 24px)' }}>
+            <div className="bg-white p-5">
+              <h3 className="text-[16px] font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                <Users className="w-5 h-5 text-[#009EDB]" />
+                Work Packages per Lead
+              </h3>
+              <ResponsiveContainer width="100%" height={Math.max(400, chartData.length * 30)}>
+                <BarChart
+                  data={chartData}
+                  layout="vertical"
+                  margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis 
+                    type="number" 
+                    tick={{ fontSize: 12, fill: '#64748b' }}
+                    stroke="#cbd5e1"
+                  />
+                  <YAxis 
+                    type="category" 
+                    dataKey="lead" 
+                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    stroke="#cbd5e1"
+                    width={120}
+                  />
+                  <RechartsTooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#fff', 
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      fontSize: '12px'
+                    }}
+                    formatter={(value: number) => [value, 'Work Packages']}
+                  />
+                  <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill="#009EDB" />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </section>
       </div>
