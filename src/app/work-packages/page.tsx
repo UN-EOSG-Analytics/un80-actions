@@ -311,12 +311,12 @@ export default function WorkPackagesPage() {
 
     // Apply work package filter (if selected) when computing leads and workstreams
     if (selectedWorkPackage) {
-      const wpMatch = selectedWorkPackage.match(/^(\d+):/);
+      const wpMatch = selectedWorkPackage.match(/^WP:\s*(\d+):/);
       if (wpMatch) {
         const wpNumber = wpMatch[1];
         filtered = filtered.filter((wp) => wp.number === wpNumber);
       } else {
-        filtered = filtered.filter((wp) => !wp.number && wp.name === selectedWorkPackage);
+        filtered = filtered.filter((wp) => !wp.number && wp.name === selectedWorkPackage.replace(/^WP:\s*/, ''));
       }
     }
 
@@ -326,7 +326,7 @@ export default function WorkPackagesPage() {
   // Get unique values for filters (filtered based on other selections)
   const uniqueWorkPackages = useMemo(() => {
     return Array.from(new Set(getFilteredWorkPackagesForOptions.map(wp => 
-      wp.number ? `${wp.number}: ${wp.name}` : wp.name
+      wp.number ? `WP: ${wp.number}: ${wp.name}` : `WP: ${wp.name}`
     ))).sort();
   }, [getFilteredWorkPackagesForOptions]);
 
@@ -384,13 +384,13 @@ export default function WorkPackagesPage() {
 
     // Work Package filter
     if (selectedWorkPackage) {
-      const wpMatch = selectedWorkPackage.match(/^(\d+):/);
+      const wpMatch = selectedWorkPackage.match(/^WP:\s*(\d+):/);
       if (wpMatch) {
         const wpNumber = wpMatch[1];
         filtered = filtered.filter((wp) => wp.number === wpNumber);
       } else {
         // Handle work packages without numbers
-        filtered = filtered.filter((wp) => !wp.number && wp.name === selectedWorkPackage);
+        filtered = filtered.filter((wp) => !wp.number && wp.name === selectedWorkPackage.replace(/^WP:\s*/, ''));
       }
     }
 
@@ -487,7 +487,7 @@ export default function WorkPackagesPage() {
                             Number of Workstreams
                           </p>
                         </div>
-                        <p className="text-[48px] font-bold text-[#009EDB] text-left leading-[56px]">
+                        <p className="text-[48px] font-bold text-black text-left leading-[56px]">
                           {statsData.workstreams}
                         </p>
                       </div>
@@ -507,7 +507,7 @@ export default function WorkPackagesPage() {
                             Number of Workpackages
                           </p>
                         </div>
-                        <p className="text-[48px] font-bold text-[#009EDB] text-left leading-[56px]">
+                        <p className="text-[48px] font-bold text-black text-left leading-[56px]">
                           {statsData.workpackages}
                         </p>
                       </div>
@@ -527,7 +527,7 @@ export default function WorkPackagesPage() {
                             Number of actions
                           </p>
                         </div>
-                        <p className="text-[48px] font-bold text-[#009EDB] text-left leading-[56px]">
+                        <p className="text-[48px] font-bold text-black text-left leading-[56px]">
                           {statsData.actions}
                         </p>
                       </div>
@@ -547,7 +547,7 @@ export default function WorkPackagesPage() {
                             Number of leads
                           </p>
                         </div>
-                        <p className="text-[48px] font-bold text-[#009EDB] text-left leading-[56px]">
+                        <p className="text-[48px] font-bold text-black text-left leading-[56px]">
                           {statsData.leads}
                         </p>
                       </div>
@@ -676,7 +676,7 @@ export default function WorkPackagesPage() {
                   open={isOpen}
                   onOpenChange={() => toggleCollapsible(collapsibleKey)}
                 >
-                  <div className={`mb-20 last:mb-0 ${isOpen ? 'border border-slate-200 rounded-[6px] bg-slate-50/50' : ''}`}>
+                  <div className={`mb-20 last:mb-0 ${isOpen ? 'border-l-4 border-l-[#009EDB] border border-slate-200 rounded-[6px] bg-slate-50/50' : ''}`}>
                     <CollapsibleTrigger className={`w-full flex flex-col items-start px-0 py-0 hover:no-underline bg-slate-50 rounded-[6px] px-6 py-4 transition-all hover:bg-[#E0F5FF] border-0 relative ${isOpen ? 'rounded-b-none' : ''}`}>
                       {/* Workstream Labels - Top Right */}
                       <div className="absolute top-4 right-12 flex flex-row gap-2">
@@ -770,11 +770,11 @@ export default function WorkPackagesPage() {
                       )}
                       {/* Goal from work package data */}
                       {wp.goal && (
-                        <div className="mt-4 pr-8 text-left pl-4 py-2">
-                          <p className="text-[13px] font-semibold text-[#009EDB] uppercase tracking-wide mb-1">
+                        <div className="mt-4 pr-8 text-left pl-0 py-2">
+                          <p className="text-[13px] font-semibold text-[#009EDB] uppercase tracking-wide mb-1 text-left">
                             Goal
                           </p>
-                          <p className="text-[14px] text-slate-800 leading-[22px] mt-2 italic">
+                          <p className="text-[14px] text-slate-800 leading-[22px] mt-2 italic text-left">
                             {wp.goal}
                           </p>
                         </div>
@@ -799,7 +799,7 @@ export default function WorkPackagesPage() {
                           {wp.actions.map((action, idx) => (
                             <div
                               key={idx}
-                              className="bg-white border-l-4 border-l-[#009EDB] border border-slate-200 rounded-[6px] p-5 transition-all hover:border-l-[#0076A4] hover:shadow-sm"
+                              className="bg-white border border-slate-200 rounded-[6px] p-5 transition-all hover:shadow-sm"
                             >
                               {/* Activity Number and Text */}
                               <div className="flex items-start gap-3 mb-4">
