@@ -244,6 +244,33 @@ export default function WorkPackagesPage() {
     });
   }, [actions]);
 
+  // Calculate statistics
+  const statsData = useMemo(() => {
+    const uniqueWorkstreams = new Set<string>();
+    const uniqueLeadsSet = new Set<string>();
+    
+    actions.forEach(action => {
+      if (action.report) {
+        uniqueWorkstreams.add(action.report);
+      }
+      if (action.work_package_leads) {
+        action.work_package_leads.split(/[;,]/).forEach(lead => {
+          const trimmed = lead.trim();
+          if (trimmed.length > 0) {
+            uniqueLeadsSet.add(trimmed);
+          }
+        });
+      }
+    });
+
+    return {
+      workstreams: uniqueWorkstreams.size,
+      workpackages: workPackages.length,
+      actions: actions.length,
+      leads: uniqueLeadsSet.size,
+    };
+  }, [actions, workPackages]);
+
   // Get unique values for filters
   const uniqueWorkPackages = useMemo(() => {
     return Array.from(new Set(workPackages.map(wp => 
@@ -344,7 +371,7 @@ export default function WorkPackagesPage() {
             />
           </div>
           <h1 className="text-[48px] font-bold text-black leading-[24px] mb-6 mt-12">
-            UN80 Initiative Dashboard
+            UN80 Initiative
           </h1>
           <div className="text-[14px] text-black leading-[24px] max-w-[1093px]">
             <p className="mb-0">
@@ -364,18 +391,18 @@ export default function WorkPackagesPage() {
                     <TooltipTrigger asChild>
                       <div className="relative flex flex-col items-start justify-start w-[280px] h-[140px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
                         <div className="flex items-center gap-2 mb-3">
-                          <Layers className="w-5 h-5 text-[#0076A4]" />
-                          <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
+                          <Layers className="w-5 h-5 text-[#009EDB]" />
+                          <p className="text-[14px] font-bold text-[#009EDB] text-left leading-[24px]">
                             Number of Workstreams
                           </p>
                         </div>
-                        <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px]">
-                          3
+                        <p className="text-[48px] font-bold text-[#009EDB] text-left leading-[56px]">
+                          {statsData.workstreams}
                         </p>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Number of Workstreams: 3</p>
+                      <p>Number of Workstreams: {statsData.workstreams}</p>
                     </TooltipContent>
                   </Tooltip>
 
@@ -384,18 +411,18 @@ export default function WorkPackagesPage() {
                     <TooltipTrigger asChild>
                       <div className="relative flex flex-col items-start justify-start w-[280px] h-[140px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
                         <div className="flex items-center gap-2 mb-3">
-                          <BriefcaseIcon className="w-5 h-5 text-[#0076A4]" />
-                          <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
+                          <BriefcaseIcon className="w-5 h-5 text-[#009EDB]" />
+                          <p className="text-[14px] font-bold text-[#009EDB] text-left leading-[24px]">
                             Number of Workpackages
                           </p>
                         </div>
-                        <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px]">
-                          31
+                        <p className="text-[48px] font-bold text-[#009EDB] text-left leading-[56px]">
+                          {statsData.workpackages}
                         </p>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Number of Workpackages: 31</p>
+                      <p>Number of Workpackages: {statsData.workpackages}</p>
                     </TooltipContent>
                   </Tooltip>
 
@@ -404,18 +431,18 @@ export default function WorkPackagesPage() {
                     <TooltipTrigger asChild>
                       <div className="relative flex flex-col items-start justify-start w-[280px] h-[140px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
                         <div className="flex items-center gap-2 mb-3">
-                          <ListTodo className="w-5 h-5 text-[#0076A4]" />
-                          <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
+                          <ListTodo className="w-5 h-5 text-[#009EDB]" />
+                          <p className="text-[14px] font-bold text-[#009EDB] text-left leading-[24px]">
                             Number of actions
                           </p>
                         </div>
-                        <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px]">
-                          90
+                        <p className="text-[48px] font-bold text-[#009EDB] text-left leading-[56px]">
+                          {statsData.actions}
                         </p>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Number of actions: 90</p>
+                      <p>Number of actions: {statsData.actions}</p>
                     </TooltipContent>
                   </Tooltip>
 
@@ -424,18 +451,18 @@ export default function WorkPackagesPage() {
                     <TooltipTrigger asChild>
                       <div className="relative flex flex-col items-start justify-start w-[280px] h-[140px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
                         <div className="flex items-center gap-2 mb-3">
-                          <Users className="w-5 h-5 text-[#0076A4]" />
-                          <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
+                          <Users className="w-5 h-5 text-[#009EDB]" />
+                          <p className="text-[14px] font-bold text-[#009EDB] text-left leading-[24px]">
                             Number of leads
                           </p>
                         </div>
-                        <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px]">
-                          tbd
+                        <p className="text-[48px] font-bold text-[#009EDB] text-left leading-[56px]">
+                          {statsData.leads}
                         </p>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Number of leads: tbd</p>
+                      <p>Number of leads: {statsData.leads}</p>
                     </TooltipContent>
                   </Tooltip>
           </div>
@@ -601,28 +628,41 @@ export default function WorkPackagesPage() {
                         )}
                       </div>
                       {/* Work Package Leads - Underneath the text */}
-                      <div className="flex flex-row gap-3 flex-wrap mb-2">
-                        {wp.leads.length > 0 && wp.leads.map((lead, leadIdx) => {
-                          const longForm = abbreviationMap[lead] || lead;
-                          return (
-                            <Tooltip key={leadIdx}>
-                              <TooltipTrigger asChild>
-                                <div className="flex items-center gap-2 cursor-help">
-                                  <User className="w-4 h-4 text-gray-600" />
-                                  <p className="text-[14px] text-gray-600 leading-[20px]">
-                                    {lead}
-                                  </p>
-                                </div>
-                              </TooltipTrigger>
-                              {longForm !== lead && (
-                                <TooltipContent>
-                                  <p>{longForm}</p>
-                                </TooltipContent>
-                              )}
-                            </Tooltip>
-                          );
-                        })}
-                      </div>
+                      {wp.leads.length > 0 && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center gap-2 cursor-help mb-2">
+                              <User className="w-4 h-4 text-gray-600" />
+                              <p className="text-[14px] text-gray-600 leading-[20px]">
+                                {wp.leads.map((lead, idx) => {
+                                  const longForm = abbreviationMap[lead] || lead;
+                                  return (
+                                    <span key={idx}>
+                                      {idx > 0 && ', '}
+                                      <span title={longForm !== lead ? longForm : undefined}>
+                                        {lead}
+                                      </span>
+                                    </span>
+                                  );
+                                })}
+                              </p>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>
+                              {wp.leads.map((lead, idx) => {
+                                const longForm = abbreviationMap[lead] || lead;
+                                return (
+                                  <span key={idx}>
+                                    {idx > 0 && ', '}
+                                    {longForm}
+                                  </span>
+                                );
+                              })}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
                       {/* Goal for first Work Package */}
                       {index === 0 && (
                         <div className="mt-3 pr-8 text-left">
@@ -647,45 +687,68 @@ export default function WorkPackagesPage() {
                     </CollapsibleTrigger>
                     <CollapsibleContent className={`px-0 pb-4 pt-4 pl-6 ${isOpen ? 'px-6' : ''}`}>
                       {wp.actions.length > 0 ? (
-                        <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-4">
                           {/* Header */}
-                          <h3 className="text-[16px] font-bold text-slate-900 leading-[24px] mb-2">
-                            Indicative activities
-                          </h3>
+                          <div className="flex flex-col gap-2 mb-2">
+                            <h3 className="text-[16px] font-semibold text-slate-700 uppercase tracking-wider text-left">
+                              Indicative activities
+                            </h3>
+                            <div className="h-px w-full bg-gradient-to-r from-slate-300 via-slate-300 to-transparent"></div>
+                          </div>
                           {/* Display each indicative_activity in its own box */}
                           {wp.actions.map((action, idx) => (
                             <div
                               key={idx}
-                              className="bg-white border border-slate-200 rounded-[6px] p-4 transition-all hover:border-[#0076A4]/30"
+                              className="bg-white border-l-4 border-l-[#009EDB] border border-slate-200 rounded-[6px] p-5 transition-all hover:border-l-[#0076A4] hover:shadow-sm"
                             >
-                              {/* Indicative Activity Text */}
-                              <p className="text-[14px] font-medium text-slate-900 leading-[20px] mb-3">
-                                {action.text}
-                              </p>
+                              {/* Activity Number and Text */}
+                              <div className="flex items-start gap-3 mb-4">
+                                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#009EDB]/10 flex items-center justify-center mt-0.5">
+                                  <span className="text-[12px] font-semibold text-[#009EDB]">
+                                    {idx + 1}
+                                  </span>
+                                </div>
+                                <p className="text-[15px] font-medium text-slate-900 leading-[24px] flex-1">
+                                  {action.text}
+                                </p>
+                              </div>
                               
                               {/* Work Package Leads - Icon + Text */}
                               {action.leads.length > 0 && (
-                                <div className="flex flex-row gap-3 flex-wrap">
-                                  {action.leads.map((lead, leadIdx) => {
-                                    const longForm = abbreviationMap[lead] || lead;
-                                    return (
-                                      <Tooltip key={leadIdx}>
-                                        <TooltipTrigger asChild>
-                                          <div className="flex items-center gap-2 cursor-help">
-                                            <User className="w-4 h-4 text-gray-600" />
-                                            <p className="text-[14px] text-gray-600 leading-[20px]">
-                                              {lead}
-                                            </p>
-                                          </div>
-                                        </TooltipTrigger>
-                                        {longForm !== lead && (
-                                          <TooltipContent>
-                                            <p>{longForm}</p>
-                                          </TooltipContent>
-                                        )}
-                                      </Tooltip>
-                                    );
-                                  })}
+                                <div className="ml-9 pt-3 border-t border-slate-100">
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div className="flex items-center gap-2 cursor-help">
+                                        <User className="w-4 h-4 text-gray-500" />
+                                        <p className="text-[13px] text-gray-600 leading-[20px]">
+                                          {action.leads.map((lead, idx) => {
+                                            const longForm = abbreviationMap[lead] || lead;
+                                            return (
+                                              <span key={idx}>
+                                                {idx > 0 && ', '}
+                                                <span title={longForm !== lead ? longForm : undefined}>
+                                                  {lead}
+                                                </span>
+                                              </span>
+                                            );
+                                          })}
+                                        </p>
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>
+                                        {action.leads.map((lead, idx) => {
+                                          const longForm = abbreviationMap[lead] || lead;
+                                          return (
+                                            <span key={idx}>
+                                              {idx > 0 && ', '}
+                                              {longForm}
+                                            </span>
+                                          );
+                                        })}
+                                      </p>
+                                    </TooltipContent>
+                                  </Tooltip>
                                 </div>
                               )}
                             </div>
