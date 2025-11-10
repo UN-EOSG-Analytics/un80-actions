@@ -30,6 +30,17 @@ import Image from "next/image";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
+// Mapping of abbreviations to their long forms
+const abbreviationMap: Record<string, string> = {
+  'USG DPPA': 'Under-Secretary-General for Political and Peacebuilding Affairs',
+  'USG DPO': 'Under-Secretary-General for Peace Operations',
+  'USG OCHA': 'Under-Secretary-General for Humanitarian Affairs and Emergency Relief Coordinator',
+  'USG': 'Under-Secretary-General',
+  'DPPA': 'Department of Political and Peacebuilding Affairs',
+  'DPO': 'Department of Peace Operations',
+  'OCHA': 'Office for the Coordination of Humanitarian Affairs',
+};
+
 interface WorkPackageStats {
   total: number;
   completed: number;
@@ -348,77 +359,85 @@ export default function WorkPackagesPage() {
         {/* Progress Section */}
         <section className="mb-0">
           <div className="flex gap-4 items-start flex-nowrap">
-            {/* Card 1 - Number of Workstreams */}
-            <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="relative flex flex-col items-start justify-start w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
-                    <Layers className="w-5 h-5 text-[#0076A4] mb-2" />
-                    <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px] mb-3">
-                      3
-                    </p>
-                    <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
-                      Number of Workstreams
-                    </p>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Number of Workstreams: 3</p>
-                </TooltipContent>
-              </Tooltip>
+                {/* Card 1 - Number of Workstreams */}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="relative flex flex-col items-start justify-start w-[280px] h-[140px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Layers className="w-5 h-5 text-[#0076A4]" />
+                          <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
+                            Number of Workstreams
+                          </p>
+                        </div>
+                        <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px]">
+                          3
+                        </p>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Number of Workstreams: 3</p>
+                    </TooltipContent>
+                  </Tooltip>
 
-              {/* Card 2 - Number of Workpackages */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="relative flex flex-col items-start justify-start w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
-                    <BriefcaseIcon className="w-5 h-5 text-[#0076A4] mb-2" />
-                    <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px] mb-3">
-                      31
-                    </p>
-                    <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
-                      Number of Workpackages
-                    </p>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Number of Workpackages: 31</p>
-                </TooltipContent>
-              </Tooltip>
+                {/* Card 2 - Number of Workpackages */}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="relative flex flex-col items-start justify-start w-[280px] h-[140px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
+                        <div className="flex items-center gap-2 mb-3">
+                          <BriefcaseIcon className="w-5 h-5 text-[#0076A4]" />
+                          <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
+                            Number of Workpackages
+                          </p>
+                        </div>
+                        <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px]">
+                          31
+                        </p>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Number of Workpackages: 31</p>
+                    </TooltipContent>
+                  </Tooltip>
 
-              {/* Card 3 - Number of actions */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="relative flex flex-col items-start justify-start w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
-                    <ListTodo className="w-5 h-5 text-[#0076A4] mb-2" />
-                    <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px] mb-3">
-                      90
-                    </p>
-                    <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
-                      Number of actions
-                    </p>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Number of actions: 90</p>
-                </TooltipContent>
-              </Tooltip>
+                {/* Card 3 - Number of actions */}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="relative flex flex-col items-start justify-start w-[280px] h-[140px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
+                        <div className="flex items-center gap-2 mb-3">
+                          <ListTodo className="w-5 h-5 text-[#0076A4]" />
+                          <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
+                            Number of actions
+                          </p>
+                        </div>
+                        <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px]">
+                          90
+                        </p>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Number of actions: 90</p>
+                    </TooltipContent>
+                  </Tooltip>
 
-              {/* Card 4 - Number of leads */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="relative flex flex-col items-start justify-start w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
-                    <Users className="w-5 h-5 text-[#0076A4] mb-2" />
-                    <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px] mb-3">
-                      tbd
-                    </p>
-                    <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
-                      Number of leads
-                    </p>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Number of leads: tbd</p>
-                </TooltipContent>
-              </Tooltip>
+                {/* Card 4 - Number of leads */}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="relative flex flex-col items-start justify-start w-[280px] h-[140px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Users className="w-5 h-5 text-[#0076A4]" />
+                          <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
+                            Number of leads
+                          </p>
+                        </div>
+                        <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px]">
+                          tbd
+                        </p>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Number of leads: tbd</p>
+                    </TooltipContent>
+                  </Tooltip>
           </div>
         </section>
 
@@ -430,29 +449,31 @@ export default function WorkPackagesPage() {
           </h2>
           
           {/* Search Bar */}
-          <div className="flex gap-[8px] items-start mb-3 flex-wrap">
-            <div className="flex gap-[8px] items-start flex-1 min-w-[384px]">
-              <div className="flex-1 relative">
-                <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
-                <Input
-                  type="text"
-                  placeholder="Search for work package"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-[40px] text-[16px] border-0 border-b border-slate-300 rounded-none pl-[32px] pr-[56px] py-[8px] text-slate-400 bg-white transition-all hover:border-b-[#0076A4]/50 focus:border-b-[#0076A4] focus:ring-0"
-                />
+          <div className="w-[818px]">
+            <div className="flex gap-[8px] items-start mb-3 flex-wrap">
+              <div className="flex gap-[8px] items-start flex-1">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                  <Input
+                    type="text"
+                    placeholder="Search for work package"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full h-[40px] text-[16px] border-0 border-b border-slate-300 rounded-none pl-[32px] pr-[56px] py-[8px] text-slate-400 bg-white transition-all hover:border-b-[#0076A4]/50 focus:border-b-[#0076A4] focus:ring-0"
+                  />
+                </div>
+                <Button
+                  onClick={handleResetFilters}
+                  className="bg-[#0076A4] hover:bg-[#006a94] text-white px-4 py-2 h-[40px] rounded-[6px] text-[14px] font-medium shrink-0 transition-all"
+                >
+                  Reset
+                </Button>
               </div>
-              <Button
-                onClick={handleResetFilters}
-                className="bg-[#0076A4] hover:bg-[#006a94] text-white px-4 py-2 h-[40px] rounded-[6px] text-[14px] font-medium shrink-0 transition-all"
-              >
-                Reset
-              </Button>
             </div>
           </div>
 
           {/* Advanced Filtering Collapsible */}
-          <div className="mb-3">
+          <div className="mb-3 w-[818px]">
             <Collapsible open={isAdvancedFilterOpen} onOpenChange={setIsAdvancedFilterOpen}>
               <div className="flex items-center gap-2">
                 <CollapsibleTrigger className="flex items-center gap-2 text-[14px] text-slate-700 hover:text-slate-900 transition-colors">
@@ -465,9 +486,9 @@ export default function WorkPackagesPage() {
                 </CollapsibleTrigger>
               </div>
               <CollapsibleContent className="mt-3">
-                <div className="flex gap-[8px] items-center flex-wrap">
+                <div className="flex gap-[8px] items-center flex-nowrap w-full">
                   <Select value={selectedWorkPackage} onValueChange={setSelectedWorkPackage}>
-                    <SelectTrigger className="w-[235px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
+                    <SelectTrigger className="w-[267px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
                       <SelectValue placeholder="Select Work Package" />
                     </SelectTrigger>
                     <SelectContent>
@@ -480,7 +501,7 @@ export default function WorkPackagesPage() {
                   </Select>
 
                   <Select value={selectedLead} onValueChange={setSelectedLead}>
-                    <SelectTrigger className="w-[235px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
+                    <SelectTrigger className="w-[267px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
                       <SelectValue placeholder="Select Work Package Lead" />
                     </SelectTrigger>
                     <SelectContent>
@@ -493,7 +514,7 @@ export default function WorkPackagesPage() {
                   </Select>
 
                   <Select value={selectedWorkstream} onValueChange={setSelectedWorkstream}>
-                    <SelectTrigger className="w-[235px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
+                    <SelectTrigger className="w-[267px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
                       <SelectValue placeholder="Select Workstream" />
                     </SelectTrigger>
                     <SelectContent>
@@ -512,7 +533,7 @@ export default function WorkPackagesPage() {
 
         {/* Work Packages Collapsible */}
         <section className="w-[818px]">
-          <div className="w-full">
+          <div className="w-full space-y-4">
             {filteredWorkPackages.map((wp, index) => {
               const collapsibleKey = `${wp.report.join('-')}-${wp.number || 'empty'}-${index}`;
               const isOpen = openCollapsibles.has(collapsibleKey);
@@ -525,53 +546,99 @@ export default function WorkPackagesPage() {
                 >
                   <div className={`mb-20 last:mb-0 ${isOpen ? 'border border-slate-200 rounded-[6px] bg-slate-50/50' : ''}`}>
                     <CollapsibleTrigger className={`w-full flex flex-col items-start px-0 py-0 hover:no-underline bg-slate-50 rounded-[6px] px-6 py-4 transition-all hover:bg-[#E0F5FF] border-0 relative ${isOpen ? 'rounded-b-none' : ''}`}>
-                      <div className="text-left min-w-0 mb-2 pr-8">
-                        <p className="text-[16px] font-medium text-slate-900 leading-[24px] inline">
-                          {wp.name}
-                        </p>
-                        {wp.number && (
-                          <span className="text-[16px] font-medium text-gray-400 leading-[24px]">
-                            , Work Package {wp.number}
-                          </span>
+                      {/* Workstream Labels - Top Right */}
+                      <div className="absolute top-4 right-12 flex flex-row gap-2">
+                        {wp.report.includes('WS2') && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="flex items-center gap-2 cursor-help">
+                                <Folder className="w-4 h-4 text-gray-600" />
+                                <p className="text-[14px] text-gray-600 leading-[20px]">
+                                  WS2
+                                </p>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Workstream 2</p>
+                            </TooltipContent>
+                          </Tooltip>
                         )}
-                        {!wp.number && (
-                          <span className="text-[16px] font-medium text-gray-400 leading-[24px]">
-                            , Work Package
-                          </span>
+                        {wp.report.includes('WS3') && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="flex items-center gap-2 cursor-help">
+                                <Folder className="w-4 h-4 text-gray-600" />
+                                <p className="text-[14px] text-gray-600 leading-[20px]">
+                                  WS3
+                                </p>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Workstream 3</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+                      <div className="text-left min-w-0 mb-2 pr-8">
+                        {wp.number ? (
+                          <>
+                            <span className="text-[16px] font-medium text-gray-400 leading-[24px]">
+                              WP {wp.number}:
+                            </span>
+                            <span className="text-[16px] font-medium text-slate-900 leading-[24px] ml-1">
+                              {wp.name}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-[16px] font-medium text-gray-400 leading-[24px]">
+                              WP:
+                            </span>
+                            <span className="text-[16px] font-medium text-slate-900 leading-[24px] ml-1">
+                              {wp.name}
+                            </span>
+                          </>
                         )}
                       </div>
                       {/* Work Package Leads - Underneath the text */}
-                      {wp.leads.length > 0 && (
-                        <div className="flex flex-row gap-3 flex-wrap mb-2">
-                          {wp.leads.map((lead, leadIdx) => (
-                            <div key={leadIdx} className="flex items-center gap-2">
-                              <User className="w-4 h-4 text-gray-600" />
-                              <p className="text-[14px] text-gray-600 leading-[20px]">
-                                {lead}
-                              </p>
-                            </div>
-                          ))}
+                      <div className="flex flex-row gap-3 flex-wrap mb-2">
+                        {wp.leads.length > 0 && wp.leads.map((lead, leadIdx) => {
+                          const longForm = abbreviationMap[lead] || lead;
+                          return (
+                            <Tooltip key={leadIdx}>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center gap-2 cursor-help">
+                                  <User className="w-4 h-4 text-gray-600" />
+                                  <p className="text-[14px] text-gray-600 leading-[20px]">
+                                    {lead}
+                                  </p>
+                                </div>
+                              </TooltipTrigger>
+                              {longForm !== lead && (
+                                <TooltipContent>
+                                  <p>{longForm}</p>
+                                </TooltipContent>
+                              )}
+                            </Tooltip>
+                          );
+                        })}
+                      </div>
+                      {/* Goal for first Work Package */}
+                      {index === 0 && (
+                        <div className="mt-3 pr-8 text-left">
+                          <p className="text-[14px] text-slate-700 leading-[20px] italic text-left">
+                            We make peace operations leaner and more effective by assigning civilian tasks to the entities best equipped to deliver them, ensuring seamless transitions and lasting stability.
+                          </p>
                         </div>
                       )}
-                      {/* Workstream Labels - Underneath the text */}
-                      <div className="flex flex-col gap-1">
-                        {wp.report.includes('WS2') && (
-                          <div className="flex items-center gap-2">
-                            <Folder className="w-4 h-4 text-gray-600" />
-                            <p className="text-[14px] text-gray-600 leading-[20px]">
-                              WS2
-                            </p>
-                          </div>
-                        )}
-                        {wp.report.includes('WS3') && (
-                          <div className="flex items-center gap-2">
-                            <Folder className="w-4 h-4 text-gray-600" />
-                            <p className="text-[14px] text-gray-600 leading-[20px]">
-                              WS3
-                            </p>
-                          </div>
-                        )}
-                      </div>
+                      {/* Goal for New Humanitarian Compact Work Package */}
+                      {wp.name.toLowerCase().includes('humanitarian compact') && (
+                        <div className="mt-3 pr-8 text-left">
+                          <p className="text-[14px] text-slate-700 leading-[20px] italic text-left">
+                            Rebuild trust in humanitarian action through faster, simpler, and more united response that reaches millions more people with the same resources.
+                          </p>
+                        </div>
+                      )}
                       <ChevronDown
                         className={`w-5 h-5 text-slate-600 transition-transform shrink-0 absolute top-4 right-4 ${
                           isOpen ? "transform rotate-180" : ""
@@ -598,37 +665,29 @@ export default function WorkPackagesPage() {
                               
                               {/* Work Package Leads - Icon + Text */}
                               {action.leads.length > 0 && (
-                                <div className="flex flex-row gap-3 flex-wrap mb-3">
-                                  {action.leads.map((lead, leadIdx) => (
-                                    <div key={leadIdx} className="flex items-center gap-2">
-                                      <User className="w-4 h-4 text-gray-600" />
-                                      <p className="text-[14px] text-gray-600 leading-[20px]">
-                                        {lead}
-                                      </p>
-                                    </div>
-                                  ))}
+                                <div className="flex flex-row gap-3 flex-wrap">
+                                  {action.leads.map((lead, leadIdx) => {
+                                    const longForm = abbreviationMap[lead] || lead;
+                                    return (
+                                      <Tooltip key={leadIdx}>
+                                        <TooltipTrigger asChild>
+                                          <div className="flex items-center gap-2 cursor-help">
+                                            <User className="w-4 h-4 text-gray-600" />
+                                            <p className="text-[14px] text-gray-600 leading-[20px]">
+                                              {lead}
+                                            </p>
+                                          </div>
+                                        </TooltipTrigger>
+                                        {longForm !== lead && (
+                                          <TooltipContent>
+                                            <p>{longForm}</p>
+                                          </TooltipContent>
+                                        )}
+                                      </Tooltip>
+                                    );
+                                  })}
                                 </div>
                               )}
-                              
-                              {/* Workstream Labels - Icon + Text */}
-                              <div className="flex flex-col gap-1">
-                                {action.report === 'WS2' && (
-                                  <div className="flex items-center gap-2">
-                                    <Folder className="w-4 h-4 text-gray-600" />
-                                    <p className="text-[14px] text-gray-600 leading-[20px]">
-                                      WS2
-                                    </p>
-                                  </div>
-                                )}
-                                {action.report === 'WS3' && (
-                                  <div className="flex items-center gap-2">
-                                    <Folder className="w-4 h-4 text-gray-600" />
-                                    <p className="text-[14px] text-gray-600 leading-[20px]">
-                                      WS3
-                                    </p>
-                                  </div>
-                                )}
-                              </div>
                             </div>
                           ))}
                         </div>
