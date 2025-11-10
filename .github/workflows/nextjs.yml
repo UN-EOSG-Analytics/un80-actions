@@ -1,15 +1,19 @@
-# NOTE: 
-# - static_site_generator: next has been removed to manage basePath manually in next.config.ts
-
 # Sample workflow for building and deploying a Next.js site to GitHub Pages
 #
 # To get started with Next.js see: https://nextjs.org/docs/getting-started
-#
-name: Deploy Next.js site to Pages
+
+name: Deploy Next.js to GitHub Pages
 
 on:
   # Runs on pushes targeting the default branch
   push:
+    branches: ["main"]
+
+  # Runs after the data fetching workflow completes
+  workflow_run:
+    workflows: ["Process raw JSON data"]
+    types:
+      - completed
     branches: ["main"]
 
   # Allows you to run this workflow manually from the Actions tab
@@ -31,6 +35,9 @@ jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
+    # Skip deployment if the commit message contains 'automated data update'
+    # This prevents deploying before data processing is complete
+    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, 'automated data update') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

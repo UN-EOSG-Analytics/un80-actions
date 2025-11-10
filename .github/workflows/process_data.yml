@@ -1,0 +1,39 @@
+name: Process raw JSON data
+
+on:
+    workflow_dispatch: # Allows manual trigger
+    push:
+        branches:
+            - main
+
+permissions:
+    contents: write # This grants permission to push changes
+
+jobs:
+    update-data:
+        runs-on: ubuntu-latest
+        # Only run on push if the commit message is from the automated data update
+        # This prevents infinite loops (github-actions commits won't match this message)
+        if: ${{ github.event_name != 'push' || contains(github.event.head_commit.message, 'automated data update') }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Set up uv
+              uses: astral-sh/setup-uv@v6
+              with:
+                  enable-cache: true
+
+            - name: Install dependencies from lockfile
+              run: uv sync --frozen # Guarantees reproducible installs: The exact versions in the lock file are installed.
+
+            - name: Run data cleaning script
+              run: uv run python python/prepare_data.py
+
+            - name: Commit and push changes
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                  git add .
+                  git commit -m "chore: automated data processing [GitHub Actions]" || exit 0
+                  git push
