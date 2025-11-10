@@ -31,7 +31,7 @@ for col in date_columns:
         df[col] = df[col].dt.strftime("%Y-%m-%d").fillna("")
 
 # Process list columns (semicolon-separated strings)
-list_columns = ["work_package_leads", "un_budget", "ms_body"]
+list_columns = ["work_package_leads", "un_budget"]
 
 for col in list_columns:
     if col in df.columns:
@@ -41,12 +41,26 @@ for col in list_columns:
             else []
         )
 
+# Process boolean columns (Yes/No to true/false)
+boolean_columns = ["big_ticket", "ms_approval"]
+
+for col in boolean_columns:
+    if col in df.columns:
+        df[col] = df[col].apply(
+            lambda x: True
+            if str(x).strip().lower() == "yes"
+            else False
+            if str(x).strip().lower() == "no"
+            else None
+        )
+
 # Clean all string columns (squish whitespace, strip, handle nulls)
 for col in df.columns:
     # Skip columns we've already processed or that aren't object type
     if (
         col not in date_columns
         and col not in list_columns
+        and col not in boolean_columns
         and df[col].dtype == "object"
     ):
         df[col] = df[col].apply(
