@@ -63,7 +63,7 @@ const WS3_WORK_PACKAGES = {
   ],
 };
 
-const WS1_WORK_PACKAGES = {
+const WS1_WORK_PACKAGES: Record<string, Array<{ number: string; name: string }>> = {
   "Global": [
     { number: "12", name: "Regional integrated platforms" },
     { number: "13", name: "Shared platform initiative" },
