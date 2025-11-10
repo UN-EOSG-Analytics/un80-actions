@@ -16,9 +16,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { fetchActions, filterActions } from "@/lib/actions";
+import { fetchActions } from "@/lib/actions";
 import type { Actions, Action } from "@/types/action";
-import { parseWorkPackageLeads } from "@/lib/actions";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
@@ -167,10 +166,12 @@ export default function Home() {
   const uniqueLeads = useMemo(() => {
     const leads = new Set<string>();
     actions.forEach((action) => {
-      if (action.work_package_leads) {
-        action.work_package_leads
-          .split(";")
-          .forEach((lead) => leads.add(lead.trim()));
+      if (Array.isArray(action.work_package_leads)) {
+        action.work_package_leads.forEach((lead: string) => {
+          if (lead && lead.trim()) {
+            leads.add(lead.trim());
+          }
+        });
       }
     });
     return Array.from(leads).sort();
@@ -184,7 +185,10 @@ export default function Home() {
   const filteredActions = useMemo(() => {
     let filtered = actions;
     if (selectedLead) {
-      filtered = filterActions(filtered, { work_package_leads: selectedLead });
+      filtered = filtered.filter((action) => 
+        Array.isArray(action.work_package_leads) && 
+        action.work_package_leads.includes(selectedLead)
+      );
     }
     return filtered;
   }, [actions, selectedLead]);
@@ -215,7 +219,9 @@ export default function Home() {
     const firstAction = detailActions[0];
     return {
       name: firstAction.work_package_name,
-      leads: parseWorkPackageLeads(firstAction.work_package_leads),
+      leads: Array.isArray(firstAction.work_package_leads) 
+        ? firstAction.work_package_leads 
+        : [],
       workstream: firstAction.report,
       actions: detailActions,
     };

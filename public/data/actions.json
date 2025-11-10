@@ -1,13 +1,13 @@
 [
   {
-    "report":"WS3",
-    "work_package_number":"1",
-    "work_package_name":"Peace operations (task delegation; review)",
-    "document_paragraph":"23",
-    "action_number":"14",
-    "indicative_activity":"Delegate relevant programmatic tasks such as rule of law, governance and child protection – and the associated resources – to UN system entities best equipped to deliver them",
-    "big_ticket":true,
-    "work_package_leads":[
+    "report": "WS3",
+    "work_package_number": "1",
+    "work_package_name": "Peace operations (task delegation; review)",
+    "document_paragraph": "23",
+    "action_number": "14",
+    "indicative_activity": "Delegate relevant programmatic tasks such as rule of law, governance and child protection – and the associated resources – to UN system entities best equipped to deliver them",
+    "big_ticket": true,
+    "work_package_leads": [
       "USG DPPA",
       "USG DPO"
     ],
@@ -16,35 +16,31 @@
     "ms_body":[
       "GA"
     ],
-    "legal_consideration":"GA decision (programme and peacekeeping budgets) required. Decisions of the governing bodies (including the executive boards) of the relevant agencies, funds and programmes required.",
-    "un_budget":[
-      "PKM 2026\/27",
+    "legal_consideration": "GA decision (programme and peacekeeping budgets) required. Decisions of the governing bodies (including the executive boards) of the relevant agencies, funds and programmes required.",
+    "un_budget": [
+      "PKM 2026/27",
       "RB 2027"
     ],
-    "work_package_goal":"Make peace operations leaner and more effective by assigning civilian tasks to the entities best equipped to deliver them, ensuring seamless transitions and lasting stability."
+    "work_package_goal": "Make peace operations leaner and more effective by assigning civilian tasks to the entities best equipped to deliver them, ensuring seamless transitions and lasting stability."
   },
   {
-    "report":"WS3",
-    "work_package_number":"1",
-    "work_package_name":"Peace operations (task delegation; review)",
-    "document_paragraph":"24",
-    "action_number":"15",
-    "indicative_activity":"Present comprehensive proposal for the reset of peace operations to Member States upon conclusion of the review mandated by the Pact for the Future",
-    "big_ticket":true,
-    "work_package_leads":[
+    "report": "WS3",
+    "work_package_number": "1",
+    "work_package_name": "Peace operations (task delegation; review)",
+    "document_paragraph": "24",
+    "action_number": "15",
+    "indicative_activity": "Present comprehensive proposal for the reset of peace operations to Member States upon conclusion of the review mandated by the Pact for the Future",
+    "big_ticket": true,
+    "work_package_leads": [
       "USG DPPA",
       "USG DPO"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": "Make peace operations leaner and more effective by assigning civilian tasks to the entities best equipped to deliver them, ensuring seamless transitions and lasting stability."
   },
   {
     "report":"WS3",
@@ -145,17 +141,30 @@
     "work_package_leads":[
       "USG Policy"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-      "GA",
-      "SC"
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
+  },
+  {
+    "report": "WS3",
+    "work_package_number": "2",
+    "work_package_name": "New Humanitarian Compact",
+    "document_paragraph": "29",
+    "action_number": "18",
+    "indicative_activity": "Scale common services with a Global Services Hub and interoperable digital platforms to help consolidate surge rosters, logistics, security, telecoms and engineering support",
+    "big_ticket": true,
+    "work_package_leads": [
+      "USG OCHA"
     ],
-    "legal_consideration":"GA decision (including on programme budget) and Security Council decision could be required.",
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -169,16 +178,12 @@
       "ASG DCO",
       "DSG"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": "Rebuild trust in humanitarian action through faster, simpler, and more united response that reaches millions more people with the same resources."
   },
   {
     "report":"WS3",
@@ -192,16 +197,12 @@
       "ASG DCO",
       "DSG"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -215,16 +216,12 @@
       "USG OCHA",
       "DSG"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -238,16 +235,12 @@
       "USG OCHA",
       "DSG"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -262,16 +255,16 @@
       "ED WFP",
       "Co-Chairs BIG"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
+    "first_milestone": "2026-02-27",
+    "ms_approval": true,
+    "ms_body": [
+      "GA"
     ],
-    "legal_consideration":null,
-    "un_budget":[
-
+    "legal_consideration": "GA decision required.",
+    "un_budget": [
+      "RB 2027"
     ],
-    "work_package_goal":null
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -286,16 +279,14 @@
       "ED WFP",
       "Co-Chairs BIG"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
+    "first_milestone": "2026-02-27",
+    "ms_approval": false,
+    "ms_body": [
+      "GA"
     ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "legal_consideration": "GA decision (including on programme budget) could be required.",
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -310,16 +301,12 @@
       "ED WFP",
       "Co-Chairs BIG"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -334,16 +321,12 @@
       "ED WFP",
       "Co-Chairs BIG"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -358,16 +341,16 @@
       "ED WFP",
       "Co-Chairs BIG"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
+    "first_milestone": "2026-02-27",
+    "ms_approval": true,
+    "ms_body": [
+      "GA"
     ],
-    "legal_consideration":null,
-    "un_budget":[
-
+    "legal_consideration": "GA decision (programme budget) is required",
+    "un_budget": [
+      "RB 2027"
     ],
-    "work_package_goal":null
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -382,16 +365,12 @@
       "Chair DTN",
       "SG ITU"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -454,16 +433,12 @@
       "USG DESA",
       "ED UNICEF"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -478,16 +453,12 @@
       "USG DESA",
       "ED UNICEF"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -501,16 +472,12 @@
       "ASG UNITAR",
       "Rector UNU"
     ],
-    "first_milestone":null,
-    "ms_approval":true,
-    "ms_body":[
-      "GA"
-    ],
-    "legal_consideration":"GA decision required.",
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -524,17 +491,15 @@
       "ASG UNITAR",
       "Rector UNU"
     ],
-    "first_milestone":null,
-    "ms_approval":true,
-    "ms_body":[
-      "SG",
-      "UNU"
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [
+      "GA",
+      "SC"
     ],
-    "legal_consideration":"UNU Council and SG decisions required.",
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "legal_consideration": "GA decision (including on programme budget) and Security Council decision could be required.",
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -548,16 +513,12 @@
       "ASG UNITAR",
       "Rector UNU"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -571,16 +532,12 @@
       "SA Reform",
       "ASG DCO"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -594,16 +551,12 @@
       "SA Reform",
       "ASG DCO"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -617,16 +570,12 @@
       "SA Reform",
       "ASG DCO"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS2",
@@ -640,16 +589,12 @@
       "SA Reform",
       "ASG DCO"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": "2025-10-30",
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS2",
@@ -661,18 +606,15 @@
     "big_ticket":true,
     "work_package_leads":[
       "USG Policy",
-      "USG DGACM"
+      "USG DESA",
+      "ED UNICEF"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": "2025-10-30",
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS2",
@@ -684,18 +626,15 @@
     "big_ticket":true,
     "work_package_leads":[
       "USG Policy",
-      "USG DGACM"
+      "USG DESA",
+      "ED UNICEF"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS2",
@@ -707,18 +646,15 @@
     "big_ticket":true,
     "work_package_leads":[
       "USG Policy",
-      "USG DGACM"
+      "USG DESA",
+      "ED UNICEF"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -731,16 +667,15 @@
     "work_package_leads":[
       "USG OCHA"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
+    "first_milestone": null,
+    "ms_approval": true,
+    "ms_body": [
+      "SG",
+      "UNU"
     ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "legal_consideration": "UNU Council and SG decisions required.",
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -753,16 +688,12 @@
     "work_package_leads":[
       "USG OCHA"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -775,16 +706,12 @@
     "work_package_leads":[
       "USG OCHA"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -841,16 +768,12 @@
     "work_package_leads":[
       "USG OCHA"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -863,16 +786,12 @@
     "work_package_leads":[
       "USG OCHA"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -885,16 +804,12 @@
     "work_package_leads":[
       "USG OCHA"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -907,16 +822,12 @@
     "work_package_leads":[
       "USG OCHA"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS2",
@@ -929,16 +840,12 @@
     "work_package_leads":[
       "CDC"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS2",
@@ -951,16 +858,12 @@
     "work_package_leads":[
       "CDC"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS2",
@@ -973,16 +876,12 @@
     "work_package_leads":[
       "CDC"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS2",
@@ -995,16 +894,12 @@
     "work_package_leads":[
       "SA Reform"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1023,11 +918,11 @@
     "ms_body":[
       "GA"
     ],
-    "legal_consideration":"GA decision (programme budget) required.",
-    "un_budget":[
+    "legal_consideration": "GA decision (programme budget) required.",
+    "un_budget": [
       "RB 2026 Rev"
     ],
-    "work_package_goal":null
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1046,11 +941,11 @@
     "ms_body":[
       "GA"
     ],
-    "legal_consideration":"GA decision (programme budget) required.",
-    "un_budget":[
+    "legal_consideration": "GA decision (programme budget) could be required.",
+    "un_budget": [
       "RB 2026 Rev"
     ],
-    "work_package_goal":null
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1092,11 +987,11 @@
     "ms_body":[
       "GA"
     ],
-    "legal_consideration":"GA decision (programme budget) could be required.",
-    "un_budget":[
+    "legal_consideration": "GA decision (programme budget) required.",
+    "un_budget": [
       "RB 2026 Rev"
     ],
-    "work_package_goal":null
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1110,16 +1005,16 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
+    "first_milestone": "2025-12-30",
+    "ms_approval": true,
+    "ms_body": [
+      "GA"
     ],
-    "legal_consideration":null,
-    "un_budget":[
-
+    "legal_consideration": "GA decision (programme budget) required.",
+    "un_budget": [
+      "RB 2026 Rev"
     ],
-    "work_package_goal":null
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1133,16 +1028,16 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "first_milestone":null,
-    "ms_approval":true,
-    "ms_body":[
-      "GA"
+    "first_milestone": "2025-12-30",
+    "ms_approval": true,
+    "ms_body": [
+      "SC"
     ],
-    "legal_consideration":"GA decision (programme budget) is required.",
-    "un_budget":[
-
+    "legal_consideration": "Security Council decision required.",
+    "un_budget": [
+      "RB 2026 Rev"
     ],
-    "work_package_goal":null
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1161,11 +1056,11 @@
     "ms_body":[
       "GA"
     ],
-    "legal_consideration":"GA decision (programme budget) is required",
-    "un_budget":[
-      "RB 2027"
+    "legal_consideration": "Exchange of letters between SG and PSC required.",
+    "un_budget": [
+      "RB 2026 Rev"
     ],
-    "work_package_goal":null
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1179,16 +1074,16 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
+    "first_milestone": "2025-12-30",
+    "ms_approval": true,
+    "ms_body": [
+      "GA"
     ],
-    "legal_consideration":null,
-    "un_budget":[
-
+    "legal_consideration": "GA decision (programme budget) required.",
+    "un_budget": [
+      "RB 2026 Rev"
     ],
-    "work_package_goal":null
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1202,16 +1097,16 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
+    "first_milestone": "2025-12-30",
+    "ms_approval": true,
+    "ms_body": [
+      "GA"
     ],
-    "legal_consideration":null,
-    "un_budget":[
-
+    "legal_consideration": "GA decision (programme budget) required",
+    "un_budget": [
+      "RB 2026 Rev"
     ],
-    "work_package_goal":null
+    "work_package_goal": "Transform scattered country teams into integrated, empowered platforms that deliver one coherent offer aligned with national priorities"
   },
   {
     "report":"WS3",
@@ -1230,11 +1125,9 @@
     "ms_body":[
       "GA"
     ],
-    "legal_consideration":"GA decision (programme budget) required.",
-    "un_budget":[
-      "RB 2026 Rev"
-    ],
-    "work_package_goal":null
+    "legal_consideration": "GA decision (programme budget) is required.",
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1253,11 +1146,11 @@
     "ms_body":[
       "GA"
     ],
-    "legal_consideration":"GA decision (programme budget) required.",
-    "un_budget":[
-      "RB 2026 Rev"
+    "legal_consideration": "GA decision (programme budget) is required",
+    "un_budget": [
+      "RB 2027"
     ],
-    "work_package_goal":null
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1321,11 +1214,11 @@
     "ms_body":[
       "GA"
     ],
-    "legal_consideration":"GA decisions (including on programme budget) required.",
-    "un_budget":[
+    "legal_consideration": "GA decisions (including on programme budget) required.",
+    "un_budget": [
       "RB 2027"
     ],
-    "work_package_goal":null
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1343,11 +1236,11 @@
     "ms_body":[
       "GA"
     ],
-    "legal_consideration":"GA decision (programme budget) is required",
-    "un_budget":[
+    "legal_consideration": "GA decision (programme budget) is required",
+    "un_budget": [
       "RB 2027"
     ],
-    "work_package_goal":null
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1501,16 +1394,17 @@
       "ES ECA",
       "SG UNCTAD"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-      "GA"
+    "first_milestone": "2026-02-27",
+    "ms_approval": true,
+    "ms_body": [
+      "GA",
+      "ECOSOC"
     ],
-    "legal_consideration":"GA decision (programme budget) could be required.",
-    "un_budget":[
-
+    "legal_consideration": "ECOSOC and GA (programme budget) decisions required.",
+    "un_budget": [
+      "RB 2027"
     ],
-    "work_package_goal":null
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1525,16 +1419,14 @@
       "ES ECA",
       "SG UNCTAD"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-      "GA"
+    "first_milestone": "2026-02-27",
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [
+      "RB 2027"
     ],
-    "legal_consideration":"GA decision (programme budget) could be required.",
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1558,7 +1450,7 @@
     "un_budget":[
 
     ],
-    "work_package_goal":null
+    "work_package_goal": null
   },
   {
     "report":"WS2",
@@ -1571,14 +1463,11 @@
     "work_package_leads":[
       "USG Policy"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
+    "first_milestone": "2026-12-30",
+    "ms_approval": true,
+    "ms_body": [
+      "ECOSOC",
+      "SPECIALIZED AGENCIES"
     ],
     "work_package_goal":null
   },
@@ -1661,16 +1550,12 @@
     "work_package_leads":[
       "CDC"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS2",
@@ -1705,16 +1590,12 @@
     "work_package_leads":[
       "CDC"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS1",
@@ -1843,16 +1724,14 @@
     "work_package_leads":[
       "DSG"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [
+      "SG"
     ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "legal_consideration": "SG decision required.",
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1932,16 +1811,12 @@
     "work_package_leads":[
       "SG ITU"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
@@ -1954,16 +1829,12 @@
     "work_package_leads":[
       "SG ITU"
     ],
-    "first_milestone":null,
-    "ms_approval":false,
-    "ms_body":[
-
-    ],
-    "legal_consideration":null,
-    "un_budget":[
-
-    ],
-    "work_package_goal":null
+    "first_milestone": null,
+    "ms_approval": false,
+    "ms_body": [],
+    "legal_consideration": null,
+    "un_budget": [],
+    "work_package_goal": null
   },
   {
     "report":"WS3",
