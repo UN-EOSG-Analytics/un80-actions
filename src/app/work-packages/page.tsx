@@ -25,7 +25,7 @@ import {
 import { fetchActions } from "@/lib/actions";
 import type { Actions } from "@/types/action";
 import { useEffect } from "react";
-import { Package, CheckCircle, ListChecks, ClipboardCheck, ChevronDown, Users, FileText, User, Folder } from "lucide-react";
+import { Package, CheckCircle, ListChecks, ClipboardCheck, ChevronDown, Users, FileText, User, Folder, Briefcase, Search, Layers, Briefcase as BriefcaseIcon, ListTodo } from "lucide-react";
 import Image from "next/image";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
@@ -49,6 +49,7 @@ export default function WorkPackagesPage() {
   const [selectedLead, setSelectedLead] = useState<string>("");
   const [selectedWorkstream, setSelectedWorkstream] = useState<string>("");
   const [openCollapsibles, setOpenCollapsibles] = useState<Set<string>>(new Set());
+  const [isAdvancedFilterOpen, setIsAdvancedFilterOpen] = useState<boolean>(false);
   const [stats, setStats] = useState<WorkPackageStats>({
     total: 30,
     completed: 2,
@@ -56,6 +57,7 @@ export default function WorkPackagesPage() {
     completedActions: 0,
   });
   const [nextMilestone, setNextMilestone] = useState<NextMilestone | null>(null);
+  const [progressPercentage, setProgressPercentage] = useState<number>(0);
 
   // Convert Excel serial date to readable date format
   const excelDateToDate = (serial: string): Date | null => {
@@ -78,48 +80,62 @@ export default function WorkPackagesPage() {
     return `${day}/${month}/${year}`;
   };
 
-  useEffect(() => {
-    fetchActions()
-      .then((data) => {
-        setActions(data);
-        // Calculate stats from data
-        const uniqueWPs = new Set(
-          data.map((a) => `${a.report}-${a.work_package_number}`)
-        );
-        setStats({
-          total: uniqueWPs.size,
-          completed: 2, // This would come from actual completion data
-          totalActions: data.length,
-          completedActions: 0, // This would come from actual completion data
-        });
+      useEffect(() => {
+        fetchActions()
+          .then((data) => {
+            setActions(data);
+            // Calculate stats from data
+            const uniqueWPs = new Set(
+              data.map((a) => `${a.report}-${a.work_package_number}`)
+            );
+            setStats({
+              total: uniqueWPs.size,
+              completed: 2, // This would come from actual completion data
+              totalActions: data.length,
+              completedActions: 0, // This would come from actual completion data
+            });
 
-        // Calculate next upcoming milestone
-        const today = new Date();
-        const milestones = data
-          .filter(a => a.first_milestone && a.first_milestone.trim() !== '' && a.indicative_activity)
-          .map(a => {
-            const milestoneDate = excelDateToDate(a.first_milestone);
-            return milestoneDate ? {
-              date: milestoneDate,
-              indicativeActivity: a.indicative_activity,
-            } : null;
+            // Calculate next upcoming milestone
+            const today = new Date();
+            const milestones = data
+              .filter(a => a.first_milestone && a.first_milestone.trim() !== '' && a.indicative_activity)
+              .map(a => {
+                const milestoneDate = excelDateToDate(a.first_milestone);
+                return milestoneDate ? {
+                  date: milestoneDate,
+                  indicativeActivity: a.indicative_activity,
+                } : null;
+              })
+              .filter((m): m is { date: Date; indicativeActivity: string } => m !== null)
+              .filter(m => m.date >= today)
+              .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+            if (milestones.length > 0) {
+              const next = milestones[0];
+              setNextMilestone({
+                date: formatDate(next.date),
+                indicativeActivity: next.indicativeActivity,
+              });
+            }
+
+            // Calculate progress bar percentage
+            const startDate = new Date(2025, 9, 31); // October 31, 2025 (month is 0-indexed)
+            const endDate = new Date(2027, 11, 31); // December 31, 2027
+            const now = new Date();
+            
+            const totalDuration = endDate.getTime() - startDate.getTime();
+            const elapsedDuration = now.getTime() - startDate.getTime();
+            
+            // Calculate percentage, clamped between 0 and 100
+            let percentage = (elapsedDuration / totalDuration) * 100;
+            percentage = Math.max(0, Math.min(100, percentage));
+            
+            setProgressPercentage(percentage);
           })
-          .filter((m): m is { date: Date; indicativeActivity: string } => m !== null)
-          .filter(m => m.date >= today)
-          .sort((a, b) => a.date.getTime() - b.date.getTime());
-
-        if (milestones.length > 0) {
-          const next = milestones[0];
-          setNextMilestone({
-            date: formatDate(next.date),
-            indicativeActivity: next.indicativeActivity,
+          .catch((error) => {
+            console.error("Failed to fetch actions:", error);
           });
-        }
-      })
-      .catch((error) => {
-        console.error("Failed to fetch actions:", error);
-      });
-  }, []);
+      }, []);
 
   // Group actions by work package (combine across reports)
   const workPackages = useMemo(() => {
@@ -303,7 +319,7 @@ export default function WorkPackagesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Main Container - Left-aligned with consistent padding */}
-      <div className="max-w-[1421px] mx-auto px-[101px] pt-16 pb-8">
+      <div className="max-w-[1421px] mx-auto px-[101px] pt-8 pb-8">
         {/* Header Section */}
         <header className="mb-4 relative">
           <div className="absolute -top-8 right-0">
@@ -316,7 +332,7 @@ export default function WorkPackagesPage() {
               priority
             />
           </div>
-          <h1 className="text-[48px] font-bold text-black leading-[24px] mb-6 mt-20">
+          <h1 className="text-[48px] font-bold text-black leading-[24px] mb-6 mt-12">
             UN80 Initiative Dashboard
           </h1>
           <div className="text-[14px] text-black leading-[24px] max-w-[1093px]">
@@ -331,200 +347,166 @@ export default function WorkPackagesPage() {
 
         {/* Progress Section */}
         <section className="mb-0">
-          <h2 className="text-[14px] font-normal text-black leading-[24px] mb-3">
-            Progress
-          </h2>
           <div className="flex gap-4 items-start flex-nowrap">
-            {/* Work packages completed */}
+            {/* Card 1 - Number of Workstreams */}
             <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="relative flex flex-col items-start justify-start w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
-                    <Package className="w-5 h-5 text-[#0076A4] mb-2" />
+                    <Layers className="w-5 h-5 text-[#0076A4] mb-2" />
                     <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px] mb-3">
-                      {stats.completed}/{stats.total}
+                      3
                     </p>
                     <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
-                      Work packages completed
+                      Number of Workstreams
                     </p>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Work packages completed: {stats.completed}/{stats.total}</p>
+                  <p>Number of Workstreams: 3</p>
                 </TooltipContent>
               </Tooltip>
 
-              {/* Actions completed */}
+              {/* Card 2 - Number of Workpackages */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="relative flex flex-col items-start justify-start w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
-                    <CheckCircle className="w-5 h-5 text-[#0076A4] mb-2" />
+                    <BriefcaseIcon className="w-5 h-5 text-[#0076A4] mb-2" />
                     <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px] mb-3">
-                      {stats.completedActions}/{stats.totalActions}
+                      31
                     </p>
                     <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
-                      Actions completed
+                      Number of Workpackages
                     </p>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Actions completed: {stats.completedActions}/{stats.totalActions}</p>
+                  <p>Number of Workpackages: 31</p>
                 </TooltipContent>
               </Tooltip>
 
-              {/* Actions leads assigned */}
+              {/* Card 3 - Number of actions */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="relative flex flex-col items-start justify-start w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
-                    <ListChecks className="w-5 h-5 text-[#0076A4] mb-2" />
+                    <ListTodo className="w-5 h-5 text-[#0076A4] mb-2" />
                     <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px] mb-3">
-                      0
+                      90
                     </p>
                     <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
-                      Actions leads assigned
+                      Number of actions
                     </p>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Actions leads assigned: 0</p>
+                  <p>Number of actions: 90</p>
                 </TooltipContent>
               </Tooltip>
 
-              {/* Actions support assigned */}
+              {/* Card 4 - Number of leads */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="relative flex flex-col items-start justify-start w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
-                    <ClipboardCheck className="w-5 h-5 text-[#0076A4] mb-2" />
+                    <Users className="w-5 h-5 text-[#0076A4] mb-2" />
                     <p className="text-[48px] font-bold text-[#0076A4] text-left leading-[56px] mb-3">
-                      0
+                      tbd
                     </p>
                     <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px]">
-                      Actions support assigned
+                      Number of leads
                     </p>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Actions support assigned: 0</p>
+                  <p>Number of leads: tbd</p>
                 </TooltipContent>
               </Tooltip>
-
-              {/* Card 5 - Next Upcoming Milestone */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="relative flex flex-col items-start justify-start w-[280px] h-[200px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
-                    <Users className="w-5 h-5 text-[#0076A4] mb-3" />
-                    <p className="text-[14px] font-bold text-[#0076A4] text-left leading-[24px] mb-3">
-                      Next upcoming milestone:
-                    </p>
-                    {nextMilestone ? (
-                      <div className="flex flex-col gap-2 items-start">
-                        <p className="text-[16px] font-bold text-[#0076A4] text-left leading-[20px]">
-                          {nextMilestone.date}
-                        </p>
-                        <p className="text-[12px] font-medium text-[#0076A4] text-left leading-[16px] line-clamp-3">
-                          {nextMilestone.indicativeActivity}
-                        </p>
-                      </div>
-                    ) : (
-                      <p className="text-[16px] font-medium text-[#0076A4] text-left leading-[20px]">
-                        No upcoming milestones
-                      </p>
-                    )}
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p className="font-bold mb-1">Next upcoming milestone:</p>
-                  {nextMilestone ? (
-                    <>
-                      <p className="font-bold">{nextMilestone.date}</p>
-                      <p className="text-sm">{nextMilestone.indicativeActivity}</p>
-                    </>
-                  ) : (
-                    <p>No upcoming milestones</p>
-                  )}
-                </TooltipContent>
-              </Tooltip>
-          </div>
-          
-          {/* Card 6 - Progress Bar (Full Width) */}
-          <div className="flex flex-col gap-3 w-full mt-4">
-            <div className="flex justify-between items-center text-[12px] font-medium text-[#0076A4]">
-              <span>31/10/2026</span>
-              <span className="text-[14px] font-bold">Final milestone (31/12/2026)</span>
-            </div>
-            <div className="w-full h-6 bg-white rounded-full border border-[#0076A4]/30 overflow-hidden relative">
-              <div 
-                className="h-full bg-[#0076A4] rounded-full transition-all"
-                style={{ width: '50%' }}
-              />
-            </div>
           </div>
         </section>
 
         {/* Work Packages Breakdown Section */}
         <section className="mb-4 mt-6">
-          <h2 className="text-[24px] font-bold text-black leading-[24px] mb-3">
+          <h2 className="text-[24px] font-bold text-black leading-[24px] mb-3 flex items-center gap-2">
+            <Briefcase className="w-6 h-6 text-black" />
             Work Packages breakdown
           </h2>
           
-          {/* Filters Row */}
-          <div className="flex gap-[8px] items-center mb-3 flex-wrap">
-            <Select value={selectedWorkPackage} onValueChange={setSelectedWorkPackage}>
-              <SelectTrigger className="w-[235px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
-                <SelectValue placeholder="Select Work Package" />
-              </SelectTrigger>
-              <SelectContent>
-                {uniqueWorkPackages.map((wp) => (
-                  <SelectItem key={wp} value={wp}>
-                    {wp}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={selectedLead} onValueChange={setSelectedLead}>
-              <SelectTrigger className="w-[235px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
-                <SelectValue placeholder="Select Work Package Lead" />
-              </SelectTrigger>
-              <SelectContent>
-                {uniqueLeads.map((lead) => (
-                  <SelectItem key={lead} value={lead}>
-                    {lead}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={selectedWorkstream} onValueChange={setSelectedWorkstream}>
-              <SelectTrigger className="w-[235px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
-                <SelectValue placeholder="Select Workstream" />
-              </SelectTrigger>
-              <SelectContent>
-                {uniqueWorkstreams.map((ws) => (
-                  <SelectItem key={ws} value={ws}>
-                    {ws}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* Search Bar */}
+          <div className="flex gap-[8px] items-start mb-3 flex-wrap">
+            <div className="flex gap-[8px] items-start flex-1 min-w-[384px]">
+              <div className="flex-1 relative">
+                <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                <Input
+                  type="text"
+                  placeholder="Search for work package"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-[40px] text-[16px] border-0 border-b border-slate-300 rounded-none pl-[32px] pr-[56px] py-[8px] text-slate-400 bg-white transition-all hover:border-b-[#0076A4]/50 focus:border-b-[#0076A4] focus:ring-0"
+                />
+              </div>
+              <Button
+                onClick={handleResetFilters}
+                className="bg-[#0076A4] hover:bg-[#006a94] text-white px-4 py-2 h-[40px] rounded-[6px] text-[14px] font-medium shrink-0 transition-all"
+              >
+                Reset
+              </Button>
+            </div>
           </div>
 
-          {/* Search Bar */}
-          <div className="flex gap-[8px] items-start w-[384px]">
-            <div className="flex-1">
-              <Input
-                type="text"
-                placeholder="Search for work package"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-[40px] text-[16px] border-slate-300 rounded-[6px] pl-[12px] pr-[56px] py-[8px] text-slate-400 bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4] focus:ring-2 focus:ring-[#0076A4]/20"
-              />
-            </div>
-            <Button
-              onClick={handleResetFilters}
-              className="bg-[#0076A4] hover:bg-[#006a94] text-white px-4 py-2 h-[40px] rounded-[6px] text-[14px] font-medium shrink-0 transition-all"
-            >
-              Reset
-            </Button>
+          {/* Advanced Filtering Collapsible */}
+          <div className="mb-3">
+            <Collapsible open={isAdvancedFilterOpen} onOpenChange={setIsAdvancedFilterOpen}>
+              <div className="flex items-center gap-2">
+                <CollapsibleTrigger className="flex items-center gap-2 text-[14px] text-slate-700 hover:text-slate-900 transition-colors">
+                  <span>Advanced filtering</span>
+                  <ChevronDown
+                    className={`w-4 h-4 text-slate-600 transition-transform ${
+                      isAdvancedFilterOpen ? "transform rotate-180" : ""
+                    }`}
+                  />
+                </CollapsibleTrigger>
+              </div>
+              <CollapsibleContent className="mt-3">
+                <div className="flex gap-[8px] items-center flex-wrap">
+                  <Select value={selectedWorkPackage} onValueChange={setSelectedWorkPackage}>
+                    <SelectTrigger className="w-[235px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
+                      <SelectValue placeholder="Select Work Package" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {uniqueWorkPackages.map((wp) => (
+                        <SelectItem key={wp} value={wp}>
+                          {wp}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={selectedLead} onValueChange={setSelectedLead}>
+                    <SelectTrigger className="w-[235px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
+                      <SelectValue placeholder="Select Work Package Lead" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {uniqueLeads.map((lead) => (
+                        <SelectItem key={lead} value={lead}>
+                          {lead}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={selectedWorkstream} onValueChange={setSelectedWorkstream}>
+                    <SelectTrigger className="w-[235px] h-[25px] text-[14px] border-slate-300 rounded-[6px] bg-white transition-all hover:border-[#0076A4]/50 focus:border-[#0076A4]">
+                      <SelectValue placeholder="Select Workstream" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {uniqueWorkstreams.map((ws) => (
+                        <SelectItem key={ws} value={ws}>
+                          {ws}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
           </div>
         </section>
 
@@ -541,26 +523,26 @@ export default function WorkPackagesPage() {
                   open={isOpen}
                   onOpenChange={() => toggleCollapsible(collapsibleKey)}
                 >
-                  <div className="mb-12 last:mb-0">
-                    <CollapsibleTrigger className="w-full flex flex-col items-start px-0 py-0 hover:no-underline bg-slate-50 rounded-[6px] px-6 py-4 transition-all hover:bg-slate-100 border-0 relative">
+                  <div className={`mb-20 last:mb-0 ${isOpen ? 'border border-slate-200 rounded-[6px] bg-slate-50/50' : ''}`}>
+                    <CollapsibleTrigger className={`w-full flex flex-col items-start px-0 py-0 hover:no-underline bg-slate-50 rounded-[6px] px-6 py-4 transition-all hover:bg-[#E0F5FF] border-0 relative ${isOpen ? 'rounded-b-none' : ''}`}>
                       <div className="text-left min-w-0 mb-2 pr-8">
                         <p className="text-[16px] font-medium text-slate-900 leading-[24px] inline">
                           {wp.name}
                         </p>
                         {wp.number && (
-                          <span className="text-[16px] font-medium text-gray-400 leading-[24px] ml-2">
+                          <span className="text-[16px] font-medium text-gray-400 leading-[24px]">
                             , Work Package {wp.number}
                           </span>
                         )}
                         {!wp.number && (
-                          <span className="text-[16px] font-medium text-gray-400 leading-[24px] ml-2">
+                          <span className="text-[16px] font-medium text-gray-400 leading-[24px]">
                             , Work Package
                           </span>
                         )}
                       </div>
                       {/* Work Package Leads - Underneath the text */}
                       {wp.leads.length > 0 && (
-                        <div className="flex flex-col gap-1 mb-2">
+                        <div className="flex flex-row gap-3 flex-wrap mb-2">
                           {wp.leads.map((lead, leadIdx) => (
                             <div key={leadIdx} className="flex items-center gap-2">
                               <User className="w-4 h-4 text-gray-600" />
@@ -596,7 +578,7 @@ export default function WorkPackagesPage() {
                         }`}
                       />
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="px-0 pb-4 pt-4 pl-6">
+                    <CollapsibleContent className={`px-0 pb-4 pt-4 pl-6 ${isOpen ? 'px-6' : ''}`}>
                       {wp.actions.length > 0 ? (
                         <div className="flex flex-col gap-3">
                           {/* Header */}
@@ -614,8 +596,22 @@ export default function WorkPackagesPage() {
                                 {action.text}
                               </p>
                               
+                              {/* Work Package Leads - Icon + Text */}
+                              {action.leads.length > 0 && (
+                                <div className="flex flex-row gap-3 flex-wrap mb-3">
+                                  {action.leads.map((lead, leadIdx) => (
+                                    <div key={leadIdx} className="flex items-center gap-2">
+                                      <User className="w-4 h-4 text-gray-600" />
+                                      <p className="text-[14px] text-gray-600 leading-[20px]">
+                                        {lead}
+                                      </p>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              
                               {/* Workstream Labels - Icon + Text */}
-                              <div className="flex flex-col gap-1 mb-3">
+                              <div className="flex flex-col gap-1">
                                 {action.report === 'WS2' && (
                                   <div className="flex items-center gap-2">
                                     <Folder className="w-4 h-4 text-gray-600" />
@@ -633,20 +629,6 @@ export default function WorkPackagesPage() {
                                   </div>
                                 )}
                               </div>
-                              
-                              {/* Work Package Leads - Icon + Text */}
-                              {action.leads.length > 0 && (
-                                <div className="flex flex-col gap-1">
-                                  {action.leads.map((lead, leadIdx) => (
-                                    <div key={leadIdx} className="flex items-center gap-2">
-                                      <User className="w-4 h-4 text-gray-600" />
-                                      <p className="text-[14px] text-gray-600 leading-[20px]">
-                                        {lead}
-                                      </p>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
                             </div>
                           ))}
                         </div>
