@@ -1,4 +1,4 @@
-name: Fetch Data from Airtable
+name: Process raw JSON data
 
 on:
     workflow_dispatch: # Allows manual trigger
