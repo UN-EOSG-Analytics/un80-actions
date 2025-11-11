@@ -88,7 +88,12 @@ export default function WorkPackagesPage() {
   const [selectedWorkstream, setSelectedWorkstream] = useState<string>("");
   const [selectedBigTicket, setSelectedBigTicket] = useState<string>("");
   const [chartSearchQuery, setChartSearchQuery] = useState<string>("");
+  const [workstreamChartSearchQuery, setWorkstreamChartSearchQuery] = useState<string>("");
+  const [workpackageChartSearchQuery, setWorkpackageChartSearchQuery] = useState<string>("");
   const [sortOption, setSortOption] = useState<string>("");
+  const [showAllLeads, setShowAllLeads] = useState<boolean>(false);
+  const [showAllWorkstreams, setShowAllWorkstreams] = useState<boolean>(false);
+  const [showAllWorkpackages, setShowAllWorkpackages] = useState<boolean>(false);
   const [openCollapsibles, setOpenCollapsibles] = useState<Set<string>>(new Set());
   const [isAdvancedFilterOpen, setIsAdvancedFilterOpen] = useState<boolean>(false);
   const [openFilterCollapsibles, setOpenFilterCollapsibles] = useState<Set<string>>(new Set());
@@ -381,6 +386,74 @@ export default function WorkPackagesPage() {
       }))
       .sort((a, b) => b.count - a.count); // Sort by count descending
   }, [workPackages, chartSearchQuery]);
+
+  // Calculate chart data: count actions per workstream
+  const workstreamChartData = useMemo(() => {
+    const workstreamCounts = new Map<string, number>();
+    
+    actions.forEach(action => {
+      // Filter by chart search query if provided
+      if (workstreamChartSearchQuery.trim()) {
+        const query = workstreamChartSearchQuery.toLowerCase();
+        if (!action.report.toLowerCase().includes(query)) {
+          return;
+        }
+      }
+      const currentCount = workstreamCounts.get(action.report) || 0;
+      workstreamCounts.set(action.report, currentCount + 1);
+    });
+
+    return Array.from(workstreamCounts.entries())
+      .map(([workstream, count]) => ({
+        workstream,
+        count,
+      }))
+      .sort((a, b) => {
+        // Sort WS1, WS2, WS3
+        const order = ['WS1', 'WS2', 'WS3'];
+        const aIndex = order.indexOf(a.workstream);
+        const bIndex = order.indexOf(b.workstream);
+        if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+        if (aIndex !== -1) return -1;
+        if (bIndex !== -1) return 1;
+        return a.workstream.localeCompare(b.workstream);
+      });
+  }, [actions, workstreamChartSearchQuery]);
+
+  // Calculate chart data: count actions per workpackage
+  const workpackageChartData = useMemo(() => {
+    const workpackageCounts = new Map<string, number>();
+    
+    actions.forEach(action => {
+      const wpKey = action.work_package_number ? `${action.work_package_number}: ${action.work_package_name}` : action.work_package_name;
+      // Filter by chart search query if provided
+      if (workpackageChartSearchQuery.trim()) {
+        const query = workpackageChartSearchQuery.toLowerCase();
+        if (!wpKey.toLowerCase().includes(query)) {
+          return;
+        }
+      }
+      const currentCount = workpackageCounts.get(wpKey) || 0;
+      workpackageCounts.set(wpKey, currentCount + 1);
+    });
+
+    return Array.from(workpackageCounts.entries())
+      .map(([workpackage, count]) => ({
+        workpackage,
+        count,
+      }))
+      .sort((a, b) => {
+        // Sort by workpackage number if available
+        const aMatch = a.workpackage.match(/^(\d+):/);
+        const bMatch = b.workpackage.match(/^(\d+):/);
+        if (aMatch && bMatch) {
+          return parseInt(aMatch[1]) - parseInt(bMatch[1]);
+        }
+        if (aMatch) return -1;
+        if (bMatch) return 1;
+        return a.workpackage.localeCompare(b.workpackage);
+      });
+  }, [actions, workpackageChartSearchQuery]);
 
   // Filter work packages based on search and filters
   const filteredWorkPackages = useMemo(() => {
@@ -986,7 +1059,7 @@ export default function WorkPackagesPage() {
                   onOpenChange={() => toggleCollapsible(collapsibleKey)}
                 >
                   <div className={`mb-20 last:mb-0 ${isOpen ? 'border-l-4 border-l-[#009EDB] border border-slate-200 rounded-[6px] bg-slate-50/50' : ''}`}>
-                    <CollapsibleTrigger className={`w-full flex flex-col items-start px-0 py-0 hover:no-underline rounded-[6px] px-6 py-4 transition-all hover:bg-[#E0F5FF] border-0 relative ${isOpen ? 'rounded-b-none bg-slate-50/50' : wp.bigTicket ? 'bg-gray-50' : 'bg-gray-200'}`}>
+                    <CollapsibleTrigger className={`w-full flex flex-col items-start px-0 py-0 hover:no-underline rounded-[6px] px-6 py-4 transition-all hover:bg-[#E0F5FF] border-0 relative ${isOpen ? 'rounded-b-none bg-slate-50/50' : 'bg-gray-50'}`}>
                       <div className="text-left min-w-0 mb-1 pr-20 sm:pr-8">
                         {wp.number ? (
                           <>
@@ -1069,7 +1142,7 @@ export default function WorkPackagesPage() {
                         {wp.leads.length > 0 && (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <div className="flex items-center gap-2 cursor-help">
+                              <div className="flex items-center gap-1 sm:gap-2 cursor-help">
                                 <User className="w-4 h-4 text-gray-600" />
                                 <p className="text-[15px] text-gray-600 leading-[20px]">
                                   {wp.leads.map((lead, idx) => {
@@ -1149,7 +1222,7 @@ export default function WorkPackagesPage() {
                                   <div className="flex items-center gap-3 flex-wrap">
                                     <Tooltip>
                                       <TooltipTrigger asChild>
-                                        <div className="flex items-center gap-2 cursor-help">
+                                        <div className="flex items-center gap-1 sm:gap-2 cursor-help">
                                           <User className="w-4 h-4 text-gray-500" />
                                           <p className="text-[14px] text-gray-600 leading-[21px]">
                                             {action.leads.map((lead, idx) => {
@@ -1209,8 +1282,9 @@ export default function WorkPackagesPage() {
               </div>
           </div>
 
-          {/* Chart Section */}
-          <div className="w-full lg:w-[320px] flex-shrink-0 mt-6 lg:mt-0 lg:border-l lg:border-slate-200 lg:pl-6 lg:ml-[calc((4*280px+3*16px)-818px-320px-24px)]">
+          {/* Charts Container */}
+          <div className="w-full lg:w-[320px] flex-shrink-0 mt-6 lg:mt-0 lg:border-l lg:border-slate-200 lg:pl-6 lg:ml-[calc((4*280px+3*16px)-818px-320px-24px)] flex flex-col gap-0">
+            {/* First Chart Section */}
             <div className="bg-white p-4 sm:p-5 rounded-[8px]">
               <h3 className="text-[17px] font-semibold text-slate-900 mb-2 flex items-center gap-2">
                 <Users className="w-5 h-5 text-[#009EDB]" />
@@ -1227,17 +1301,18 @@ export default function WorkPackagesPage() {
                   placeholder="Search entities"
                   value={chartSearchQuery}
                   onChange={(e) => setChartSearchQuery(e.target.value)}
-                  className="w-full h-[36px] text-[15px] border-0 border-b border-slate-300 rounded-none pl-[32px] pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
+                  className="w-full h-[36px] text-[15px] border-0 border-b border-slate-300 rounded-none pl-[40px] pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
                 />
               </div>
               <div className="h-[300px] sm:h-[350px] md:h-[400px] overflow-y-auto overflow-x-hidden">
                 <table className="w-full">
                   <tbody>
-                    {chartData.map((entry, index) => {
+                    {(showAllLeads ? chartData : chartData.slice(0, 3)).map((entry, index) => {
                       const maxCount = chartData.length > 0 ? Math.max(...chartData.map(d => d.count)) : 1;
                       const percentage = (entry.count / maxCount) * 100;
                       const isSelected = selectedLead === entry.lead;
                       const isFiltered = selectedLead && selectedLead !== entry.lead;
+                      const displayedData = showAllLeads ? chartData : chartData.slice(0, 3);
                       
                       return (
                         <tr
@@ -1252,7 +1327,7 @@ export default function WorkPackagesPage() {
                           }}
                           className={`cursor-pointer transition-colors hover:bg-slate-50 ${
                             isFiltered ? 'opacity-30' : ''
-                          } ${index < chartData.length - 1 ? 'border-b border-slate-200' : ''}`}
+                          } ${index < displayedData.length - 1 ? 'border-b border-slate-200' : ''}`}
                         >
                           <td className="py-3 pr-3">
                             <div className="flex items-center justify-between gap-3">
@@ -1281,6 +1356,184 @@ export default function WorkPackagesPage() {
                     })}
                   </tbody>
                 </table>
+                {chartData.length > 3 && (
+                  <button
+                    onClick={() => setShowAllLeads(!showAllLeads)}
+                    className="w-full mt-3 py-2 text-[14px] text-left text-[#009EDB] hover:text-[#0076A4] transition-colors"
+                  >
+                    {showAllLeads ? 'Show less' : `Show more (${chartData.length - 3} more)`}
+                  </button>
+                )}
+              </div>
+            </div>
+            
+            {/* Second Chart Section - Actions per Workstream */}
+            <div className="bg-white p-4 sm:p-5 rounded-[8px]">
+              <h3 className="text-[17px] font-semibold text-slate-900 mb-2 flex items-center gap-2">
+                <Layers className="w-5 h-5 text-[#009EDB]" />
+                Actions per workstream
+              </h3>
+              <p className="text-[15px] text-slate-600 mb-3">
+                Actions per Workstream
+              </p>
+              {/* Chart Search Bar */}
+              <div className="relative w-full mb-4">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#009EDB] pointer-events-none z-10" />
+                <Input
+                  type="text"
+                  placeholder="Search workstreams"
+                  value={workstreamChartSearchQuery}
+                  onChange={(e) => setWorkstreamChartSearchQuery(e.target.value)}
+                  className="w-full h-[36px] text-[15px] border-0 border-b border-slate-300 rounded-none pl-[40px] pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
+                />
+              </div>
+              <div className="h-[300px] sm:h-[350px] md:h-[400px] overflow-y-auto overflow-x-hidden">
+                <table className="w-full">
+                  <tbody>
+                    {(showAllWorkstreams ? workstreamChartData : workstreamChartData.slice(0, 3)).map((entry, index) => {
+                      const maxCount = workstreamChartData.length > 0 ? Math.max(...workstreamChartData.map(d => d.count)) : 1;
+                      const percentage = (entry.count / maxCount) * 100;
+                      const isSelected = selectedWorkstream === entry.workstream;
+                      const isFiltered = selectedWorkstream && selectedWorkstream !== entry.workstream;
+                      const displayedData = showAllWorkstreams ? workstreamChartData : workstreamChartData.slice(0, 3);
+                      
+                      return (
+                        <tr
+                          key={index}
+                          onClick={() => {
+                            // Toggle: if already selected, deselect; otherwise select
+                            if (isSelected) {
+                              setSelectedWorkstream("");
+                            } else {
+                              setSelectedWorkstream(entry.workstream);
+                            }
+                          }}
+                          className={`cursor-pointer transition-colors hover:bg-slate-50 ${
+                            isFiltered ? 'opacity-30' : ''
+                          } ${index < displayedData.length - 1 ? 'border-b border-slate-200' : ''}`}
+                        >
+                          <td className="py-3 pr-3">
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[14px] font-medium text-slate-900 flex-shrink-0 min-w-0">
+                                {entry.workstream}
+                              </span>
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <span className={`text-[14px] font-semibold min-w-[20px] font-mono ${
+                                      isSelected ? 'text-[#0076A4]' : 'text-[#009EDB]'
+                                    }`}>
+                                  {entry.count}
+                                </span>
+                                <div className="w-[120px] h-[8px] bg-slate-100 rounded-full overflow-hidden relative">
+                                  <div
+                                    className={`h-full rounded-full transition-all ${
+                                      isSelected ? 'bg-[#0076A4]' : 'bg-[#009EDB]'
+                                    }`}
+                                    style={{ width: `${percentage}%` }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                {workstreamChartData.length > 3 && (
+                  <button
+                    onClick={() => setShowAllWorkstreams(!showAllWorkstreams)}
+                    className="w-full mt-3 py-2 text-[14px] text-left text-[#009EDB] hover:text-[#0076A4] transition-colors"
+                  >
+                    {showAllWorkstreams ? 'Show less' : `Show more (${workstreamChartData.length - 3} more)`}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Third Chart Section - Actions per Workpackage */}
+            <div className="bg-white p-4 sm:p-5 rounded-[8px]">
+              <h3 className="text-[17px] font-semibold text-slate-900 mb-2 flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-[#009EDB]" />
+                Actions per Workpackage
+              </h3>
+              <p className="text-[15px] text-slate-600 mb-3">
+                Actions per Workpackage
+              </p>
+              {/* Chart Search Bar */}
+              <div className="relative w-full mb-4">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#009EDB] pointer-events-none z-10" />
+                <Input
+                  type="text"
+                  placeholder="Search workpackages"
+                  value={workpackageChartSearchQuery}
+                  onChange={(e) => setWorkpackageChartSearchQuery(e.target.value)}
+                  className="w-full h-[36px] text-[15px] border-0 border-b border-slate-300 rounded-none pl-[40px] pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
+                />
+              </div>
+              <div className="h-[300px] sm:h-[350px] md:h-[400px] overflow-y-auto overflow-x-hidden">
+                <table className="w-full">
+                  <tbody>
+                    {(showAllWorkpackages ? workpackageChartData : workpackageChartData.slice(0, 3)).map((entry, index) => {
+                      const maxCount = workpackageChartData.length > 0 ? Math.max(...workpackageChartData.map(d => d.count)) : 1;
+                      const percentage = (entry.count / maxCount) * 100;
+                      const wpMatch = entry.workpackage.match(/^(\d+):/);
+                      const wpNumber = wpMatch ? wpMatch[1] : null;
+                      const wpName = wpMatch ? entry.workpackage.replace(/^\d+:\s*/, '') : entry.workpackage;
+                      const wpOption = wpNumber ? `WP: ${wpNumber}: ${wpName}` : `WP: ${wpName}`;
+                      const isSelected = selectedWorkPackage === wpOption;
+                      const isFiltered = selectedWorkPackage && selectedWorkPackage !== wpOption;
+                      const displayedData = showAllWorkpackages ? workpackageChartData : workpackageChartData.slice(0, 3);
+                      
+                      return (
+                        <tr
+                          key={index}
+                          onClick={() => {
+                            // Toggle: if already selected, deselect; otherwise select
+                            if (isSelected) {
+                              setSelectedWorkPackage("");
+                            } else {
+                              setSelectedWorkPackage(wpOption);
+                            }
+                          }}
+                          className={`cursor-pointer transition-colors hover:bg-slate-50 ${
+                            isFiltered ? 'opacity-30' : ''
+                          } ${index < displayedData.length - 1 ? 'border-b border-slate-200' : ''}`}
+                        >
+                          <td className="py-3 pr-3">
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[14px] font-medium text-slate-900 flex-shrink-0 min-w-0">
+                                {wpNumber ? `WP: ${wpNumber}` : 'WP:'}
+                              </span>
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <span className={`text-[14px] font-semibold min-w-[20px] font-mono ${
+                                      isSelected ? 'text-[#0076A4]' : 'text-[#009EDB]'
+                                    }`}>
+                                  {entry.count}
+                                </span>
+                                <div className="w-[120px] h-[8px] bg-slate-100 rounded-full overflow-hidden relative">
+                                  <div
+                                    className={`h-full rounded-full transition-all ${
+                                      isSelected ? 'bg-[#0076A4]' : 'bg-[#009EDB]'
+                                    }`}
+                                    style={{ width: `${percentage}%` }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                {workpackageChartData.length > 3 && (
+                  <button
+                    onClick={() => setShowAllWorkpackages(!showAllWorkpackages)}
+                    className="w-full mt-3 py-2 text-[14px] text-left text-[#009EDB] hover:text-[#0076A4] transition-colors"
+                  >
+                    {showAllWorkpackages ? 'Show less' : `Show more (${workpackageChartData.length - 3} more)`}
+                  </button>
+                )}
               </div>
             </div>
           </div>
