@@ -14,6 +14,11 @@ with open(input_path, "r", encoding="utf-8") as f:
 # Convert to DataFrame
 df = pd.DataFrame(data)
 
+# Assert no column is completely null (indicates error on Power Automate export)
+for col in df.columns:
+    if df[col].isnull().all():
+        raise AssertionError(f"Column '{col}' is completely null.")
+
 # Process date columns
 date_columns = ["first_milestone"]  # Add other date columns here if needed
 
