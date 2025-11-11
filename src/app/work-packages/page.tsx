@@ -25,8 +25,7 @@ import {
 import { fetchActions } from "@/lib/actions";
 import type { Actions } from "@/types/action";
 import { useEffect } from "react";
-import { Package, CheckCircle, ListChecks, ClipboardCheck, ChevronDown, Users, FileText, User, Briefcase, Search, Layers, Briefcase as BriefcaseIcon, ListTodo, Trophy } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
+import { Package, CheckCircle, ListChecks, ClipboardCheck, ChevronDown, Users, FileText, User, Briefcase, Search, Layers, Briefcase as BriefcaseIcon, ListTodo, Trophy, Filter, ArrowUpDown, Info } from "lucide-react";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
@@ -87,8 +86,12 @@ export default function WorkPackagesPage() {
   const [selectedWorkPackage, setSelectedWorkPackage] = useState<string>("");
   const [selectedLead, setSelectedLead] = useState<string>("");
   const [selectedWorkstream, setSelectedWorkstream] = useState<string>("");
+  const [selectedBigTicket, setSelectedBigTicket] = useState<string>("");
+  const [chartSearchQuery, setChartSearchQuery] = useState<string>("");
+  const [sortOption, setSortOption] = useState<string>("");
   const [openCollapsibles, setOpenCollapsibles] = useState<Set<string>>(new Set());
   const [isAdvancedFilterOpen, setIsAdvancedFilterOpen] = useState<boolean>(false);
+  const [openFilterCollapsibles, setOpenFilterCollapsibles] = useState<Set<string>>(new Set());
   const [stats, setStats] = useState<WorkPackageStats>({
     total: 0,
     completed: 0,
@@ -359,6 +362,13 @@ export default function WorkPackagesPage() {
     
     workPackages.forEach(wp => {
       wp.leads.forEach(lead => {
+        // Filter by chart search query if provided
+        if (chartSearchQuery.trim()) {
+          const query = chartSearchQuery.toLowerCase();
+          if (!lead.toLowerCase().includes(query)) {
+            return;
+          }
+        }
         const currentCount = leadCounts.get(lead) || 0;
         leadCounts.set(lead, currentCount + 1);
       });
@@ -370,7 +380,7 @@ export default function WorkPackagesPage() {
         count,
       }))
       .sort((a, b) => b.count - a.count); // Sort by count descending
-  }, [workPackages]);
+  }, [workPackages, chartSearchQuery]);
 
   // Filter work packages based on search and filters
   const filteredWorkPackages = useMemo(() => {
@@ -410,8 +420,39 @@ export default function WorkPackagesPage() {
       filtered = filtered.filter((wp) => wp.report.includes(selectedWorkstream));
     }
 
+    // Big Ticket filter
+    if (selectedBigTicket === "big-ticket") {
+      filtered = filtered.filter((wp) => wp.bigTicket === true);
+    } else if (selectedBigTicket === "other") {
+      filtered = filtered.filter((wp) => wp.bigTicket === false);
+    }
+
+    // Sort filtered work packages
+    if (sortOption) {
+      filtered = [...filtered].sort((a, b) => {
+        switch (sortOption) {
+          case "name-asc":
+            return a.name.localeCompare(b.name);
+          case "name-desc":
+            return b.name.localeCompare(a.name);
+          case "number-asc":
+            const numA = parseInt(a.number) || 0;
+            const numB = parseInt(b.number) || 0;
+            if (numA !== numB) return numA - numB;
+            return a.name.localeCompare(b.name);
+          case "number-desc":
+            const numA2 = parseInt(a.number) || 0;
+            const numB2 = parseInt(b.number) || 0;
+            if (numA2 !== numB2) return numB2 - numA2;
+            return a.name.localeCompare(b.name);
+          default:
+            return 0;
+        }
+      });
+    }
+
     return filtered;
-  }, [workPackages, searchQuery, selectedWorkPackage, selectedLead, selectedWorkstream]);
+  }, [workPackages, searchQuery, selectedWorkPackage, selectedLead, selectedWorkstream, selectedBigTicket, sortOption]);
 
   // Calculate statistics based on filtered data
   const statsData = useMemo(() => {
@@ -502,6 +543,7 @@ export default function WorkPackagesPage() {
     setSelectedWorkPackage("");
     setSelectedLead("");
     setSelectedWorkstream("");
+    setSelectedBigTicket("");
   };
 
   const toggleCollapsible = (key: string) => {
@@ -518,18 +560,27 @@ export default function WorkPackagesPage() {
 
       return (
         <TooltipProvider delayDuration={200}>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-white">
       {/* Main Container - Left-aligned with consistent padding */}
-      <div className="max-w-[1421px] mx-auto px-4 sm:px-6 md:px-8 lg:px-[101px] pt-4 sm:pt-6 md:pt-8 pb-4 sm:pb-6 md:pb-8">
+      <div className="max-w-[1421px] mx-auto px-4 sm:px-6 md:px-8 lg:px-[101px] pt-1 sm:pt-2 md:pt-3 pb-4 sm:pb-6 md:pb-8">
         {/* Header Section */}
         <header className="mb-4 relative">
-          <div className="mb-6 mt-8 sm:mt-10 md:mt-12">
-            <h1 className="text-[32px] sm:text-[40px] md:text-[48px] lg:text-[56px] font-bold text-gray-800 leading-[40px] sm:leading-[48px] md:leading-[56px] lg:leading-[64px] tracking-[-0.02em] relative inline-block">
-              <span className="relative z-10 bg-clip-text">UN80 Initiative</span>
-              <span className="absolute -bottom-2 left-0 right-0 h-[2px] bg-gradient-to-r from-gray-400 via-gray-400/70 to-transparent rounded-full opacity-80"></span>
-            </h1>
+          <div className="mb-6 mt-1 sm:mt-2 md:mt-3 relative">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-[33px] sm:text-[41px] md:text-[49px] lg:text-[57px] text-gray-800 leading-[41px] sm:leading-[49px] md:leading-[57px] lg:leading-[65px] tracking-[-0.02em] relative inline-block">
+                <span className="relative z-10 bg-clip-text">
+                  <span className="font-bold">UN80</span>
+                  <span className="font-normal"> Initiative</span>
+                </span>
+              </h1>
+              <button className="flex items-center gap-1.5 px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full text-[13px] font-medium transition-colors h-[28px]">
+                <Info className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" />
+                <span>Beta version</span>
+              </button>
+            </div>
+            <div className="absolute -left-4 sm:-left-6 md:-left-8 lg:-left-[101px] -right-4 sm:-right-6 md:-right-8 lg:-right-[101px] top-full mt-2 h-[1px] bg-gradient-to-r from-gray-400 via-gray-400/70 to-transparent opacity-80"></div>
           </div>
-          <div className="text-[15px] text-gray-600 leading-[26px] max-w-[1093px] mt-2">
+          <div className="text-[16px] text-gray-600 leading-[27px] max-w-[1093px] mt-2">
             <p>
               This Dashboard is an annex to the <a href="https://www.un.org/un80-initiative/en" target="_blank" rel="noopener noreferrer" className="text-[#009EDB] hover:text-[#0076A4] hover:underline transition-colors">UN80 Initiative Action Plan</a>. It presents the detailed work packages across the three <a href="https://www.un.org/un80-initiative/en" target="_blank" rel="noopener noreferrer" className="text-[#009EDB] hover:text-[#0076A4] hover:underline transition-colors">UN80 Initiative</a> workstreams in a single reference. This Dashboard also lists designated leads for each work package, as well as their individual action items (derived from paragraphs in the SG's reports on <a href="https://www.un.org/un80-initiative/en" target="_blank" rel="noopener noreferrer" className="text-[#009EDB] hover:text-[#0076A4] hover:underline transition-colors">UN80 Initiative</a>).
             </p>
@@ -544,14 +595,14 @@ export default function WorkPackagesPage() {
                     <TooltipTrigger asChild>
                       <div className="relative w-full sm:w-[280px] h-[140px]">
                         <div className="absolute inset-0 bg-white rounded-lg"></div>
-                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
-                        <div className="flex items-center gap-2 mb-3">
-                          <Layers className="w-5 h-5 text-[#009EDB]" />
-                          <p className="text-[14px] sm:text-[15px] md:text-[16px] font-bold text-[#009EDB] text-left leading-[20px] sm:leading-[22px] md:leading-[24px]">
-                            Number of workstreams
+                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0 pl-[26px]">
+                        <div className="flex items-center gap-2 mb-3 w-full justify-between">
+                          <p className="text-[17px] sm:text-[18px] md:text-[19px] font-normal text-[#009EDB] text-left leading-[21px] sm:leading-[23px] md:leading-[25px]">
+                            Workstreams
                           </p>
+                          <Layers className="w-5 h-5 text-[#009EDB] flex-shrink-0 mr-[10px]" />
                         </div>
-                        <p className="text-[36px] sm:text-[42px] md:text-[48px] font-bold text-[#2E3440] text-left leading-[44px] sm:leading-[50px] md:leading-[56px]">
+                        <p className="text-[37px] sm:text-[43px] md:text-[49px] font-bold text-[#2E3440] text-left leading-[45px] sm:leading-[51px] md:leading-[57px]">
                           {statsData.workstreams}
                         </p>
                         </div>
@@ -567,14 +618,14 @@ export default function WorkPackagesPage() {
                     <TooltipTrigger asChild>
                       <div className="relative w-full sm:w-[280px] h-[140px]">
                         <div className="absolute inset-0 bg-white rounded-lg"></div>
-                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
-                        <div className="flex items-center gap-2 mb-3">
-                          <BriefcaseIcon className="w-5 h-5 text-[#009EDB]" />
-                          <p className="text-[14px] sm:text-[15px] md:text-[16px] font-bold text-[#009EDB] text-left leading-[20px] sm:leading-[22px] md:leading-[24px]">
-                            Number of workpackages
+                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0 pl-[26px]">
+                        <div className="flex items-center gap-2 mb-3 w-full justify-between">
+                          <p className="text-[17px] sm:text-[18px] md:text-[19px] font-normal text-[#009EDB] text-left leading-[21px] sm:leading-[23px] md:leading-[25px]">
+                            Workpackages
                           </p>
+                          <BriefcaseIcon className="w-5 h-5 text-[#009EDB] flex-shrink-0 mr-[10px]" />
                         </div>
-                        <p className="text-[36px] sm:text-[42px] md:text-[48px] font-bold text-[#2E3440] text-left leading-[44px] sm:leading-[50px] md:leading-[56px]">
+                        <p className="text-[37px] sm:text-[43px] md:text-[49px] font-bold text-[#2E3440] text-left leading-[45px] sm:leading-[51px] md:leading-[57px]">
                           {statsData.workpackages}
                         </p>
                         </div>
@@ -590,14 +641,14 @@ export default function WorkPackagesPage() {
                     <TooltipTrigger asChild>
                       <div className="relative w-full sm:w-[280px] h-[140px]">
                         <div className="absolute inset-0 bg-white rounded-lg"></div>
-                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
-                        <div className="flex items-center gap-2 mb-3">
-                          <ListTodo className="w-5 h-5 text-[#009EDB]" />
-                          <p className="text-[14px] sm:text-[15px] md:text-[16px] font-bold text-[#009EDB] text-left leading-[20px] sm:leading-[22px] md:leading-[24px]">
-                            Number of actions
+                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0 pl-[26px]">
+                        <div className="flex items-center gap-2 mb-3 w-full justify-between">
+                          <p className="text-[17px] sm:text-[18px] md:text-[19px] font-normal text-[#009EDB] text-left leading-[21px] sm:leading-[23px] md:leading-[25px]">
+                            Actions
                           </p>
+                          <ListTodo className="w-5 h-5 text-[#009EDB] flex-shrink-0 mr-[10px]" />
                         </div>
-                        <p className="text-[36px] sm:text-[42px] md:text-[48px] font-bold text-[#2E3440] text-left leading-[44px] sm:leading-[50px] md:leading-[56px]">
+                        <p className="text-[37px] sm:text-[43px] md:text-[49px] font-bold text-[#2E3440] text-left leading-[45px] sm:leading-[51px] md:leading-[57px]">
                           {statsData.actions}
                         </p>
                         </div>
@@ -613,14 +664,14 @@ export default function WorkPackagesPage() {
                     <TooltipTrigger asChild>
                       <div className="relative w-full sm:w-[280px] h-[140px]">
                         <div className="absolute inset-0 bg-white rounded-lg"></div>
-                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
-                        <div className="flex items-center gap-2 mb-3">
-                          <Users className="w-5 h-5 text-[#009EDB]" />
-                          <p className="text-[14px] sm:text-[15px] md:text-[16px] font-bold text-[#009EDB] text-left leading-[20px] sm:leading-[22px] md:leading-[24px]">
-                            Number of leads
+                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0 pl-[26px]">
+                        <div className="flex items-center gap-2 mb-3 w-full justify-between">
+                          <p className="text-[17px] sm:text-[18px] md:text-[19px] font-normal text-[#009EDB] text-left leading-[21px] sm:leading-[23px] md:leading-[25px]">
+                            UN system leaders
                           </p>
+                          <Users className="w-5 h-5 text-[#009EDB] flex-shrink-0 mr-[10px]" />
                         </div>
-                        <p className="text-[36px] sm:text-[42px] md:text-[48px] font-bold text-[#2E3440] text-left leading-[44px] sm:leading-[50px] md:leading-[56px]">
+                        <p className="text-[37px] sm:text-[43px] md:text-[49px] font-bold text-[#2E3440] text-left leading-[45px] sm:leading-[51px] md:leading-[57px]">
                           {statsData.leads}
                         </p>
                         </div>
@@ -639,11 +690,265 @@ export default function WorkPackagesPage() {
           <section className="flex flex-col lg:flex-row gap-6 items-start">
             {/* Work Packages Collapsible */}
             <div className="flex-1 w-full lg:max-w-[818px]">
-              <div className="w-full bg-white rounded-[8px] p-4 sm:p-5 md:p-6">
-                <h2 className="text-[20px] sm:text-[22px] md:text-[24px] font-bold text-black leading-[24px] mb-3 flex items-center gap-2">
-                  <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-black" />
+              <div className="flex items-center justify-between mb-3 flex-wrap gap-4">
+                <h2 className="text-[22px] sm:text-[24px] md:text-[26px] font-bold text-black leading-[25px] flex items-center gap-2">
+                  <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-[#009EDB]" />
                   Work packages
                 </h2>
+                
+                {/* Advanced Filtering and Sort */}
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  {/* Advanced Filtering Collapsible */}
+                  <Collapsible open={isAdvancedFilterOpen} onOpenChange={setIsAdvancedFilterOpen}>
+                    <CollapsibleTrigger className="flex items-center gap-1.5 text-[15px] font-medium text-slate-700 hover:text-[#009EDB] transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50">
+                      <span>Show advanced filters</span>
+                      <ChevronDown
+                        className={`w-3 h-3 text-slate-600 transition-transform ${
+                          isAdvancedFilterOpen ? "transform rotate-180" : ""
+                        }`}
+                      />
+                    </CollapsibleTrigger>
+                  </Collapsible>
+                  
+                  {/* Sort Option */}
+                  <div className="flex items-center">
+                    <Select value={sortOption} onValueChange={setSortOption}>
+                      <SelectTrigger className="w-[160px] h-[36px] text-[14px] border-0 rounded-[6px] bg-transparent transition-all hover:text-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:border-0">
+                        <SelectValue placeholder="Sort" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-[8px] border-slate-200 shadow-lg bg-white p-1 min-w-[160px]">
+                        <SelectItem 
+                          value="name-asc"
+                          className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-[highlighted]:bg-[#E0F5FF] transition-colors"
+                        >
+                          Name (A-Z)
+                        </SelectItem>
+                        <SelectItem 
+                          value="name-desc"
+                          className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-[highlighted]:bg-[#E0F5FF] transition-colors"
+                        >
+                          Name (Z-A)
+                        </SelectItem>
+                        <SelectItem 
+                          value="number-asc"
+                          className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-[highlighted]:bg-[#E0F5FF] transition-colors"
+                        >
+                          Number (1-31)
+                        </SelectItem>
+                        <SelectItem 
+                          value="number-desc"
+                          className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-[highlighted]:bg-[#E0F5FF] transition-colors"
+                        >
+                          Number (31-1)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Advanced Filters Content - Expands Below */}
+              {isAdvancedFilterOpen && (
+                <div className="w-full mt-3 mb-3 bg-white border border-slate-200 rounded-[8px] p-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Work Package Filter */}
+                    <div className="flex flex-col gap-2">
+                      <Collapsible 
+                        open={openFilterCollapsibles.has('workPackage')} 
+                        onOpenChange={(open) => {
+                          setOpenFilterCollapsibles(prev => {
+                            const next = new Set(prev);
+                            if (open) next.add('workPackage');
+                            else next.delete('workPackage');
+                            return next;
+                          });
+                        }}
+                      >
+                        <CollapsibleTrigger className="w-full flex items-center justify-between h-[40px] px-3 text-[15px] border border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
+                          <div className="flex items-center gap-2">
+                            <Briefcase className="w-4 h-4 text-[#009EDB]" />
+                            <span className="text-slate-700">{selectedWorkPackage || "Select work package"}</span>
+                          </div>
+                          <ChevronDown className={`w-4 h-4 text-slate-600 transition-transform ${openFilterCollapsibles.has('workPackage') ? 'transform rotate-180' : ''}`} />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="mt-1 border border-slate-200 rounded-[8px] bg-white shadow-lg">
+                          <div className="p-1 max-h-[200px] overflow-y-auto">
+                            {uniqueWorkPackages.map((wp) => (
+                              <div
+                                key={wp}
+                                onClick={() => {
+                                  setSelectedWorkPackage(wp === selectedWorkPackage ? "" : wp);
+                                  setOpenFilterCollapsibles(prev => {
+                                    const next = new Set(prev);
+                                    next.delete('workPackage');
+                                    return next;
+                                  });
+                                }}
+                                className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${
+                                  selectedWorkPackage === wp ? 'bg-[#E0F5FF] font-medium' : ''
+                                }`}
+                              >
+                                {wp}
+                              </div>
+                            ))}
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </div>
+
+                    {/* Work Package Leads Filter */}
+                    <div className="flex flex-col gap-2">
+                      <Collapsible 
+                        open={openFilterCollapsibles.has('lead')} 
+                        onOpenChange={(open) => {
+                          setOpenFilterCollapsibles(prev => {
+                            const next = new Set(prev);
+                            if (open) next.add('lead');
+                            else next.delete('lead');
+                            return next;
+                          });
+                        }}
+                      >
+                        <CollapsibleTrigger className="w-full flex items-center justify-between h-[40px] px-3 text-[15px] border border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
+                          <div className="flex items-center gap-2">
+                            <User className="w-4 h-4 text-[#009EDB]" />
+                            <span className="text-slate-700">{selectedLead || "Select work package lead"}</span>
+                          </div>
+                          <ChevronDown className={`w-4 h-4 text-slate-600 transition-transform ${openFilterCollapsibles.has('lead') ? 'transform rotate-180' : ''}`} />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="mt-1 border border-slate-200 rounded-[8px] bg-white shadow-lg">
+                          <div className="p-1 max-h-[200px] overflow-y-auto">
+                            {uniqueLeads.map((lead) => (
+                              <div
+                                key={lead}
+                                onClick={() => {
+                                  setSelectedLead(lead === selectedLead ? "" : lead);
+                                  setOpenFilterCollapsibles(prev => {
+                                    const next = new Set(prev);
+                                    next.delete('lead');
+                                    return next;
+                                  });
+                                }}
+                                className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${
+                                  selectedLead === lead ? 'bg-[#E0F5FF] font-medium' : ''
+                                }`}
+                              >
+                                {lead}
+                              </div>
+                            ))}
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </div>
+
+                    {/* Workstream Filter */}
+                    <div className="flex flex-col gap-2">
+                      <Collapsible 
+                        open={openFilterCollapsibles.has('workstream')} 
+                        onOpenChange={(open) => {
+                          setOpenFilterCollapsibles(prev => {
+                            const next = new Set(prev);
+                            if (open) next.add('workstream');
+                            else next.delete('workstream');
+                            return next;
+                          });
+                        }}
+                      >
+                        <CollapsibleTrigger className="w-full flex items-center justify-between h-[40px] px-3 text-[15px] border border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
+                          <div className="flex items-center gap-2">
+                            <Layers className="w-4 h-4 text-[#009EDB]" />
+                            <span className="text-slate-700">{selectedWorkstream || "Select workstream"}</span>
+                          </div>
+                          <ChevronDown className={`w-4 h-4 text-slate-600 transition-transform ${openFilterCollapsibles.has('workstream') ? 'transform rotate-180' : ''}`} />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="mt-1 border border-slate-200 rounded-[8px] bg-white shadow-lg">
+                          <div className="p-1 max-h-[200px] overflow-y-auto">
+                            {uniqueWorkstreams.map((ws) => (
+                              <div
+                                key={ws}
+                                onClick={() => {
+                                  setSelectedWorkstream(ws === selectedWorkstream ? "" : ws);
+                                  setOpenFilterCollapsibles(prev => {
+                                    const next = new Set(prev);
+                                    next.delete('workstream');
+                                    return next;
+                                  });
+                                }}
+                                className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${
+                                  selectedWorkstream === ws ? 'bg-[#E0F5FF] font-medium' : ''
+                                }`}
+                              >
+                                {ws}
+                              </div>
+                            ))}
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </div>
+
+                    {/* Type Filter */}
+                    <div className="flex flex-col gap-2">
+                      <Collapsible 
+                        open={openFilterCollapsibles.has('type')} 
+                        onOpenChange={(open) => {
+                          setOpenFilterCollapsibles(prev => {
+                            const next = new Set(prev);
+                            if (open) next.add('type');
+                            else next.delete('type');
+                            return next;
+                          });
+                        }}
+                      >
+                        <CollapsibleTrigger className="w-full flex items-center justify-between h-[40px] px-3 text-[15px] border border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
+                          <div className="flex items-center gap-2">
+                            <Filter className="w-4 h-4 text-[#009EDB]" />
+                            <span className="text-slate-700">
+                              {selectedBigTicket === "big-ticket" ? '"Big Ticket" Work packages' : 
+                               selectedBigTicket === "other" ? "Other Work packages" : 
+                               "Select type"}
+                            </span>
+                          </div>
+                          <ChevronDown className={`w-4 h-4 text-slate-600 transition-transform ${openFilterCollapsibles.has('type') ? 'transform rotate-180' : ''}`} />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="mt-1 border border-slate-200 rounded-[8px] bg-white shadow-lg">
+                          <div className="p-1">
+                            <div
+                              onClick={() => {
+                                setSelectedBigTicket(selectedBigTicket === "big-ticket" ? "" : "big-ticket");
+                                setOpenFilterCollapsibles(prev => {
+                                  const next = new Set(prev);
+                                  next.delete('type');
+                                  return next;
+                                });
+                              }}
+                              className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${
+                                selectedBigTicket === "big-ticket" ? 'bg-[#E0F5FF] font-medium' : ''
+                              }`}
+                            >
+                              "Big Ticket" Work packages
+                            </div>
+                            <div
+                              onClick={() => {
+                                setSelectedBigTicket(selectedBigTicket === "other" ? "" : "other");
+                                setOpenFilterCollapsibles(prev => {
+                                  const next = new Set(prev);
+                                  next.delete('type');
+                                  return next;
+                                });
+                              }}
+                              className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${
+                                selectedBigTicket === "other" ? 'bg-[#E0F5FF] font-medium' : ''
+                              }`}
+                            >
+                              Other Work packages
+                            </div>
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </div>
+                  </div>
+                </div>
+              )}
                 
                 {/* Search Bar */}
                 <div className="w-full mb-4">
@@ -654,101 +959,19 @@ export default function WorkPackagesPage() {
                       placeholder="Search for work package"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full h-[44px] text-[15px] border border-slate-300 rounded-[8px] pl-[40px] pr-4 py-[10px] text-slate-700 bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20 focus:ring-offset-0"
+                      className="w-full h-[44px] text-[16px] border-0 border-b border-slate-300 rounded-none pl-[40px] pr-4 py-[10px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
                     />
                   </div>
-                  {(searchQuery || selectedWorkPackage || selectedLead || selectedWorkstream) && (
+                  {(searchQuery || selectedWorkPackage || selectedLead || selectedWorkstream || selectedBigTicket) && (
                     <div className="w-full sm:w-[770px]">
                       <Button
                         onClick={handleResetFilters}
-                        className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-1.5 h-[36px] rounded-[8px] text-[13px] font-semibold transition-all shadow-sm hover:shadow-md"
+                        className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-1.5 h-[36px] rounded-[8px] text-[14px] font-semibold transition-all shadow-sm hover:shadow-md"
                       >
                         Reset
                       </Button>
                     </div>
                   )}
-                </div>
-
-                {/* Advanced Filtering Collapsible */}
-                <div className="mb-4 w-full sm:w-[600px]">
-                  <Collapsible open={isAdvancedFilterOpen} onOpenChange={setIsAdvancedFilterOpen}>
-                    <div className="flex items-center gap-2">
-                      <CollapsibleTrigger className="flex items-center gap-2 text-[14px] font-medium text-slate-700 hover:text-[#009EDB] transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50">
-                        <span>Advanced filtering</span>
-                        <ChevronDown
-                          className={`w-4 h-4 text-slate-600 transition-transform ${
-                            isAdvancedFilterOpen ? "transform rotate-180" : ""
-                          }`}
-                        />
-                      </CollapsibleTrigger>
-                    </div>
-                    <CollapsibleContent className="mt-3">
-                      <div className="flex flex-col sm:flex-row gap-3 items-center flex-wrap">
-                        <Select value={selectedWorkPackage} onValueChange={setSelectedWorkPackage}>
-                          <SelectTrigger className="w-full sm:w-[190px] h-[40px] text-[14px] border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20">
-                            <SelectValue placeholder="Select work package" />
-                          </SelectTrigger>
-                          <SelectContent className="rounded-[8px] border-slate-200 shadow-lg bg-white p-1 min-w-[190px]">
-                            {uniqueWorkPackages.map((wp) => (
-                              <SelectItem 
-                                key={wp} 
-                                value={wp}
-                                className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-[highlighted]:bg-[#E0F5FF] transition-colors"
-                              >
-                                {wp}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-
-                        <Select value={selectedLead} onValueChange={setSelectedLead}>
-                          <SelectTrigger className="w-full sm:w-[190px] h-[40px] text-[14px] border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20">
-                            <SelectValue placeholder="Select work package lead" />
-                          </SelectTrigger>
-                          <SelectContent className="rounded-[8px] border-slate-200 shadow-lg bg-white p-1 min-w-[190px]">
-                            {uniqueLeads.map((lead) => (
-                              <SelectItem 
-                                key={lead} 
-                                value={lead}
-                                className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-[highlighted]:bg-[#E0F5FF] transition-colors"
-                              >
-                                {lead}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-
-                        <Select value={selectedWorkstream} onValueChange={setSelectedWorkstream}>
-                          <SelectTrigger className="w-full sm:w-[190px] h-[40px] text-[14px] border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20">
-                            <SelectValue placeholder="Select workstream" />
-                          </SelectTrigger>
-                          <SelectContent className="rounded-[8px] border-slate-200 shadow-lg bg-white p-1 min-w-[190px]">
-                            {uniqueWorkstreams.map((ws) => (
-                              <SelectItem 
-                                key={ws} 
-                                value={ws}
-                                className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-[highlighted]:bg-[#E0F5FF] transition-colors"
-                              >
-                                {ws}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </CollapsibleContent>
-                  </Collapsible>
-                </div>
-
-                {/* Legend */}
-                <div className="flex flex-wrap items-center gap-4 mb-4 p-3 bg-gray-50 rounded-[6px]">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-sm bg-gray-50 border border-gray-300"></div>
-                    <span className="text-[13px] text-slate-700 font-medium">"Big Ticket" Work packages</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-sm bg-gray-200 border border-gray-300"></div>
-                    <span className="text-[13px] text-slate-700 font-medium">Other Work packages</span>
-                  </div>
                 </div>
 
                 <div className="w-full space-y-4">
@@ -764,14 +987,45 @@ export default function WorkPackagesPage() {
                 >
                   <div className={`mb-20 last:mb-0 ${isOpen ? 'border-l-4 border-l-[#009EDB] border border-slate-200 rounded-[6px] bg-slate-50/50' : ''}`}>
                     <CollapsibleTrigger className={`w-full flex flex-col items-start px-0 py-0 hover:no-underline rounded-[6px] px-6 py-4 transition-all hover:bg-[#E0F5FF] border-0 relative ${isOpen ? 'rounded-b-none bg-slate-50/50' : wp.bigTicket ? 'bg-gray-50' : 'bg-gray-200'}`}>
-                          {/* Workstream Labels - Top Right */}
-                          <div className="absolute top-4 right-4 sm:right-12 flex flex-row gap-1 sm:gap-2">
+                      <div className="text-left min-w-0 mb-1 pr-20 sm:pr-8">
+                        {wp.number ? (
+                          <>
+                            <span className="text-[17px] font-medium text-gray-400 leading-[24px]">
+                              Work package {wp.number}:
+                            </span>
+                            <span className="text-[17px] font-medium text-slate-900 leading-[24px] ml-1">
+                              {wp.name}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-[17px] font-medium text-slate-900 leading-[24px]">
+                            {wp.name}
+                          </span>
+                        )}
+                      </div>
+                      {/* Goal from work package data */}
+                      {wp.goal && (
+                        <div className="mt-0.5 pr-8 text-left pl-0 py-2 mb-2">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Trophy className="w-4 h-4 text-[#009EDB]" />
+                            <p className="text-[14px] font-semibold text-[#009EDB] uppercase tracking-wide text-left">
+                              Goal
+                            </p>
+                          </div>
+                          <p className="text-[15px] text-slate-800 leading-[23px] mt-2 text-left">
+                            {wp.goal}
+                          </p>
+                        </div>
+                      )}
+                      {/* Report Labels and Work Package Leads */}
+                      <div className="flex items-center gap-3 mb-2 flex-wrap">
+                        {/* Workstream Labels */}
                         {wp.report.includes('WS1') && (
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <div className="flex items-center gap-1 sm:gap-2 cursor-help">
-                                <Layers className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
-                                <p className="text-[12px] sm:text-[14px] text-gray-600 leading-[20px]">
+                                <Layers className="w-4 h-4 text-gray-600" />
+                                <p className="text-[15px] text-gray-600 leading-[20px]">
                                   WS1
                                 </p>
                               </div>
@@ -785,8 +1039,8 @@ export default function WorkPackagesPage() {
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <div className="flex items-center gap-1 sm:gap-2 cursor-help">
-                                <Layers className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
-                                <p className="text-[12px] sm:text-[14px] text-gray-600 leading-[20px]">
+                                <Layers className="w-4 h-4 text-gray-600" />
+                                <p className="text-[15px] text-gray-600 leading-[20px]">
                                   WS2
                                 </p>
                               </div>
@@ -800,8 +1054,8 @@ export default function WorkPackagesPage() {
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <div className="flex items-center gap-1 sm:gap-2 cursor-help">
-                                <Layers className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
-                                <p className="text-[12px] sm:text-[14px] text-gray-600 leading-[20px]">
+                                <Layers className="w-4 h-4 text-gray-600" />
+                                <p className="text-[15px] text-gray-600 leading-[20px]">
                                   WS3
                                 </p>
                               </div>
@@ -811,93 +1065,65 @@ export default function WorkPackagesPage() {
                             </TooltipContent>
                           </Tooltip>
                         )}
-                      </div>
-                      <div className="text-left min-w-0 mb-2 pr-20 sm:pr-8">
-                        {wp.number ? (
-                          <>
-                            <span className="text-[16px] font-medium text-gray-400 leading-[24px]">
-                              WP {wp.number}:
-                            </span>
-                            <span className="text-[16px] font-medium text-slate-900 leading-[24px] ml-1">
-                              {wp.name}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-[16px] font-medium text-gray-400 leading-[24px]">
-                              WP:
-                            </span>
-                            <span className="text-[16px] font-medium text-slate-900 leading-[24px] ml-1">
-                              {wp.name}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                      {/* Work Package Leads - Underneath the text */}
-                      {wp.leads.length > 0 && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="flex items-center gap-2 cursor-help mb-2">
-                              <User className="w-4 h-4 text-gray-600" />
-                              <p className="text-[14px] text-gray-600 leading-[20px]">
+                        {/* Work Package Leads */}
+                        {wp.leads.length > 0 && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="flex items-center gap-2 cursor-help">
+                                <User className="w-4 h-4 text-gray-600" />
+                                <p className="text-[15px] text-gray-600 leading-[20px]">
+                                  {wp.leads.map((lead, idx) => {
+                                    const longForm = abbreviationMap[lead] || lead;
+                                    return (
+                                      <span key={idx}>
+                                        {idx > 0 && ', '}
+                                        <span title={longForm !== lead ? longForm : undefined}>
+                                          {lead}
+                                        </span>
+                                      </span>
+                                    );
+                                  })}
+                                </p>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
                                 {wp.leads.map((lead, idx) => {
                                   const longForm = abbreviationMap[lead] || lead;
                                   return (
                                     <span key={idx}>
                                       {idx > 0 && ', '}
-                                      <span title={longForm !== lead ? longForm : undefined}>
-                                        {lead}
-                                      </span>
+                                      {longForm}
                                     </span>
                                   );
                                 })}
                               </p>
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>
-                              {wp.leads.map((lead, idx) => {
-                                const longForm = abbreviationMap[lead] || lead;
-                                return (
-                                  <span key={idx}>
-                                    {idx > 0 && ', '}
-                                    {longForm}
-                                  </span>
-                                );
-                              })}
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
-                      {/* Goal from work package data */}
-                      {wp.goal && (
-                        <div className="mt-2 pr-8 text-left pl-0 py-2">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Trophy className="w-4 h-4 text-[#009EDB]" />
-                            <p className="text-[13px] font-semibold text-[#009EDB] uppercase tracking-wide text-left">
-                              Goal
-                            </p>
-                          </div>
-                          <p className="text-[14px] text-slate-800 leading-[22px] mt-2 italic text-left">
-                            {wp.goal}
-                          </p>
-                        </div>
-                      )}
-                          <ChevronDown
-                            className={`w-4 h-4 sm:w-5 sm:h-5 text-slate-600 transition-transform shrink-0 absolute top-4 right-2 sm:right-4 ${
-                              isOpen ? "transform rotate-180" : ""
-                            }`}
-                          />
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+                      {/* Details Button */}
+                      <button
+                        type="button"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-[6px] text-[14px] font-medium transition-colors absolute top-4 right-2 sm:right-4"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleCollapsible(collapsibleKey);
+                        }}
+                      >
+                        <Info className="w-3.5 h-3.5 text-gray-600" />
+                        <span>Details</span>
+                      </button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className={`px-0 pb-4 pt-4 pl-6 ${isOpen ? 'px-6' : ''}`}>
                       {wp.actions.length > 0 ? (
                         <div className="flex flex-col gap-4">
                           {/* Header */}
                           <div className="flex flex-col gap-2 mb-2">
-                            <h3 className="text-[16px] font-semibold text-slate-700 tracking-wider text-left">
-                              Indicative activities
+                            <h3 className="text-[17px] font-semibold text-slate-700 tracking-wider text-left">
+                              Indicative actions
                             </h3>
-                            <div className="h-px w-full bg-gradient-to-r from-slate-300 via-slate-300 to-transparent"></div>
                           </div>
                           {/* Display each indicative_activity in its own box */}
                           {wp.actions.map((action, idx) => (
@@ -908,11 +1134,11 @@ export default function WorkPackagesPage() {
                               {/* Activity Number and Text */}
                               <div className="flex items-start gap-3 mb-4">
                                 <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#009EDB]/10 flex items-center justify-center mt-0.5">
-                                  <span className="text-[12px] font-semibold text-[#009EDB]">
+                                  <span className="text-[13px] font-semibold text-[#009EDB]">
                                     {idx + 1}
                                   </span>
                                 </div>
-                                <p className="text-[15px] font-medium text-slate-900 leading-[24px] flex-1">
+                                <p className="text-[16px] font-medium text-slate-900 leading-[25px] flex-1">
                                   {action.text}
                                 </p>
                               </div>
@@ -920,39 +1146,49 @@ export default function WorkPackagesPage() {
                               {/* Work Package Leads - Icon + Text */}
                               {action.leads.length > 0 && (
                                 <div className="ml-9 pt-3 border-t border-slate-100">
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <div className="flex items-center gap-2 cursor-help">
-                                        <User className="w-4 h-4 text-gray-500" />
-                                        <p className="text-[13px] text-gray-600 leading-[20px]">
+                                  <div className="flex items-center gap-3 flex-wrap">
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <div className="flex items-center gap-2 cursor-help">
+                                          <User className="w-4 h-4 text-gray-500" />
+                                          <p className="text-[14px] text-gray-600 leading-[21px]">
+                                            {action.leads.map((lead, idx) => {
+                                              const longForm = abbreviationMap[lead] || lead;
+                                              return (
+                                                <span key={idx}>
+                                                  {idx > 0 && ', '}
+                                                  <span title={longForm !== lead ? longForm : undefined}>
+                                                    {lead}
+                                                  </span>
+                                                </span>
+                                              );
+                                            })}
+                                          </p>
+                                        </div>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>
                                           {action.leads.map((lead, idx) => {
                                             const longForm = abbreviationMap[lead] || lead;
                                             return (
                                               <span key={idx}>
                                                 {idx > 0 && ', '}
-                                                <span title={longForm !== lead ? longForm : undefined}>
-                                                  {lead}
-                                                </span>
+                                                {longForm}
                                               </span>
                                             );
                                           })}
                                         </p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                    {action.documentParagraph && (
+                                      <div className="flex items-center gap-1.5">
+                                        <FileText className="w-3.5 h-3.5 text-gray-500" />
+                                        <span className="text-[14px] text-gray-600 leading-[21px]">
+                                          Para. {action.documentParagraph}
+                                        </span>
                                       </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>
-                                        {action.leads.map((lead, idx) => {
-                                          const longForm = abbreviationMap[lead] || lead;
-                                          return (
-                                            <span key={idx}>
-                                              {idx > 0 && ', '}
-                                              {longForm}
-                                            </span>
-                                          );
-                                        })}
-                                      </p>
-                                    </TooltipContent>
-                                  </Tooltip>
+                                    )}
+                                  </div>
                                 </div>
                               )}
                             </div>
@@ -960,7 +1196,7 @@ export default function WorkPackagesPage() {
                         </div>
                       ) : (
                         <div className="bg-white border border-slate-200 rounded-[6px] p-[17px]">
-                          <p className="text-[14px] font-normal text-slate-900 leading-[20px]">
+                          <p className="text-[15px] font-normal text-slate-900 leading-[21px]">
                             No actions available
                           </p>
                         </div>
@@ -971,78 +1207,80 @@ export default function WorkPackagesPage() {
               );
             })}
               </div>
-            </div>
           </div>
 
           {/* Chart Section */}
           <div className="w-full lg:w-[320px] flex-shrink-0 mt-6 lg:mt-0 lg:border-l lg:border-slate-200 lg:pl-6 lg:ml-[calc((4*280px+3*16px)-818px-320px-24px)]">
             <div className="bg-white p-4 sm:p-5 rounded-[8px]">
-              <h3 className="text-[16px] font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              <h3 className="text-[17px] font-semibold text-slate-900 mb-2 flex items-center gap-2">
                 <Users className="w-5 h-5 text-[#009EDB]" />
                 Work packages per lead
               </h3>
+              <p className="text-[15px] text-slate-600 mb-3">
+                Entities and number of related Work packages
+              </p>
+              {/* Chart Search Bar */}
+              <div className="relative w-full mb-4">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#009EDB] pointer-events-none z-10" />
+                <Input
+                  type="text"
+                  placeholder="Search entities"
+                  value={chartSearchQuery}
+                  onChange={(e) => setChartSearchQuery(e.target.value)}
+                  className="w-full h-[36px] text-[15px] border-0 border-b border-slate-300 rounded-none pl-[32px] pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
+                />
+              </div>
               <div className="h-[300px] sm:h-[350px] md:h-[400px] overflow-y-auto overflow-x-hidden">
-                <ResponsiveContainer width="100%" height={Math.max(300, chartData.length * 25)}>
-                  <BarChart
-                    data={chartData}
-                    layout="vertical"
-                    margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} vertical={true} />
-                    <XAxis 
-                      type="number" 
-                      tick={{ fontSize: 12, fill: '#64748b' }}
-                      stroke="#cbd5e1"
-                    />
-                    <YAxis 
-                      type="category" 
-                      dataKey="lead" 
-                      tick={{ fontSize: 11, fill: '#64748b' }}
-                      tickLine={false}
-                      stroke="#cbd5e1"
-                      width={120}
-                    />
-                    <RechartsTooltip 
-                      contentStyle={{ 
-                        backgroundColor: '#fff', 
-                        border: '1px solid #e2e8f0',
-                        borderRadius: '6px',
-                        fontSize: '12px'
-                      }}
-                      formatter={(value: number) => [value, 'Work Packages']}
-                    />
-                    <Bar 
-                      dataKey="count" 
-                      radius={[0, 4, 4, 0]} 
-                      barSize={20}
-                      onClick={(data: any) => {
-                        if (data && data.lead) {
-                          const clickedLead = data.lead;
-                          // Toggle: if already selected, deselect; otherwise select
-                          if (selectedLead === clickedLead) {
-                            setSelectedLead("");
-                          } else {
-                            setSelectedLead(clickedLead);
-                          }
-                        }
-                      }}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <LabelList 
-                        dataKey="count" 
-                        position="right" 
-                        style={{ fill: '#64748b', fontSize: '11px', fontWeight: '500' }}
-                      />
-                      {chartData.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={selectedLead === entry.lead ? "#0076A4" : "#009EDB"}
-                          style={{ opacity: selectedLead && selectedLead !== entry.lead ? 0.3 : 1 }}
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                <table className="w-full">
+                  <tbody>
+                    {chartData.map((entry, index) => {
+                      const maxCount = chartData.length > 0 ? Math.max(...chartData.map(d => d.count)) : 1;
+                      const percentage = (entry.count / maxCount) * 100;
+                      const isSelected = selectedLead === entry.lead;
+                      const isFiltered = selectedLead && selectedLead !== entry.lead;
+                      
+                      return (
+                        <tr
+                          key={index}
+                          onClick={() => {
+                            // Toggle: if already selected, deselect; otherwise select
+                            if (isSelected) {
+                              setSelectedLead("");
+                            } else {
+                              setSelectedLead(entry.lead);
+                            }
+                          }}
+                          className={`cursor-pointer transition-colors hover:bg-slate-50 ${
+                            isFiltered ? 'opacity-30' : ''
+                          } ${index < chartData.length - 1 ? 'border-b border-slate-200' : ''}`}
+                        >
+                          <td className="py-3 pr-3">
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[14px] font-medium text-slate-900 flex-shrink-0 min-w-0">
+                                {entry.lead}
+                              </span>
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <span className={`text-[14px] font-semibold min-w-[20px] font-mono ${
+                                      isSelected ? 'text-[#0076A4]' : 'text-[#009EDB]'
+                                    }`}>
+                                  {entry.count}
+                                </span>
+                                <div className="w-[120px] h-[8px] bg-slate-100 rounded-full overflow-hidden relative">
+                                  <div
+                                    className={`h-full rounded-full transition-all ${
+                                      isSelected ? 'bg-[#0076A4]' : 'bg-[#009EDB]'
+                                    }`}
+                                    style={{ width: `${percentage}%` }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
