@@ -48,6 +48,8 @@ export interface Action {
 
     /** Work package goal description or null */
     work_package_goal: string | null;
+
+    doc_text: string | null;
 }
 
 /**
