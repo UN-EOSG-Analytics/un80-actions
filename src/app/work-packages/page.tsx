@@ -26,7 +26,6 @@ import { fetchActions } from "@/lib/actions";
 import type { Actions } from "@/types/action";
 import { useEffect } from "react";
 import { Package, CheckCircle, ListChecks, ClipboardCheck, ChevronDown, Users, FileText, User, Briefcase, Search, Layers, Briefcase as BriefcaseIcon, ListTodo, Trophy } from "lucide-react";
-import Image from "next/image";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
@@ -36,10 +35,37 @@ const abbreviationMap: Record<string, string> = {
   'USG DPPA': 'Under-Secretary-General for Political and Peacebuilding Affairs',
   'USG DPO': 'Under-Secretary-General for Peace Operations',
   'USG OCHA': 'Under-Secretary-General for Humanitarian Affairs and Emergency Relief Coordinator',
-  'USG': 'Under-Secretary-General',
-  'DPPA': 'Department of Political and Peacebuilding Affairs',
-  'DPO': 'Department of Peace Operations',
-  'OCHA': 'Office for the Coordination of Humanitarian Affairs',
+  'USG DESA': 'Under-Secretary-General for Economic and Social Affairs',
+  'USG Policy': 'Under-Secretary-General for Policy',
+  'USG UNODC': 'Under-Secretary-General for Drugs and Crime',
+  'USG OCT': 'Under-Secretary-General for Counter-Terrorism',
+  'USG UNEP': 'Under-Secretary-General for the UN Environment Programme',
+  'USG UNU': 'Under-Secretary-General of the United Nations University',
+  'USG DGACM': 'Under-Secretary-General for General Assembly and Conference Management',
+  'USG ODA': 'Under-Secretary-General for Disarmament Affairs',
+  'DSG': 'Deputy Secretary-General',
+  'ASG DCO': 'Assistant Secretary-General for Development Coordination Office',
+  'ASG UNITAR': 'Assistant Secretary-General for the UN Institute for Training and Research',
+  'HC OHCHR': 'High Commissioner for Human Rights',
+  'SG ITU': 'Secretary-General of the International Telecommunication Union',
+  'Chair HLCM': 'Chair of the High-Level Committee on Management',
+  'ED WFP': 'Executive Director of the World Food Programme',
+  'ED UNOPS': 'Executive Director of the UN Office for Project Services',
+  'ED UNFPA': 'Executive Director of the UN Population Fund',
+  'ED UN Women': 'Executive Director of UN Women',
+  'ED UNAIDS': 'Executive Director of UNAIDS',
+  'ED UNICEF': 'Executive Director of UNICEF',
+  'SA Reform': 'Special Adviser on Reform',
+  'CDC': 'Chef de Cabinet',
+  'Chair DTN': 'Chair of the Digital Transformation Network',
+  'USG ECA': 'Under-Secretary-General of the Economic Commission for Africa',
+  'SG': 'Secretary-General',
+  'GA': 'General Assembly',
+  'SC': 'Security Council',
+  'ECOSOC': 'Economic and Social Council',
+  'WS1': 'Workstream 1',
+  'WS2': 'Workstream 2',
+  'WS3': 'Workstream 3',
 };
 
 interface WorkPackageStats {
@@ -175,6 +201,7 @@ export default function WorkPackagesPage() {
         name: string;
         leads: string[];
         goal: string | null;
+        bigTicket: boolean;
         actions: Array<{
           text: string;
           documentParagraph: string;
@@ -199,6 +226,7 @@ export default function WorkPackagesPage() {
           name: action.work_package_name,
           leads: leads,
           goal: action.work_package_goal || null,
+          bigTicket: action.big_ticket || false,
           actions: [],
         });
       }
@@ -222,6 +250,11 @@ export default function WorkPackagesPage() {
       // Update goal if not set or if this action has a goal
       if (action.work_package_goal && !wp.goal) {
         wp.goal = action.work_package_goal;
+      }
+      
+      // Update big_ticket status - if any action is big_ticket, mark the work package as big_ticket
+      if (action.big_ticket) {
+        wp.bigTicket = true;
       }
       
       // Add indicative activity if not already included
@@ -268,32 +301,6 @@ export default function WorkPackagesPage() {
     });
   }, [actions]);
 
-  // Calculate statistics
-  const statsData = useMemo(() => {
-    const uniqueWorkstreams = new Set<string>();
-    const uniqueLeadsSet = new Set<string>();
-    
-    actions.forEach(action => {
-      if (action.report) {
-        uniqueWorkstreams.add(action.report);
-      }
-      if (Array.isArray(action.work_package_leads)) {
-        action.work_package_leads.forEach(lead => {
-          const trimmed = lead?.trim();
-          if (trimmed && trimmed.length > 0) {
-            uniqueLeadsSet.add(trimmed);
-          }
-        });
-      }
-    });
-
-    return {
-      workstreams: uniqueWorkstreams.size,
-      workpackages: workPackages.length,
-      actions: actions.length,
-      leads: uniqueLeadsSet.size,
-    };
-  }, [actions, workPackages]);
 
   // Helper function to filter work packages based on selected filters (excluding the filter being computed)
   const getFilteredWorkPackagesForOptions = useMemo(() => {
@@ -406,6 +413,71 @@ export default function WorkPackagesPage() {
     return filtered;
   }, [workPackages, searchQuery, selectedWorkPackage, selectedLead, selectedWorkstream]);
 
+  // Calculate statistics based on filtered data
+  const statsData = useMemo(() => {
+    const uniqueWorkstreams = new Set<string>();
+    const uniqueLeadsSet = new Set<string>();
+    
+    // Filter actions based on current filters
+    let filteredActions = actions;
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filteredActions = filteredActions.filter(
+        (action) =>
+          action.work_package_name.toLowerCase().includes(query) ||
+          action.work_package_number.includes(query) ||
+          (Array.isArray(action.work_package_leads) && action.work_package_leads.some((lead) => lead.toLowerCase().includes(query))) ||
+          action.indicative_activity.toLowerCase().includes(query)
+      );
+    }
+
+    // Work Package filter
+    if (selectedWorkPackage) {
+      const wpMatch = selectedWorkPackage.match(/^WP:\s*(\d+):/);
+      if (wpMatch) {
+        const wpNumber = wpMatch[1];
+        filteredActions = filteredActions.filter((action) => action.work_package_number === wpNumber);
+      } else {
+        filteredActions = filteredActions.filter((action) => !action.work_package_number && action.work_package_name === selectedWorkPackage.replace(/^WP:\s*/, ''));
+      }
+    }
+
+    // Lead filter
+    if (selectedLead) {
+      filteredActions = filteredActions.filter((action) => 
+        Array.isArray(action.work_package_leads) && action.work_package_leads.includes(selectedLead)
+      );
+    }
+
+    // Workstream filter
+    if (selectedWorkstream) {
+      filteredActions = filteredActions.filter((action) => action.report === selectedWorkstream);
+    }
+    
+    filteredActions.forEach(action => {
+      if (action.report) {
+        uniqueWorkstreams.add(action.report);
+      }
+      if (Array.isArray(action.work_package_leads)) {
+        action.work_package_leads.forEach(lead => {
+          const trimmed = lead?.trim();
+          if (trimmed && trimmed.length > 0) {
+            uniqueLeadsSet.add(trimmed);
+          }
+        });
+      }
+    });
+
+    return {
+      workstreams: uniqueWorkstreams.size,
+      workpackages: filteredWorkPackages.length,
+      actions: filteredActions.length,
+      leads: uniqueLeadsSet.size,
+    };
+  }, [actions, searchQuery, selectedWorkPackage, selectedLead, selectedWorkstream, filteredWorkPackages]);
+
   // Clear filters if selected value is no longer available
   useEffect(() => {
     if (selectedWorkPackage && !uniqueWorkPackages.includes(selectedWorkPackage)) {
@@ -445,30 +517,21 @@ export default function WorkPackagesPage() {
   };
 
       return (
-        <div className="min-h-screen bg-gray-100">
+        <TooltipProvider delayDuration={200}>
+        <div className="min-h-screen bg-gray-50">
       {/* Main Container - Left-aligned with consistent padding */}
       <div className="max-w-[1421px] mx-auto px-4 sm:px-6 md:px-8 lg:px-[101px] pt-4 sm:pt-6 md:pt-8 pb-4 sm:pb-6 md:pb-8">
         {/* Header Section */}
         <header className="mb-4 relative">
-          <div className="absolute -top-4 sm:-top-6 md:-top-8 right-0">
-            <Image
-              src={`${basePath}/images/UN_Logo_Horizontal_Black_English.svg`}
-              alt="United Nations Logo"
-              width={200}
-              height={60}
-              className="h-auto w-[120px] sm:w-[150px] md:w-[200px]"
-              priority
-            />
+          <div className="mb-6 mt-8 sm:mt-10 md:mt-12">
+            <h1 className="text-[32px] sm:text-[40px] md:text-[48px] lg:text-[56px] font-bold text-gray-800 leading-[40px] sm:leading-[48px] md:leading-[56px] lg:leading-[64px] tracking-[-0.02em] relative inline-block">
+              <span className="relative z-10 bg-clip-text">UN80 Initiative</span>
+              <span className="absolute -bottom-2 left-0 right-0 h-[2px] bg-gradient-to-r from-gray-400 via-gray-400/70 to-transparent rounded-full opacity-80"></span>
+            </h1>
           </div>
-          <h1 className="text-[32px] sm:text-[40px] md:text-[48px] lg:text-[56px] font-bold text-black leading-[40px] sm:leading-[48px] md:leading-[56px] lg:leading-[64px] mb-4 mt-8 sm:mt-10 md:mt-12 tracking-tight">
-            UN80 Initiative
-          </h1>
-          <div className="text-[14px] text-black leading-[24px] max-w-[1093px]">
-            <p className="mb-0">
-              This Dashboard is an annex to the UN80 Initiative Action Plan: presents the detailed work packages across the three UN80 workstreams in a single reference.
-            </p>
-            <p className="mb-0">
-              Furthermore, it is a consolidated work package document that lists all work packages and their designated leads, as well as their individual action items (derived from paragraphs in the SG's reports on UN80).
+          <div className="text-[15px] text-gray-600 leading-[26px] max-w-[1093px] mt-2">
+            <p>
+              This Dashboard is an annex to the <a href="https://www.un.org/un80-initiative/en" target="_blank" rel="noopener noreferrer" className="text-[#009EDB] hover:text-[#0076A4] hover:underline transition-colors">UN80 Initiative Action Plan</a>. It presents the detailed work packages across the three <a href="https://www.un.org/un80-initiative/en" target="_blank" rel="noopener noreferrer" className="text-[#009EDB] hover:text-[#0076A4] hover:underline transition-colors">UN80 Initiative</a> workstreams in a single reference. This Dashboard also lists designated leads for each work package, as well as their individual action items (derived from paragraphs in the SG's reports on <a href="https://www.un.org/un80-initiative/en" target="_blank" rel="noopener noreferrer" className="text-[#009EDB] hover:text-[#0076A4] hover:underline transition-colors">UN80 Initiative</a>).
             </p>
           </div>
         </header>
@@ -479,16 +542,19 @@ export default function WorkPackagesPage() {
                 {/* Card 1 - Number of Workstreams */}
                 <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="relative flex flex-col items-start justify-start w-full sm:w-[280px] h-[140px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
+                      <div className="relative w-full sm:w-[280px] h-[140px]">
+                        <div className="absolute inset-0 bg-white rounded-lg"></div>
+                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
                         <div className="flex items-center gap-2 mb-3">
                           <Layers className="w-5 h-5 text-[#009EDB]" />
                           <p className="text-[14px] sm:text-[15px] md:text-[16px] font-bold text-[#009EDB] text-left leading-[20px] sm:leading-[22px] md:leading-[24px]">
                             Number of workstreams
                           </p>
                         </div>
-                        <p className="text-[36px] sm:text-[42px] md:text-[48px] font-bold text-[#009EDB] text-left leading-[44px] sm:leading-[50px] md:leading-[56px]">
+                        <p className="text-[36px] sm:text-[42px] md:text-[48px] font-bold text-[#2E3440] text-left leading-[44px] sm:leading-[50px] md:leading-[56px]">
                           {statsData.workstreams}
                         </p>
+                        </div>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -499,16 +565,19 @@ export default function WorkPackagesPage() {
                 {/* Card 2 - Number of Workpackages */}
                 <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="relative flex flex-col items-start justify-start w-full sm:w-[280px] h-[140px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
+                      <div className="relative w-full sm:w-[280px] h-[140px]">
+                        <div className="absolute inset-0 bg-white rounded-lg"></div>
+                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
                         <div className="flex items-center gap-2 mb-3">
                           <BriefcaseIcon className="w-5 h-5 text-[#009EDB]" />
                           <p className="text-[14px] sm:text-[15px] md:text-[16px] font-bold text-[#009EDB] text-left leading-[20px] sm:leading-[22px] md:leading-[24px]">
                             Number of workpackages
                           </p>
                         </div>
-                        <p className="text-[36px] sm:text-[42px] md:text-[48px] font-bold text-[#009EDB] text-left leading-[44px] sm:leading-[50px] md:leading-[56px]">
+                        <p className="text-[36px] sm:text-[42px] md:text-[48px] font-bold text-[#2E3440] text-left leading-[44px] sm:leading-[50px] md:leading-[56px]">
                           {statsData.workpackages}
                         </p>
+                        </div>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -519,16 +588,19 @@ export default function WorkPackagesPage() {
                 {/* Card 3 - Number of actions */}
                 <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="relative flex flex-col items-start justify-start w-full sm:w-[280px] h-[140px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
+                      <div className="relative w-full sm:w-[280px] h-[140px]">
+                        <div className="absolute inset-0 bg-white rounded-lg"></div>
+                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
                         <div className="flex items-center gap-2 mb-3">
                           <ListTodo className="w-5 h-5 text-[#009EDB]" />
                           <p className="text-[14px] sm:text-[15px] md:text-[16px] font-bold text-[#009EDB] text-left leading-[20px] sm:leading-[22px] md:leading-[24px]">
                             Number of actions
                           </p>
                         </div>
-                        <p className="text-[36px] sm:text-[42px] md:text-[48px] font-bold text-[#009EDB] text-left leading-[44px] sm:leading-[50px] md:leading-[56px]">
+                        <p className="text-[36px] sm:text-[42px] md:text-[48px] font-bold text-[#2E3440] text-left leading-[44px] sm:leading-[50px] md:leading-[56px]">
                           {statsData.actions}
                         </p>
+                        </div>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -539,16 +611,19 @@ export default function WorkPackagesPage() {
                 {/* Card 4 - Number of leads */}
                 <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="relative flex flex-col items-start justify-start w-full sm:w-[280px] h-[140px] bg-[#E0F5FF] rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
+                      <div className="relative w-full sm:w-[280px] h-[140px]">
+                        <div className="absolute inset-0 bg-white rounded-lg"></div>
+                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0">
                         <div className="flex items-center gap-2 mb-3">
                           <Users className="w-5 h-5 text-[#009EDB]" />
                           <p className="text-[14px] sm:text-[15px] md:text-[16px] font-bold text-[#009EDB] text-left leading-[20px] sm:leading-[22px] md:leading-[24px]">
                             Number of leads
                           </p>
                         </div>
-                        <p className="text-[36px] sm:text-[42px] md:text-[48px] font-bold text-[#009EDB] text-left leading-[44px] sm:leading-[50px] md:leading-[56px]">
+                        <p className="text-[36px] sm:text-[42px] md:text-[48px] font-bold text-[#2E3440] text-left leading-[44px] sm:leading-[50px] md:leading-[56px]">
                           {statsData.leads}
                         </p>
+                        </div>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -572,28 +647,26 @@ export default function WorkPackagesPage() {
                 
                 {/* Search Bar */}
                 <div className="w-full mb-4">
-                  <div className="flex flex-col sm:flex-row gap-3 items-start mb-4">
-                    <div className="flex flex-col sm:flex-row gap-3 items-start w-full sm:w-auto">
-                      <div className="relative w-full sm:w-[600px]">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#009EDB] pointer-events-none z-10" />
-                        <Input
-                          type="text"
-                          placeholder="Search for work package"
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="w-full h-[44px] text-[15px] border border-slate-300 rounded-[8px] pl-[40px] pr-4 py-[10px] text-slate-700 bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20 focus:ring-offset-0"
-                        />
-                      </div>
-                      {(searchQuery || selectedWorkPackage || selectedLead || selectedWorkstream) && (
-                        <Button
-                          onClick={handleResetFilters}
-                          className="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 h-[44px] rounded-[8px] text-[14px] font-semibold shrink-0 transition-all shadow-sm hover:shadow-md flex items-center gap-2"
-                        >
-                          <span>Reset</span>
-                        </Button>
-                      )}
-                    </div>
+                  <div className="relative w-full sm:w-[770px] mb-2">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#009EDB] pointer-events-none z-10" />
+                    <Input
+                      type="text"
+                      placeholder="Search for work package"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full h-[44px] text-[15px] border border-slate-300 rounded-[8px] pl-[40px] pr-4 py-[10px] text-slate-700 bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm focus:border-[#009EDB] focus:ring-2 focus:ring-[#009EDB]/20 focus:ring-offset-0"
+                    />
                   </div>
+                  {(searchQuery || selectedWorkPackage || selectedLead || selectedWorkstream) && (
+                    <div className="w-full sm:w-[770px]">
+                      <Button
+                        onClick={handleResetFilters}
+                        className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-1.5 h-[36px] rounded-[8px] text-[13px] font-semibold transition-all shadow-sm hover:shadow-md"
+                      >
+                        Reset
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Advanced Filtering Collapsible */}
@@ -666,6 +739,18 @@ export default function WorkPackagesPage() {
                   </Collapsible>
                 </div>
 
+                {/* Legend */}
+                <div className="flex flex-wrap items-center gap-4 mb-4 p-3 bg-gray-50 rounded-[6px]">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-sm bg-gray-50 border border-gray-300"></div>
+                    <span className="text-[13px] text-slate-700 font-medium">"Big Ticket" Work packages</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-sm bg-gray-200 border border-gray-300"></div>
+                    <span className="text-[13px] text-slate-700 font-medium">Other Work packages</span>
+                  </div>
+                </div>
+
                 <div className="w-full space-y-4">
             {filteredWorkPackages.map((wp, index) => {
               const collapsibleKey = `${wp.report.join('-')}-${wp.number || 'empty'}-${index}`;
@@ -678,15 +763,30 @@ export default function WorkPackagesPage() {
                   onOpenChange={() => toggleCollapsible(collapsibleKey)}
                 >
                   <div className={`mb-20 last:mb-0 ${isOpen ? 'border-l-4 border-l-[#009EDB] border border-slate-200 rounded-[6px] bg-slate-50/50' : ''}`}>
-                    <CollapsibleTrigger className={`w-full flex flex-col items-start px-0 py-0 hover:no-underline bg-slate-50 rounded-[6px] px-6 py-4 transition-all hover:bg-[#E0F5FF] border-0 relative ${isOpen ? 'rounded-b-none' : ''}`}>
+                    <CollapsibleTrigger className={`w-full flex flex-col items-start px-0 py-0 hover:no-underline rounded-[6px] px-6 py-4 transition-all hover:bg-[#E0F5FF] border-0 relative ${isOpen ? 'rounded-b-none bg-slate-50/50' : wp.bigTicket ? 'bg-gray-50' : 'bg-gray-200'}`}>
                           {/* Workstream Labels - Top Right */}
-                          <div className="absolute top-4 right-8 sm:right-12 flex flex-row gap-2">
+                          <div className="absolute top-4 right-4 sm:right-12 flex flex-row gap-1 sm:gap-2">
+                        {wp.report.includes('WS1') && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="flex items-center gap-1 sm:gap-2 cursor-help">
+                                <Layers className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
+                                <p className="text-[12px] sm:text-[14px] text-gray-600 leading-[20px]">
+                                  WS1
+                                </p>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Workstream 1</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
                         {wp.report.includes('WS2') && (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <div className="flex items-center gap-2 cursor-help">
-                                <Layers className="w-4 h-4 text-gray-600" />
-                                <p className="text-[14px] text-gray-600 leading-[20px]">
+                              <div className="flex items-center gap-1 sm:gap-2 cursor-help">
+                                <Layers className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
+                                <p className="text-[12px] sm:text-[14px] text-gray-600 leading-[20px]">
                                   WS2
                                 </p>
                               </div>
@@ -699,9 +799,9 @@ export default function WorkPackagesPage() {
                         {wp.report.includes('WS3') && (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <div className="flex items-center gap-2 cursor-help">
-                                <Layers className="w-4 h-4 text-gray-600" />
-                                <p className="text-[14px] text-gray-600 leading-[20px]">
+                              <div className="flex items-center gap-1 sm:gap-2 cursor-help">
+                                <Layers className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
+                                <p className="text-[12px] sm:text-[14px] text-gray-600 leading-[20px]">
                                   WS3
                                 </p>
                               </div>
@@ -712,7 +812,7 @@ export default function WorkPackagesPage() {
                           </Tooltip>
                         )}
                       </div>
-                      <div className="text-left min-w-0 mb-2 pr-8">
+                      <div className="text-left min-w-0 mb-2 pr-20 sm:pr-8">
                         {wp.number ? (
                           <>
                             <span className="text-[16px] font-medium text-gray-400 leading-[24px]">
@@ -950,6 +1050,7 @@ export default function WorkPackagesPage() {
         </section>
       </div>
     </div>
+        </TooltipProvider>
   );
 }
 
