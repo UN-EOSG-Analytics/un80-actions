@@ -78,18 +78,19 @@ export function FilterControls({
     return (
         <>
             {/* Header with Advanced Filters Toggle and Sort */}
-            <div className="flex items-center justify-between mb-3 gap-4">
-                <h2 className="text-[22px] sm:text-[24px] md:text-[26px] font-bold text-black leading-[25px] flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3 sm:gap-4">
+                <h2 className="text-[22px] sm:text-[24px] md:text-[26px] font-bold text-black leading-[25px] flex items-center gap-2 shrink-0">
                     <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-un-blue" />
                     Work Packages
                 </h2>
 
                 {/* Advanced Filtering and Sort */}
-                <div className="flex items-center gap-3 shrink-0">
+                <div className="flex items-center gap-2 sm:gap-3 shrink-0 flex-wrap sm:flex-nowrap">
                     {/* Advanced Filtering Collapsible */}
                     <Collapsible open={isAdvancedFilterOpen} onOpenChange={onAdvancedFilterOpenChange}>
-                        <CollapsibleTrigger className="flex items-center gap-1.5 text-[15px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap">
-                            <span>Show Advanced Filters</span>
+                        <CollapsibleTrigger className="flex items-center gap-1.5 text-[14px] sm:text-[15px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap">
+                            <span className="hidden sm:inline">Show Advanced Filters</span>
+                            <span className="sm:hidden">Filters</span>
                             <ChevronDown
                                 className={`w-3 h-3 text-slate-600 transition-transform ${isAdvancedFilterOpen ? 'transform rotate-180' : ''
                                     }`}
@@ -98,7 +99,7 @@ export function FilterControls({
                     </Collapsible>
 
                     {/* Sort Option */}
-                    <div className="w-36">
+                    <div className="w-32 sm:w-36">
                         <FilterDropdown
                             open={openFilterCollapsibles.has('sort')}
                             onOpenChange={(open) => onToggleFilterCollapsible('sort', open)}
