@@ -16,6 +16,16 @@ export function WorkPackageList({
     onSelectLead,
     onSelectWorkstream,
 }: WorkPackageListProps) {
+    if (workPackages.length === 0) {
+        return (
+            <div className="w-full py-12">
+                <p className="text-left text-gray-600">
+                    No results found. Try adjusting your filters or search query.
+                </p>
+            </div>
+        );
+    }
+
     return (
         <div className="w-full space-y-4">
             {workPackages.map((wp, index) => {
