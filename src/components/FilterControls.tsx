@@ -89,8 +89,7 @@ export function FilterControls({
                     {/* Advanced Filtering Collapsible */}
                     <Collapsible open={isAdvancedFilterOpen} onOpenChange={onAdvancedFilterOpenChange}>
                         <CollapsibleTrigger className="flex items-center gap-1.5 text-[14px] sm:text-[15px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap">
-                            <span className="hidden sm:inline">Show Advanced Filters</span>
-                            <span className="sm:hidden">Filters</span>
+                            <span>Show Advanced Filters</span>
                             <ChevronDown
                                 className={`w-3 h-3 text-slate-600 transition-transform ${isAdvancedFilterOpen ? 'transform rotate-180' : ''
                                     }`}
