@@ -9,7 +9,7 @@ on:
   push:
     branches: ["main"]
 
-  # Runs after the data fetching workflow completes
+  # Runs after the data processing workflow completes
   workflow_run:
     workflows: ["Process raw JSON data"]
     types:
@@ -35,9 +35,14 @@ jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
-    # Skip deployment if the commit message contains 'automated data update'
-    # This prevents deploying before data processing is complete
-    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, 'automated data update') }}
+    # Skip if triggered by push with 'automated data update' message (wait for process_data.yml to complete)
+    # Run if triggered by workflow_run and it succeeded, or if manual dispatch, or if push without that message
+    if: |
+      ${{
+        github.event_name == 'workflow_dispatch' ||
+        (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+        (github.event_name == 'push' && !contains(github.event.head_commit.message, 'automated data update'))
+      }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

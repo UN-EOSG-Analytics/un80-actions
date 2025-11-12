@@ -12,9 +12,9 @@ permissions:
 jobs:
     update-data:
         runs-on: ubuntu-latest
-        # Only run on push if the commit message is from the automated data update
-        # This prevents infinite loops (github-actions commits won't match this message)
-        if: ${{ github.event_name != 'push' || contains(github.event.head_commit.message, 'automated data update') }}
+        # Only run on push if the commit message contains 'automated data update'
+        # This prevents the workflow from running on its own commits
+        if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'automated data update') }}
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
