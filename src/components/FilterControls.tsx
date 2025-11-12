@@ -125,7 +125,7 @@ export function FilterControls({
                                 touch-manipulation transition-colors
                                 ${hasActiveAdvancedFilters
                                     ? 'bg-un-blue/10 border-un-blue text-un-blue hover:border-un-blue'
-                                    : 'bg-white border-gray-200 text-gray-500 hover:bg-un-blue/10 hover:border-un-blue hover:text-un-blue'
+                                    : 'bg-white border-gray-400 text-gray-900 hover:bg-un-blue/10 hover:border-un-blue hover:text-un-blue'
                                 }
                             `}>
                                 <Filter className="h-4 w-4 shrink-0" />
@@ -218,7 +218,7 @@ export function FilterControls({
                                 touch-manipulation transition-colors
                                 ${hasActiveAdvancedFilters
                                     ? 'bg-un-blue/10 border-un-blue text-un-blue hover:border-un-blue'
-                                    : 'bg-white border-gray-200 text-gray-500 hover:bg-un-blue/10 hover:border-un-blue hover:text-un-blue'
+                                    : 'bg-white border-gray-300 text-gray-900 hover:bg-un-blue/10 hover:border-un-blue hover:text-un-blue'
                                 }
                             `}>
                                 <Filter className="h-4 w-4 shrink-0" />
