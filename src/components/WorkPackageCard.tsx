@@ -3,13 +3,12 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ActionItem } from "@/components/ActionCard";
 import { WorkstreamLabels } from "@/components/WorkstreamBadge";
-import { abbreviationMap } from "@/constants/abbreviations";
+import { LeadsBadge } from "@/components/LeadsBadge";
 import { formatGoalText } from "@/lib/utils";
 import type { WorkPackage, WorkPackageAction } from "@/types";
-import { Info, Trophy, Users } from "lucide-react";
+import { Info, Trophy } from "lucide-react";
 
 interface WorkPackageActionsProps {
     actions: WorkPackageAction[];
@@ -109,45 +108,7 @@ export function WorkPackageItem({
                         <WorkstreamLabels report={wp.report} />
 
                         {/* Work Package Leads */}
-                        {wp.leads.length > 0 && (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="flex items-center gap-1 sm:gap-2 cursor-help">
-                                        <Users className="w-4 h-4 text-gray-600" />
-                                        <p className="text-base text-gray-600 leading-5">
-                                            {wp.leads.map((lead, idx) => {
-                                                const longForm = abbreviationMap[lead] || lead;
-                                                return (
-                                                    <span key={idx}>
-                                                        {idx > 0 && ", "}
-                                                        <span
-                                                            title={
-                                                                longForm !== lead ? longForm : undefined
-                                                            }
-                                                        >
-                                                            {lead}
-                                                        </span>
-                                                    </span>
-                                                );
-                                            })}
-                                        </p>
-                                    </div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>
-                                        {wp.leads.map((lead, idx) => {
-                                            const longForm = abbreviationMap[lead] || lead;
-                                            return (
-                                                <span key={idx}>
-                                                    {idx > 0 && ", "}
-                                                    {longForm}
-                                                </span>
-                                            );
-                                        })}
-                                    </p>
-                                </TooltipContent>
-                            </Tooltip>
-                        )}
+                        <LeadsBadge leads={wp.leads} />
                     </div>
                 </CollapsibleTrigger>
 
