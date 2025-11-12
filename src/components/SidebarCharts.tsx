@@ -84,20 +84,6 @@ export function SidebarCharts({
     return (
         <div className="w-full lg:w-[320px] lg:max-w-[320px] shrink-0 lg:border-l lg:border-slate-200 lg:pl-6 flex flex-col gap-3 min-w-0">
             <SidebarChart
-                title="Actions per Workstream"
-                description="Number of actions per workstream"
-                icon={<Layers className="w-5 h-5 text-un-blue" />}
-                data={workstreamsChartEntries}
-                searchQuery={workstreamsSearchQuery}
-                onSearchChange={onWorkstreamsSearchChange}
-                searchPlaceholder="Search workstreams"
-                selectedValue={selectedWorkstream}
-                onSelectValue={onSelectWorkstream}
-                showAll={showAllWorkstreams}
-                onToggleShowAll={onToggleShowAllWorkstreams}
-            />
-
-            <SidebarChart
                 title="Work Packages per Lead"
                 description="Principals and number of related work packages"
                 icon={<Users className="w-5 h-5 text-un-blue" />}
@@ -109,7 +95,21 @@ export function SidebarCharts({
                 onSelectValue={onSelectLead}
                 showAll={showAllLeads}
                 onToggleShowAll={onToggleShowAllLeads}
-                initialDisplayCount={4}
+                initialDisplayCount={6}
+            />
+
+            <SidebarChart
+                title="Actions per Workstream"
+                description="Number of actions per workstream"
+                icon={<Layers className="w-5 h-5 text-un-blue" />}
+                data={workstreamsChartEntries}
+                searchQuery={workstreamsSearchQuery}
+                onSearchChange={onWorkstreamsSearchChange}
+                searchPlaceholder="Search workstreams"
+                selectedValue={selectedWorkstream}
+                onSelectValue={onSelectWorkstream}
+                showAll={showAllWorkstreams}
+                onToggleShowAll={onToggleShowAllWorkstreams}
             />
 
             <SidebarChart
