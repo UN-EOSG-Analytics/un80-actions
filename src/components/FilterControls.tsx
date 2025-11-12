@@ -106,7 +106,7 @@ export function FilterControls({
     return (
         <>
             {/* Header with Advanced Filters Toggle and Sort */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3 sm:gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 gap-3 sm:gap-4">
                 <h2 className="text-[22px] sm:text-[24px] md:text-[26px] font-bold text-black leading-[25px] flex items-center gap-2 shrink-0">
                     <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-un-blue" />
                     Work Packages
