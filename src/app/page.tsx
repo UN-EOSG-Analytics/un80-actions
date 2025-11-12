@@ -23,7 +23,7 @@ import {
 import { fetchActions } from "@/lib/actions";
 import { parseDate, formatDate, formatGoalText } from "@/lib/utils";
 import { abbreviationMap } from "@/constants/abbreviations";
-import type { Actions, WorkPackageStats, NextMilestone } from "@/types";
+import type { Actions, WorkPackageStats, NextMilestone, WorkPackage } from "@/types";
 import { Briefcase, Briefcase as BriefcaseIcon, ChevronDown, FileText, Filter, Info, Layers, ListTodo, Search, Trophy, User, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -120,24 +120,7 @@ export default function WorkPackagesPage() {
 
     // Group actions by work package (combine across reports)
     const workPackages = useMemo(() => {
-        const wpMap = new Map<
-            string,
-            {
-                report: string[];
-                number: string;
-                name: string;
-                leads: string[];
-                goal: string | null;
-                bigTicket: boolean;
-                actions: Array<{
-                    text: string;
-                    documentParagraph: string;
-                    leads: string[];
-                    report: string;
-                    docText: string | null;
-                }>;
-            }
-        >();
+        const wpMap = new Map<string, WorkPackage>();
 
         actions.forEach((action) => {
             // Use work_package_number as key to combine across reports

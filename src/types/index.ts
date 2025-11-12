@@ -83,3 +83,104 @@ export interface NextMilestone {
     date: string;
     indicativeActivity: string;
 }
+
+/**
+ * Represents an individual action within a work package
+ */
+export interface WorkPackageAction {
+    text: string;
+    documentParagraph: string;
+    leads: string[];
+    report: string;
+    docText: string | null;
+}
+
+/**
+ * Represents a grouped work package with aggregated data across reports
+ */
+export interface WorkPackage {
+    report: string[];
+    number: string;
+    name: string;
+    leads: string[];
+    goal: string | null;
+    bigTicket: boolean;
+    actions: WorkPackageAction[];
+}
+
+// ============================================================================
+// Filter State Types
+// ============================================================================
+
+/**
+ * Filter state for work packages
+ */
+export interface FilterState {
+    searchQuery: string;
+    selectedWorkPackage: string;
+    selectedLead: string;
+    selectedWorkstream: string;
+    selectedBigTicket: string;
+    sortOption: string;
+}
+
+// ============================================================================
+// Chart Data Types
+// ============================================================================
+
+/**
+ * Lead chart entry
+ */
+export interface LeadChartEntry {
+    lead: string;
+    count: number;
+}
+
+/**
+ * Workstream chart entry
+ */
+export interface WorkstreamChartEntry {
+    workstream: string;
+    count: number;
+}
+
+/**
+ * Work package chart entry
+ */
+export interface WorkPackageChartEntry {
+    workpackage: string;
+    count: number;
+}
+
+/**
+ * Statistics data for display
+ */
+export interface StatsData {
+    workstreams: number;
+    workpackages: number;
+    actions: number;
+    leads: number;
+}
+
+// ============================================================================
+// UI State Types
+// ============================================================================
+
+/**
+ * Chart search queries
+ */
+export interface ChartSearchState {
+    chartSearchQuery: string;
+    workstreamChartSearchQuery: string;
+    workpackageChartSearchQuery: string;
+}
+
+/**
+ * Collapsible visibility state
+ */
+export interface CollapsibleState {
+    showAllLeads: boolean;
+    showAllWorkstreams: boolean;
+    showAllWorkpackages: boolean;
+    isAdvancedFilterOpen: boolean;
+}
