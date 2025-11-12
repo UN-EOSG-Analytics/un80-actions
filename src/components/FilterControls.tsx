@@ -26,8 +26,8 @@ interface FilterControlsProps {
     onSelectWorkPackage: (value: string[]) => void;
     selectedLead: string[];
     onSelectLead: (value: string[]) => void;
-    selectedWorkstream: string;
-    onSelectWorkstream: (value: string) => void;
+    selectedWorkstream: string[];
+    onSelectWorkstream: (value: string[]) => void;
     selectedBigTicket: string;
     onSelectBigTicket: (value: string) => void;
 
@@ -71,7 +71,7 @@ export function FilterControls({
         searchQuery ||
         selectedWorkPackage.length > 0 ||
         selectedLead.length > 0 ||
-        selectedWorkstream ||
+        selectedWorkstream.length > 0 ||
         selectedBigTicket
     );
 
@@ -193,17 +193,25 @@ export function FilterControls({
                         open={openFilterCollapsibles.has('workstream')}
                         onOpenChange={(open) => onToggleFilterCollapsible('workstream', open)}
                         icon={<Layers className="w-4 h-4 text-un-blue" />}
-                        triggerText={selectedWorkstream || 'Select workstream'}
-                        isFiltered={!!selectedWorkstream}
-                        allActive={!selectedWorkstream}
+                        triggerText={
+                            selectedWorkstream.length === 0 
+                                ? 'Select workstream' 
+                                : selectedWorkstream.length === 1 
+                                    ? selectedWorkstream[0] 
+                                    : `${selectedWorkstream.length} workstreams selected`
+                        }
+                        isFiltered={selectedWorkstream.length > 0}
+                        allActive={false}
                         options={uniqueWorkstreams.map((ws): FilterOption => ({
                             key: ws,
                             label: ws,
                         }))}
-                        selectedKeys={new Set(selectedWorkstream ? [selectedWorkstream] : [])}
+                        selectedKeys={new Set(selectedWorkstream)}
                         onToggle={(key) => {
-                            onSelectWorkstream(key === selectedWorkstream ? '' : key);
-                            onCloseFilterCollapsible('workstream');
+                            const newSelected = selectedWorkstream.includes(key)
+                                ? selectedWorkstream.filter(ws => ws !== key)
+                                : [...selectedWorkstream, key];
+                            onSelectWorkstream(newSelected);
                         }}
                         ariaLabel="Filter by workstream"
                     />

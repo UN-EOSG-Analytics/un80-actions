@@ -17,8 +17,8 @@ interface SidebarChartsProps {
     workstreamsData: WorkstreamChartEntry[];
     workstreamsSearchQuery: string;
     onWorkstreamsSearchChange: (query: string) => void;
-    selectedWorkstream: string;
-    onSelectWorkstream: (workstream: string) => void;
+    selectedWorkstream: string[];
+    onSelectWorkstream: (workstream: string[]) => void;
     showAllWorkstreams: boolean;
     onToggleShowAllWorkstreams: () => void;
 
@@ -105,8 +105,8 @@ export function SidebarCharts({
                 searchQuery={leadsSearchQuery}
                 onSearchChange={onLeadsSearchChange}
                 searchPlaceholder="Search entities"
-                selectedValue={selectedLead[0] || ''}
-                onSelectValue={(lead) => onSelectLead(lead ? [lead] : [])}
+                selectedValue={selectedLead}
+                onSelectValue={onSelectLead}
                 showAll={showAllLeads}
                 onToggleShowAll={onToggleShowAllLeads}
                 initialDisplayCount={4}
@@ -120,8 +120,8 @@ export function SidebarCharts({
                 searchQuery={workPackagesSearchQuery}
                 onSearchChange={onWorkPackagesSearchChange}
                 searchPlaceholder="Search work packages"
-                selectedValue={selectedWorkPackage[0] || ''}
-                onSelectValue={(wp) => onSelectWorkPackage(wp ? [wp] : [])}
+                selectedValue={selectedWorkPackage}
+                onSelectValue={onSelectWorkPackage}
                 showAll={showAllWorkPackages}
                 onToggleShowAll={onToggleShowAllWorkPackages}
             />

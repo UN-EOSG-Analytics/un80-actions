@@ -9,7 +9,7 @@ export function useFilters() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedWorkPackage, setSelectedWorkPackage] = useState<string[]>([]);
     const [selectedLead, setSelectedLead] = useState<string[]>([]);
-    const [selectedWorkstream, setSelectedWorkstream] = useState<string>("");
+    const [selectedWorkstream, setSelectedWorkstream] = useState<string[]>([]);
     const [selectedBigTicket, setSelectedBigTicket] = useState<string>("");
     const [sortOption, setSortOption] = useState<string>("");
 
@@ -26,7 +26,7 @@ export function useFilters() {
         setSearchQuery("");
         setSelectedWorkPackage([]);
         setSelectedLead([]);
-        setSelectedWorkstream("");
+        setSelectedWorkstream([]);
         setSelectedBigTicket("");
     };
 

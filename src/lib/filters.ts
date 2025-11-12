@@ -55,9 +55,11 @@ export function filterWorkPackages(
         );
     }
 
-    // Workstream filter
-    if (filters.selectedWorkstream) {
-        filtered = filtered.filter((wp) => wp.report.includes(filters.selectedWorkstream));
+    // Workstream filter (supports multiple selections)
+    if (filters.selectedWorkstream && filters.selectedWorkstream.length > 0) {
+        filtered = filtered.filter((wp) => 
+            filters.selectedWorkstream.some(ws => wp.report.includes(ws))
+        );
     }
 
     // Big Ticket filter
@@ -305,9 +307,11 @@ export function calculateStatsData(
         );
     }
 
-    // Workstream filter
-    if (filters.selectedWorkstream) {
-        filteredActions = filteredActions.filter((action) => action.report === filters.selectedWorkstream);
+    // Workstream filter (supports multiple selections)
+    if (filters.selectedWorkstream && filters.selectedWorkstream.length > 0) {
+        filteredActions = filteredActions.filter((action) => 
+            filters.selectedWorkstream.includes(action.report)
+        );
     }
 
     filteredActions.forEach(action => {

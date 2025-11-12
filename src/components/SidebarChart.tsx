@@ -18,8 +18,8 @@ interface SidebarChartProps {
     searchQuery: string;
     onSearchChange: (query: string) => void;
     searchPlaceholder: string;
-    selectedValue: string;
-    onSelectValue: (value: string) => void;
+    selectedValue: string[];
+    onSelectValue: (value: string[]) => void;
     showAll: boolean;
     onToggleShowAll: () => void;
     initialDisplayCount?: number;
@@ -42,9 +42,11 @@ export function SidebarChart({
     const displayedData = showAll ? data : data.slice(0, initialDisplayCount);
     const maxCount = data.length > 0 ? Math.max(...data.map(d => d.count)) : 1;
 
-    const handleRowClick = (value: string) => {
-        // Toggle: if already selected, deselect; otherwise select
-        onSelectValue(selectedValue === value ? "" : value);
+        const handleClickBar = (value: string) => {
+        const newSelected = selectedValue.includes(value)
+            ? selectedValue.filter((v) => v !== value)
+            : [...selectedValue, value];
+        onSelectValue(newSelected);
     };
 
     return (
@@ -75,13 +77,13 @@ export function SidebarChart({
                     <tbody>
                         {displayedData.map((entry, index) => {
                             const percentage = (entry.count / maxCount) * 100;
-                            const isSelected = selectedValue === entry.value;
-                            const isFiltered = selectedValue && selectedValue !== entry.value;
+                            const isSelected = selectedValue.includes(entry.value);
+                            const isFiltered = selectedValue.length > 0 && !selectedValue.includes(entry.value);
 
                             return (
                                 <tr
                                     key={entry.value}
-                                    onClick={() => handleRowClick(entry.value)}
+                                    onClick={() => handleClickBar(entry.value)}
                                     className={`group cursor-pointer transition-colors hover:bg-slate-50 ${isFiltered ? 'opacity-30' : ''
                                         } ${index < displayedData.length - 1 ? 'border-b border-slate-200' : ''}`}
                                 >

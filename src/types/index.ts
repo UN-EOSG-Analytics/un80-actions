@@ -119,7 +119,7 @@ export interface FilterState {
     searchQuery: string;
     selectedWorkPackage: string[];
     selectedLead: string[];
-    selectedWorkstream: string;
+    selectedWorkstream: string[];
     selectedBigTicket: string;
     sortOption: string;
 }
