@@ -15,12 +15,12 @@ export function ActionItem({ action, index, workPackageNumber }: ActionItemProps
             {/* Activity Number and Text */}
             <div className="flex gap-3 mb-4 items-start">
                 <div className="shrink-0 w-6 h-6 rounded-full bg-un-blue/10 flex items-center justify-center mt-[3px]">
-                    <span className="text-[13px] font-semibold text-un-blue">
+                    <span className="text-xs font-semibold text-un-blue">
                         {index + 1}
                     </span>
                 </div>
                 <div className="flex-1">
-                    <p className="text-[16px] font-medium text-slate-900 leading-[25px]">
+                    <p className="text-base font-medium text-slate-900 leading-normal">
                         {action.text}
                     </p>
                 </div>
@@ -34,7 +34,7 @@ export function ActionItem({ action, index, workPackageNumber }: ActionItemProps
                             <TooltipTrigger asChild>
                                 <div className="flex items-center gap-1 sm:gap-2 cursor-help">
                                     <Users className="w-4 h-4 text-gray-500" />
-                                    <p className="text-[14px] text-gray-600 leading-[21px]">
+                                    <p className="text-sm text-gray-600 leading-tight">
                                         {action.leads.map((lead, idx) => {
                                             const longForm = abbreviationMap[lead] || lead;
                                             return (
@@ -66,7 +66,7 @@ export function ActionItem({ action, index, workPackageNumber }: ActionItemProps
                         {action.documentParagraph && (
                             <div className="flex items-center gap-1.5">
                                 <FileText className="w-3.5 h-3.5 text-gray-500" />
-                                <span className="text-[14px] text-gray-600 leading-[21px]">
+                                <span className="text-sm text-gray-600 leading-tight">
                                     {workPackageNumber === '31'
                                         ? `A/80/400`
                                         : action.report === 'WS3'
@@ -83,7 +83,7 @@ export function ActionItem({ action, index, workPackageNumber }: ActionItemProps
                     {/* Doc Text */}
                     {action.docText && (
                         <div className="pt-3 mt-3 border-t border-slate-100">
-                            <p className="text-[14px] text-gray-600 leading-[21px]">
+                            <p className="text-sm text-gray-600 leading-tight">
                                 {action.docText}
                             </p>
                         </div>
@@ -93,7 +93,7 @@ export function ActionItem({ action, index, workPackageNumber }: ActionItemProps
             {/* Doc Text - when no leads */}
             {action.leads.length === 0 && action.docText && (
                 <div className="ml-9 pt-3 border-t border-slate-100">
-                    <p className="text-[14px] text-gray-600 leading-[21px]">
+                    <p className="text-sm text-gray-600 leading-tight">
                         {action.docText}
                     </p>
                 </div>

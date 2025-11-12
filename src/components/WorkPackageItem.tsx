@@ -170,7 +170,7 @@ export function WorkPackageItem({
                 </button>
 
                 {/* Collapsible Content */}
-                <CollapsibleContent className={`px-0 pb-4 pt-4 pl-6 ${isOpen ? "px-6" : ""}`}>
+                <CollapsibleContent className={`px-0 pb-4 pt-2 pl-6 ${isOpen ? "px-6" : ""}`}>
                     <WorkPackageActions
                         actions={wp.actions}
                         workPackageNumber={wp.number}

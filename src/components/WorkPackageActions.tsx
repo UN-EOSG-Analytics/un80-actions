@@ -10,7 +10,7 @@ export function WorkPackageActions({ actions, workPackageNumber }: WorkPackageAc
     if (actions.length === 0) {
         return (
             <div className="bg-white border border-slate-200 rounded-[6px] p-[17px]">
-                <p className="text-[15px] font-normal text-slate-900 leading-[21px]">
+                <p className="text-sm font-normal text-slate-900 leading-tight">
                     No actions available
                 </p>
             </div>
@@ -18,13 +18,11 @@ export function WorkPackageActions({ actions, workPackageNumber }: WorkPackageAc
     }
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
             {/* Header */}
-            <div className="flex flex-col gap-2 mb-2">
-                <h3 className="text-[17px] font-semibold text-slate-700 tracking-wider text-left">
-                    Indicative actions
-                </h3>
-            </div>
+            <h3 className="text-lg font-semibold text-slate-700 tracking-wider text-left">
+                Indicative Actions
+            </h3>
             {/* Display each indicative_activity in its own box */}
             {actions.map((action, idx) => (
                 <ActionItem
