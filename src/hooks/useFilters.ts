@@ -11,7 +11,7 @@ export function useFilters() {
     const [selectedLead, setSelectedLead] = useState<string[]>([]);
     const [selectedWorkstream, setSelectedWorkstream] = useState<string[]>([]);
     const [selectedBigTicket, setSelectedBigTicket] = useState<string>("");
-    const [sortOption, setSortOption] = useState<string>("");
+    const [sortOption, setSortOption] = useState<string>("number-asc");
 
     const filters: FilterState = {
         searchQuery,
@@ -32,7 +32,7 @@ export function useFilters() {
 
     const handleResetAll = () => {
         handleResetFilters();
-        setSortOption("");
+        setSortOption("number-asc");
     };
 
     return {

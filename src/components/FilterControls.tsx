@@ -131,10 +131,10 @@ export function FilterControls({
                                         className="flex items-center gap-1.5 text-[14px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap"
                                     >
                                         <span>
-                                            {sortOption === 'name-asc' ? 'Name (A-Z)' :
-                                                sortOption === 'name-desc' ? 'Name (Z-A)' :
-                                                sortOption === 'number-asc' ? 'Number (1-31)' :
+                                            {sortOption === 'number-asc' ? 'Number (1-31)' :
                                                 sortOption === 'number-desc' ? 'Number (31-1)' :
+                                                sortOption === 'name-asc' ? 'Name (A-Z)' :
+                                                sortOption === 'name-desc' ? 'Name (Z-A)' :
                                                 'Sort'}
                                         </span>
                                         <ChevronDown
@@ -152,10 +152,10 @@ export function FilterControls({
                                 >
                                     <div>
                                         {[
-                                            { key: 'name-asc', label: 'Name (A-Z)' },
-                                            { key: 'name-desc', label: 'Name (Z-A)' },
                                             { key: 'number-asc', label: 'Number (1-31)' },
                                             { key: 'number-desc', label: 'Number (31-1)' },
+                                            { key: 'name-asc', label: 'Name (A-Z)' },
+                                            { key: 'name-desc', label: 'Name (Z-A)' },
                                         ].map((option) => (
                                             <button
                                                 key={option.key}
@@ -194,7 +194,7 @@ export function FilterControls({
                         </Collapsible>
 
                         {/* Sort Option */}
-                        <div className="w-36">
+                        <div className="w-32">
                             <FilterDropdown
                                 open={!isMobile && openFilterCollapsibles.has('sort')}
                                 onOpenChange={(open) => {
@@ -204,19 +204,18 @@ export function FilterControls({
                                 }}
                                 icon={<ArrowUpDown className="w-4 h-4" />}
                                 triggerText={
-                                    sortOption === 'name-asc' ? 'Name (A-Z)' :
-                                    sortOption === 'name-desc' ? 'Name (Z-A)' :
-                                    sortOption === 'number-asc' ? 'Number (1-31)' :
-                                    sortOption === 'number-desc' ? 'Number (31-1)' :
+                                    sortOption === 'number-desc' ? '31-1' :
+                                    sortOption === 'name-asc' ? 'A-Z' :
+                                    sortOption === 'name-desc' ? 'Z-A' :
                                     'Sort'
                                 }
-                                isFiltered={false}
+                                isFiltered={sortOption !== 'number-asc'}
                                 allActive={false}
                                 options={[
-                                    { key: 'name-asc', label: 'Name (A-Z)' },
-                                    { key: 'name-desc', label: 'Name (Z-A)' },
                                     { key: 'number-asc', label: 'Number (1-31)' },
                                     { key: 'number-desc', label: 'Number (31-1)' },
+                                    { key: 'name-asc', label: 'Name (A-Z)' },
+                                    { key: 'name-desc', label: 'Name (Z-A)' },
                                 ]}
                                 selectedKeys={new Set([sortOption])}
                                 onToggle={(key) => {
