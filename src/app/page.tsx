@@ -5,7 +5,7 @@ import { ExplainerText } from "@/components/ExplainerText";
 import { FilterControls } from "@/components/FilterControls";
 import { Header } from "@/components/HeaderBar";
 import { SidebarCharts } from "@/components/SidebarCharts";
-import { WorkPackageList } from "@/components/ActionPlanList";
+import { WorkPackageList } from "@/components/ListContainer";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useActions } from "@/hooks/useActions";
 import { useChartSearch } from "@/hooks/useChartSearch";

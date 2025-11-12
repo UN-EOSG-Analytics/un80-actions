@@ -4,11 +4,47 @@ import {
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { WorkPackageActions } from "@/components/WorkPackageActions";
+import { ActionItem } from "@/components/ActionCard";
+import { WorkstreamLabels } from "@/components/WorkstreamBadge";
 import { abbreviationMap } from "@/constants/abbreviations";
 import { formatGoalText } from "@/lib/utils";
-import type { WorkPackage } from "@/types";
-import { Info, Layers, Trophy, Users } from "lucide-react";
+import type { WorkPackage, WorkPackageAction } from "@/types";
+import { Info, Trophy, Users } from "lucide-react";
+
+interface WorkPackageActionsProps {
+    actions: WorkPackageAction[];
+    workPackageNumber: string;
+}
+
+function WorkPackageActions({ actions, workPackageNumber }: WorkPackageActionsProps) {
+    if (actions.length === 0) {
+        return (
+            <div className="bg-white border border-slate-200 rounded-[6px] p-[17px]">
+                <p className="text-sm font-normal text-slate-900 leading-tight">
+                    No actions available
+                </p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex flex-col gap-2">
+            {/* Header */}
+            <h3 className="text-lg font-semibold text-slate-700 tracking-wider text-left">
+                Indicative Actions
+            </h3>
+            {/* Display each indicative_activity in its own box */}
+            {actions.map((action, idx) => (
+                <ActionItem
+                    key={idx}
+                    action={action}
+                    index={idx}
+                    workPackageNumber={workPackageNumber}
+                />
+            ))}
+        </div>
+    );
+}
 
 interface WorkPackageItemProps {
     workPackage: WorkPackage;
@@ -26,8 +62,8 @@ export function WorkPackageItem({
         <Collapsible open={isOpen} onOpenChange={onToggle}>
             <div
                 className={`mb-20 last:mb-0 relative ${isOpen
-                        ? "border-l-4 border-l-un-blue border border-slate-200 rounded-[6px] bg-slate-50/50"
-                        : ""
+                    ? "border-l-4 border-l-un-blue border border-slate-200 rounded-[6px] bg-slate-50/50"
+                    : ""
                     }`}
             >
                 <CollapsibleTrigger
@@ -70,45 +106,7 @@ export function WorkPackageItem({
                     {/* Report Labels and Work Package Leads */}
                     <div className="flex items-center gap-3 mb-2 flex-wrap">
                         {/* Workstream Labels */}
-                        {wp.report.includes("WS1") && (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="flex items-center gap-1 sm:gap-2 cursor-help">
-                                        <Layers className="w-4 h-4 text-gray-600" />
-                                        <p className="text-base text-gray-600 leading-5">WS1</p>
-                                    </div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Workstream 1</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        )}
-                        {wp.report.includes("WS2") && (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="flex items-center gap-1 sm:gap-2 cursor-help">
-                                        <Layers className="w-4 h-4 text-gray-600" />
-                                        <p className="text-base text-gray-600 leading-5">WS2</p>
-                                    </div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Workstream 2</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        )}
-                        {wp.report.includes("WS3") && (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="flex items-center gap-1 sm:gap-2 cursor-help">
-                                        <Layers className="w-4 h-4 text-gray-600" />
-                                        <p className="text-base text-gray-600 leading-5">WS3</p>
-                                    </div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Workstream 3</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        )}
+                        <WorkstreamLabels report={wp.report} />
 
                         {/* Work Package Leads */}
                         {wp.leads.length > 0 && (

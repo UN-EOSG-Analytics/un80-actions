@@ -1,4 +1,4 @@
-import { WorkPackageItem } from "@/components/WorkPackageItem";
+import { WorkPackageItem } from "@/components/WorkPackageCard";
 import type { WorkPackage } from "@/types";
 
 interface WorkPackageListProps {
