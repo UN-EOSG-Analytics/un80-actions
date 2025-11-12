@@ -1,0 +1,101 @@
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { abbreviationMap } from "@/constants/abbreviations";
+import type { WorkPackageAction } from "@/types";
+import { FileText, User } from "lucide-react";
+
+interface ActionItemProps {
+    action: WorkPackageAction;
+    index: number;
+    workPackageNumber: string;
+}
+
+export function ActionItem({ action, index, workPackageNumber }: ActionItemProps) {
+    return (
+        <div className="bg-white border border-slate-200 rounded-[6px] p-5 transition-all hover:shadow-sm">
+            {/* Activity Number and Text */}
+            <div className="flex items-start gap-3 mb-4">
+                <div className="shrink-0 w-6 h-6 rounded-full bg-un-blue/10 flex items-center justify-center mt-0.5">
+                    <span className="text-[13px] font-semibold text-un-blue">
+                        {index + 1}
+                    </span>
+                </div>
+                <p className="text-[16px] font-medium text-slate-900 leading-[25px] flex-1">
+                    {action.text}
+                </p>
+            </div>
+
+            {/* Work Package Leads - Icon + Text */}
+            {action.leads.length > 0 && (
+                <div className="ml-9 pt-3 border-t border-slate-100">
+                    <div className="flex items-center gap-3 flex-wrap">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div className="flex items-center gap-1 sm:gap-2 cursor-help">
+                                    <User className="w-4 h-4 text-gray-500" />
+                                    <p className="text-[14px] text-gray-600 leading-[21px]">
+                                        {action.leads.map((lead, idx) => {
+                                            const longForm = abbreviationMap[lead] || lead;
+                                            return (
+                                                <span key={idx}>
+                                                    {idx > 0 && ', '}
+                                                    <span title={longForm !== lead ? longForm : undefined}>
+                                                        {lead}
+                                                    </span>
+                                                </span>
+                                            );
+                                        })}
+                                    </p>
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>
+                                    {action.leads.map((lead, idx) => {
+                                        const longForm = abbreviationMap[lead] || lead;
+                                        return (
+                                            <span key={idx}>
+                                                {idx > 0 && ', '}
+                                                {longForm}
+                                            </span>
+                                        );
+                                    })}
+                                </p>
+                            </TooltipContent>
+                        </Tooltip>
+                        {action.documentParagraph && (
+                            <div className="flex items-center gap-1.5">
+                                <FileText className="w-3.5 h-3.5 text-gray-500" />
+                                <span className="text-[14px] text-gray-600 leading-[21px]">
+                                    {workPackageNumber === '31'
+                                        ? `A/80/400`
+                                        : action.report === 'WS3'
+                                            ? `A/80/392 para. ${action.documentParagraph}`
+                                            : action.report === 'WS2'
+                                                ? `A/80/318 para. ${action.documentParagraph}`
+                                                : action.report === 'WS1'
+                                                    ? `A/80/400`
+                                                    : `Para. ${action.documentParagraph}`}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                    {/* Doc Text */}
+                    {action.docText && (
+                        <div className="ml-1.5 pt-3 mt-3 border-t border-slate-100">
+                            <p className="text-[14px] text-gray-600 leading-[21px]">
+                                {action.docText}
+                            </p>
+                        </div>
+                    )}
+                </div>
+            )}
+            {/* Doc Text - when no leads */}
+            {action.leads.length === 0 && action.docText && (
+                <div className="ml-1.5 pt-3 border-t border-slate-100">
+                    <p className="text-[14px] text-gray-600 leading-[21px]">
+                        {action.docText}
+                    </p>
+                </div>
+            )}
+        </div>
+    );
+}
