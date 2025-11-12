@@ -61,9 +61,9 @@ export function WorkPackageItem({
     return (
         <Collapsible open={isOpen} onOpenChange={onToggle}>
             <div
-                className={`mb-20 last:mb-0 relative ${isOpen
-                    ? "border-l-4 border-l-un-blue border border-slate-200 rounded-[6px] bg-slate-50/50"
-                    : ""
+                className={`mb-20 last:mb-0 relative border-l-4 ${isOpen
+                    ? "border-l-un-blue border border-slate-200 rounded-[6px] bg-slate-50/50"
+                    : "border-l-transparent"
                     }`}
             >
                 <CollapsibleTrigger
