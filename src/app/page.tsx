@@ -1,5 +1,6 @@
 "use client";
 
+import { DataCard } from "@/components/DataCard";
 import { FilterControls } from "@/components/FilterControls";
 import { SidebarCharts } from "@/components/SidebarCharts";
 import {
@@ -115,7 +116,7 @@ export default function WorkPackagesPage() {
                         </div>
                         <div className="text-[16px] text-gray-600 leading-[27px] max-w-[1093px] mt-2">
                             <p>
-                                This Dashboard is an annex to the <a href="https://www.un.org/un80-initiative/en" target="_blank" rel="noopener noreferrer" className="text-[#009EDB] hover:text-[#0076A4] hover:underline transition-colors">UN80 Initiative Action Plan</a>. It presents the detailed work packages across the three <a href="https://www.un.org/un80-initiative/en" target="_blank" rel="noopener noreferrer" className="text-[#009EDB] hover:text-[#0076A4] hover:underline transition-colors">UN80 Initiative</a> workstreams in a single reference. This Dashboard also lists designated leads for each work package, as well as their individual action items (derived from paragraphs in the SG's reports on <a href="https://www.un.org/un80-initiative/en" target="_blank" rel="noopener noreferrer" className="text-[#009EDB] hover:text-[#0076A4] hover:underline transition-colors">UN80 Initiative</a>).
+                                This Dashboard is an annex to the <a href="https://www.un.org/un80-initiative/en" target="_blank" rel="noopener noreferrer" className="text-un-blue hover:text-[#0076A4] hover:underline transition-colors">UN80 Initiative Action Plan</a>. It presents the detailed work packages across the three <a href="https://www.un.org/un80-initiative/en" target="_blank" rel="noopener noreferrer" className="text-un-blue hover:text-[#0076A4] hover:underline transition-colors">UN80 Initiative</a> workstreams in a single reference. This Dashboard also lists designated leads for each work package, as well as their individual action items (derived from paragraphs in the SG's reports on <a href="https://www.un.org/un80-initiative/en" target="_blank" rel="noopener noreferrer" className="text-un-blue hover:text-[#0076A4] hover:underline transition-colors">UN80 Initiative</a>).
                             </p>
                         </div>
                     </header>
@@ -123,97 +124,33 @@ export default function WorkPackagesPage() {
                     {/* Progress Section */}
                     <section className="mb-0">
                         <div className="flex flex-col sm:flex-row gap-4 items-start flex-wrap sm:flex-nowrap">
-                            {/* Card 1 - Number of Workstreams */}
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="relative w-full sm:w-[280px] h-[140px]">
-                                        <div className="absolute inset-0 bg-white rounded-lg"></div>
-                                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0 pl-[26px]">
-                                            <div className="flex items-center gap-2 mb-3 w-full justify-between">
-                                                <p className="text-[17px] sm:text-[18px] md:text-[19px] font-normal text-[#009EDB] text-left leading-[21px] sm:leading-[23px] md:leading-[25px]">
-                                                    Workstreams
-                                                </p>
-                                                <Layers className="w-5 h-5 text-[#009EDB] flex-shrink-0 mr-[10px]" />
-                                            </div>
-                                            <p className="text-[37px] sm:text-[43px] md:text-[49px] font-bold text-[#2E3440] text-left leading-[45px] sm:leading-[51px] md:leading-[57px]">
-                                                {statsData.workstreams}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Number of workstreams: {statsData.workstreams}</p>
-                                </TooltipContent>
-                            </Tooltip>
+                            <DataCard
+                                title="Workstreams"
+                                value={statsData.workstreams}
+                                icon={<Layers className="w-5 h-5 text-un-blue" />}
+                                tooltipText={`Number of workstreams: ${statsData.workstreams}`}
+                            />
 
-                            {/* Card 2 - Number of Workpackages */}
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="relative w-full sm:w-[280px] h-[140px]">
-                                        <div className="absolute inset-0 bg-white rounded-lg"></div>
-                                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0 pl-[26px]">
-                                            <div className="flex items-center gap-2 mb-3 w-full justify-between">
-                                                <p className="text-[17px] sm:text-[18px] md:text-[19px] font-normal text-[#009EDB] text-left leading-[21px] sm:leading-[23px] md:leading-[25px]">
-                                                    Work packages
-                                                </p>
-                                                <BriefcaseIcon className="w-5 h-5 text-[#009EDB] flex-shrink-0 mr-[10px]" />
-                                            </div>
-                                            <p className="text-[37px] sm:text-[43px] md:text-[49px] font-bold text-[#2E3440] text-left leading-[45px] sm:leading-[51px] md:leading-[57px]">
-                                                {statsData.workpackages}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Number of work packages: {statsData.workpackages}</p>
-                                </TooltipContent>
-                            </Tooltip>
+                            <DataCard
+                                title="Work packages"
+                                value={statsData.workpackages}
+                                icon={<BriefcaseIcon className="w-5 h-5 text-un-blue" />}
+                                tooltipText={`Number of work packages: ${statsData.workpackages}`}
+                            />
 
-                            {/* Card 3 - Number of actions */}
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="relative w-full sm:w-[280px] h-[140px]">
-                                        <div className="absolute inset-0 bg-white rounded-lg"></div>
-                                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0 pl-[26px]">
-                                            <div className="flex items-center gap-2 mb-3 w-full justify-between">
-                                                <p className="text-[17px] sm:text-[18px] md:text-[19px] font-normal text-[#009EDB] text-left leading-[21px] sm:leading-[23px] md:leading-[25px]">
-                                                    Actions
-                                                </p>
-                                                <ListTodo className="w-5 h-5 text-[#009EDB] flex-shrink-0 mr-[10px]" />
-                                            </div>
-                                            <p className="text-[37px] sm:text-[43px] md:text-[49px] font-bold text-[#2E3440] text-left leading-[45px] sm:leading-[51px] md:leading-[57px]">
-                                                {statsData.actions}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Number of actions: {statsData.actions}</p>
-                                </TooltipContent>
-                            </Tooltip>
+                            <DataCard
+                                title="Actions"
+                                value={statsData.actions}
+                                icon={<ListTodo className="w-5 h-5 text-un-blue" />}
+                                tooltipText={`Number of actions: ${statsData.actions}`}
+                            />
 
-                            {/* Card 4 - Number of leads */}
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="relative w-full sm:w-[280px] h-[140px]">
-                                        <div className="absolute inset-0 bg-white rounded-lg"></div>
-                                        <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0 pl-[26px]">
-                                            <div className="flex items-center gap-2 mb-3 w-full justify-between">
-                                                <p className="text-[17px] sm:text-[18px] md:text-[19px] font-normal text-[#009EDB] text-left leading-[21px] sm:leading-[23px] md:leading-[25px]">
-                                                    UN system leaders
-                                                </p>
-                                                <Users className="w-5 h-5 text-[#009EDB] flex-shrink-0 mr-[10px]" />
-                                            </div>
-                                            <p className="text-[37px] sm:text-[43px] md:text-[49px] font-bold text-[#2E3440] text-left leading-[45px] sm:leading-[51px] md:leading-[57px]">
-                                                {statsData.leads}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Number of leads: {statsData.leads}</p>
-                                </TooltipContent>
-                            </Tooltip>
+                            <DataCard
+                                title="UN system leaders"
+                                value={statsData.leads}
+                                icon={<Users className="w-5 h-5 text-un-blue" />}
+                                tooltipText={`Number of leads: ${statsData.leads}`}
+                            />
                         </div>
                     </section>
 
@@ -258,7 +195,7 @@ export default function WorkPackagesPage() {
                                                 open={isOpen}
                                                 onOpenChange={() => toggleCollapsible(collapsibleKey)}
                                             >
-                                                <div className={`mb-20 last:mb-0 relative ${isOpen ? 'border-l-4 border-l-[#009EDB] border border-slate-200 rounded-[6px] bg-slate-50/50' : ''}`}>
+                                                <div className={`mb-20 last:mb-0 relative ${isOpen ? 'border-l-4 border-l-un-blue border border-slate-200 rounded-[6px] bg-slate-50/50' : ''}`}>
                                                     <CollapsibleTrigger className={`w-full flex flex-col items-start px-0 py-0 hover:no-underline rounded-[6px] px-6 py-4 transition-all hover:bg-[#E0F5FF] border-0 ${isOpen ? 'rounded-b-none bg-slate-50/50' : 'bg-gray-50'}`}>
                                                         <div className="text-left min-w-0 mb-1 pr-20 sm:pr-8">
                                                             {wp.number ? (
@@ -280,8 +217,8 @@ export default function WorkPackagesPage() {
                                                         {wp.goal && (
                                                             <div className="mt-0.5 pr-8 text-left pl-0 py-2 mb-2">
                                                                 <div className="flex items-center gap-2 mb-1">
-                                                                    <Trophy className="w-4 h-4 text-[#009EDB]" />
-                                                                    <p className="text-[14px] font-semibold text-[#009EDB] uppercase tracking-wide text-left">
+                                                                    <Trophy className="w-4 h-4 text-un-blue" />
+                                                                    <p className="text-[14px] font-semibold text-un-blue uppercase tracking-wide text-left">
                                                                         Goal
                                                                     </p>
                                                                 </div>
@@ -406,8 +343,8 @@ export default function WorkPackagesPage() {
                                                                     >
                                                                         {/* Activity Number and Text */}
                                                                         <div className="flex items-start gap-3 mb-4">
-                                                                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#009EDB]/10 flex items-center justify-center mt-0.5">
-                                                                                <span className="text-[13px] font-semibold text-[#009EDB]">
+                                                                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-un-blue/10 flex items-center justify-center mt-0.5">
+                                                                                <span className="text-[13px] font-semibold text-un-blue">
                                                                                     {idx + 1}
                                                                                 </span>
                                                                             </div>
