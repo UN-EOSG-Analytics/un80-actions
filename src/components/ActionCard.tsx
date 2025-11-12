@@ -63,18 +63,18 @@ export function ActionItem({ action, index, workPackageNumber }: ActionItemProps
                                 </p>
                             </TooltipContent>
                         </Tooltip>
-                        {action.documentParagraph && (
+                        {(action.documentParagraph || action.report === 'WS1' || workPackageNumber === '31') && (
                             <div className="flex items-center gap-1.5">
                                 <FileText className="w-3.5 h-3.5 text-gray-500" />
                                 <span className="text-sm text-gray-600 leading-tight">
                                     {workPackageNumber === '31'
                                         ? `A/80/400`
-                                        : action.report === 'WS3'
-                                            ? `A/80/392 para. ${action.documentParagraph}`
-                                            : action.report === 'WS2'
-                                                ? `A/80/318 para. ${action.documentParagraph}`
-                                                : action.report === 'WS1'
-                                                    ? `A/80/400`
+                                        : action.report === 'WS1'
+                                            ? `A/80/400`
+                                            : action.report === 'WS3'
+                                                ? `A/80/392 para. ${action.documentParagraph}`
+                                                : action.report === 'WS2'
+                                                    ? `A/80/318 para. ${action.documentParagraph}`
                                                     : `Para. ${action.documentParagraph}`}
                                 </span>
                             </div>

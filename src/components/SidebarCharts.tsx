@@ -90,7 +90,7 @@ export function SidebarCharts({
                 data={leadsChartEntries}
                 searchQuery={leadsSearchQuery}
                 onSearchChange={onLeadsSearchChange}
-                searchPlaceholder="Search entities"
+                searchPlaceholder="Search principals"
                 selectedValue={selectedLead}
                 onSelectValue={onSelectLead}
                 showAll={showAllLeads}

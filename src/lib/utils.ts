@@ -52,16 +52,29 @@ export const formatDate = (date: Date): string => {
 
 /**
  * Format goal text: lowercase everything except first letter of each sentence
+ * Preserves proper capitalization for "United Nations" and "Member States"
  * @param text - Text to format
  * @returns Formatted text with proper sentence capitalization
  */
 export const formatGoalText = (text: string): string => {
     if (!text) return text;
     
+    // Preserve proper capitalization for specific terms
+    const preservedTerms = [
+        { original: /United Nations/gi, replacement: '___UNITED_NATIONS___' },
+        { original: /Member States/gi, replacement: '___MEMBER_STATES___' },
+    ];
+    
+    // Replace preserved terms with placeholders
+    let processedText = text;
+    preservedTerms.forEach(({ original, replacement }) => {
+        processedText = processedText.replace(original, replacement);
+    });
+    
     // Split by sentence boundaries (., !, ?) while preserving them
-    const sentences = text.split(/([.!?]+(?:\s+|$))/);
+    const sentences = processedText.split(/([.!?]+(?:\s+|$))/);
 
-    return sentences
+    const formatted = sentences
         .map((sentence) => {
             // Skip if it's just punctuation/whitespace
             if (!sentence.trim() || /^[.!?\s]+$/.test(sentence)) {
@@ -80,4 +93,11 @@ export const formatGoalText = (text: string): string => {
             return leadingWhitespace + capitalized + trailingWhitespace;
         })
         .join('');
+    
+    // Restore preserved terms with proper capitalization
+    let result = formatted;
+    result = result.replace(/___UNITED_NATIONS___/gi, 'United Nations');
+    result = result.replace(/___MEMBER_STATES___/gi, 'Member States');
+    
+    return result;
 };

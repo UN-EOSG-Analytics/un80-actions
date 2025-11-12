@@ -35,7 +35,7 @@ export function Header() {
                                 </TooltipTrigger>
                                 <TooltipContent side="bottom" className="max-w-56">
                                     <p className="text-sm">
-                                        This dashboard is in beta and may be updated frequently.
+                                        This dashboard is currently in its beta version and will be updated on a regular basis.
                                     </p>
                                 </TooltipContent>
                             </Tooltip>

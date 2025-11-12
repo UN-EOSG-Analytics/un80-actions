@@ -107,7 +107,7 @@ export function SidebarChart({
                                             )}
                                             <div className="flex items-center gap-2 shrink-0">
                                                 <span
-                                                    className={`text-[14px] font-semibold min-w-[20px] text-right font-mono ${isSelected ? 'text-un-blue' : 'text-un-blue'
+                                                    className={`text-[14px] font-normal min-w-[20px] text-right font-mono ${isSelected ? 'text-un-blue' : 'text-un-blue'
                                                         }`}
                                                 >
                                                     {entry.count}

@@ -112,14 +112,14 @@ export function WorkPackageItem({
                 {/* Details Button */}
                 <button
                     type="button"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-[6px] text-sm font-medium transition-colors absolute top-4 right-2 sm:right-4"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-[6px] text-sm font-medium transition-colors absolute top-4 right-2 sm:right-4"
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         onToggle();
                     }}
                 >
-                    <Info className="w-3.5 h-3.5 text-gray-600" />
+                    <Info className="w-3.5 h-3.5 text-gray-700" />
                     <span>Details</span>
                 </button>
 

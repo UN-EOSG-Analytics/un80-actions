@@ -4,7 +4,7 @@ export function ExplainerText() {
             <p className="leading-relaxed mb-0">
                 This Dashboard is an annex to the{" "}
                 <a
-                    href="https://www.un.org/un80-initiative/en"
+                    href="https://www.un.org/un80-initiative/sites/default/files/2025-11/UN80_Initiative_Action_Plan.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-bold text-un-blue hover:underline transition-all"
