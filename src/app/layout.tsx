@@ -26,7 +26,7 @@ export default function RootLayout({
         <html lang="en" className={`${roboto.className} antialiased`}>
             <body>
                 {children}
-                <GoogleAnalytics gaId="G-XYZ" />
+                <GoogleAnalytics gaId="G-7BS4GDJ7ZQ" />
             </body>
         </html>
     );
