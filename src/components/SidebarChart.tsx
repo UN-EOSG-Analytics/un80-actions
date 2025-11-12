@@ -42,7 +42,7 @@ export function SidebarChart({
     const displayedData = showAll ? data : data.slice(0, initialDisplayCount);
     const maxCount = data.length > 0 ? Math.max(...data.map(d => d.count)) : 1;
 
-        const handleClickBar = (value: string) => {
+    const handleClickBar = (value: string) => {
         const newSelected = selectedValue.includes(value)
             ? selectedValue.filter((v) => v !== value)
             : [...selectedValue, value];
@@ -132,7 +132,7 @@ export function SidebarChart({
                 {data.length > initialDisplayCount && (
                     <button
                         onClick={onToggleShowAll}
-                        className="w-full mt-2 py-2 text-[14px] text-left text-un-blue hover:text-un-blue/80 transition-colors"
+                        className="w-full py-2 text-[14px] text-left text-un-blue hover:text-un-blue/80 transition-colors"
                     >
                         {showAll ? 'Show less' : `Show ${data.length - initialDisplayCount} more`}
                     </button>
