@@ -4,6 +4,8 @@
 
 name: Deploy Next.js to GitHub Pages
 
+run-name: ${{ github.event_name == 'workflow_run' && '🔄 Redeploy after data processing' || github.event_name == 'workflow_dispatch' && '🚀 Manual deployment' || github.event.head_commit.message }}
+
 on:
   # Runs on pushes targeting the default branch
   push:
