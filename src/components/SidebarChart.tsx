@@ -80,7 +80,7 @@ export function SidebarChart({
                     placeholder={searchPlaceholder}
                     value={searchQuery}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className="w-full h-9 text-[15px] border-0 border-b border-slate-300 rounded-none pl-6 pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-un-blue/60 focus:border-b-un-blue focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
+                    className="w-full h-9 text-[15px] border-0 border-b border-slate-300 rounded-none pl-6 pr-4 py-[8px] text-slate-700 placeholder:text-slate-400 bg-white transition-all hover:border-b-un-blue/60 focus:border-b-un-blue focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
                 />
             </div>
 
