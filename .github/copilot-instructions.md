@@ -12,4 +12,5 @@
 - do not create parallel infrastructures, prefer global solutions, do not hardcode things where it would be hard to find.
 - left align
 - follow clear design hierarchy
+- when brainstorming solutions, don't just start, ask me first, give options
 
