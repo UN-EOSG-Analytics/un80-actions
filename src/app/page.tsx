@@ -21,6 +21,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { abbreviationMap } from "@/constants/abbreviations";
+import { SidebarCharts } from "@/components/SidebarCharts";
 import { useActions } from "@/hooks/useActions";
 import { useChartSearch } from "@/hooks/useChartSearch";
 import { useCollapsibles } from "@/hooks/useCollapsibles";
@@ -720,264 +721,29 @@ export default function WorkPackagesPage() {
                             </div>
 
                             {/* Charts Container */}
-                            <div className="w-full lg:w-[320px] flex-shrink-0 mt-6 lg:mt-0 lg:border-l lg:border-slate-200 lg:pl-6 lg:ml-[calc((4*280px+3*16px)-818px-320px-24px)] flex flex-col gap-0">
-                                {/* First Chart Section */}
-                                <div className="bg-white p-4 sm:p-5 rounded-[8px]">
-                                    <h3 className="text-[17px] font-semibold text-slate-900 mb-2 flex items-center gap-2">
-                                        <Users className="w-5 h-5 text-[#009EDB]" />
-                                        Work packages per lead
-                                    </h3>
-                                    <p className="text-[15px] text-slate-600 mb-3">
-                                        Principals and number of related work packages
-                                    </p>
-                                    {/* Chart Search Bar */}
-                                    <div className="relative w-full mb-4">
-                                        <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#009EDB] pointer-events-none z-10" />
-                                        <Input
-                                            type="text"
-                                            placeholder="Search entities"
-                                            value={chartSearchQuery}
-                                            onChange={(e) => setChartSearchQuery(e.target.value)}
-                                            className="w-full h-[36px] text-[15px] border-0 border-b border-slate-300 rounded-none pl-6 pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
-                                        />
-                                    </div>
-                                    <div className="h-[300px] sm:h-[350px] md:h-[400px] overflow-y-auto overflow-x-hidden">
-                                        <table className="w-full">
-                                            <tbody>
-                                                {(showAllLeads ? chartData : chartData.slice(0, 3)).map((entry, index) => {
-                                                    const maxCount = chartData.length > 0 ? Math.max(...chartData.map(d => d.count)) : 1;
-                                                    const percentage = (entry.count / maxCount) * 100;
-                                                    const isSelected = selectedLead === entry.lead;
-                                                    const isFiltered = selectedLead && selectedLead !== entry.lead;
-                                                    const displayedData = showAllLeads ? chartData : chartData.slice(0, 3);
-
-                                                    return (
-                                                        <tr
-                                                            key={index}
-                                                            onClick={() => {
-                                                                // Toggle: if already selected, deselect; otherwise select
-                                                                if (isSelected) {
-                                                                    setSelectedLead("");
-                                                                } else {
-                                                                    setSelectedLead(entry.lead);
-                                                                }
-                                                            }}
-                                                            className={`cursor-pointer transition-colors hover:bg-slate-50 ${isFiltered ? 'opacity-30' : ''
-                                                                } ${index < displayedData.length - 1 ? 'border-b border-slate-200' : ''}`}
-                                                        >
-                                                            <td className="py-3 pr-3">
-                                                                <div className="flex items-center justify-between gap-3">
-                                                                    <span className="text-[14px] font-medium text-slate-900 flex-shrink-0 min-w-0">
-                                                                        {entry.lead}
-                                                                    </span>
-                                                                    <div className="flex items-center gap-2 flex-shrink-0">
-                                                                        <span className={`text-[14px] font-semibold min-w-[20px] font-mono ${isSelected ? 'text-[#0076A4]' : 'text-[#009EDB]'
-                                                                            }`}>
-                                                                            {entry.count}
-                                                                        </span>
-                                                                        <div className="w-[120px] h-[8px] bg-slate-100 rounded-full overflow-hidden relative">
-                                                                            <div
-                                                                                className={`h-full rounded-full transition-all ${isSelected ? 'bg-[#0076A4]' : 'bg-[#009EDB]'
-                                                                                    }`}
-                                                                                style={{ width: `${percentage}%` }}
-                                                                            />
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })}
-                                            </tbody>
-                                        </table>
-                                        {chartData.length > 3 && (
-                                            <button
-                                                onClick={() => setShowAllLeads(!showAllLeads)}
-                                                className="w-full mt-3 py-2 text-[14px] text-left text-[#009EDB] hover:text-[#0076A4] transition-colors"
-                                            >
-                                                {showAllLeads ? 'Show less' : `Show more (${chartData.length - 3} more)`}
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Second Chart Section - Actions per Workstream */}
-                                <div className="bg-white p-4 sm:p-5 rounded-[8px]">
-                                    <h3 className="text-[17px] font-semibold text-slate-900 mb-2 flex items-center gap-2">
-                                        <Layers className="w-5 h-5 text-[#009EDB]" />
-                                        Actions per workstream
-                                    </h3>
-                                    <p className="text-[15px] text-slate-600 mb-3">
-                                        Number of actions per workstream
-                                    </p>
-                                    {/* Chart Search Bar */}
-                                    <div className="relative w-full mb-4">
-                                        <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#009EDB] pointer-events-none z-10" />
-                                        <Input
-                                            type="text"
-                                            placeholder="Search workstreams"
-                                            value={workstreamChartSearchQuery}
-                                            onChange={(e) => setWorkstreamChartSearchQuery(e.target.value)}
-                                            className="w-full h-[36px] text-[15px] border-0 border-b border-slate-300 rounded-none pl-6 pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
-                                        />
-                                    </div>
-                                    <div className="h-[300px] sm:h-[350px] md:h-[400px] overflow-y-auto overflow-x-hidden">
-                                        <table className="w-full">
-                                            <tbody>
-                                                {(showAllWorkstreams ? workstreamChartData : workstreamChartData.slice(0, 3)).map((entry, index) => {
-                                                    const maxCount = workstreamChartData.length > 0 ? Math.max(...workstreamChartData.map(d => d.count)) : 1;
-                                                    const percentage = (entry.count / maxCount) * 100;
-                                                    const isSelected = selectedWorkstream === entry.workstream;
-                                                    const isFiltered = selectedWorkstream && selectedWorkstream !== entry.workstream;
-                                                    const displayedData = showAllWorkstreams ? workstreamChartData : workstreamChartData.slice(0, 3);
-
-                                                    return (
-                                                        <tr
-                                                            key={index}
-                                                            onClick={() => {
-                                                                // Toggle: if already selected, deselect; otherwise select
-                                                                if (isSelected) {
-                                                                    setSelectedWorkstream("");
-                                                                } else {
-                                                                    setSelectedWorkstream(entry.workstream);
-                                                                }
-                                                            }}
-                                                            className={`cursor-pointer transition-colors hover:bg-slate-50 ${isFiltered ? 'opacity-30' : ''
-                                                                } ${index < displayedData.length - 1 ? 'border-b border-slate-200' : ''}`}
-                                                        >
-                                                            <td className="py-3 pr-3">
-                                                                <div className="flex items-center justify-between gap-3">
-                                                                    <span className="text-[14px] font-medium text-slate-900 flex-shrink-0 min-w-0">
-                                                                        {entry.workstream}
-                                                                    </span>
-                                                                    <div className="flex items-center gap-2 flex-shrink-0">
-                                                                        <span className={`text-[14px] font-semibold min-w-[20px] font-mono ${isSelected ? 'text-[#0076A4]' : 'text-[#009EDB]'
-                                                                            }`}>
-                                                                            {entry.count}
-                                                                        </span>
-                                                                        <div className="w-[120px] h-[8px] bg-slate-100 rounded-full overflow-hidden relative">
-                                                                            <div
-                                                                                className={`h-full rounded-full transition-all ${isSelected ? 'bg-[#0076A4]' : 'bg-[#009EDB]'
-                                                                                    }`}
-                                                                                style={{ width: `${percentage}%` }}
-                                                                            />
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })}
-                                            </tbody>
-                                        </table>
-                                        {workstreamChartData.length > 3 && (
-                                            <button
-                                                onClick={() => setShowAllWorkstreams(!showAllWorkstreams)}
-                                                className="w-full mt-3 py-2 text-[14px] text-left text-[#009EDB] hover:text-[#0076A4] transition-colors"
-                                            >
-                                                {showAllWorkstreams ? 'Show less' : `Show more (${workstreamChartData.length - 3} more)`}
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Third Chart Section - Actions per Workpackage */}
-                                <div className="bg-white p-4 sm:p-5 rounded-[8px]">
-                                    <h3 className="text-[17px] font-semibold text-slate-900 mb-2 flex items-center gap-2">
-                                        <Briefcase className="w-5 h-5 text-[#009EDB]" />
-                                        Actions per work package
-                                    </h3>
-                                    <p className="text-[15px] text-slate-600 mb-3">
-                                        Number of actions per work package
-                                    </p>
-                                    {/* Chart Search Bar */}
-                                    <div className="relative w-full mb-4">
-                                        <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#009EDB] pointer-events-none z-10" />
-                                        <Input
-                                            type="text"
-                                            placeholder="Search work packages"
-                                            value={workpackageChartSearchQuery}
-                                            onChange={(e) => setWorkpackageChartSearchQuery(e.target.value)}
-                                            className="w-full h-[36px] text-[15px] border-0 border-b border-slate-300 rounded-none pl-6 pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
-                                        />
-                                    </div>
-                                    <div className="h-[300px] sm:h-[350px] md:h-[400px] overflow-y-auto overflow-x-hidden">
-                                        <table className="w-full">
-                                            <tbody>
-                                                {(showAllWorkpackages ? workpackageChartData : workpackageChartData.slice(0, 3)).map((entry, index) => {
-                                                    const maxCount = workpackageChartData.length > 0 ? Math.max(...workpackageChartData.map(d => d.count)) : 1;
-                                                    const percentage = (entry.count / maxCount) * 100;
-                                                    const wpMatch = entry.workpackage.match(/^(\d+):/);
-                                                    const wpNumber = wpMatch ? wpMatch[1] : null;
-                                                    const wpName = wpMatch ? entry.workpackage.replace(/^\d+:\s*/, '') : entry.workpackage;
-                                                    const wpOption = wpNumber ? `${wpNumber}: ${wpName}` : wpName;
-                                                    const isSelected = selectedWorkPackage === wpOption;
-                                                    const isFiltered = selectedWorkPackage && selectedWorkPackage !== wpOption;
-                                                    const displayedData = showAllWorkpackages ? workpackageChartData : workpackageChartData.slice(0, 3);
-
-                                                    return (
-                                                        <tr
-                                                            key={index}
-                                                            onClick={() => {
-                                                                // Toggle: if already selected, deselect; otherwise select
-                                                                if (isSelected) {
-                                                                    setSelectedWorkPackage("");
-                                                                } else {
-                                                                    setSelectedWorkPackage(wpOption);
-                                                                }
-                                                            }}
-                                                            className={`cursor-pointer transition-colors hover:bg-slate-50 ${isFiltered ? 'opacity-30' : ''
-                                                                } ${index < displayedData.length - 1 ? 'border-b border-slate-200' : ''}`}
-                                                        >
-                                                            <td className="py-3 pr-3">
-                                                                <div className="flex items-center justify-between gap-3">
-                                                                    {wpNumber ? (
-                                                                        <Tooltip>
-                                                                            <TooltipTrigger asChild>
-                                                                                <span className="text-[14px] font-medium text-slate-900 flex-shrink-0 min-w-0 cursor-help">
-                                                                                    WP: {wpNumber}
-                                                                                </span>
-                                                                            </TooltipTrigger>
-                                                                            <TooltipContent>
-                                                                                <p>{wpName}</p>
-                                                                            </TooltipContent>
-                                                                        </Tooltip>
-                                                                    ) : (
-                                                                        <span className="text-[14px] font-medium text-slate-900 flex-shrink-0 min-w-0">
-                                                                            Work package
-                                                                        </span>
-                                                                    )}
-                                                                    <div className="flex items-center gap-2 flex-shrink-0">
-                                                                        <span className={`text-[14px] font-semibold min-w-[20px] font-mono ${isSelected ? 'text-[#0076A4]' : 'text-[#009EDB]'
-                                                                            }`}>
-                                                                            {entry.count}
-                                                                        </span>
-                                                                        <div className="w-[120px] h-[8px] bg-slate-100 rounded-full overflow-hidden relative">
-                                                                            <div
-                                                                                className={`h-full rounded-full transition-all ${isSelected ? 'bg-[#0076A4]' : 'bg-[#009EDB]'
-                                                                                    }`}
-                                                                                style={{ width: `${percentage}%` }}
-                                                                            />
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })}
-                                            </tbody>
-                                        </table>
-                                        {workpackageChartData.length > 3 && (
-                                            <button
-                                                onClick={() => setShowAllWorkpackages(!showAllWorkpackages)}
-                                                className="w-full mt-3 py-2 text-[14px] text-left text-[#009EDB] hover:text-[#0076A4] transition-colors"
-                                            >
-                                                {showAllWorkpackages ? 'Show less' : `Show more (${workpackageChartData.length - 3} more)`}
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
+                            <SidebarCharts
+                                leadsData={chartData}
+                                leadsSearchQuery={chartSearchQuery}
+                                onLeadsSearchChange={setChartSearchQuery}
+                                selectedLead={selectedLead}
+                                onSelectLead={setSelectedLead}
+                                showAllLeads={showAllLeads}
+                                onToggleShowAllLeads={() => setShowAllLeads(!showAllLeads)}
+                                workstreamsData={workstreamChartData}
+                                workstreamsSearchQuery={workstreamChartSearchQuery}
+                                onWorkstreamsSearchChange={setWorkstreamChartSearchQuery}
+                                selectedWorkstream={selectedWorkstream}
+                                onSelectWorkstream={setSelectedWorkstream}
+                                showAllWorkstreams={showAllWorkstreams}
+                                onToggleShowAllWorkstreams={() => setShowAllWorkstreams(!showAllWorkstreams)}
+                                workPackagesData={workpackageChartData}
+                                workPackagesSearchQuery={workpackageChartSearchQuery}
+                                onWorkPackagesSearchChange={setWorkpackageChartSearchQuery}
+                                selectedWorkPackage={selectedWorkPackage}
+                                onSelectWorkPackage={setSelectedWorkPackage}
+                                showAllWorkPackages={showAllWorkpackages}
+                                onToggleShowAllWorkPackages={() => setShowAllWorkpackages(!showAllWorkpackages)}
+                            />
                         </section>
                     </section>
                 </div>
