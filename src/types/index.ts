@@ -117,7 +117,7 @@ export interface WorkPackage {
  */
 export interface FilterState {
     searchQuery: string;
-    selectedWorkPackage: string;
+    selectedWorkPackage: string[];
     selectedLead: string;
     selectedWorkstream: string;
     selectedBigTicket: string;

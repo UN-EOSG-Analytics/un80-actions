@@ -26,8 +26,8 @@ interface SidebarChartsProps {
     workPackagesData: WorkPackageChartEntry[];
     workPackagesSearchQuery: string;
     onWorkPackagesSearchChange: (query: string) => void;
-    selectedWorkPackage: string;
-    onSelectWorkPackage: (workPackage: string) => void;
+    selectedWorkPackage: string[];
+    onSelectWorkPackage: (workPackage: string[]) => void;
     showAllWorkPackages: boolean;
     onToggleShowAllWorkPackages: () => void;
 }
@@ -120,8 +120,8 @@ export function SidebarCharts({
                 searchQuery={workPackagesSearchQuery}
                 onSearchChange={onWorkPackagesSearchChange}
                 searchPlaceholder="Search work packages"
-                selectedValue={selectedWorkPackage}
-                onSelectValue={onSelectWorkPackage}
+                selectedValue={selectedWorkPackage[0] || ''}
+                onSelectValue={(wp) => onSelectWorkPackage(wp ? [wp] : [])}
                 showAll={showAllWorkPackages}
                 onToggleShowAll={onToggleShowAllWorkPackages}
             />

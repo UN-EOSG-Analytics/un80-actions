@@ -7,7 +7,7 @@ import type { FilterState } from "@/types";
  */
 export function useFilters() {
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedWorkPackage, setSelectedWorkPackage] = useState<string>("");
+    const [selectedWorkPackage, setSelectedWorkPackage] = useState<string[]>([]);
     const [selectedLead, setSelectedLead] = useState<string>("");
     const [selectedWorkstream, setSelectedWorkstream] = useState<string>("");
     const [selectedBigTicket, setSelectedBigTicket] = useState<string>("");
@@ -24,7 +24,7 @@ export function useFilters() {
 
     const handleResetFilters = () => {
         setSearchQuery("");
-        setSelectedWorkPackage("");
+        setSelectedWorkPackage([]);
         setSelectedLead("");
         setSelectedWorkstream("");
         setSelectedBigTicket("");
@@ -50,18 +50,24 @@ export function useFilters() {
 
 /**
  * Hook to automatically clear filter if selected value is no longer available
- * @param selectedValue - Currently selected filter value
- * @param availableValues - Array of available values
- * @param setValue - Setter function for the filter value
  */
 export function useFilterSync(
-    selectedValue: string,
+    selectedValue: string | string[],
     availableValues: string[],
-    setValue: (value: string) => void
+    setValue: ((value: string[]) => void) | ((value: string) => void)
 ) {
     useEffect(() => {
-        if (selectedValue && !availableValues.includes(selectedValue)) {
-            setValue("");
+        if (Array.isArray(selectedValue)) {
+            // Handle array (multi-select)
+            const validValues = selectedValue.filter(val => availableValues.includes(val));
+            if (validValues.length !== selectedValue.length) {
+                (setValue as (value: string[]) => void)(validValues);
+            }
+        } else {
+            // Handle string (single-select)
+            if (selectedValue && !availableValues.includes(selectedValue)) {
+                (setValue as (value: string) => void)("");
+            }
         }
     }, [selectedValue, availableValues, setValue]);
 }

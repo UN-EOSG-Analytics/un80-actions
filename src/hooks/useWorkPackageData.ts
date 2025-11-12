@@ -45,19 +45,11 @@ export function useWorkPackageData(
             filtered = filtered.filter((wp) => wp.report.includes(filters.selectedWorkstream));
         }
 
-        // Apply work package filter (if selected) when computing leads and workstreams
-        if (filters.selectedWorkPackage) {
-            const wpMatch = filters.selectedWorkPackage.match(/^(\d+):/);
-            if (wpMatch) {
-                const wpNumber = wpMatch[1];
-                filtered = filtered.filter((wp) => wp.number === wpNumber);
-            } else {
-                filtered = filtered.filter((wp) => !wp.number && wp.name === filters.selectedWorkPackage);
-            }
-        }
+        // NOTE: Do NOT filter by selectedWorkPackage here for multi-select
+        // We want to show all available work packages in the dropdown
 
         return filtered;
-    }, [workPackages, filters.selectedLead, filters.selectedWorkstream, filters.selectedWorkPackage]);
+    }, [workPackages, filters.selectedLead, filters.selectedWorkstream]);
 
     // Get unique values for filters (filtered based on other selections)
     const uniqueWorkPackages = useMemo(

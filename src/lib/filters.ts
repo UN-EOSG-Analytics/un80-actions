@@ -32,16 +32,20 @@ export function filterWorkPackages(
         );
     }
 
-    // Work Package filter
-    if (filters.selectedWorkPackage) {
-        const wpMatch = filters.selectedWorkPackage.match(/^(\d+):/);
-        if (wpMatch) {
-            const wpNumber = wpMatch[1];
-            filtered = filtered.filter((wp) => wp.number === wpNumber);
-        } else {
-            // Handle work packages without numbers
-            filtered = filtered.filter((wp) => !wp.number && wp.name === filters.selectedWorkPackage);
-        }
+    // Work Package filter (supports multiple selections)
+    if (filters.selectedWorkPackage && filters.selectedWorkPackage.length > 0) {
+        const selectedNumbers = filters.selectedWorkPackage.map(wp => {
+            const wpMatch = wp.match(/^(\d+):/);
+            return wpMatch ? wpMatch[1] : wp;
+        });
+        
+        filtered = filtered.filter((wp) => {
+            if (wp.number) {
+                return selectedNumbers.includes(wp.number);
+            } else {
+                return selectedNumbers.includes(wp.name);
+            }
+        });
     }
 
     // Lead filter
@@ -98,7 +102,12 @@ export function filterWorkPackages(
 export function getUniqueWorkPackages(workPackages: WorkPackage[]): string[] {
     return Array.from(new Set(workPackages.map(wp =>
         wp.number ? `${wp.number}: ${wp.name}` : wp.name
-    ))).sort();
+    ))).sort((a, b) => {
+        // Extract numbers from strings like "1: Name" or "10: Name"
+        const numA = parseInt(a.split(':')[0]) || 0;
+        const numB = parseInt(b.split(':')[0]) || 0;
+        return numA - numB;
+    });
 }
 
 /**
@@ -270,17 +279,20 @@ export function calculateStatsData(
         );
     }
 
-    // Work Package filter
-    if (filters.selectedWorkPackage) {
-        const wpMatch = filters.selectedWorkPackage.match(/^(\d+):/);
-        if (wpMatch) {
-            const wpNumber = wpMatch[1];
-            filteredActions = filteredActions.filter((action) => action.work_package_number === wpNumber);
-        } else {
-            filteredActions = filteredActions.filter(
-                (action) => !action.work_package_number && action.work_package_name === filters.selectedWorkPackage
-            );
-        }
+    // Work Package filter (supports multiple selections)
+    if (filters.selectedWorkPackage && filters.selectedWorkPackage.length > 0) {
+        const selectedNumbers = filters.selectedWorkPackage.map(wp => {
+            const wpMatch = wp.match(/^(\d+):/);
+            return wpMatch ? wpMatch[1] : wp;
+        });
+        
+        filteredActions = filteredActions.filter((action) => {
+            if (action.work_package_number) {
+                return selectedNumbers.includes(action.work_package_number);
+            } else {
+                return selectedNumbers.includes(action.work_package_name);
+            }
+        });
     }
 
     // Lead filter

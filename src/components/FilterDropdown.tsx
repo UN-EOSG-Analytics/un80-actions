@@ -61,7 +61,7 @@ export default function FilterDropdown({
             relative w-full h-10 
             flex items-center gap-3 px-3 
             border rounded-lg 
-            text-sm
+            text-base
             touch-manipulation transition-colors
             ${isFiltered
                             ? 'bg-un-blue/10 border-un-blue text-un-blue hover:border-un-blue'
@@ -86,10 +86,15 @@ export default function FilterDropdown({
                 </button>
             </PopoverTrigger>
             <PopoverContent
-                className="w-max max-w-[calc(100vw-2rem)] sm:max-w-sm p-1 bg-white border border-gray-200 shadow-lg max-h-[200px] overflow-y-auto"
+                className="w-max max-w-[calc(100vw-2rem)] sm:max-w-sm p-1 bg-white border border-gray-200 shadow-lg max-h-[400px] overflow-y-auto"
                 align="start"
                 side="bottom"
                 sideOffset={4}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+                onInteractOutside={() => {
+                    // Allow closing when clicking outside
+                    onOpenChange(false);
+                }}
             >
                 <div>
                     {options.map((option) => {
@@ -101,23 +106,24 @@ export default function FilterDropdown({
                             <button
                                 key={option.key}
                                 onClick={() => onToggle(option.key)}
+                                onPointerDown={(e) => e.preventDefault()}
                                 className="flex items-center gap-3 py-1.5 px-2 rounded-md hover:bg-un-blue/10 hover:text-un-blue cursor-pointer transition-colors w-full text-left"
                             >
                                 {option.color && (
-                                    <div className={`${option.color} w-4 h-4 rounded flex-shrink-0`}></div>
+                                    <div className={`${option.color} w-4 h-4 rounded shrink-0`}></div>
                                 )}
                                 {option.icon && (
-                                    <div className="flex-shrink-0">
+                                    <div className="shrink-0">
                                         {option.icon}
                                     </div>
                                 )}
-                                <span className="text-base flex-1">
+                                <span className="text-sm flex-1">
                                     {option.label}
                                     {option.count !== undefined && (
                                         <span className="opacity-60"> ({option.count})</span>
                                     )}
                                 </span>
-                                <div className="w-4 h-4 flex-shrink-0 flex items-center justify-center">
+                                <div className="w-4 h-4 shrink-0 flex items-center justify-center">
                                     {showCheckmark && (
                                         <Check className="h-4 w-4 text-un-blue" />
                                     )}

@@ -5,14 +5,7 @@ import {
     Collapsible,
     CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { Briefcase, ChevronDown, Filter, Layers, User } from 'lucide-react';
+import { ArrowUpDown, Briefcase, ChevronDown, Filter, Layers, User } from 'lucide-react';
 
 interface FilterControlsProps {
     // Advanced filter state
@@ -29,8 +22,8 @@ interface FilterControlsProps {
     onCloseFilterCollapsible: (key: string) => void;
 
     // Filter values
-    selectedWorkPackage: string;
-    onSelectWorkPackage: (value: string) => void;
+    selectedWorkPackage: string[];
+    onSelectWorkPackage: (value: string[]) => void;
     selectedLead: string;
     onSelectLead: (value: string) => void;
     selectedWorkstream: string;
@@ -76,7 +69,7 @@ export function FilterControls({
 }: FilterControlsProps) {
     const hasActiveFilters = !!(
         searchQuery ||
-        selectedWorkPackage ||
+        selectedWorkPackage.length > 0 ||
         selectedLead ||
         selectedWorkstream ||
         selectedBigTicket
@@ -85,7 +78,7 @@ export function FilterControls({
     return (
         <>
             {/* Header with Advanced Filters Toggle and Sort */}
-            <div className="flex items-center justify-between mb-3 flex-wrap gap-4">
+            <div className="flex items-center justify-between mb-3 gap-4">
                 <h2 className="text-[22px] sm:text-[24px] md:text-[26px] font-bold text-black leading-[25px] flex items-center gap-2">
                     <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-un-blue" />
                     Work Packages
@@ -95,7 +88,7 @@ export function FilterControls({
                 <div className="flex items-center gap-3 shrink-0">
                     {/* Advanced Filtering Collapsible */}
                     <Collapsible open={isAdvancedFilterOpen} onOpenChange={onAdvancedFilterOpenChange}>
-                        <CollapsibleTrigger className="flex items-center gap-1.5 text-[15px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50">
+                        <CollapsibleTrigger className="flex items-center gap-1.5 text-[15px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap">
                             <span>Show Advanced Filters</span>
                             <ChevronDown
                                 className={`w-3 h-3 text-slate-600 transition-transform ${isAdvancedFilterOpen ? 'transform rotate-180' : ''
@@ -105,38 +98,33 @@ export function FilterControls({
                     </Collapsible>
 
                     {/* Sort Option */}
-                    <div className="flex items-center">
-                        <Select value={sortOption} onValueChange={onSortChange}>
-                            <SelectTrigger className="w-36 h-9 text-[14px] border-0 rounded-[6px] bg-transparent transition-all hover:text-un-blue focus:ring-0 focus:ring-offset-0 focus:border-0">
-                                <SelectValue placeholder="Sort" />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-xl border-slate-200 shadow-lg bg-white p-1 min-w-36">
-                                <SelectItem
-                                    value="name-asc"
-                                    className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-highlighted:bg-[#E0F5FF] transition-colors"
-                                >
-                                    Name (A-Z)
-                                </SelectItem>
-                                <SelectItem
-                                    value="name-desc"
-                                    className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-highlighted:bg-[#E0F5FF] transition-colors"
-                                >
-                                    Name (Z-A)
-                                </SelectItem>
-                                <SelectItem
-                                    value="number-asc"
-                                    className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-highlighted:bg-[#E0F5FF] transition-colors"
-                                >
-                                    Number (1-31)
-                                </SelectItem>
-                                <SelectItem
-                                    value="number-desc"
-                                    className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-highlighted:bg-[#E0F5FF] transition-colors"
-                                >
-                                    Number (31-1)
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
+                    <div className="w-36">
+                        <FilterDropdown
+                            open={openFilterCollapsibles.has('sort')}
+                            onOpenChange={(open) => onToggleFilterCollapsible('sort', open)}
+                            icon={<ArrowUpDown className="w-4 h-4" />}
+                            triggerText={
+                                sortOption === 'name-asc' ? 'Name (A-Z)' :
+                                sortOption === 'name-desc' ? 'Name (Z-A)' :
+                                sortOption === 'number-asc' ? 'Number (1-31)' :
+                                sortOption === 'number-desc' ? 'Number (31-1)' :
+                                'Sort'
+                            }
+                            isFiltered={false}
+                            allActive={false}
+                            options={[
+                                { key: 'name-asc', label: 'Name (A-Z)' },
+                                { key: 'name-desc', label: 'Name (Z-A)' },
+                                { key: 'number-asc', label: 'Number (1-31)' },
+                                { key: 'number-desc', label: 'Number (31-1)' },
+                            ]}
+                            selectedKeys={new Set([sortOption])}
+                            onToggle={(key) => {
+                                onSortChange(key);
+                                onCloseFilterCollapsible('sort');
+                            }}
+                            ariaLabel="Sort work packages"
+                        />
                     </div>
                 </div>
             </div>
@@ -149,17 +137,25 @@ export function FilterControls({
                         open={openFilterCollapsibles.has('workPackage')}
                         onOpenChange={(open) => onToggleFilterCollapsible('workPackage', open)}
                         icon={<Briefcase className="w-4 h-4 text-un-blue" />}
-                        triggerText={selectedWorkPackage || 'Select work package'}
-                        isFiltered={!!selectedWorkPackage}
-                        allActive={!selectedWorkPackage}
+                        triggerText={
+                            selectedWorkPackage.length === 0 
+                                ? 'Select work package' 
+                                : selectedWorkPackage.length === 1 
+                                    ? selectedWorkPackage[0] 
+                                    : `${selectedWorkPackage.length} selected`
+                        }
+                        isFiltered={selectedWorkPackage.length > 0}
+                        allActive={false}
                         options={uniqueWorkPackages.map((wp): FilterOption => ({
                             key: wp,
                             label: wp,
                         }))}
-                        selectedKeys={new Set(selectedWorkPackage ? [selectedWorkPackage] : [])}
+                        selectedKeys={new Set(selectedWorkPackage)}
                         onToggle={(key) => {
-                            onSelectWorkPackage(key === selectedWorkPackage ? '' : key);
-                            onCloseFilterCollapsible('workPackage');
+                            const newSelected = selectedWorkPackage.includes(key)
+                                ? selectedWorkPackage.filter(wp => wp !== key)
+                                : [...selectedWorkPackage, key];
+                            onSelectWorkPackage(newSelected);
                         }}
                         ariaLabel="Filter by work package"
                     />
