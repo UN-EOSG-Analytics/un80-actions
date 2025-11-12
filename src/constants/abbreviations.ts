@@ -14,6 +14,7 @@ export const abbreviationMap: Record<string, string> = {
     'USG UNU': 'Under-Secretary-General of the United Nations University',
     'USG DGACM': 'Under-Secretary-General for General Assembly and Conference Management',
     'USG ODA': 'Under-Secretary-General for Disarmament Affairs',
+    'Administrator UNDP': 'Administrator of the United Nations Development Programme',
     'DSG': 'Deputy Secretary-General',
     'ASG DCO': 'Assistant Secretary-General for Development Coordination Office',
     'ASG UNITAR': 'Assistant Secretary-General for the UN Institute for Training and Research',
