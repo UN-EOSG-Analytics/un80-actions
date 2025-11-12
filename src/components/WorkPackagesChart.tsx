@@ -40,7 +40,7 @@ export function WorkPackagesChart({
         <SidebarChart
             title="Actions per work package"
             description="Number of actions per work package"
-            icon={<Briefcase className="w-5 h-5 text-[#009EDB]" />}
+            icon={<Briefcase className="w-5 h-5 text-un-blue" />}
             data={chartEntries}
             searchQuery={searchQuery}
             onSearchChange={onSearchChange}

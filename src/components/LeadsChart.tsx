@@ -32,7 +32,7 @@ export function LeadsChart({
         <SidebarChart
             title="Work packages per lead"
             description="Principals and number of related work packages"
-            icon={<Users className="w-5 h-5 text-[#009EDB]" />}
+            icon={<Users className="w-5 h-5 text-un-blue" />}
             data={chartEntries}
             searchQuery={searchQuery}
             onSearchChange={onSearchChange}

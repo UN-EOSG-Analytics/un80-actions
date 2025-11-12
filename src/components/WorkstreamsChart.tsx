@@ -32,7 +32,7 @@ export function WorkstreamsChart({
         <SidebarChart
             title="Actions per workstream"
             description="Number of actions per workstream"
-            icon={<Layers className="w-5 h-5 text-[#009EDB]" />}
+            icon={<Layers className="w-5 h-5 text-un-blue" />}
             data={chartEntries}
             searchQuery={searchQuery}
             onSearchChange={onSearchChange}

@@ -87,7 +87,7 @@ export function FilterControls({
             {/* Header with Advanced Filters Toggle and Sort */}
             <div className="flex items-center justify-between mb-3 flex-wrap gap-4">
                 <h2 className="text-[22px] sm:text-[24px] md:text-[26px] font-bold text-black leading-[25px] flex items-center gap-2">
-                    <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-[#009EDB]" />
+                    <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-un-blue" />
                     Work packages
                 </h2>
 
@@ -95,7 +95,7 @@ export function FilterControls({
                 <div className="flex items-center gap-3 shrink-0">
                     {/* Advanced Filtering Collapsible */}
                     <Collapsible open={isAdvancedFilterOpen} onOpenChange={onAdvancedFilterOpenChange}>
-                        <CollapsibleTrigger className="flex items-center gap-1.5 text-[15px] font-medium text-slate-700 hover:text-[#009EDB] transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50">
+                        <CollapsibleTrigger className="flex items-center gap-1.5 text-[15px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50">
                             <span>Show advanced filters</span>
                             <ChevronDown
                                 className={`w-3 h-3 text-slate-600 transition-transform ${isAdvancedFilterOpen ? 'transform rotate-180' : ''
@@ -107,7 +107,7 @@ export function FilterControls({
                     {/* Sort Option */}
                     <div className="flex items-center">
                         <Select value={sortOption} onValueChange={onSortChange}>
-                            <SelectTrigger className="w-40 h-9 text-[14px] border-0 rounded-[6px] bg-transparent transition-all hover:text-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:border-0">
+                            <SelectTrigger className="w-40 h-9 text-[14px] border-0 rounded-[6px] bg-transparent transition-all hover:text-un-blue focus:ring-0 focus:ring-offset-0 focus:border-0">
                                 <SelectValue placeholder="Sort" />
                             </SelectTrigger>
                             <SelectContent className="rounded-xl border-slate-200 shadow-lg bg-white p-1 min-w-40">
@@ -151,9 +151,9 @@ export function FilterControls({
                                 open={openFilterCollapsibles.has('workPackage')}
                                 onOpenChange={(open) => onToggleFilterCollapsible('workPackage', open)}
                             >
-                                <CollapsibleTrigger className="w-full flex items-center justify-between h-10 px-3 text-[15px] border border-slate-300 rounded-xl bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
+                                <CollapsibleTrigger className="w-full flex items-center justify-between h-10 px-3 text-[15px] border border-slate-300 rounded-xl bg-white transition-all hover:border-un-blue/60 hover:shadow-sm">
                                     <div className="flex items-center gap-2">
-                                        <Briefcase className="w-4 h-4 text-[#009EDB]" />
+                                        <Briefcase className="w-4 h-4 text-un-blue" />
                                         <span className="text-slate-700">
                                             {selectedWorkPackage || 'Select work package'}
                                         </span>
@@ -189,9 +189,9 @@ export function FilterControls({
                                 open={openFilterCollapsibles.has('lead')}
                                 onOpenChange={(open) => onToggleFilterCollapsible('lead', open)}
                             >
-                                <CollapsibleTrigger className="w-full flex items-center justify-between h-10 px-3 text-[15px] border border-slate-300 rounded-xl bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
+                                <CollapsibleTrigger className="w-full flex items-center justify-between h-10 px-3 text-[15px] border border-slate-300 rounded-xl bg-white transition-all hover:border-un-blue/60 hover:shadow-sm">
                                     <div className="flex items-center gap-2">
-                                        <User className="w-4 h-4 text-[#009EDB]" />
+                                        <User className="w-4 h-4 text-un-blue" />
                                         <span className="text-slate-700">
                                             {selectedLead || 'Select work package lead'}
                                         </span>
@@ -227,9 +227,9 @@ export function FilterControls({
                                 open={openFilterCollapsibles.has('workstream')}
                                 onOpenChange={(open) => onToggleFilterCollapsible('workstream', open)}
                             >
-                                <CollapsibleTrigger className="w-full flex items-center justify-between h-10 px-3 text-[15px] border border-slate-300 rounded-xl bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
+                                <CollapsibleTrigger className="w-full flex items-center justify-between h-10 px-3 text-[15px] border border-slate-300 rounded-xl bg-white transition-all hover:border-un-blue/60 hover:shadow-sm">
                                     <div className="flex items-center gap-2">
-                                        <Layers className="w-4 h-4 text-[#009EDB]" />
+                                        <Layers className="w-4 h-4 text-un-blue" />
                                         <span className="text-slate-700">
                                             {selectedWorkstream || 'Select workstream'}
                                         </span>
@@ -265,9 +265,9 @@ export function FilterControls({
                                 open={openFilterCollapsibles.has('type')}
                                 onOpenChange={(open) => onToggleFilterCollapsible('type', open)}
                             >
-                                <CollapsibleTrigger className="w-full flex items-center justify-between h-10 px-3 text-[15px] border border-slate-300 rounded-xl bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
+                                <CollapsibleTrigger className="w-full flex items-center justify-between h-10 px-3 text-[15px] border border-slate-300 rounded-xl bg-white transition-all hover:border-un-blue/60 hover:shadow-sm">
                                     <div className="flex items-center gap-2">
-                                        <Filter className="w-4 h-4 text-[#009EDB]" />
+                                        <Filter className="w-4 h-4 text-un-blue" />
                                         <span className="text-slate-700">
                                             {selectedBigTicket === 'big-ticket'
                                                 ? '"Big Ticket" Work packages'
@@ -314,13 +314,13 @@ export function FilterControls({
             {/* Search Bar */}
             <div className="w-full mb-4">
                 <div className="relative w-full sm:w-[770px] mb-2">
-                    <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#009EDB] pointer-events-none z-10" />
+                    <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-5 h-5 text-un-blue pointer-events-none z-10" />
                     <Input
                         type="text"
                         placeholder="Search for work package"
                         value={searchQuery}
                         onChange={(e) => onSearchChange(e.target.value)}
-                        className="w-full h-11 text-[16px] border-0 border-b border-slate-300 rounded-none pl-6 pr-4 py-2.5 text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
+                        className="w-full h-11 text-[16px] border-0 border-b border-slate-300 rounded-none pl-6 pr-4 py-2.5 text-slate-700 bg-white transition-all hover:border-b-un-blue/60 focus:border-b-un-blue focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
                     />
                 </div>
                 {hasActiveFilters && (

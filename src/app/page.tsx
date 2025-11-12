@@ -124,33 +124,10 @@ export default function WorkPackagesPage() {
                     {/* Progress Section */}
                     <section className="mb-0">
                         <div className="flex flex-col sm:flex-row gap-4 items-start flex-wrap sm:flex-nowrap">
-                            <DataCard
-                                title="Workstreams"
-                                value={statsData.workstreams}
-                                icon={<Layers className="w-5 h-5 text-un-blue" />}
-                                tooltipText={`Number of workstreams: ${statsData.workstreams}`}
-                            />
-
-                            <DataCard
-                                title="Work packages"
-                                value={statsData.workpackages}
-                                icon={<BriefcaseIcon className="w-5 h-5 text-un-blue" />}
-                                tooltipText={`Number of work packages: ${statsData.workpackages}`}
-                            />
-
-                            <DataCard
-                                title="Actions"
-                                value={statsData.actions}
-                                icon={<ListTodo className="w-5 h-5 text-un-blue" />}
-                                tooltipText={`Number of actions: ${statsData.actions}`}
-                            />
-
-                            <DataCard
-                                title="UN system leaders"
-                                value={statsData.leads}
-                                icon={<Users className="w-5 h-5 text-un-blue" />}
-                                tooltipText={`Number of leads: ${statsData.leads}`}
-                            />
+                            <DataCard title="Workstreams" value={statsData.workstreams} icon={Layers} />
+                            <DataCard title="Work packages" value={statsData.workpackages} icon={BriefcaseIcon} />
+                            <DataCard title="Actions" value={statsData.actions} icon={ListTodo} />
+                            <DataCard title="UN system leaders" value={statsData.leads} icon={Users} />
                         </div>
                     </section>
 

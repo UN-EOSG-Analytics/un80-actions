@@ -59,13 +59,13 @@ export function SidebarChart({
 
             {/* Search Bar */}
             <div className="relative w-full mb-4">
-                <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#009EDB] pointer-events-none z-10" />
+                <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 text-un-blue pointer-events-none z-10" />
                 <Input
                     type="text"
                     placeholder={searchPlaceholder}
                     value={searchQuery}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className="w-full h-9 text-[15px] border-0 border-b border-slate-300 rounded-none pl-6 pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
+                    className="w-full h-9 text-[15px] border-0 border-b border-slate-300 rounded-none pl-6 pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-un-blue/60 focus:border-b-un-blue focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
                 />
             </div>
 
@@ -107,7 +107,7 @@ export function SidebarChart({
                                             <div className="flex items-center gap-2 shrink-0">
                                                 <span
                                                     className={`text-[14px] font-semibold min-w-[20px] font-mono ${
-                                                        isSelected ? 'text-[#0076A4]' : 'text-[#009EDB]'
+                                                        isSelected ? 'text-[#0076A4]' : 'text-un-blue'
                                                     }`}
                                                 >
                                                     {entry.count}
@@ -115,7 +115,7 @@ export function SidebarChart({
                                                 <div className="w-[120px] h-[8px] bg-slate-100 rounded-full overflow-hidden relative">
                                                     <div
                                                         className={`h-full rounded-full transition-all ${
-                                                            isSelected ? 'bg-[#0076A4]' : 'bg-[#009EDB]'
+                                                            isSelected ? 'bg-[#0076A4]' : 'bg-un-blue'
                                                         }`}
                                                         style={{ width: `${percentage}%` }}
                                                     />
@@ -133,7 +133,7 @@ export function SidebarChart({
                 {data.length > initialDisplayCount && (
                     <button
                         onClick={onToggleShowAll}
-                        className="w-full mt-3 py-2 text-[14px] text-left text-[#009EDB] hover:text-[#0076A4] transition-colors"
+                        className="w-full mt-3 py-2 text-[14px] text-left text-un-blue hover:text-[#0076A4] transition-colors"
                     >
                         {showAll ? 'Show less' : `Show more (${data.length - initialDisplayCount} more)`}
                     </button>
