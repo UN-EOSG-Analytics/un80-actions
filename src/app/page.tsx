@@ -97,7 +97,7 @@ export default function WorkPackagesPage() {
 
                         {/* DataCards Section */}
                         <section className="mb-10">
-                            <div className="flex flex-col sm:flex-row gap-4 items-start flex-wrap sm:flex-nowrap">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                                 <DataCard title="Workstreams" value={statsData.workstreams} icon={Layers} />
                                 <DataCard title="Work Packages" value={statsData.workpackages} icon={BriefcaseIcon} />
                                 <DataCard title="Actions" value={statsData.actions} icon={ListTodo} />

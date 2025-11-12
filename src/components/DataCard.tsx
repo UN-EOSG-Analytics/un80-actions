@@ -15,10 +15,10 @@ export function DataCard({ title, value, icon: Icon, className }: DataCardProps)
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <div className={cn('relative w-full sm:w-[280px] h-[140px]', className)}>
+                <div className={cn('relative w-full h-[110px] sm:h-[140px]', className)}>
                     <div className="absolute inset-0 bg-white rounded-lg"></div>
-                    <Card className="relative flex flex-col items-start justify-start w-full h-full bg-un-blue/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0 pl-[26px] shadow-none gap-0">
-                        <div className="flex items-center gap-2 mb-3 w-full justify-between">
+                    <Card className="relative flex flex-col items-start justify-start w-full h-full bg-un-blue/10 rounded-lg px-4 py-4 sm:py-6 transition-all hover:scale-[1.02] cursor-pointer border-0 pl-[26px] shadow-none gap-0">
+                        <div className="flex items-center gap-2 mb-2 sm:mb-3 w-full justify-between">
                             <p className="text-[17px] sm:text-[18px] md:text-[19px] font-normal text-un-blue text-left leading-[21px] sm:leading-[23px] md:leading-[25px]">
                                 {title}
                             </p>
