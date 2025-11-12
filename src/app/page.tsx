@@ -135,6 +135,30 @@ export default function WorkPackagesPage() {
     return `${day}/${month}/${year}`;
   };
 
+  // Format goal text: lowercase everything except first letter of each sentence
+  const formatGoalText = (text: string): string => {
+    if (!text) return text;
+    // Split by sentence boundaries (., !, ?) while preserving them
+    const sentences = text.split(/([.!?]+(?:\s+|$))/);
+    
+    return sentences
+      .map((sentence) => {
+        // Skip if it's just punctuation/whitespace
+        if (!sentence.trim() || /^[.!?\s]+$/.test(sentence)) {
+          return sentence;
+        }
+        // Lowercase everything, then capitalize first letter
+        const trimmed = sentence.trim();
+        const lowercased = trimmed.toLowerCase();
+        const capitalized = lowercased.charAt(0).toUpperCase() + lowercased.slice(1);
+        // Preserve original whitespace
+        const leadingWhitespace = sentence.match(/^\s*/)?.[0] || '';
+        const trailingWhitespace = sentence.match(/\s*$/)?.[0] || '';
+        return leadingWhitespace + capitalized + trailingWhitespace;
+      })
+      .join('');
+  };
+
       useEffect(() => {
         setIsLoading(true);
         fetchActions()
@@ -1085,8 +1109,8 @@ export default function WorkPackagesPage() {
                               Goal
                             </p>
                           </div>
-                          <p className="text-[15px] text-slate-800 leading-[23px] mt-2 text-left">
-                            {wp.goal}
+                          <p className="text-[15px] text-slate-800 leading-[23px] mt-2 text-left normal-case">
+                            {formatGoalText(wp.goal)}
                           </p>
                         </div>
                       )}
@@ -1295,13 +1319,13 @@ export default function WorkPackagesPage() {
               </p>
               {/* Chart Search Bar */}
               <div className="relative w-full mb-4">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#009EDB] pointer-events-none z-10" />
+                <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#009EDB] pointer-events-none z-10" />
                 <Input
                   type="text"
                   placeholder="Search entities"
                   value={chartSearchQuery}
                   onChange={(e) => setChartSearchQuery(e.target.value)}
-                  className="w-full h-[36px] text-[15px] border-0 border-b border-slate-300 rounded-none pl-[40px] pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
+                  className="w-full h-[36px] text-[15px] border-0 border-b border-slate-300 rounded-none pl-6 pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
                 />
               </div>
               <div className="h-[300px] sm:h-[350px] md:h-[400px] overflow-y-auto overflow-x-hidden">
@@ -1378,13 +1402,13 @@ export default function WorkPackagesPage() {
               </p>
               {/* Chart Search Bar */}
               <div className="relative w-full mb-4">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#009EDB] pointer-events-none z-10" />
+                <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#009EDB] pointer-events-none z-10" />
                 <Input
                   type="text"
                   placeholder="Search workstreams"
                   value={workstreamChartSearchQuery}
                   onChange={(e) => setWorkstreamChartSearchQuery(e.target.value)}
-                  className="w-full h-[36px] text-[15px] border-0 border-b border-slate-300 rounded-none pl-[40px] pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
+                  className="w-full h-[36px] text-[15px] border-0 border-b border-slate-300 rounded-none pl-6 pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
                 />
               </div>
               <div className="h-[300px] sm:h-[350px] md:h-[400px] overflow-y-auto overflow-x-hidden">
@@ -1461,13 +1485,13 @@ export default function WorkPackagesPage() {
               </p>
               {/* Chart Search Bar */}
               <div className="relative w-full mb-4">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#009EDB] pointer-events-none z-10" />
+                <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#009EDB] pointer-events-none z-10" />
                 <Input
                   type="text"
                   placeholder="Search work packages"
                   value={workpackageChartSearchQuery}
                   onChange={(e) => setWorkpackageChartSearchQuery(e.target.value)}
-                  className="w-full h-[36px] text-[15px] border-0 border-b border-slate-300 rounded-none pl-[40px] pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
+                  className="w-full h-[36px] text-[15px] border-0 border-b border-slate-300 rounded-none pl-6 pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
                 />
               </div>
               <div className="h-[300px] sm:h-[350px] md:h-[400px] overflow-y-auto overflow-x-hidden">
