@@ -107,10 +107,10 @@ export function FilterControls({
                     {/* Sort Option */}
                     <div className="flex items-center">
                         <Select value={sortOption} onValueChange={onSortChange}>
-                            <SelectTrigger className="w-40 h-9 text-[14px] border-0 rounded-[6px] bg-transparent transition-all hover:text-un-blue focus:ring-0 focus:ring-offset-0 focus:border-0">
+                            <SelectTrigger className="w-36 h-9 text-[14px] border-0 rounded-[6px] bg-transparent transition-all hover:text-un-blue focus:ring-0 focus:ring-offset-0 focus:border-0">
                                 <SelectValue placeholder="Sort" />
                             </SelectTrigger>
-                            <SelectContent className="rounded-xl border-slate-200 shadow-lg bg-white p-1 min-w-40">
+                            <SelectContent className="rounded-xl border-slate-200 shadow-lg bg-white p-1 min-w-36">
                                 <SelectItem
                                     value="name-asc"
                                     className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-highlighted:bg-[#E0F5FF] transition-colors"
