@@ -8,8 +8,8 @@ interface SidebarChartsProps {
     leadsData: LeadChartEntry[];
     leadsSearchQuery: string;
     onLeadsSearchChange: (query: string) => void;
-    selectedLead: string;
-    onSelectLead: (lead: string) => void;
+    selectedLead: string[];
+    onSelectLead: (lead: string[]) => void;
     showAllLeads: boolean;
     onToggleShowAllLeads: () => void;
 
@@ -105,8 +105,8 @@ export function SidebarCharts({
                 searchQuery={leadsSearchQuery}
                 onSearchChange={onLeadsSearchChange}
                 searchPlaceholder="Search entities"
-                selectedValue={selectedLead}
-                onSelectValue={onSelectLead}
+                selectedValue={selectedLead[0] || ''}
+                onSelectValue={(lead) => onSelectLead(lead ? [lead] : [])}
                 showAll={showAllLeads}
                 onToggleShowAll={onToggleShowAllLeads}
                 initialDisplayCount={4}

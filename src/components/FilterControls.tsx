@@ -24,8 +24,8 @@ interface FilterControlsProps {
     // Filter values
     selectedWorkPackage: string[];
     onSelectWorkPackage: (value: string[]) => void;
-    selectedLead: string;
-    onSelectLead: (value: string) => void;
+    selectedLead: string[];
+    onSelectLead: (value: string[]) => void;
     selectedWorkstream: string;
     onSelectWorkstream: (value: string) => void;
     selectedBigTicket: string;
@@ -70,7 +70,7 @@ export function FilterControls({
     const hasActiveFilters = !!(
         searchQuery ||
         selectedWorkPackage.length > 0 ||
-        selectedLead ||
+        selectedLead.length > 0 ||
         selectedWorkstream ||
         selectedBigTicket
     );
@@ -142,7 +142,7 @@ export function FilterControls({
                                 ? 'Select work package' 
                                 : selectedWorkPackage.length === 1 
                                     ? selectedWorkPackage[0] 
-                                    : `${selectedWorkPackage.length} selected`
+                                    : `${selectedWorkPackage.length} work packages selected`
                         }
                         isFiltered={selectedWorkPackage.length > 0}
                         allActive={false}
@@ -165,17 +165,25 @@ export function FilterControls({
                         open={openFilterCollapsibles.has('lead')}
                         onOpenChange={(open) => onToggleFilterCollapsible('lead', open)}
                         icon={<User className="w-4 h-4 text-un-blue" />}
-                        triggerText={selectedLead || 'Select work package lead'}
-                        isFiltered={!!selectedLead}
-                        allActive={!selectedLead}
+                        triggerText={
+                            selectedLead.length === 0 
+                                ? 'Select work package lead' 
+                                : selectedLead.length === 1 
+                                    ? selectedLead[0] 
+                                    : `${selectedLead.length} leads selected`
+                        }
+                        isFiltered={selectedLead.length > 0}
+                        allActive={false}
                         options={uniqueLeads.map((lead): FilterOption => ({
                             key: lead,
                             label: lead,
                         }))}
-                        selectedKeys={new Set(selectedLead ? [selectedLead] : [])}
+                        selectedKeys={new Set(selectedLead)}
                         onToggle={(key) => {
-                            onSelectLead(key === selectedLead ? '' : key);
-                            onCloseFilterCollapsible('lead');
+                            const newSelected = selectedLead.includes(key)
+                                ? selectedLead.filter(lead => lead !== key)
+                                : [...selectedLead, key];
+                            onSelectLead(newSelected);
                         }}
                         ariaLabel="Filter by work package lead"
                     />

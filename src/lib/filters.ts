@@ -48,9 +48,11 @@ export function filterWorkPackages(
         });
     }
 
-    // Lead filter
-    if (filters.selectedLead) {
-        filtered = filtered.filter((wp) => wp.leads.includes(filters.selectedLead));
+    // Lead filter (supports multiple selections)
+    if (filters.selectedLead && filters.selectedLead.length > 0) {
+        filtered = filtered.filter((wp) => 
+            wp.leads.some(lead => filters.selectedLead.includes(lead))
+        );
     }
 
     // Workstream filter
@@ -295,10 +297,11 @@ export function calculateStatsData(
         });
     }
 
-    // Lead filter
-    if (filters.selectedLead) {
+    // Lead filter (supports multiple selections)
+    if (filters.selectedLead && filters.selectedLead.length > 0) {
         filteredActions = filteredActions.filter((action) =>
-            Array.isArray(action.work_package_leads) && action.work_package_leads.includes(filters.selectedLead)
+            Array.isArray(action.work_package_leads) && 
+            action.work_package_leads.some(lead => filters.selectedLead.includes(lead))
         );
     }
 

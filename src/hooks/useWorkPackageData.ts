@@ -35,10 +35,8 @@ export function useWorkPackageData(
     const getFilteredWorkPackagesForOptions = useMemo(() => {
         let filtered = workPackages;
 
-        // Apply lead filter (if selected) when computing work packages and workstreams
-        if (filters.selectedLead) {
-            filtered = filtered.filter((wp) => wp.leads.includes(filters.selectedLead));
-        }
+        // NOTE: Do NOT filter by selectedLead here for multi-select
+        // We want to show all available leads in the dropdown
 
         // Apply workstream filter (if selected) when computing work packages and leads
         if (filters.selectedWorkstream) {
@@ -49,7 +47,7 @@ export function useWorkPackageData(
         // We want to show all available work packages in the dropdown
 
         return filtered;
-    }, [workPackages, filters.selectedLead, filters.selectedWorkstream]);
+    }, [workPackages, filters.selectedWorkstream]);
 
     // Get unique values for filters (filtered based on other selections)
     const uniqueWorkPackages = useMemo(

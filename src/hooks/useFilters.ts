@@ -8,7 +8,7 @@ import type { FilterState } from "@/types";
 export function useFilters() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedWorkPackage, setSelectedWorkPackage] = useState<string[]>([]);
-    const [selectedLead, setSelectedLead] = useState<string>("");
+    const [selectedLead, setSelectedLead] = useState<string[]>([]);
     const [selectedWorkstream, setSelectedWorkstream] = useState<string>("");
     const [selectedBigTicket, setSelectedBigTicket] = useState<string>("");
     const [sortOption, setSortOption] = useState<string>("");
@@ -25,7 +25,7 @@ export function useFilters() {
     const handleResetFilters = () => {
         setSearchQuery("");
         setSelectedWorkPackage([]);
-        setSelectedLead("");
+        setSelectedLead([]);
         setSelectedWorkstream("");
         setSelectedBigTicket("");
     };
