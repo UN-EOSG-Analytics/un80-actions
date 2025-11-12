@@ -5,7 +5,8 @@ import {
     Collapsible,
     CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { ArrowUpDown, Briefcase, ChevronDown, Filter, Layers, User } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ArrowUpDown, Briefcase, ChevronDown, Check, Filter, Layers, User } from 'lucide-react';
 
 interface FilterControlsProps {
     // Advanced filter state
@@ -86,45 +87,105 @@ export function FilterControls({
 
                 {/* Advanced Filtering and Sort */}
                 <div className="flex items-center gap-2 sm:gap-3 shrink-0 flex-wrap sm:flex-nowrap">
-                    {/* Advanced Filtering Collapsible */}
-                    <Collapsible open={isAdvancedFilterOpen} onOpenChange={onAdvancedFilterOpenChange}>
-                        <CollapsibleTrigger className="flex items-center gap-1.5 text-[14px] sm:text-[15px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap">
-                            <span>Show Advanced Filters</span>
-                            <ChevronDown
-                                className={`w-3 h-3 text-slate-600 transition-transform ${isAdvancedFilterOpen ? 'transform rotate-180' : ''
-                                    }`}
-                            />
-                        </CollapsibleTrigger>
-                    </Collapsible>
+                    {/* Mobile: Simple buttons aligned left */}
+                    <div className="flex items-center gap-2 sm:hidden">
+                        {/* Advanced Filtering Collapsible */}
+                        <Collapsible open={isAdvancedFilterOpen} onOpenChange={onAdvancedFilterOpenChange}>
+                            <CollapsibleTrigger className="flex items-center gap-1.5 text-[14px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap">
+                                <span>Show Advanced Filters</span>
+                                <ChevronDown
+                                    className={`w-3 h-3 text-slate-600 transition-transform ${isAdvancedFilterOpen ? 'transform rotate-180' : ''
+                                        }`}
+                                />
+                            </CollapsibleTrigger>
+                        </Collapsible>
 
-                    {/* Sort Option */}
-                    <div className="w-32 sm:w-36">
-                        <FilterDropdown
-                            open={openFilterCollapsibles.has('sort')}
-                            onOpenChange={(open) => onToggleFilterCollapsible('sort', open)}
-                            icon={<ArrowUpDown className="w-4 h-4" />}
-                            triggerText={
-                                sortOption === 'name-asc' ? 'Name (A-Z)' :
-                                sortOption === 'name-desc' ? 'Name (Z-A)' :
-                                sortOption === 'number-asc' ? 'Number (1-31)' :
-                                sortOption === 'number-desc' ? 'Number (31-1)' :
-                                'Sort'
-                            }
-                            isFiltered={false}
-                            allActive={false}
-                            options={[
-                                { key: 'name-asc', label: 'Name (A-Z)' },
-                                { key: 'name-desc', label: 'Name (Z-A)' },
-                                { key: 'number-asc', label: 'Number (1-31)' },
-                                { key: 'number-desc', label: 'Number (31-1)' },
-                            ]}
-                            selectedKeys={new Set([sortOption])}
-                            onToggle={(key) => {
-                                onSortChange(key);
-                                onCloseFilterCollapsible('sort');
-                            }}
-                            ariaLabel="Sort work packages"
-                        />
+                        {/* Sort Option - Mobile Style */}
+                        <Popover open={openFilterCollapsibles.has('sort')} onOpenChange={(open) => onToggleFilterCollapsible('sort', open)}>
+                            <PopoverTrigger asChild>
+                                <button className="flex items-center gap-1.5 text-[14px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap">
+                                    <span>
+                                        {sortOption === 'name-asc' ? 'Name (A-Z)' :
+                                            sortOption === 'name-desc' ? 'Name (Z-A)' :
+                                            sortOption === 'number-asc' ? 'Number (1-31)' :
+                                            sortOption === 'number-desc' ? 'Number (31-1)' :
+                                            'Sort'}
+                                    </span>
+                                    <ChevronDown
+                                        className={`w-3 h-3 text-slate-600 transition-transform ${openFilterCollapsibles.has('sort') ? 'transform rotate-180' : ''
+                                            }`}
+                                    />
+                                </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-max max-w-[calc(100vw-2rem)] p-1 bg-white border border-gray-200 shadow-lg" align="start" side="bottom" sideOffset={4}>
+                                <div>
+                                    {[
+                                        { key: 'name-asc', label: 'Name (A-Z)' },
+                                        { key: 'name-desc', label: 'Name (Z-A)' },
+                                        { key: 'number-asc', label: 'Number (1-31)' },
+                                        { key: 'number-desc', label: 'Number (31-1)' },
+                                    ].map((option) => (
+                                        <button
+                                            key={option.key}
+                                            onClick={() => {
+                                                onSortChange(option.key);
+                                                onCloseFilterCollapsible('sort');
+                                            }}
+                                            className="flex items-center gap-3 py-1.5 px-2 rounded-md hover:bg-un-blue/10 hover:text-un-blue cursor-pointer transition-colors w-full text-left text-sm"
+                                        >
+                                            <span>{option.label}</span>
+                                            {sortOption === option.key && (
+                                                <Check className="h-4 w-4 text-un-blue ml-auto" />
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+
+                    {/* Desktop: Original layout */}
+                    <div className="hidden sm:flex items-center gap-3">
+                        {/* Advanced Filtering Collapsible */}
+                        <Collapsible open={isAdvancedFilterOpen} onOpenChange={onAdvancedFilterOpenChange}>
+                            <CollapsibleTrigger className="flex items-center gap-1.5 text-[15px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap">
+                                <span>Show Advanced Filters</span>
+                                <ChevronDown
+                                    className={`w-3 h-3 text-slate-600 transition-transform ${isAdvancedFilterOpen ? 'transform rotate-180' : ''
+                                        }`}
+                                />
+                            </CollapsibleTrigger>
+                        </Collapsible>
+
+                        {/* Sort Option */}
+                        <div className="w-36">
+                            <FilterDropdown
+                                open={openFilterCollapsibles.has('sort')}
+                                onOpenChange={(open) => onToggleFilterCollapsible('sort', open)}
+                                icon={<ArrowUpDown className="w-4 h-4" />}
+                                triggerText={
+                                    sortOption === 'name-asc' ? 'Name (A-Z)' :
+                                    sortOption === 'name-desc' ? 'Name (Z-A)' :
+                                    sortOption === 'number-asc' ? 'Number (1-31)' :
+                                    sortOption === 'number-desc' ? 'Number (31-1)' :
+                                    'Sort'
+                                }
+                                isFiltered={false}
+                                allActive={false}
+                                options={[
+                                    { key: 'name-asc', label: 'Name (A-Z)' },
+                                    { key: 'name-desc', label: 'Name (Z-A)' },
+                                    { key: 'number-asc', label: 'Number (1-31)' },
+                                    { key: 'number-desc', label: 'Number (31-1)' },
+                                ]}
+                                selectedKeys={new Set([sortOption])}
+                                onToggle={(key) => {
+                                    onSortChange(key);
+                                    onCloseFilterCollapsible('sort');
+                                }}
+                                ariaLabel="Sort work packages"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
