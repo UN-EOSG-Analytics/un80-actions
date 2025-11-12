@@ -1,19 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { FilterControls } from "@/components/FilterControls";
+import { SidebarCharts } from "@/components/SidebarCharts";
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Input } from "@/components/ui/input";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import {
     Tooltip,
     TooltipContent,
@@ -21,14 +14,13 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { abbreviationMap } from "@/constants/abbreviations";
-import { SidebarCharts } from "@/components/SidebarCharts";
 import { useActions } from "@/hooks/useActions";
 import { useChartSearch } from "@/hooks/useChartSearch";
 import { useCollapsibles } from "@/hooks/useCollapsibles";
 import { useFilters, useFilterSync } from "@/hooks/useFilters";
 import { useWorkPackageData } from "@/hooks/useWorkPackageData";
 import { formatGoalText } from "@/lib/utils";
-import { Briefcase, Briefcase as BriefcaseIcon, ChevronDown, FileText, Filter, Info, Layers, ListTodo, Search, Trophy, User, Users } from "lucide-react";
+import { Briefcase as BriefcaseIcon, FileText, Info, Layers, ListTodo, Trophy, User, Users } from "lucide-react";
 
 export default function WorkPackagesPage() {
     // Custom hooks for state management
@@ -231,235 +223,29 @@ export default function WorkPackagesPage() {
                         <section className="flex flex-col lg:flex-row gap-6 items-start">
                             {/* Work Packages Collapsible */}
                             <div className="flex-1 w-full lg:max-w-[818px]">
-                                <div className="flex items-center justify-between mb-3 flex-wrap gap-4">
-                                    <h2 className="text-[22px] sm:text-[24px] md:text-[26px] font-bold text-black leading-[25px] flex items-center gap-2">
-                                        <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-[#009EDB]" />
-                                        Work packages
-                                    </h2>
-
-                                    {/* Advanced Filtering and Sort */}
-                                    <div className="flex items-center gap-3 flex-shrink-0">
-                                        {/* Advanced Filtering Collapsible */}
-                                        <Collapsible open={isAdvancedFilterOpen} onOpenChange={setIsAdvancedFilterOpen}>
-                                            <CollapsibleTrigger className="flex items-center gap-1.5 text-[15px] font-medium text-slate-700 hover:text-[#009EDB] transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50">
-                                                <span>Show advanced filters</span>
-                                                <ChevronDown
-                                                    className={`w-3 h-3 text-slate-600 transition-transform ${isAdvancedFilterOpen ? "transform rotate-180" : ""
-                                                        }`}
-                                                />
-                                            </CollapsibleTrigger>
-                                        </Collapsible>
-
-                                        {/* Sort Option */}
-                                        <div className="flex items-center">
-                                            <Select value={sortOption} onValueChange={setSortOption}>
-                                                <SelectTrigger className="w-[160px] h-[36px] text-[14px] border-0 rounded-[6px] bg-transparent transition-all hover:text-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:border-0">
-                                                    <SelectValue placeholder="Sort" />
-                                                </SelectTrigger>
-                                                <SelectContent className="rounded-[8px] border-slate-200 shadow-lg bg-white p-1 min-w-[160px]">
-                                                    <SelectItem
-                                                        value="name-asc"
-                                                        className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-[highlighted]:bg-[#E0F5FF] transition-colors"
-                                                    >
-                                                        Name (A-Z)
-                                                    </SelectItem>
-                                                    <SelectItem
-                                                        value="name-desc"
-                                                        className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-[highlighted]:bg-[#E0F5FF] transition-colors"
-                                                    >
-                                                        Name (Z-A)
-                                                    </SelectItem>
-                                                    <SelectItem
-                                                        value="number-asc"
-                                                        className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-[highlighted]:bg-[#E0F5FF] transition-colors"
-                                                    >
-                                                        Number (1-31)
-                                                    </SelectItem>
-                                                    <SelectItem
-                                                        value="number-desc"
-                                                        className="rounded-[6px] px-3 py-2 text-[14px] cursor-pointer hover:bg-[#E0F5FF] focus:bg-[#E0F5FF] data-[highlighted]:bg-[#E0F5FF] transition-colors"
-                                                    >
-                                                        Number (31-1)
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Advanced Filters Content - Expands Below */}
-                                {isAdvancedFilterOpen && (
-                                    <div className="w-full mt-3 mb-3 bg-white border border-slate-200 rounded-[8px] p-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            {/* Work Package Filter */}
-                                            <div className="flex flex-col gap-2">
-                                                <Collapsible
-                                                    open={openFilterCollapsibles.has('workPackage')}
-                                                    onOpenChange={(open) => toggleFilterCollapsible('workPackage', open)}
-                                                >
-                                                    <CollapsibleTrigger className="w-full flex items-center justify-between h-[40px] px-3 text-[15px] border border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
-                                                        <div className="flex items-center gap-2">
-                                                            <Briefcase className="w-4 h-4 text-[#009EDB]" />
-                                                            <span className="text-slate-700">{selectedWorkPackage || "Select work package"}</span>
-                                                        </div>
-                                                        <ChevronDown className={`w-4 h-4 text-slate-600 transition-transform ${openFilterCollapsibles.has('workPackage') ? 'transform rotate-180' : ''}`} />
-                                                    </CollapsibleTrigger>
-                                                    <CollapsibleContent className="mt-1 border border-slate-200 rounded-[8px] bg-white shadow-lg">
-                                                        <div className="p-1 max-h-[200px] overflow-y-auto">
-                                                            {uniqueWorkPackages.map((wp) => (
-                                                                <div
-                                                                    key={wp}
-                                                                    onClick={() => {
-                                                                        setSelectedWorkPackage(wp === selectedWorkPackage ? "" : wp);
-                                                                        closeFilterCollapsible('workPackage');
-                                                                    }}
-                                                                    className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${selectedWorkPackage === wp ? 'bg-[#E0F5FF] font-medium' : ''
-                                                                        }`}
-                                                                >
-                                                                    {wp}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </CollapsibleContent>
-                                                </Collapsible>
-                                            </div>
-
-                                            {/* Work Package Leads Filter */}
-                                            <div className="flex flex-col gap-2">
-                                                <Collapsible
-                                                    open={openFilterCollapsibles.has('lead')}
-                                                    onOpenChange={(open) => toggleFilterCollapsible('lead', open)}
-                                                >
-                                                    <CollapsibleTrigger className="w-full flex items-center justify-between h-[40px] px-3 text-[15px] border border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
-                                                        <div className="flex items-center gap-2">
-                                                            <User className="w-4 h-4 text-[#009EDB]" />
-                                                            <span className="text-slate-700">{selectedLead || "Select work package lead"}</span>
-                                                        </div>
-                                                        <ChevronDown className={`w-4 h-4 text-slate-600 transition-transform ${openFilterCollapsibles.has('lead') ? 'transform rotate-180' : ''}`} />
-                                                    </CollapsibleTrigger>
-                                                    <CollapsibleContent className="mt-1 border border-slate-200 rounded-[8px] bg-white shadow-lg">
-                                                        <div className="p-1 max-h-[200px] overflow-y-auto">
-                                                            {uniqueLeads.map((lead) => (
-                                                                <div
-                                                                    key={lead}
-                                                                    onClick={() => {
-                                                                        setSelectedLead(lead === selectedLead ? "" : lead);
-                                                                        closeFilterCollapsible('lead');
-                                                                    }}
-                                                                    className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${selectedLead === lead ? 'bg-[#E0F5FF] font-medium' : ''
-                                                                        }`}
-                                                                >
-                                                                    {lead}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </CollapsibleContent>
-                                                </Collapsible>
-                                            </div>
-
-                                            {/* Workstream Filter */}
-                                            <div className="flex flex-col gap-2">
-                                                <Collapsible
-                                                    open={openFilterCollapsibles.has('workstream')}
-                                                    onOpenChange={(open) => toggleFilterCollapsible('workstream', open)}
-                                                >
-                                                    <CollapsibleTrigger className="w-full flex items-center justify-between h-[40px] px-3 text-[15px] border border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
-                                                        <div className="flex items-center gap-2">
-                                                            <Layers className="w-4 h-4 text-[#009EDB]" />
-                                                            <span className="text-slate-700">{selectedWorkstream || "Select workstream"}</span>
-                                                        </div>
-                                                        <ChevronDown className={`w-4 h-4 text-slate-600 transition-transform ${openFilterCollapsibles.has('workstream') ? 'transform rotate-180' : ''}`} />
-                                                    </CollapsibleTrigger>
-                                                    <CollapsibleContent className="mt-1 border border-slate-200 rounded-[8px] bg-white shadow-lg">
-                                                        <div className="p-1 max-h-[200px] overflow-y-auto">
-                                                            {uniqueWorkstreams.map((ws) => (
-                                                                <div
-                                                                    key={ws}
-                                                                    onClick={() => {
-                                                                        setSelectedWorkstream(ws === selectedWorkstream ? "" : ws);
-                                                                        closeFilterCollapsible('workstream');
-                                                                    }}
-                                                                    className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${selectedWorkstream === ws ? 'bg-[#E0F5FF] font-medium' : ''
-                                                                        }`}
-                                                                >
-                                                                    {ws}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </CollapsibleContent>
-                                                </Collapsible>
-                                            </div>
-
-                                            {/* Type Filter */}
-                                            <div className="flex flex-col gap-2">
-                                                <Collapsible
-                                                    open={openFilterCollapsibles.has('type')}
-                                                    onOpenChange={(open) => toggleFilterCollapsible('type', open)}
-                                                >
-                                                    <CollapsibleTrigger className="w-full flex items-center justify-between h-[40px] px-3 text-[15px] border border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
-                                                        <div className="flex items-center gap-2">
-                                                            <Filter className="w-4 h-4 text-[#009EDB]" />
-                                                            <span className="text-slate-700">
-                                                                {selectedBigTicket === "big-ticket" ? '"Big Ticket" Work packages' :
-                                                                    selectedBigTicket === "other" ? "Other Work packages" :
-                                                                        "Select type"}
-                                                            </span>
-                                                        </div>
-                                                        <ChevronDown className={`w-4 h-4 text-slate-600 transition-transform ${openFilterCollapsibles.has('type') ? 'transform rotate-180' : ''}`} />
-                                                    </CollapsibleTrigger>
-                                                    <CollapsibleContent className="mt-1 border border-slate-200 rounded-[8px] bg-white shadow-lg">
-                                                        <div className="p-1">
-                                                            <div
-                                                                onClick={() => {
-                                                                    setSelectedBigTicket(selectedBigTicket === "big-ticket" ? "" : "big-ticket");
-                                                                    closeFilterCollapsible('type');
-                                                                }}
-                                                                className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${selectedBigTicket === "big-ticket" ? 'bg-[#E0F5FF] font-medium' : ''
-                                                                    }`}
-                                                            >
-                                                                "Big Ticket" Work packages
-                                                            </div>
-                                                            <div
-                                                                onClick={() => {
-                                                                    setSelectedBigTicket(selectedBigTicket === "other" ? "" : "other");
-                                                                    closeFilterCollapsible('type');
-                                                                }}
-                                                                className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${selectedBigTicket === "other" ? 'bg-[#E0F5FF] font-medium' : ''
-                                                                    }`}
-                                                            >
-                                                                Other Work packages
-                                                            </div>
-                                                        </div>
-                                                    </CollapsibleContent>
-                                                </Collapsible>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Search Bar */}
-                                <div className="w-full mb-4">
-                                    <div className="relative w-full sm:w-[770px] mb-2">
-                                        <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#009EDB] pointer-events-none z-10" />
-                                        <Input
-                                            type="text"
-                                            placeholder="Search for work package"
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                            className="w-full h-[44px] text-[16px] border-0 border-b border-slate-300 rounded-none pl-6 pr-4 py-[10px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
-                                        />
-                                    </div>
-                                    {(searchQuery || selectedWorkPackage || selectedLead || selectedWorkstream || selectedBigTicket) && (
-                                        <div className="w-full sm:w-[770px]">
-                                            <Button
-                                                onClick={handleResetFilters}
-                                                className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-1.5 h-[36px] rounded-[8px] text-[14px] font-semibold transition-all shadow-sm hover:shadow-md"
-                                            >
-                                                Reset
-                                            </Button>
-                                        </div>
-                                    )}
-                                </div>
+                                <FilterControls
+                                    isAdvancedFilterOpen={isAdvancedFilterOpen}
+                                    onAdvancedFilterOpenChange={setIsAdvancedFilterOpen}
+                                    sortOption={sortOption}
+                                    onSortChange={setSortOption}
+                                    openFilterCollapsibles={openFilterCollapsibles}
+                                    onToggleFilterCollapsible={toggleFilterCollapsible}
+                                    onCloseFilterCollapsible={closeFilterCollapsible}
+                                    selectedWorkPackage={selectedWorkPackage}
+                                    onSelectWorkPackage={setSelectedWorkPackage}
+                                    selectedLead={selectedLead}
+                                    onSelectLead={setSelectedLead}
+                                    selectedWorkstream={selectedWorkstream}
+                                    onSelectWorkstream={setSelectedWorkstream}
+                                    selectedBigTicket={selectedBigTicket}
+                                    onSelectBigTicket={setSelectedBigTicket}
+                                    searchQuery={searchQuery}
+                                    onSearchChange={setSearchQuery}
+                                    uniqueWorkPackages={uniqueWorkPackages}
+                                    uniqueLeads={uniqueLeads}
+                                    uniqueWorkstreams={uniqueWorkstreams}
+                                    onResetFilters={handleResetFilters}
+                                />
 
                                 <div className="w-full space-y-4">
                                     {filteredWorkPackages.map((wp, index) => {
