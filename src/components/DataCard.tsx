@@ -9,9 +9,10 @@ interface DataCardProps {
     value: string | number;
     icon: LucideIcon;
     className?: string;
+    isLoading?: boolean;
 }
 
-export function DataCard({ title, value, icon: Icon, className }: DataCardProps) {
+export function DataCard({ title, value, icon: Icon, className, isLoading = false }: DataCardProps) {
     return (
         <Tooltip>
             <TooltipTrigger asChild>
@@ -27,13 +28,13 @@ export function DataCard({ title, value, icon: Icon, className }: DataCardProps)
                             </div>
                         </div>
                         <p className="text-[37px] sm:text-[43px] md:text-[49px] font-bold text-[#2E3440] text-left leading-[45px] sm:leading-[51px] md:leading-[57px] tabular-nums">
-                            {value}
+                            {isLoading ? '' : value}
                         </p>
                     </Card>
                 </div>
             </TooltipTrigger>
             <TooltipContent>
-                <p>Number of {title}: {value}</p>
+                <p>Number of {title}: {isLoading ? 'Loading...' : value}</p>
             </TooltipContent>
         </Tooltip>
     );

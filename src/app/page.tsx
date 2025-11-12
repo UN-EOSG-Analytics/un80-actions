@@ -99,10 +99,10 @@ export default function WorkPackagesPage() {
                         {/* DataCards Section */}
                         <section className="mb-10">
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                                <DataCard title="Workstreams" value={statsData.workstreams} icon={Layers} />
-                                <DataCard title="Work Packages" value={statsData.workpackages} icon={BriefcaseIcon} />
-                                <DataCard title="Actions" value={statsData.actions} icon={ListTodo} />
-                                <DataCard title="UN System Leaders" value={statsData.leads} icon={Users} />
+                                <DataCard title="Workstreams" value={statsData.workstreams} icon={Layers} isLoading={isLoading} />
+                                <DataCard title="Work Packages" value={statsData.workpackages} icon={BriefcaseIcon} isLoading={isLoading} />
+                                <DataCard title="Actions" value={statsData.actions} icon={ListTodo} isLoading={isLoading} />
+                                <DataCard title="UN System Leaders" value={statsData.leads} icon={Users} isLoading={isLoading} />
                             </div>
                         </section>
 
