@@ -30,6 +30,11 @@ export function useFilters() {
         setSelectedBigTicket("");
     };
 
+    const handleResetAll = () => {
+        handleResetFilters();
+        setSortOption("");
+    };
+
     return {
         filters,
         searchQuery,
@@ -45,6 +50,7 @@ export function useFilters() {
         sortOption,
         setSortOption,
         handleResetFilters,
+        handleResetAll,
     };
 }
 

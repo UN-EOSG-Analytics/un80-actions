@@ -33,6 +33,7 @@ export default function WorkPackagesPage() {
         sortOption,
         setSortOption,
         handleResetFilters,
+        handleResetAll,
     } = useFilters();
 
     const {
@@ -87,7 +88,7 @@ export default function WorkPackagesPage() {
         <TooltipProvider delayDuration={200}>
             <div className="min-h-screen bg-white">
                 {/* Fixed Header */}
-                <Header />
+                <Header onReset={handleResetAll} />
 
                 {/* Main Container - with padding to account for fixed header */}
                 <main className="w-full max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-8 sm:px-12 lg:px-16 pt-28 lg:pt-20">
