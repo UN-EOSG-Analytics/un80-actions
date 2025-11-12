@@ -1,8 +1,8 @@
+import FilterDropdown, { FilterOption } from '@/components/FilterDropdown';
 import ResetButton from '@/components/ResetButton';
 import { SearchBar } from '@/components/SearchBar';
 import {
     Collapsible,
-    CollapsibleContent,
     CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import {
@@ -143,171 +143,92 @@ export function FilterControls({
 
             {/* Advanced Filters Content - Expands Below */}
             {isAdvancedFilterOpen && (
-                <div className="w-full mt-3 mb-3 bg-white border border-slate-200 rounded-xl p-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        {/* Work Package Filter */}
-                        <div className="flex flex-col gap-2">
-                            <Collapsible
-                                open={openFilterCollapsibles.has('workPackage')}
-                                onOpenChange={(open) => onToggleFilterCollapsible('workPackage', open)}
-                            >
-                                <CollapsibleTrigger className="w-full flex items-center justify-between h-10 px-3 text-[15px] border border-slate-300 rounded-xl bg-white transition-all hover:border-un-blue/60 hover:shadow-sm">
-                                    <div className="flex items-center gap-2">
-                                        <Briefcase className="w-4 h-4 text-un-blue" />
-                                        <span className="text-slate-700">
-                                            {selectedWorkPackage || 'Select work package'}
-                                        </span>
-                                    </div>
-                                    <ChevronDown
-                                        className={`w-4 h-4 text-slate-600 transition-transform ${openFilterCollapsibles.has('workPackage') ? 'transform rotate-180' : ''
-                                            }`}
-                                    />
-                                </CollapsibleTrigger>
-                                <CollapsibleContent className="mt-1 border border-slate-200 rounded-xl bg-white shadow-lg">
-                                    <div className="p-1 max-h-[200px] overflow-y-auto">
-                                        {uniqueWorkPackages.map((wp) => (
-                                            <div
-                                                key={wp}
-                                                onClick={() => {
-                                                    onSelectWorkPackage(wp === selectedWorkPackage ? '' : wp);
-                                                    onCloseFilterCollapsible('workPackage');
-                                                }}
-                                                className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${selectedWorkPackage === wp ? 'bg-[#E0F5FF] font-medium' : ''
-                                                    }`}
-                                            >
-                                                {wp}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </CollapsibleContent>
-                            </Collapsible>
-                        </div>
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                    {/* Work Package Filter */}
+                    <FilterDropdown
+                        open={openFilterCollapsibles.has('workPackage')}
+                        onOpenChange={(open) => onToggleFilterCollapsible('workPackage', open)}
+                        icon={<Briefcase className="w-4 h-4 text-un-blue" />}
+                        triggerText={selectedWorkPackage || 'Select work package'}
+                        isFiltered={!!selectedWorkPackage}
+                        allActive={!selectedWorkPackage}
+                        options={uniqueWorkPackages.map((wp): FilterOption => ({
+                            key: wp,
+                            label: wp,
+                        }))}
+                        selectedKeys={new Set(selectedWorkPackage ? [selectedWorkPackage] : [])}
+                        onToggle={(key) => {
+                            onSelectWorkPackage(key === selectedWorkPackage ? '' : key);
+                            onCloseFilterCollapsible('workPackage');
+                        }}
+                        ariaLabel="Filter by work package"
+                    />
 
-                        {/* Work Package Leads Filter */}
-                        <div className="flex flex-col gap-2">
-                            <Collapsible
-                                open={openFilterCollapsibles.has('lead')}
-                                onOpenChange={(open) => onToggleFilterCollapsible('lead', open)}
-                            >
-                                <CollapsibleTrigger className="w-full flex items-center justify-between h-10 px-3 text-[15px] border border-slate-300 rounded-xl bg-white transition-all hover:border-un-blue/60 hover:shadow-sm">
-                                    <div className="flex items-center gap-2">
-                                        <User className="w-4 h-4 text-un-blue" />
-                                        <span className="text-slate-700">
-                                            {selectedLead || 'Select work package lead'}
-                                        </span>
-                                    </div>
-                                    <ChevronDown
-                                        className={`w-4 h-4 text-slate-600 transition-transform ${openFilterCollapsibles.has('lead') ? 'transform rotate-180' : ''
-                                            }`}
-                                    />
-                                </CollapsibleTrigger>
-                                <CollapsibleContent className="mt-1 border border-slate-200 rounded-xl bg-white shadow-lg">
-                                    <div className="p-1 max-h-[200px] overflow-y-auto">
-                                        {uniqueLeads.map((lead) => (
-                                            <div
-                                                key={lead}
-                                                onClick={() => {
-                                                    onSelectLead(lead === selectedLead ? '' : lead);
-                                                    onCloseFilterCollapsible('lead');
-                                                }}
-                                                className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${selectedLead === lead ? 'bg-[#E0F5FF] font-medium' : ''
-                                                    }`}
-                                            >
-                                                {lead}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </CollapsibleContent>
-                            </Collapsible>
-                        </div>
+                    {/* Work Package Leads Filter */}
+                    <FilterDropdown
+                        open={openFilterCollapsibles.has('lead')}
+                        onOpenChange={(open) => onToggleFilterCollapsible('lead', open)}
+                        icon={<User className="w-4 h-4 text-un-blue" />}
+                        triggerText={selectedLead || 'Select work package lead'}
+                        isFiltered={!!selectedLead}
+                        allActive={!selectedLead}
+                        options={uniqueLeads.map((lead): FilterOption => ({
+                            key: lead,
+                            label: lead,
+                        }))}
+                        selectedKeys={new Set(selectedLead ? [selectedLead] : [])}
+                        onToggle={(key) => {
+                            onSelectLead(key === selectedLead ? '' : key);
+                            onCloseFilterCollapsible('lead');
+                        }}
+                        ariaLabel="Filter by work package lead"
+                    />
 
-                        {/* Workstream Filter */}
-                        <div className="flex flex-col gap-2">
-                            <Collapsible
-                                open={openFilterCollapsibles.has('workstream')}
-                                onOpenChange={(open) => onToggleFilterCollapsible('workstream', open)}
-                            >
-                                <CollapsibleTrigger className="w-full flex items-center justify-between h-10 px-3 text-[15px] border border-slate-300 rounded-xl bg-white transition-all hover:border-un-blue/60 hover:shadow-sm">
-                                    <div className="flex items-center gap-2">
-                                        <Layers className="w-4 h-4 text-un-blue" />
-                                        <span className="text-slate-700">
-                                            {selectedWorkstream || 'Select workstream'}
-                                        </span>
-                                    </div>
-                                    <ChevronDown
-                                        className={`w-4 h-4 text-slate-600 transition-transform ${openFilterCollapsibles.has('workstream') ? 'transform rotate-180' : ''
-                                            }`}
-                                    />
-                                </CollapsibleTrigger>
-                                <CollapsibleContent className="mt-1 border border-slate-200 rounded-xl bg-white shadow-lg">
-                                    <div className="p-1 max-h-[200px] overflow-y-auto">
-                                        {uniqueWorkstreams.map((ws) => (
-                                            <div
-                                                key={ws}
-                                                onClick={() => {
-                                                    onSelectWorkstream(ws === selectedWorkstream ? '' : ws);
-                                                    onCloseFilterCollapsible('workstream');
-                                                }}
-                                                className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${selectedWorkstream === ws ? 'bg-[#E0F5FF] font-medium' : ''
-                                                    }`}
-                                            >
-                                                {ws}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </CollapsibleContent>
-                            </Collapsible>
-                        </div>
+                    {/* Workstream Filter */}
+                    <FilterDropdown
+                        open={openFilterCollapsibles.has('workstream')}
+                        onOpenChange={(open) => onToggleFilterCollapsible('workstream', open)}
+                        icon={<Layers className="w-4 h-4 text-un-blue" />}
+                        triggerText={selectedWorkstream || 'Select workstream'}
+                        isFiltered={!!selectedWorkstream}
+                        allActive={!selectedWorkstream}
+                        options={uniqueWorkstreams.map((ws): FilterOption => ({
+                            key: ws,
+                            label: ws,
+                        }))}
+                        selectedKeys={new Set(selectedWorkstream ? [selectedWorkstream] : [])}
+                        onToggle={(key) => {
+                            onSelectWorkstream(key === selectedWorkstream ? '' : key);
+                            onCloseFilterCollapsible('workstream');
+                        }}
+                        ariaLabel="Filter by workstream"
+                    />
 
-                        {/* Type Filter */}
-                        <div className="flex flex-col gap-2">
-                            <Collapsible
-                                open={openFilterCollapsibles.has('type')}
-                                onOpenChange={(open) => onToggleFilterCollapsible('type', open)}
-                            >
-                                <CollapsibleTrigger className="w-full flex items-center justify-between h-10 px-3 text-[15px] border border-slate-300 rounded-xl bg-white transition-all hover:border-un-blue/60 hover:shadow-sm">
-                                    <div className="flex items-center gap-2">
-                                        <Filter className="w-4 h-4 text-un-blue" />
-                                        <span className="text-slate-700">
-                                            {selectedBigTicket === 'big-ticket'
-                                                ? '"Big Ticket" Work packages'
-                                                : selectedBigTicket === 'other'
-                                                    ? 'Other Work packages'
-                                                    : 'Select type'}
-                                        </span>
-                                    </div>
-                                    <ChevronDown
-                                        className={`w-4 h-4 text-slate-600 transition-transform ${openFilterCollapsibles.has('type') ? 'transform rotate-180' : ''
-                                            }`}
-                                    />
-                                </CollapsibleTrigger>
-                                <CollapsibleContent className="mt-1 border border-slate-200 rounded-xl bg-white shadow-lg">
-                                    <div className="p-1">
-                                        <div
-                                            onClick={() => {
-                                                onSelectBigTicket(selectedBigTicket === 'big-ticket' ? '' : 'big-ticket');
-                                                onCloseFilterCollapsible('type');
-                                            }}
-                                            className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${selectedBigTicket === 'big-ticket' ? 'bg-[#E0F5FF] font-medium' : ''
-                                                }`}
-                                        >
-                                            "Big Ticket" Work packages
-                                        </div>
-                                        <div
-                                            onClick={() => {
-                                                onSelectBigTicket(selectedBigTicket === 'other' ? '' : 'other');
-                                                onCloseFilterCollapsible('type');
-                                            }}
-                                            className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${selectedBigTicket === 'other' ? 'bg-[#E0F5FF] font-medium' : ''
-                                                }`}
-                                        >
-                                            Other Work packages
-                                        </div>
-                                    </div>
-                                </CollapsibleContent>
-                            </Collapsible>
-                        </div>
-                    </div>
+                    {/* Type Filter */}
+                    <FilterDropdown
+                        open={openFilterCollapsibles.has('type')}
+                        onOpenChange={(open) => onToggleFilterCollapsible('type', open)}
+                        icon={<Filter className="w-4 h-4 text-un-blue" />}
+                        triggerText={
+                            selectedBigTicket === 'big-ticket'
+                                ? '"Big Ticket" Work packages'
+                                : selectedBigTicket === 'other'
+                                    ? 'Other Work packages'
+                                    : 'Select type'
+                        }
+                        isFiltered={!!selectedBigTicket}
+                        allActive={!selectedBigTicket}
+                        options={[
+                            { key: 'big-ticket', label: '"Big Ticket" Work packages' },
+                            { key: 'other', label: 'Other Work packages' },
+                        ]}
+                        selectedKeys={new Set(selectedBigTicket ? [selectedBigTicket] : [])}
+                        onToggle={(key) => {
+                            onSelectBigTicket(key === selectedBigTicket ? '' : key);
+                            onCloseFilterCollapsible('type');
+                        }}
+                        ariaLabel="Filter by type"
+                    />
                 </div>
             )}
 

@@ -58,10 +58,10 @@ export default function FilterDropdown({
             <PopoverTrigger asChild>
                 <button
                     className={`
-            relative w-full lg:w-72 lg:flex-shrink-0 h-10 
+            relative w-full h-10 
             flex items-center gap-3 px-3 
             border rounded-lg 
-            text-base
+            text-sm
             touch-manipulation transition-colors
             ${isFiltered
                             ? 'bg-un-blue/10 border-un-blue text-un-blue hover:border-un-blue'
@@ -70,13 +70,13 @@ export default function FilterDropdown({
           `}
                     aria-label={ariaLabel}
                 >
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                         {icon}
                     </div>
                     <span className="truncate flex-1 text-left">
                         {triggerText}
                     </span>
-                    <div className="flex-shrink-0 ml-auto">
+                    <div className="shrink-0 ml-auto">
                         {open ? (
                             <ChevronUp className="h-4 w-4" />
                         ) : (
@@ -86,8 +86,9 @@ export default function FilterDropdown({
                 </button>
             </PopoverTrigger>
             <PopoverContent
-                className="w-max max-w-[calc(100vw-2rem)] sm:max-w-sm p-1 bg-white border border-gray-200 shadow-lg"
+                className="w-max max-w-[calc(100vw-2rem)] sm:max-w-sm p-1 bg-white border border-gray-200 shadow-lg max-h-[200px] overflow-y-auto"
                 align="start"
+                side="bottom"
                 sideOffset={4}
             >
                 <div>
@@ -110,7 +111,7 @@ export default function FilterDropdown({
                                         {option.icon}
                                     </div>
                                 )}
-                                <span className="text-sm flex-1">
+                                <span className="text-base flex-1">
                                     {option.label}
                                     {option.count !== undefined && (
                                         <span className="opacity-60"> ({option.count})</span>
