@@ -96,7 +96,7 @@ export function SidebarCharts({
                 showAll={showAllLeads}
                 onToggleShowAll={onToggleShowAllLeads}
                 initialDisplayCount={6}
-                barWidth={120}
+                barWidth={105}
             />
 
             <SidebarChart
@@ -111,6 +111,7 @@ export function SidebarCharts({
                 onSelectValue={onSelectWorkstream}
                 showAll={showAllWorkstreams}
                 onToggleShowAll={onToggleShowAllWorkstreams}
+                barWidth={105}
             />
 
             <SidebarChart
@@ -126,6 +127,7 @@ export function SidebarCharts({
                 showAll={showAllWorkPackages}
                 onToggleShowAll={onToggleShowAllWorkPackages}
                 initialDisplayCount={10}
+                barWidth={105}
             />
         </div>
     );

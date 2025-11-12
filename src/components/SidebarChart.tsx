@@ -48,10 +48,10 @@ export function SidebarChart({
     const maxCountDigits = Math.max(...data.map(d => d.count)).toString().length;
     const countWidth = maxCountDigits === 1 ? 'w-5' : maxCountDigits === 2 ? 'w-7' : 'w-9';
     
-    // Calculate the exact width needed for the longest label - use a more accurate calculation
-    // Average character width in 14px font is ~8px
+    // Calculate the exact width needed for the longest label
+    // Use 7px per character for more compact spacing
     const maxLabelLength = Math.max(...data.map(d => d.label.length));
-    const labelWidth = maxLabelLength * 8;
+    const labelWidth = maxLabelLength * 7;
 
     const handleClickBar = (value: string) => {
         const newSelected = selectedValue.includes(value)
@@ -85,8 +85,8 @@ export function SidebarChart({
             </div>
 
             {/* Chart Data */}
-            <div>
-                <table className="w-full">
+            <div className="overflow-hidden">
+                <table className="w-full table-fixed">
                     <tbody>
                         {displayedData.map((entry, index) => {
                             const percentage = (entry.count / maxCount) * 100;
@@ -100,8 +100,8 @@ export function SidebarChart({
                                     className={`group cursor-pointer transition-colors hover:bg-slate-50 ${isFiltered ? 'opacity-30' : ''
                                         } ${index < displayedData.length - 1 ? 'border-b border-slate-200' : ''}`}
                                 >
-                                    <td className="py-2 pr-3">
-                                        <div className="flex items-center gap-1.5">
+                                    <td className="py-2 pr-0">
+                                        <div className="flex items-center justify-between gap-1">
                                             <div style={{ width: `${labelWidth}px`, flexShrink: 0 }}>
                                                 {entry.tooltip ? (
                                                     <Tooltip>
@@ -127,7 +127,7 @@ export function SidebarChart({
                                                 >
                                                     {entry.count}
                                                 </span>
-                                                <div className="h-2 bg-slate-100 rounded-full overflow-hidden relative" style={{ width: `${barWidth}px` }}>
+                                                <div className="h-2 bg-slate-100 rounded-full overflow-hidden relative mr-2" style={{ width: `${barWidth}px` }}>
                                                     <div
                                                         className={`h-full rounded-full transition-all ${isSelected ? 'bg-un-blue' : 'bg-un-blue'
                                                             }`}
