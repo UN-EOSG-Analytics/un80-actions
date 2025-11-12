@@ -33,7 +33,7 @@ export function DataCard({ title, value, icon: Icon, className }: DataCardProps)
                 </div>
             </TooltipTrigger>
             <TooltipContent>
-                <p>Number of {title.toLowerCase()}: {value}</p>
+                <p>Number of {title}: {value}</p>
             </TooltipContent>
         </Tooltip>
     );
