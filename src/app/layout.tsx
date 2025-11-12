@@ -11,7 +11,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-    title: "UN80 Actions Dashboard",
+    title: "UN80 Initiative Actions Dashboard",
     description: "",
 };
 

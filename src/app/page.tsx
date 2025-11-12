@@ -239,6 +239,7 @@ export default function WorkPackagesPage() {
           documentParagraph: string;
           leads: string[];
           report: string;
+          docText: string | null;
         }>;
       }
     >();
@@ -303,6 +304,7 @@ export default function WorkPackagesPage() {
             documentParagraph: action.document_paragraph || '',
             leads: actionLeads,
             report: action.report,
+            docText: action.doc_text || null,
           });
         } else {
           // Merge leads if action already exists
@@ -314,6 +316,10 @@ export default function WorkPackagesPage() {
               existingAction.leads.push(lead);
             }
           });
+          // Update doc_text if not already set
+          if (action.doc_text && !existingAction.docText) {
+            existingAction.docText = action.doc_text;
+          }
         }
       }
     });
@@ -1082,8 +1088,8 @@ export default function WorkPackagesPage() {
                   open={isOpen}
                   onOpenChange={() => toggleCollapsible(collapsibleKey)}
                 >
-                  <div className={`mb-20 last:mb-0 ${isOpen ? 'border-l-4 border-l-[#009EDB] border border-slate-200 rounded-[6px] bg-slate-50/50' : ''}`}>
-                    <CollapsibleTrigger className={`w-full flex flex-col items-start px-0 py-0 hover:no-underline rounded-[6px] px-6 py-4 transition-all hover:bg-[#E0F5FF] border-0 relative ${isOpen ? 'rounded-b-none bg-slate-50/50' : 'bg-gray-50'}`}>
+                  <div className={`mb-20 last:mb-0 relative ${isOpen ? 'border-l-4 border-l-[#009EDB] border border-slate-200 rounded-[6px] bg-slate-50/50' : ''}`}>
+                    <CollapsibleTrigger className={`w-full flex flex-col items-start px-0 py-0 hover:no-underline rounded-[6px] px-6 py-4 transition-all hover:bg-[#E0F5FF] border-0 ${isOpen ? 'rounded-b-none bg-slate-50/50' : 'bg-gray-50'}`}>
                       <div className="text-left min-w-0 mb-1 pr-20 sm:pr-8">
                         {wp.number ? (
                           <>
@@ -1199,20 +1205,20 @@ export default function WorkPackagesPage() {
                           </Tooltip>
                         )}
                       </div>
-                      {/* Details Button */}
-                      <button
-                        type="button"
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-[6px] text-[14px] font-medium transition-colors absolute top-4 right-2 sm:right-4"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleCollapsible(collapsibleKey);
-                        }}
-                      >
-                        <Info className="w-3.5 h-3.5 text-gray-600" />
-                        <span>Details</span>
-                      </button>
                     </CollapsibleTrigger>
+                    {/* Details Button */}
+                    <button
+                      type="button"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-[6px] text-[14px] font-medium transition-colors absolute top-4 right-2 sm:right-4"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleCollapsible(collapsibleKey);
+                      }}
+                    >
+                      <Info className="w-3.5 h-3.5 text-gray-600" />
+                      <span>Details</span>
+                    </button>
                     <CollapsibleContent className={`px-0 pb-4 pt-4 pl-6 ${isOpen ? 'px-6' : ''}`}>
                       {wp.actions.length > 0 ? (
                         <div className="flex flex-col gap-4">
@@ -1281,11 +1287,35 @@ export default function WorkPackagesPage() {
                                       <div className="flex items-center gap-1.5">
                                         <FileText className="w-3.5 h-3.5 text-gray-500" />
                                         <span className="text-[14px] text-gray-600 leading-[21px]">
-                                          Para. {action.documentParagraph}
+                                          {wp.number === '31'
+                                            ? `A/80/400`
+                                            : action.report === 'WS3' 
+                                            ? `A/80/392 para. ${action.documentParagraph}`
+                                            : action.report === 'WS2'
+                                            ? `A/80/318 para. ${action.documentParagraph}`
+                                            : action.report === 'WS1'
+                                            ? `A/80/400`
+                                            : `Para. ${action.documentParagraph}`}
                                         </span>
                                       </div>
                                     )}
                                   </div>
+                                  {/* Doc Text */}
+                                  {action.docText && (
+                                    <div className="ml-[6px] pt-3 mt-3 border-t border-slate-100">
+                                      <p className="text-[14px] text-gray-600 leading-[21px]">
+                                        {action.docText}
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                              {/* Doc Text - when no leads */}
+                              {action.leads.length === 0 && action.docText && (
+                                <div className="ml-[6px] pt-3 border-t border-slate-100">
+                                  <p className="text-[14px] text-gray-600 leading-[21px]">
+                                    {action.docText}
+                                  </p>
                                 </div>
                               )}
                             </div>
@@ -1315,7 +1345,7 @@ export default function WorkPackagesPage() {
                 Work packages per lead
               </h3>
               <p className="text-[15px] text-slate-600 mb-3">
-                Entities and number of related work packages
+                Principals and number of related work packages
               </p>
               {/* Chart Search Bar */}
               <div className="relative w-full mb-4">
@@ -1398,7 +1428,7 @@ export default function WorkPackagesPage() {
                 Actions per workstream
               </h3>
               <p className="text-[15px] text-slate-600 mb-3">
-                Actions per workstream
+                Number of actions per workstream
               </p>
               {/* Chart Search Bar */}
               <div className="relative w-full mb-4">
@@ -1481,7 +1511,7 @@ export default function WorkPackagesPage() {
                 Actions per work package
               </h3>
               <p className="text-[15px] text-slate-600 mb-3">
-                Actions per work package
+                Number of actions per work package
               </p>
               {/* Chart Search Bar */}
               <div className="relative w-full mb-4">
@@ -1525,9 +1555,22 @@ export default function WorkPackagesPage() {
                         >
                           <td className="py-3 pr-3">
                             <div className="flex items-center justify-between gap-3">
-                              <span className="text-[14px] font-medium text-slate-900 flex-shrink-0 min-w-0">
-                                {wpNumber ? `WP: ${wpNumber}` : 'Work package'}
-                              </span>
+                              {wpNumber ? (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <span className="text-[14px] font-medium text-slate-900 flex-shrink-0 min-w-0 cursor-help">
+                                      WP: {wpNumber}
+                                    </span>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>{wpName}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              ) : (
+                                <span className="text-[14px] font-medium text-slate-900 flex-shrink-0 min-w-0">
+                                  Work package
+                                </span>
+                              )}
                               <div className="flex items-center gap-2 flex-shrink-0">
                                 <span className={`text-[14px] font-semibold min-w-[20px] font-mono ${
                                       isSelected ? 'text-[#0076A4]' : 'text-[#009EDB]'
