@@ -82,23 +82,9 @@ export function SidebarCharts({
     });
 
     return (
-        <div className="w-full lg:w-[320px] shrink-0 mt-6 lg:mt-0 lg:border-l lg:border-slate-200 lg:pl-6 lg:ml-[calc((4*280px+3*16px)-818px-320px-24px)] flex flex-col gap-4">
+        <div className="w-full lg:w-[320px] shrink-0 lg:border-l lg:border-slate-200 lg:pl-6 lg:ml-[calc((4*280px+3*16px)-818px-320px-24px)] flex flex-col gap-3">
             <SidebarChart
-                title="Work packages per lead"
-                description="Principals and number of related work packages"
-                icon={<Users className="w-5 h-5 text-un-blue" />}
-                data={leadsChartEntries}
-                searchQuery={leadsSearchQuery}
-                onSearchChange={onLeadsSearchChange}
-                searchPlaceholder="Search entities"
-                selectedValue={selectedLead}
-                onSelectValue={onSelectLead}
-                showAll={showAllLeads}
-                onToggleShowAll={onToggleShowAllLeads}
-            />
-
-            <SidebarChart
-                title="Actions per workstream"
+                title="Actions per Workstream"
                 description="Number of actions per workstream"
                 icon={<Layers className="w-5 h-5 text-un-blue" />}
                 data={workstreamsChartEntries}
@@ -112,7 +98,22 @@ export function SidebarCharts({
             />
 
             <SidebarChart
-                title="Actions per work package"
+                title="Work Packages per Lead"
+                description="Principals and number of related work packages"
+                icon={<Users className="w-5 h-5 text-un-blue" />}
+                data={leadsChartEntries}
+                searchQuery={leadsSearchQuery}
+                onSearchChange={onLeadsSearchChange}
+                searchPlaceholder="Search entities"
+                selectedValue={selectedLead}
+                onSelectValue={onSelectLead}
+                showAll={showAllLeads}
+                onToggleShowAll={onToggleShowAllLeads}
+                initialDisplayCount={4}
+            />
+
+            <SidebarChart
+                title="Actions per Work Package"
                 description="Number of actions per work package"
                 icon={<Briefcase className="w-5 h-5 text-un-blue" />}
                 data={workPackagesChartEntries}
