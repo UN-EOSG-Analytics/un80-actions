@@ -26,7 +26,7 @@ export function DataCard({ title, value, icon: Icon, className }: DataCardProps)
                                 <Icon className="w-5 h-5 text-un-blue" />
                             </div>
                         </div>
-                        <p className="text-[37px] sm:text-[43px] md:text-[49px] font-bold text-[#2E3440] text-left leading-[45px] sm:leading-[51px] md:leading-[57px]">
+                        <p className="text-[37px] sm:text-[43px] md:text-[49px] font-bold text-[#2E3440] text-left leading-[45px] sm:leading-[51px] md:leading-[57px] tabular-nums">
                             {value}
                         </p>
                     </Card>

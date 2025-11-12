@@ -95,79 +95,79 @@ export default function WorkPackagesPage() {
                         {/* Header with context info */}
                         <ExplainerText />
 
-                    {/* DataCards Section */}
-                    <section className="mb-0">
-                        <div className="flex flex-col sm:flex-row gap-4 items-start flex-wrap sm:flex-nowrap">
-                            <DataCard title="Workstreams" value={statsData.workstreams} icon={Layers} />
-                            <DataCard title="Work packages" value={statsData.workpackages} icon={BriefcaseIcon} />
-                            <DataCard title="Actions" value={statsData.actions} icon={ListTodo} />
-                            <DataCard title="UN system leaders" value={statsData.leads} icon={Users} />
-                        </div>
-                    </section>
+                        {/* DataCards Section */}
+                        <section className="mb-10">
+                            <div className="flex flex-col sm:flex-row gap-4 items-start flex-wrap sm:flex-nowrap">
+                                <DataCard title="Workstreams" value={statsData.workstreams} icon={Layers} />
+                                <DataCard title="Work Packages" value={statsData.workpackages} icon={BriefcaseIcon} />
+                                <DataCard title="Actions" value={statsData.actions} icon={ListTodo} />
+                                <DataCard title="UN System Leaders" value={statsData.leads} icon={Users} />
+                            </div>
+                        </section>
 
-                    {/* Work Packages Breakdown Section */}
-                    <section className="mb-4 mt-6">
-                        {/* Work Packages and Chart Section */}
-                        <section className="flex flex-col lg:flex-row gap-6 items-start">
-                            {/* Work Packages Collapsible */}
-                            <div className="flex-1 w-full lg:max-w-[818px]">
-                                <FilterControls
-                                    isAdvancedFilterOpen={isAdvancedFilterOpen}
-                                    onAdvancedFilterOpenChange={setIsAdvancedFilterOpen}
-                                    sortOption={sortOption}
-                                    onSortChange={setSortOption}
-                                    openFilterCollapsibles={openFilterCollapsibles}
-                                    onToggleFilterCollapsible={toggleFilterCollapsible}
-                                    onCloseFilterCollapsible={closeFilterCollapsible}
-                                    selectedWorkPackage={selectedWorkPackage}
-                                    onSelectWorkPackage={setSelectedWorkPackage}
+                        {/* Work Packages Breakdown Section */}
+                        <section className="mb-4 mt-6">
+                            {/* Work Packages and Chart Section */}
+                            <section className="flex flex-col lg:flex-row gap-6 items-start">
+                                {/* Work Packages Collapsible */}
+                                <div className="flex-1 w-full lg:max-w-[818px]">
+                                    <FilterControls
+                                        isAdvancedFilterOpen={isAdvancedFilterOpen}
+                                        onAdvancedFilterOpenChange={setIsAdvancedFilterOpen}
+                                        sortOption={sortOption}
+                                        onSortChange={setSortOption}
+                                        openFilterCollapsibles={openFilterCollapsibles}
+                                        onToggleFilterCollapsible={toggleFilterCollapsible}
+                                        onCloseFilterCollapsible={closeFilterCollapsible}
+                                        selectedWorkPackage={selectedWorkPackage}
+                                        onSelectWorkPackage={setSelectedWorkPackage}
+                                        selectedLead={selectedLead}
+                                        onSelectLead={setSelectedLead}
+                                        selectedWorkstream={selectedWorkstream}
+                                        onSelectWorkstream={setSelectedWorkstream}
+                                        selectedBigTicket={selectedBigTicket}
+                                        onSelectBigTicket={setSelectedBigTicket}
+                                        searchQuery={searchQuery}
+                                        onSearchChange={setSearchQuery}
+                                        uniqueWorkPackages={uniqueWorkPackages}
+                                        uniqueLeads={uniqueLeads}
+                                        uniqueWorkstreams={uniqueWorkstreams}
+                                        onResetFilters={handleResetFilters}
+                                    />
+
+                                    <WorkPackageList
+                                        workPackages={filteredWorkPackages}
+                                        openCollapsibles={openCollapsibles}
+                                        onToggleCollapsible={toggleCollapsible}
+                                    />
+                                </div>
+
+                                {/* Charts Container */}
+                                <SidebarCharts
+                                    leadsData={chartData}
+                                    leadsSearchQuery={chartSearchQuery}
+                                    onLeadsSearchChange={setChartSearchQuery}
                                     selectedLead={selectedLead}
                                     onSelectLead={setSelectedLead}
+                                    showAllLeads={showAllLeads}
+                                    onToggleShowAllLeads={() => setShowAllLeads(!showAllLeads)}
+                                    workstreamsData={workstreamChartData}
+                                    workstreamsSearchQuery={workstreamChartSearchQuery}
+                                    onWorkstreamsSearchChange={setWorkstreamChartSearchQuery}
                                     selectedWorkstream={selectedWorkstream}
                                     onSelectWorkstream={setSelectedWorkstream}
-                                    selectedBigTicket={selectedBigTicket}
-                                    onSelectBigTicket={setSelectedBigTicket}
-                                    searchQuery={searchQuery}
-                                    onSearchChange={setSearchQuery}
-                                    uniqueWorkPackages={uniqueWorkPackages}
-                                    uniqueLeads={uniqueLeads}
-                                    uniqueWorkstreams={uniqueWorkstreams}
-                                    onResetFilters={handleResetFilters}
+                                    showAllWorkstreams={showAllWorkstreams}
+                                    onToggleShowAllWorkstreams={() => setShowAllWorkstreams(!showAllWorkstreams)}
+                                    workPackagesData={workpackageChartData}
+                                    workPackagesSearchQuery={workpackageChartSearchQuery}
+                                    onWorkPackagesSearchChange={setWorkpackageChartSearchQuery}
+                                    selectedWorkPackage={selectedWorkPackage}
+                                    onSelectWorkPackage={setSelectedWorkPackage}
+                                    showAllWorkPackages={showAllWorkpackages}
+                                    onToggleShowAllWorkPackages={() => setShowAllWorkpackages(!showAllWorkpackages)}
                                 />
-
-                                <WorkPackageList
-                                    workPackages={filteredWorkPackages}
-                                    openCollapsibles={openCollapsibles}
-                                    onToggleCollapsible={toggleCollapsible}
-                                />
-                            </div>
-
-                            {/* Charts Container */}
-                            <SidebarCharts
-                                leadsData={chartData}
-                                leadsSearchQuery={chartSearchQuery}
-                                onLeadsSearchChange={setChartSearchQuery}
-                                selectedLead={selectedLead}
-                                onSelectLead={setSelectedLead}
-                                showAllLeads={showAllLeads}
-                                onToggleShowAllLeads={() => setShowAllLeads(!showAllLeads)}
-                                workstreamsData={workstreamChartData}
-                                workstreamsSearchQuery={workstreamChartSearchQuery}
-                                onWorkstreamsSearchChange={setWorkstreamChartSearchQuery}
-                                selectedWorkstream={selectedWorkstream}
-                                onSelectWorkstream={setSelectedWorkstream}
-                                showAllWorkstreams={showAllWorkstreams}
-                                onToggleShowAllWorkstreams={() => setShowAllWorkstreams(!showAllWorkstreams)}
-                                workPackagesData={workpackageChartData}
-                                workPackagesSearchQuery={workpackageChartSearchQuery}
-                                onWorkPackagesSearchChange={setWorkpackageChartSearchQuery}
-                                selectedWorkPackage={selectedWorkPackage}
-                                onSelectWorkPackage={setSelectedWorkPackage}
-                                showAllWorkPackages={showAllWorkpackages}
-                                onToggleShowAllWorkPackages={() => setShowAllWorkpackages(!showAllWorkpackages)}
-                            />
+                            </section>
                         </section>
-                    </section>
                     </div>
                 </main>
             </div>
