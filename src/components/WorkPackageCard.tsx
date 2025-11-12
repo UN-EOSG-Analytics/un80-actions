@@ -50,12 +50,14 @@ interface WorkPackageItemProps {
     isOpen: boolean;
     onToggle: () => void;
     collapsibleKey: string;
+    onSelectLead?: (lead: string[]) => void;
 }
 
 export function WorkPackageItem({
     workPackage: wp,
     isOpen,
     onToggle,
+    onSelectLead,
 }: WorkPackageItemProps) {
     return (
         <Collapsible open={isOpen} onOpenChange={onToggle}>
@@ -105,7 +107,7 @@ export function WorkPackageItem({
                         <WorkstreamLabels report={wp.report} />
 
                         {/* Work Package Leads */}
-                        <LeadsBadge leads={wp.leads} />
+                        <LeadsBadge leads={wp.leads} onSelectLead={onSelectLead} />
                     </div>
                 </CollapsibleTrigger>
 

@@ -4,10 +4,17 @@ import { Users } from "lucide-react";
 
 interface LeadsBadgeProps {
     leads: string[];
+    onSelectLead?: (lead: string[]) => void;
 }
 
-export function LeadsBadge({ leads }: LeadsBadgeProps) {
+export function LeadsBadge({ leads, onSelectLead }: LeadsBadgeProps) {
     if (leads.length === 0) return null;
+
+    const handleLeadClick = (lead: string) => {
+        if (onSelectLead) {
+            onSelectLead([lead]);
+        }
+    };
 
     return (
         <div className="flex items-start gap-1 sm:gap-2">
@@ -20,7 +27,15 @@ export function LeadsBadge({ leads }: LeadsBadgeProps) {
                             {idx > 0 && "; "}
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <span className="cursor-help">
+                                    <span 
+                                        className={onSelectLead ? "cursor-pointer hover:underline" : "cursor-help"}
+                                        onClick={(e) => {
+                                            if (onSelectLead) {
+                                                e.stopPropagation();
+                                                handleLeadClick(lead);
+                                            }
+                                        }}
+                                    >
                                         {lead}
                                     </span>
                                 </TooltipTrigger>

@@ -139,6 +139,7 @@ export default function WorkPackagesPage() {
                                         workPackages={filteredWorkPackages}
                                         openCollapsibles={openCollapsibles}
                                         onToggleCollapsible={toggleCollapsible}
+                                        onSelectLead={setSelectedLead}
                                     />
                                 </div>
 
