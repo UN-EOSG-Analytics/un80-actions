@@ -144,15 +144,42 @@ export function getUniqueWorkstreams(workPackages: WorkPackage[]): string[] {
  * Calculate chart data for work packages per lead
  * @param workPackages - Array of work packages
  * @param searchQuery - Optional search query to filter leads
+ * @param selectedWorkstream - Optional selected workstreams to filter by
+ * @param selectedWorkPackage - Optional selected work packages to filter by
  * @returns Array of lead chart entries sorted by count descending
  */
 export function calculateLeadChartData(
     workPackages: WorkPackage[],
-    searchQuery = ""
+    searchQuery = "",
+    selectedWorkstream: string[] = [],
+    selectedWorkPackage: string[] = []
 ): LeadChartEntry[] {
     const leadCounts = new Map<string, number>();
 
-    workPackages.forEach(wp => {
+    // Filter work packages based on other chart selections
+    let filteredWPs = workPackages;
+    
+    if (selectedWorkstream.length > 0) {
+        filteredWPs = filteredWPs.filter(wp => 
+            selectedWorkstream.some(ws => wp.report.includes(ws))
+        );
+    }
+    
+    if (selectedWorkPackage.length > 0) {
+        const selectedNumbers = selectedWorkPackage.map(wp => {
+            const wpMatch = wp.match(/^(\d+):/);
+            return wpMatch ? wpMatch[1] : wp;
+        });
+        filteredWPs = filteredWPs.filter((wp) => {
+            if (wp.number) {
+                return selectedNumbers.includes(wp.number);
+            } else {
+                return selectedNumbers.includes(wp.name);
+            }
+        });
+    }
+
+    filteredWPs.forEach(wp => {
         wp.leads.forEach(lead => {
             // Filter by chart search query if provided
             if (searchQuery.trim()) {
@@ -175,15 +202,43 @@ export function calculateLeadChartData(
  * Calculate chart data for actions per workstream
  * @param actions - Array of actions
  * @param searchQuery - Optional search query to filter workstreams
+ * @param selectedLead - Optional selected leads to filter by
+ * @param selectedWorkPackage - Optional selected work packages to filter by
  * @returns Array of workstream chart entries sorted by workstream order
  */
 export function calculateWorkstreamChartData(
     actions: Actions,
-    searchQuery = ""
+    searchQuery = "",
+    selectedLead: string[] = [],
+    selectedWorkPackage: string[] = []
 ): WorkstreamChartEntry[] {
     const workstreamCounts = new Map<string, number>();
 
-    actions.forEach(action => {
+    // Filter actions based on other chart selections
+    let filteredActions = actions;
+    
+    if (selectedLead.length > 0) {
+        filteredActions = filteredActions.filter((action) =>
+            Array.isArray(action.work_package_leads) && 
+            action.work_package_leads.some(lead => selectedLead.includes(lead))
+        );
+    }
+    
+    if (selectedWorkPackage.length > 0) {
+        const selectedNumbers = selectedWorkPackage.map(wp => {
+            const wpMatch = wp.match(/^(\d+):/);
+            return wpMatch ? wpMatch[1] : wp;
+        });
+        filteredActions = filteredActions.filter((action) => {
+            if (action.work_package_number) {
+                return selectedNumbers.includes(action.work_package_number);
+            } else {
+                return selectedNumbers.includes(action.work_package_name);
+            }
+        });
+    }
+
+    filteredActions.forEach(action => {
         // Filter by chart search query if provided
         if (searchQuery.trim()) {
             const query = searchQuery.toLowerCase();
@@ -213,15 +268,35 @@ export function calculateWorkstreamChartData(
  * Calculate chart data for actions per work package
  * @param actions - Array of actions
  * @param searchQuery - Optional search query to filter work packages
+ * @param selectedLead - Optional selected leads to filter by
+ * @param selectedWorkstream - Optional selected workstreams to filter by
  * @returns Array of work package chart entries sorted by number
  */
 export function calculateWorkPackageChartData(
     actions: Actions,
-    searchQuery = ""
+    searchQuery = "",
+    selectedLead: string[] = [],
+    selectedWorkstream: string[] = []
 ): WorkPackageChartEntry[] {
     const workpackageCounts = new Map<string, number>();
 
-    actions.forEach(action => {
+    // Filter actions based on other chart selections
+    let filteredActions = actions;
+    
+    if (selectedLead.length > 0) {
+        filteredActions = filteredActions.filter((action) =>
+            Array.isArray(action.work_package_leads) && 
+            action.work_package_leads.some(lead => selectedLead.includes(lead))
+        );
+    }
+    
+    if (selectedWorkstream.length > 0) {
+        filteredActions = filteredActions.filter((action) => 
+            selectedWorkstream.includes(action.report)
+        );
+    }
+
+    filteredActions.forEach(action => {
         const wpKey = action.work_package_number 
             ? `${action.work_package_number}: ${action.work_package_name}` 
             : action.work_package_name;

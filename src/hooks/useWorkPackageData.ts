@@ -55,21 +55,39 @@ export function useWorkPackageData(
     );
 
     // Calculate chart data: count work packages per lead
+    // Filter by selected workstream and workpackage from other charts
     const chartData = useMemo(
-        () => calculateLeadChartData(workPackages, chartSearchQuery),
-        [workPackages, chartSearchQuery]
+        () => calculateLeadChartData(
+            workPackages, 
+            chartSearchQuery,
+            filters.selectedWorkstream,
+            filters.selectedWorkPackage
+        ),
+        [workPackages, chartSearchQuery, filters.selectedWorkstream, filters.selectedWorkPackage]
     );
 
     // Calculate chart data: count actions per workstream
+    // Filter by selected lead and workpackage from other charts
     const workstreamChartData = useMemo(
-        () => calculateWorkstreamChartData(actions, workstreamChartSearchQuery),
-        [actions, workstreamChartSearchQuery]
+        () => calculateWorkstreamChartData(
+            actions, 
+            workstreamChartSearchQuery,
+            filters.selectedLead,
+            filters.selectedWorkPackage
+        ),
+        [actions, workstreamChartSearchQuery, filters.selectedLead, filters.selectedWorkPackage]
     );
 
     // Calculate chart data: count actions per work package
+    // Filter by selected lead and workstream from other charts
     const workpackageChartData = useMemo(
-        () => calculateWorkPackageChartData(actions, workpackageChartSearchQuery),
-        [actions, workpackageChartSearchQuery]
+        () => calculateWorkPackageChartData(
+            actions, 
+            workpackageChartSearchQuery,
+            filters.selectedLead,
+            filters.selectedWorkstream
+        ),
+        [actions, workpackageChartSearchQuery, filters.selectedLead, filters.selectedWorkstream]
     );
 
     // Filter work packages based on search and filters
