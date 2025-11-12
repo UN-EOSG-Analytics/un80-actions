@@ -8,7 +8,7 @@ import { WorkstreamLabels } from "@/components/WorkstreamBadge";
 import { LeadsBadge } from "@/components/LeadsBadge";
 import { formatGoalText } from "@/lib/utils";
 import type { WorkPackage, WorkPackageAction } from "@/types";
-import { Info, Trophy } from "lucide-react";
+import { Info } from "lucide-react";
 
 interface WorkPackageActionsProps {
     actions: WorkPackageAction[];
@@ -70,33 +70,27 @@ export function WorkPackageItem({
                         }`}
                 >
                     {/* Work Package Title */}
-                    <div className="text-left min-w-0 mb-1 pr-20 sm:pr-8">
+                    <div className="text-left min-w-0 mb-2 pr-20 sm:pr-8">
                         {wp.number ? (
                             <>
-                                <span className="text-lg font-medium text-gray-400 leading-6">
-                                    Work package {wp.number}:
+                                <span className="text-sm font-medium text-gray-400 uppercase tracking-wider leading-5">
+                                    Work package {wp.number}
                                 </span>
-                                <span className="text-lg font-medium text-slate-900 leading-6 ml-1">
+                                <h2 className="text-xl font-semibold text-slate-900 leading-7 mt-1">
                                     {wp.name}
-                                </span>
+                                </h2>
                             </>
                         ) : (
-                            <span className="text-lg font-medium text-slate-900 leading-6">
+                            <h2 className="text-xl font-semibold text-slate-900 leading-7">
                                 {wp.name}
-                            </span>
+                            </h2>
                         )}
                     </div>
 
                     {/* Goal from work package data */}
                     {wp.goal && (
-                        <div className="mt-0.5 pr-8 text-left pl-0 py-2 mb-2">
-                            <div className="flex items-center gap-2 mb-1">
-                                <Trophy className="w-4 h-4 text-un-blue" />
-                                <p className="text-sm font-semibold text-un-blue uppercase tracking-wide text-left">
-                                    Goal
-                                </p>
-                            </div>
-                            <p className="text-base text-slate-800 leading-relaxed mt-2 text-left normal-case">
+                        <div className="pr-8 text-left mb-4 ml-0.5 border-l-2 border-un-blue pl-3">
+                            <p className="text-[15px] text-gray-500 leading-relaxed font-medium">
                                 {formatGoalText(wp.goal)}
                             </p>
                         </div>
