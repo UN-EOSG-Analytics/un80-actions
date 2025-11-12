@@ -60,11 +60,14 @@ export function WorkPackageItem({
     return (
         <Collapsible open={isOpen} onOpenChange={onToggle}>
             <div
-                className={`mb-20 last:mb-0 relative border-l-4 border border-transparent rounded-[6px] ${isOpen
-                    ? "border-l-un-blue border-slate-200 bg-slate-50/50 transition-colors duration-200"
-                    : "border-l-transparent transition-colors duration-200 delay-[400ms]"
+                className={`mb-20 last:mb-0 relative rounded-[6px] ${isOpen
+                    ? "bg-slate-50/50 transition-colors duration-200"
+                    : "transition-colors duration-200 delay-[400ms]"
                     }`}
             >
+                {isOpen && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-un-blue rounded-l-[6px] z-10 pointer-events-none" />
+                )}
                 <CollapsibleTrigger
                     className={`w-full flex flex-col items-start px-6 py-4 hover:no-underline rounded-[6px] transition-colors hover:bg-[#E0F5FF] border-0 ${isOpen ? "rounded-b-none bg-slate-50/50" : "bg-gray-50"
                         }`}
