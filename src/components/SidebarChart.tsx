@@ -23,6 +23,7 @@ interface SidebarChartProps {
     showAll: boolean;
     onToggleShowAll: () => void;
     initialDisplayCount?: number;
+    barWidth?: number; // Width in pixels
 }
 
 export function SidebarChart({
@@ -38,9 +39,19 @@ export function SidebarChart({
     showAll,
     onToggleShowAll,
     initialDisplayCount = 3,
+    barWidth = 90,
 }: SidebarChartProps) {
     const displayedData = showAll ? data : data.slice(0, initialDisplayCount);
     const maxCount = data.length > 0 ? Math.max(...data.map(d => d.count)) : 1;
+    
+    // Calculate fixed width for count based on max count across ALL data
+    const maxCountDigits = Math.max(...data.map(d => d.count)).toString().length;
+    const countWidth = maxCountDigits === 1 ? 'w-5' : maxCountDigits === 2 ? 'w-7' : 'w-9';
+    
+    // Calculate the exact width needed for the longest label - use a more accurate calculation
+    // Average character width in 14px font is ~8px
+    const maxLabelLength = Math.max(...data.map(d => d.label.length));
+    const labelWidth = maxLabelLength * 8;
 
     const handleClickBar = (value: string) => {
         const newSelected = selectedValue.includes(value)
@@ -90,31 +101,33 @@ export function SidebarChart({
                                         } ${index < displayedData.length - 1 ? 'border-b border-slate-200' : ''}`}
                                 >
                                     <td className="py-2 pr-3">
-                                        <div className="flex items-center justify-between gap-3">
-                                            {entry.tooltip ? (
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <span className="text-[14px] font-medium text-slate-900 group-hover:text-un-blue transition-colors shrink-0 min-w-0 cursor-help">
-                                                            {entry.label}
-                                                        </span>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p>{entry.tooltip}</p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            ) : (
-                                                <span className="text-[14px] font-medium text-slate-900 group-hover:text-un-blue transition-colors shrink-0 min-w-0">
-                                                    {entry.label}
-                                                </span>
-                                            )}
-                                            <div className="flex items-center gap-2 shrink-0">
+                                        <div className="flex items-center gap-1.5">
+                                            <div style={{ width: `${labelWidth}px`, flexShrink: 0 }}>
+                                                {entry.tooltip ? (
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <span className="text-[14px] font-medium text-slate-900 group-hover:text-un-blue transition-colors cursor-help block whitespace-nowrap">
+                                                                {entry.label}
+                                                            </span>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>{entry.tooltip}</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                ) : (
+                                                    <span className="text-[14px] font-medium text-slate-900 group-hover:text-un-blue transition-colors block whitespace-nowrap">
+                                                        {entry.label}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center gap-1.5 shrink-0">
                                                 <span
-                                                    className={`text-[14px] font-normal min-w-[20px] text-right font-mono ${isSelected ? 'text-un-blue' : 'text-un-blue'
+                                                    className={`text-[14px] font-normal ${countWidth} text-right font-mono ${isSelected ? 'text-un-blue' : 'text-un-blue'
                                                         }`}
                                                 >
                                                     {entry.count}
                                                 </span>
-                                                <div className="w-[120px] h-[8px] bg-slate-100 rounded-full overflow-hidden relative">
+                                                <div className="h-2 bg-slate-100 rounded-full overflow-hidden relative" style={{ width: `${barWidth}px` }}>
                                                     <div
                                                         className={`h-full rounded-full transition-all ${isSelected ? 'bg-un-blue' : 'bg-un-blue'
                                                             }`}

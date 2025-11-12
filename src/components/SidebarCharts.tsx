@@ -96,6 +96,7 @@ export function SidebarCharts({
                 showAll={showAllLeads}
                 onToggleShowAll={onToggleShowAllLeads}
                 initialDisplayCount={6}
+                barWidth={120}
             />
 
             <SidebarChart
