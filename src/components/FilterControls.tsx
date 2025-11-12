@@ -86,7 +86,7 @@ export function FilterControls({
                 </h2>
 
                 {/* Advanced Filtering and Sort */}
-                <div className="flex items-center gap-2 sm:gap-3 shrink-0 flex-wrap sm:flex-nowrap">
+                <div className="flex items-center justify-start sm:justify-end gap-2 sm:gap-3 shrink-0 flex-wrap sm:flex-nowrap w-full sm:w-auto">
                     {/* Mobile: Simple buttons aligned left */}
                     <div className="flex items-center gap-2 sm:hidden">
                         {/* Advanced Filtering Collapsible */}
@@ -103,7 +103,10 @@ export function FilterControls({
                         {/* Sort Option - Mobile Style */}
                         <Popover open={openFilterCollapsibles.has('sort')} onOpenChange={(open) => onToggleFilterCollapsible('sort', open)}>
                             <PopoverTrigger asChild>
-                                <button className="flex items-center gap-1.5 text-[14px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap">
+                                <button 
+                                    type="button"
+                                    className="flex items-center gap-1.5 text-[14px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap"
+                                >
                                     <span>
                                         {sortOption === 'name-asc' ? 'Name (A-Z)' :
                                             sortOption === 'name-desc' ? 'Name (Z-A)' :
@@ -117,7 +120,13 @@ export function FilterControls({
                                     />
                                 </button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-max max-w-[calc(100vw-2rem)] p-1 bg-white border border-gray-200 shadow-lg" align="start" side="bottom" sideOffset={4}>
+                            <PopoverContent 
+                                className="w-max max-w-[calc(100vw-2rem)] p-1 bg-white border border-gray-200 shadow-lg" 
+                                align="start" 
+                                side="bottom" 
+                                sideOffset={4}
+                                onOpenAutoFocus={(e) => e.preventDefault()}
+                            >
                                 <div>
                                     {[
                                         { key: 'name-asc', label: 'Name (A-Z)' },
@@ -127,7 +136,10 @@ export function FilterControls({
                                     ].map((option) => (
                                         <button
                                             key={option.key}
-                                            onClick={() => {
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
                                                 onSortChange(option.key);
                                                 onCloseFilterCollapsible('sort');
                                             }}
