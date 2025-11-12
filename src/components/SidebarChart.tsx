@@ -70,7 +70,7 @@ export function SidebarChart({
             </div>
 
             {/* Chart Data */}
-            <div className="h-[300px] sm:h-[350px] md:h-[400px] overflow-y-auto overflow-x-hidden">
+            <div>
                 <table className="w-full">
                     <tbody>
                         {displayedData.map((entry, index) => {

@@ -57,7 +57,7 @@ export function SidebarCharts({
     onToggleShowAllWorkPackages,
 }: SidebarChartsProps) {
     return (
-        <div className="w-full lg:w-[320px] shrink-0 mt-6 lg:mt-0 lg:border-l lg:border-slate-200 lg:pl-6 lg:ml-[calc((4*280px+3*16px)-818px-320px-24px)] flex flex-col gap-0">
+        <div className="w-full lg:w-[320px] shrink-0 mt-6 lg:mt-0 lg:border-l lg:border-slate-200 lg:pl-6 lg:ml-[calc((4*280px+3*16px)-818px-320px-24px)] flex flex-col gap-4">
             <LeadsChart
                 data={leadsData}
                 searchQuery={leadsSearchQuery}
