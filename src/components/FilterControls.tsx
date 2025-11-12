@@ -6,7 +6,7 @@ import {
     CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ArrowUpDown, Briefcase, ChevronDown, Check, Filter, Layers, User } from 'lucide-react';
+import { ArrowUpDown, Briefcase, ChevronDown, Check, Filter, Layers, Users, Package } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface FilterControlsProps {
@@ -143,7 +143,7 @@ export function FilterControls({
                                 onToggleFilterCollapsible('sort', open);
                             }}>
                                 <PopoverTrigger asChild>
-                                    <button 
+                                    <button
                                         type="button"
                                         className={`
                                             h-10 flex items-center gap-3 px-3
@@ -160,9 +160,9 @@ export function FilterControls({
                                         <span className="truncate">
                                             {sortOption === 'number-asc' ? 'Number (1-31)' :
                                                 sortOption === 'number-desc' ? 'Number (31-1)' :
-                                                sortOption === 'name-asc' ? 'Name (A-Z)' :
-                                                sortOption === 'name-desc' ? 'Name (Z-A)' :
-                                                'Sort'}
+                                                    sortOption === 'name-asc' ? 'Name (A-Z)' :
+                                                        sortOption === 'name-desc' ? 'Name (Z-A)' :
+                                                            'Sort'}
                                         </span>
                                         <ChevronDown
                                             className={`h-4 w-4 shrink-0 transition-transform ${openFilterCollapsibles.has('sort') ? 'transform rotate-180' : ''
@@ -170,10 +170,10 @@ export function FilterControls({
                                         />
                                     </button>
                                 </PopoverTrigger>
-                                <PopoverContent 
-                                    className="w-max max-w-[calc(100vw-2rem)] p-1 bg-white border border-gray-200 shadow-lg" 
-                                    align="start" 
-                                    side="bottom" 
+                                <PopoverContent
+                                    className="w-max max-w-[calc(100vw-2rem)] p-1 bg-white border border-gray-200 shadow-lg"
+                                    align="start"
+                                    side="bottom"
                                     sideOffset={4}
                                     onOpenAutoFocus={(e) => e.preventDefault()}
                                 >
@@ -242,9 +242,9 @@ export function FilterControls({
                                 icon={<ArrowUpDown className="w-4 h-4" />}
                                 triggerText={
                                     sortOption === 'number-desc' ? '31-1' :
-                                    sortOption === 'name-asc' ? 'A-Z' :
-                                    sortOption === 'name-desc' ? 'Z-A' :
-                                    'Sort'
+                                        sortOption === 'name-asc' ? 'A-Z' :
+                                            sortOption === 'name-desc' ? 'Z-A' :
+                                                'Sort'
                                 }
                                 isFiltered={sortOption !== 'number-asc'}
                                 allActive={false}
@@ -275,10 +275,10 @@ export function FilterControls({
                         onOpenChange={(open) => onToggleFilterCollapsible('workPackage', open)}
                         icon={<Briefcase className="w-4 h-4 text-un-blue" />}
                         triggerText={
-                            selectedWorkPackage.length === 0 
-                                ? 'Select work package' 
-                                : selectedWorkPackage.length === 1 
-                                    ? selectedWorkPackage[0] 
+                            selectedWorkPackage.length === 0
+                                ? 'Select work package'
+                                : selectedWorkPackage.length === 1
+                                    ? selectedWorkPackage[0]
                                     : `${selectedWorkPackage.length} work packages selected`
                         }
                         isFiltered={selectedWorkPackage.length > 0}
@@ -301,12 +301,12 @@ export function FilterControls({
                     <FilterDropdown
                         open={openFilterCollapsibles.has('lead')}
                         onOpenChange={(open) => onToggleFilterCollapsible('lead', open)}
-                        icon={<User className="w-4 h-4 text-un-blue" />}
+                        icon={<Users className="w-4 h-4 text-un-blue" />}
                         triggerText={
-                            selectedLead.length === 0 
-                                ? 'Select work package lead' 
-                                : selectedLead.length === 1 
-                                    ? selectedLead[0] 
+                            selectedLead.length === 0
+                                ? 'Select work package lead'
+                                : selectedLead.length === 1
+                                    ? selectedLead[0]
                                     : `${selectedLead.length} leads selected`
                         }
                         isFiltered={selectedLead.length > 0}
@@ -331,10 +331,10 @@ export function FilterControls({
                         onOpenChange={(open) => onToggleFilterCollapsible('workstream', open)}
                         icon={<Layers className="w-4 h-4 text-un-blue" />}
                         triggerText={
-                            selectedWorkstream.length === 0 
-                                ? 'Select workstream' 
-                                : selectedWorkstream.length === 1 
-                                    ? selectedWorkstream[0] 
+                            selectedWorkstream.length === 0
+                                ? 'Select workstream'
+                                : selectedWorkstream.length === 1
+                                    ? selectedWorkstream[0]
                                     : `${selectedWorkstream.length} workstreams selected`
                         }
                         isFiltered={selectedWorkstream.length > 0}
@@ -357,13 +357,13 @@ export function FilterControls({
                     <FilterDropdown
                         open={openFilterCollapsibles.has('type')}
                         onOpenChange={(open) => onToggleFilterCollapsible('type', open)}
-                        icon={<Filter className="w-4 h-4 text-un-blue" />}
+                        icon={<Package className="w-4 h-4 text-un-blue" />}
                         triggerText={
                             selectedBigTicket === 'big-ticket'
                                 ? '"Big Ticket" Work packages'
                                 : selectedBigTicket === 'other'
                                     ? 'Other Work packages'
-                                    : 'Select type'
+                                    : 'Select package type'
                         }
                         isFiltered={!!selectedBigTicket}
                         allActive={!selectedBigTicket}
@@ -376,7 +376,7 @@ export function FilterControls({
                             onSelectBigTicket(key === selectedBigTicket ? '' : key);
                             onCloseFilterCollapsible('type');
                         }}
-                        ariaLabel="Filter by type"
+                        ariaLabel="Filter by package type"
                     />
                 </div>
             )}
