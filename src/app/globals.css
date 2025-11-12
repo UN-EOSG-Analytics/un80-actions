@@ -164,12 +164,17 @@ html {
 }
 
 body {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 /* Hide scrollbar for Webkit browsers (Chrome, Safari) */
 body::-webkit-scrollbar {
-  display: none;
+  width: 0;
+  background: transparent;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: transparent;
 }
 
 /* Collapsible animations */

@@ -108,9 +108,9 @@ export default function WorkPackagesPage() {
                         {/* Work Packages Breakdown Section */}
                         <section className="mb-4 mt-6">
                             {/* Work Packages and Chart Section */}
-                            <section className="flex flex-col lg:flex-row gap-6 items-start">
+                            <section className="flex flex-col lg:flex-row gap-6 items-start overflow-hidden">
                                 {/* Work Packages Collapsible */}
-                                <div className="flex-1 w-full lg:max-w-[818px]">
+                                <div className="flex-1 w-full lg:max-w-[818px] min-w-0">
                                     <FilterControls
                                         isAdvancedFilterOpen={isAdvancedFilterOpen}
                                         onAdvancedFilterOpenChange={setIsAdvancedFilterOpen}

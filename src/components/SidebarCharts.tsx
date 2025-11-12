@@ -82,7 +82,7 @@ export function SidebarCharts({
     });
 
     return (
-        <div className="w-full lg:w-[320px] shrink-0 lg:border-l lg:border-slate-200 lg:pl-6 lg:ml-[calc((4*280px+3*16px)-818px-320px-24px)] flex flex-col gap-3">
+        <div className="w-full lg:w-[320px] lg:max-w-[320px] shrink-0 lg:border-l lg:border-slate-200 lg:pl-6 flex flex-col gap-3 min-w-0">
             <SidebarChart
                 title="Actions per Workstream"
                 description="Number of actions per workstream"
