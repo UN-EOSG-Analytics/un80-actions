@@ -90,6 +90,7 @@ export default function FilterDropdown({
                 align="start"
                 side="bottom"
                 sideOffset={4}
+                avoidCollisions={false}
                 onOpenAutoFocus={(e) => e.preventDefault()}
                 onInteractOutside={() => {
                     // Allow closing when clicking outside
