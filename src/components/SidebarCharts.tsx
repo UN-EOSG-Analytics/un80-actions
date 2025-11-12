@@ -85,7 +85,7 @@ export function SidebarCharts({
         <div className="w-full lg:w-[320px] lg:max-w-[320px] shrink-0 lg:border-l lg:border-slate-200 lg:pl-6 flex flex-col gap-3 min-w-0">
             <SidebarChart
                 title="Work Packages per Lead"
-                description="Principals and number of related work packages"
+                description="Number of packages by leader"
                 icon={<Users className="w-5 h-5 text-un-blue" />}
                 data={leadsChartEntries}
                 searchQuery={leadsSearchQuery}
@@ -124,6 +124,7 @@ export function SidebarCharts({
                 onSelectValue={onSelectWorkPackage}
                 showAll={showAllWorkPackages}
                 onToggleShowAll={onToggleShowAllWorkPackages}
+                initialDisplayCount={10}
             />
         </div>
     );
