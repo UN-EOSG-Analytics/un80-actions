@@ -21,59 +21,11 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { fetchActions } from "@/lib/actions";
-import type { Actions } from "@/types/action";
+import { parseDate, formatDate, formatGoalText } from "@/lib/utils";
+import { abbreviationMap } from "@/constants/abbreviations";
+import type { Actions, WorkPackageStats, NextMilestone } from "@/types";
 import { Briefcase, Briefcase as BriefcaseIcon, ChevronDown, FileText, Filter, Info, Layers, ListTodo, Search, Trophy, User, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-
-// Mapping of abbreviations to their long forms
-const abbreviationMap: Record<string, string> = {
-    'USG DPPA': 'Under-Secretary-General for Political and Peacebuilding Affairs',
-    'USG DPO': 'Under-Secretary-General for Peace Operations',
-    'USG OCHA': 'Under-Secretary-General for Humanitarian Affairs and Emergency Relief Coordinator',
-    'USG DESA': 'Under-Secretary-General for Economic and Social Affairs',
-    'USG Policy': 'Under-Secretary-General for Policy',
-    'USG UNODC': 'Under-Secretary-General for Drugs and Crime',
-    'USG OCT': 'Under-Secretary-General for Counter-Terrorism',
-    'USG UNEP': 'Under-Secretary-General for the UN Environment Programme',
-    'USG UNU': 'Under-Secretary-General of the United Nations University',
-    'USG DGACM': 'Under-Secretary-General for General Assembly and Conference Management',
-    'USG ODA': 'Under-Secretary-General for Disarmament Affairs',
-    'DSG': 'Deputy Secretary-General',
-    'ASG DCO': 'Assistant Secretary-General for Development Coordination Office',
-    'ASG UNITAR': 'Assistant Secretary-General for the UN Institute for Training and Research',
-    'HC OHCHR': 'High Commissioner for Human Rights',
-    'SG ITU': 'Secretary-General of the International Telecommunication Union',
-    'Chair HLCM': 'Chair of the High-Level Committee on Management',
-    'ED WFP': 'Executive Director of the World Food Programme',
-    'ED UNOPS': 'Executive Director of the UN Office for Project Services',
-    'ED UNFPA': 'Executive Director of the UN Population Fund',
-    'ED UN Women': 'Executive Director of UN Women',
-    'ED UNAIDS': 'Executive Director of UNAIDS',
-    'ED UNICEF': 'Executive Director of UNICEF',
-    'SA Reform': 'Special Adviser on Reform',
-    'CDC': 'Chef de Cabinet',
-    'Chair DTN': 'Chair of the Digital Transformation Network',
-    'USG ECA': 'Under-Secretary-General of the Economic Commission for Africa',
-    'SG': 'Secretary-General',
-    'GA': 'General Assembly',
-    'SC': 'Security Council',
-    'ECOSOC': 'Economic and Social Council',
-    'WS1': 'Workstream 1',
-    'WS2': 'Workstream 2',
-    'WS3': 'Workstream 3',
-};
-
-interface WorkPackageStats {
-    total: number;
-    completed: number;
-    totalActions: number;
-    completedActions: number;
-}
-
-interface NextMilestone {
-    date: string;
-    indicativeActivity: string;
-}
 
 export default function WorkPackagesPage() {
     const [actions, setActions] = useState<Actions>([]);
@@ -101,59 +53,6 @@ export default function WorkPackagesPage() {
     });
     const [nextMilestone, setNextMilestone] = useState<NextMilestone | null>(null);
     const [progressPercentage, setProgressPercentage] = useState<number>(0);
-
-    // Convert date string (ISO format or Excel serial) to Date object
-    const parseDate = (dateStr: string | null): Date | null => {
-        if (!dateStr || dateStr.trim() === '') return null;
-
-        // Try parsing as ISO date string first (e.g., "2026-02-28")
-        const isoDate = new Date(dateStr);
-        if (!isNaN(isoDate.getTime())) {
-            return isoDate;
-        }
-
-        // Try parsing as Excel serial number
-        const serialNum = parseInt(dateStr);
-        if (!isNaN(serialNum) && serialNum > 0) {
-            const excelEpoch = new Date(1900, 0, 1);
-            const days = serialNum - (serialNum > 59 ? 1 : 0) - 1;
-            return new Date(excelEpoch.getTime() + days * 24 * 60 * 60 * 1000);
-        }
-
-        return null;
-    };
-
-    // Format date to DD/MM/YYYY
-    const formatDate = (date: Date): string => {
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-    };
-
-    // Format goal text: lowercase everything except first letter of each sentence
-    const formatGoalText = (text: string): string => {
-        if (!text) return text;
-        // Split by sentence boundaries (., !, ?) while preserving them
-        const sentences = text.split(/([.!?]+(?:\s+|$))/);
-
-        return sentences
-            .map((sentence) => {
-                // Skip if it's just punctuation/whitespace
-                if (!sentence.trim() || /^[.!?\s]+$/.test(sentence)) {
-                    return sentence;
-                }
-                // Lowercase everything, then capitalize first letter
-                const trimmed = sentence.trim();
-                const lowercased = trimmed.toLowerCase();
-                const capitalized = lowercased.charAt(0).toUpperCase() + lowercased.slice(1);
-                // Preserve original whitespace
-                const leadingWhitespace = sentence.match(/^\s*/)?.[0] || '';
-                const trailingWhitespace = sentence.match(/\s*$/)?.[0] || '';
-                return leadingWhitespace + capitalized + trailingWhitespace;
-            })
-            .join('');
-    };
 
     useEffect(() => {
         setIsLoading(true);

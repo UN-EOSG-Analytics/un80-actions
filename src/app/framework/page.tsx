@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { fetchActions } from "@/lib/actions";
-import type { Actions, Action } from "@/types/action";
+import type { Actions, Action } from "@/types";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 

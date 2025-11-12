@@ -1,4 +1,4 @@
-import type { Action, Actions } from "@/types/action";
+import type { Action, Actions } from "@/types";
 
 /**
  * Fetch actions data from the JSON file

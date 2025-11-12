@@ -4,3 +4,80 @@ import { twMerge } from "tailwind-merge"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
+/**
+ * Date utility functions
+ */
+
+/**
+ * Convert date string (ISO format or Excel serial) to Date object
+ * @param dateStr - Date string in ISO format or Excel serial number
+ * @returns Date object or null if invalid
+ */
+export const parseDate = (dateStr: string | null): Date | null => {
+    if (!dateStr || dateStr.trim() === '') return null;
+
+    // Try parsing as ISO date string first (e.g., "2026-02-28")
+    const isoDate = new Date(dateStr);
+    if (!isNaN(isoDate.getTime())) {
+        return isoDate;
+    }
+
+    // Try parsing as Excel serial number
+    const serialNum = parseInt(dateStr);
+    if (!isNaN(serialNum) && serialNum > 0) {
+        const excelEpoch = new Date(1900, 0, 1);
+        const days = serialNum - (serialNum > 59 ? 1 : 0) - 1;
+        return new Date(excelEpoch.getTime() + days * 24 * 60 * 60 * 1000);
+    }
+
+    return null;
+};
+
+/**
+ * Format date to DD/MM/YYYY
+ * @param date - Date object to format
+ * @returns Formatted date string
+ */
+export const formatDate = (date: Date): string => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+};
+
+/**
+ * Text formatting utility functions
+ */
+
+/**
+ * Format goal text: lowercase everything except first letter of each sentence
+ * @param text - Text to format
+ * @returns Formatted text with proper sentence capitalization
+ */
+export const formatGoalText = (text: string): string => {
+    if (!text) return text;
+    
+    // Split by sentence boundaries (., !, ?) while preserving them
+    const sentences = text.split(/([.!?]+(?:\s+|$))/);
+
+    return sentences
+        .map((sentence) => {
+            // Skip if it's just punctuation/whitespace
+            if (!sentence.trim() || /^[.!?\s]+$/.test(sentence)) {
+                return sentence;
+            }
+            
+            // Lowercase everything, then capitalize first letter
+            const trimmed = sentence.trim();
+            const lowercased = trimmed.toLowerCase();
+            const capitalized = lowercased.charAt(0).toUpperCase() + lowercased.slice(1);
+            
+            // Preserve original whitespace
+            const leadingWhitespace = sentence.match(/^\s*/)?.[0] || '';
+            const trailingWhitespace = sentence.match(/\s*$/)?.[0] || '';
+            
+            return leadingWhitespace + capitalized + trailingWhitespace;
+        })
+        .join('');
+};

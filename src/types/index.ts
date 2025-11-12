@@ -1,7 +1,11 @@
 /**
- * Type definitions for UN80 Actions data structure
- * Based on the actions.json data format
+ * Type definitions for UN80 Actions Dashboard
+ * Centralized type exports for the entire application
  */
+
+// ============================================================================
+// Action Types
+// ============================================================================
 
 /**
  * Represents a UN action item with its associated metadata
@@ -49,6 +53,7 @@ export interface Action {
     /** Work package goal description or null */
     work_package_goal: string | null;
 
+    /** Document text or null */
     doc_text: string | null;
 }
 
@@ -56,3 +61,25 @@ export interface Action {
  * Array of Action items
  */
 export type Actions = Action[];
+
+// ============================================================================
+// Work Package Types
+// ============================================================================
+
+/**
+ * Work package statistics interface
+ */
+export interface WorkPackageStats {
+    total: number;
+    completed: number;
+    totalActions: number;
+    completedActions: number;
+}
+
+/**
+ * Next milestone interface
+ */
+export interface NextMilestone {
+    date: string;
+    indicativeActivity: string;
+}
