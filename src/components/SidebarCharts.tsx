@@ -1,7 +1,6 @@
 import React from 'react';
-import { LeadsChart } from './LeadsChart';
-import { WorkstreamsChart } from './WorkstreamsChart';
-import { WorkPackagesChart } from './WorkPackagesChart';
+import { Users, Layers, Briefcase } from 'lucide-react';
+import { SidebarChart, SidebarChartEntry } from './SidebarChart';
 import type { LeadChartEntry, WorkstreamChartEntry, WorkPackageChartEntry } from '@/types';
 
 interface SidebarChartsProps {
@@ -56,34 +55,72 @@ export function SidebarCharts({
     showAllWorkPackages,
     onToggleShowAllWorkPackages,
 }: SidebarChartsProps) {
+    const leadsChartEntries: SidebarChartEntry[] = leadsData.map(entry => ({
+        label: entry.lead,
+        count: entry.count,
+        value: entry.lead,
+    }));
+
+    const workstreamsChartEntries: SidebarChartEntry[] = workstreamsData.map(entry => ({
+        label: entry.workstream,
+        count: entry.count,
+        value: entry.workstream,
+    }));
+
+    const workPackagesChartEntries: SidebarChartEntry[] = workPackagesData.map(entry => {
+        const wpMatch = entry.workpackage.match(/^(\d+):/);
+        const wpNumber = wpMatch ? wpMatch[1] : null;
+        const wpName = wpMatch ? entry.workpackage.replace(/^\d+:\s*/, '') : entry.workpackage;
+        const wpOption = wpNumber ? `${wpNumber}: ${wpName}` : wpName;
+
+        return {
+            label: wpNumber ? `WP${wpNumber}` : 'Work package',
+            count: entry.count,
+            value: wpOption,
+            tooltip: wpNumber ? wpName : undefined,
+        };
+    });
+
     return (
         <div className="w-full lg:w-[320px] shrink-0 mt-6 lg:mt-0 lg:border-l lg:border-slate-200 lg:pl-6 lg:ml-[calc((4*280px+3*16px)-818px-320px-24px)] flex flex-col gap-4">
-            <LeadsChart
-                data={leadsData}
+            <SidebarChart
+                title="Work packages per lead"
+                description="Principals and number of related work packages"
+                icon={<Users className="w-5 h-5 text-un-blue" />}
+                data={leadsChartEntries}
                 searchQuery={leadsSearchQuery}
                 onSearchChange={onLeadsSearchChange}
-                selectedLead={selectedLead}
-                onSelectLead={onSelectLead}
+                searchPlaceholder="Search entities"
+                selectedValue={selectedLead}
+                onSelectValue={onSelectLead}
                 showAll={showAllLeads}
                 onToggleShowAll={onToggleShowAllLeads}
             />
 
-            <WorkstreamsChart
-                data={workstreamsData}
+            <SidebarChart
+                title="Actions per workstream"
+                description="Number of actions per workstream"
+                icon={<Layers className="w-5 h-5 text-un-blue" />}
+                data={workstreamsChartEntries}
                 searchQuery={workstreamsSearchQuery}
                 onSearchChange={onWorkstreamsSearchChange}
-                selectedWorkstream={selectedWorkstream}
-                onSelectWorkstream={onSelectWorkstream}
+                searchPlaceholder="Search workstreams"
+                selectedValue={selectedWorkstream}
+                onSelectValue={onSelectWorkstream}
                 showAll={showAllWorkstreams}
                 onToggleShowAll={onToggleShowAllWorkstreams}
             />
 
-            <WorkPackagesChart
-                data={workPackagesData}
+            <SidebarChart
+                title="Actions per work package"
+                description="Number of actions per work package"
+                icon={<Briefcase className="w-5 h-5 text-un-blue" />}
+                data={workPackagesChartEntries}
                 searchQuery={workPackagesSearchQuery}
                 onSearchChange={onWorkPackagesSearchChange}
-                selectedWorkPackage={selectedWorkPackage}
-                onSelectWorkPackage={onSelectWorkPackage}
+                searchPlaceholder="Search work packages"
+                selectedValue={selectedWorkPackage}
+                onSelectValue={onSelectWorkPackage}
                 showAll={showAllWorkPackages}
                 onToggleShowAll={onToggleShowAllWorkPackages}
             />
