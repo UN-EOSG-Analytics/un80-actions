@@ -21,15 +21,15 @@ export function ExplainerText() {
                     UN80 Initiative
                 </a>{" "}
                 workstreams in a single reference. This Dashboard also lists designated leads
-                for each work package, as well as their individual action items (derived from
-                paragraphs in the SG&apos;s reports on the{" "}
+                for each work package, along with their individual action items (derived from
+                paragraphs in the{" "}
                 <a
                     href="https://www.un.org/un80-initiative/en"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-bold text-un-blue hover:underline transition-all"
                 >
-                    UN80 Initiative
+                    SG&apos;s reports on the UN80 Initiative
                 </a>
                 ).
             </p>
