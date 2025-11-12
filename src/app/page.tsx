@@ -1315,7 +1315,7 @@ export default function WorkPackagesPage() {
                 Work packages per lead
               </h3>
               <p className="text-[15px] text-slate-600 mb-3">
-                Entities and number of related Work packages
+                Entities and number of related work packages
               </p>
               {/* Chart Search Bar */}
               <div className="relative w-full mb-4">
@@ -1398,7 +1398,7 @@ export default function WorkPackagesPage() {
                 Actions per workstream
               </h3>
               <p className="text-[15px] text-slate-600 mb-3">
-                Actions per Workstream
+                Actions per workstream
               </p>
               {/* Chart Search Bar */}
               <div className="relative w-full mb-4">
