@@ -86,7 +86,7 @@ export function SidebarCharts({
             <SidebarChart
                 title="Work Packages per Lead"
                 description="Number of packages by leader"
-                icon={<Users className="w-5 h-5 text-un-blue" />}
+                icon={<Users />}
                 data={leadsChartEntries}
                 searchQuery={leadsSearchQuery}
                 onSearchChange={onLeadsSearchChange}
@@ -101,7 +101,7 @@ export function SidebarCharts({
             <SidebarChart
                 title="Actions per Workstream"
                 description="Number of actions per workstream"
-                icon={<Layers className="w-5 h-5 text-un-blue" />}
+                icon={<Layers />}
                 data={workstreamsChartEntries}
                 searchQuery={workstreamsSearchQuery}
                 onSearchChange={onWorkstreamsSearchChange}
@@ -115,7 +115,7 @@ export function SidebarCharts({
             <SidebarChart
                 title="Actions per Work Package"
                 description="Number of actions per work package"
-                icon={<Briefcase className="w-5 h-5 text-un-blue" />}
+                icon={<Briefcase />}
                 data={workPackagesChartEntries}
                 searchQuery={workPackagesSearchQuery}
                 onSearchChange={onWorkPackagesSearchChange}

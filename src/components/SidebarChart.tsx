@@ -52,7 +52,9 @@ export function SidebarChart({
     return (
         <div className="bg-white px-4 sm:px-5 pt-0 pb-4 sm:pb-5 rounded-xl">
             <h3 className="text-[17px] font-semibold text-slate-900 mb-2 flex items-center gap-2">
-                {icon}
+                <span className="w-5 h-5 text-un-blue flex items-center justify-center">
+                    {icon}
+                </span>
                 {title}
             </h3>
             <p className="text-[15px] text-slate-600 mb-3">
