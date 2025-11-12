@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/collapsible';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ArrowUpDown, Briefcase, ChevronDown, Check, Filter, Layers, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface FilterControlsProps {
     // Advanced filter state
@@ -68,6 +69,25 @@ export function FilterControls({
     uniqueWorkstreams,
     onResetFilters,
 }: FilterControlsProps) {
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 640);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    // Close desktop sort dropdown when mobile opens
+    useEffect(() => {
+        if (isMobile && openFilterCollapsibles.has('sort')) {
+            // Mobile sort is open, ensure desktop is closed
+            // The desktop one should be hidden anyway, but this ensures state is clean
+        }
+    }, [isMobile, openFilterCollapsibles]);
+
     const hasActiveFilters = !!(
         searchQuery ||
         selectedWorkPackage.length > 0 ||
@@ -91,7 +111,7 @@ export function FilterControls({
                     <div className="flex items-center gap-2 sm:hidden">
                         {/* Advanced Filtering Collapsible */}
                         <Collapsible open={isAdvancedFilterOpen} onOpenChange={onAdvancedFilterOpenChange}>
-                            <CollapsibleTrigger className="flex items-center gap-1.5 text-[14px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap">
+                            <CollapsibleTrigger className="flex items-center gap-1.5 text-[14px] font-medium text-slate-700 hover:text-un-blue transition-colors pl-0 pr-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap">
                                 <span>Show Advanced Filters</span>
                                 <ChevronDown
                                     className={`w-3 h-3 text-slate-600 transition-transform ${isAdvancedFilterOpen ? 'transform rotate-180' : ''
@@ -101,59 +121,63 @@ export function FilterControls({
                         </Collapsible>
 
                         {/* Sort Option - Mobile Style */}
-                        <Popover open={openFilterCollapsibles.has('sort')} onOpenChange={(open) => onToggleFilterCollapsible('sort', open)}>
-                            <PopoverTrigger asChild>
-                                <button 
-                                    type="button"
-                                    className="flex items-center gap-1.5 text-[14px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap"
+                        {isMobile && (
+                            <Popover open={openFilterCollapsibles.has('sort')} onOpenChange={(open) => {
+                                onToggleFilterCollapsible('sort', open);
+                            }}>
+                                <PopoverTrigger asChild>
+                                    <button 
+                                        type="button"
+                                        className="flex items-center gap-1.5 text-[14px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap"
+                                    >
+                                        <span>
+                                            {sortOption === 'name-asc' ? 'Name (A-Z)' :
+                                                sortOption === 'name-desc' ? 'Name (Z-A)' :
+                                                sortOption === 'number-asc' ? 'Number (1-31)' :
+                                                sortOption === 'number-desc' ? 'Number (31-1)' :
+                                                'Sort'}
+                                        </span>
+                                        <ChevronDown
+                                            className={`w-3 h-3 text-slate-600 transition-transform ${openFilterCollapsibles.has('sort') ? 'transform rotate-180' : ''
+                                                }`}
+                                        />
+                                    </button>
+                                </PopoverTrigger>
+                                <PopoverContent 
+                                    className="w-max max-w-[calc(100vw-2rem)] p-1 bg-white border border-gray-200 shadow-lg" 
+                                    align="start" 
+                                    side="bottom" 
+                                    sideOffset={4}
+                                    onOpenAutoFocus={(e) => e.preventDefault()}
                                 >
-                                    <span>
-                                        {sortOption === 'name-asc' ? 'Name (A-Z)' :
-                                            sortOption === 'name-desc' ? 'Name (Z-A)' :
-                                            sortOption === 'number-asc' ? 'Number (1-31)' :
-                                            sortOption === 'number-desc' ? 'Number (31-1)' :
-                                            'Sort'}
-                                    </span>
-                                    <ChevronDown
-                                        className={`w-3 h-3 text-slate-600 transition-transform ${openFilterCollapsibles.has('sort') ? 'transform rotate-180' : ''
-                                            }`}
-                                    />
-                                </button>
-                            </PopoverTrigger>
-                            <PopoverContent 
-                                className="w-max max-w-[calc(100vw-2rem)] p-1 bg-white border border-gray-200 shadow-lg" 
-                                align="start" 
-                                side="bottom" 
-                                sideOffset={4}
-                                onOpenAutoFocus={(e) => e.preventDefault()}
-                            >
-                                <div>
-                                    {[
-                                        { key: 'name-asc', label: 'Name (A-Z)' },
-                                        { key: 'name-desc', label: 'Name (Z-A)' },
-                                        { key: 'number-asc', label: 'Number (1-31)' },
-                                        { key: 'number-desc', label: 'Number (31-1)' },
-                                    ].map((option) => (
-                                        <button
-                                            key={option.key}
-                                            type="button"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                onSortChange(option.key);
-                                                onCloseFilterCollapsible('sort');
-                                            }}
-                                            className="flex items-center gap-3 py-1.5 px-2 rounded-md hover:bg-un-blue/10 hover:text-un-blue cursor-pointer transition-colors w-full text-left text-sm"
-                                        >
-                                            <span>{option.label}</span>
-                                            {sortOption === option.key && (
-                                                <Check className="h-4 w-4 text-un-blue ml-auto" />
-                                            )}
-                                        </button>
-                                    ))}
-                                </div>
-                            </PopoverContent>
-                        </Popover>
+                                    <div>
+                                        {[
+                                            { key: 'name-asc', label: 'Name (A-Z)' },
+                                            { key: 'name-desc', label: 'Name (Z-A)' },
+                                            { key: 'number-asc', label: 'Number (1-31)' },
+                                            { key: 'number-desc', label: 'Number (31-1)' },
+                                        ].map((option) => (
+                                            <button
+                                                key={option.key}
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    onSortChange(option.key);
+                                                    onCloseFilterCollapsible('sort');
+                                                }}
+                                                className="flex items-center gap-3 py-1.5 px-2 rounded-md hover:bg-un-blue/10 hover:text-un-blue cursor-pointer transition-colors w-full text-left text-sm"
+                                            >
+                                                <span>{option.label}</span>
+                                                {sortOption === option.key && (
+                                                    <Check className="h-4 w-4 text-un-blue ml-auto" />
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+                        )}
                     </div>
 
                     {/* Desktop: Original layout */}
@@ -172,8 +196,12 @@ export function FilterControls({
                         {/* Sort Option */}
                         <div className="w-36">
                             <FilterDropdown
-                                open={openFilterCollapsibles.has('sort')}
-                                onOpenChange={(open) => onToggleFilterCollapsible('sort', open)}
+                                open={!isMobile && openFilterCollapsibles.has('sort')}
+                                onOpenChange={(open) => {
+                                    if (!isMobile) {
+                                        onToggleFilterCollapsible('sort', open);
+                                    }
+                                }}
                                 icon={<ArrowUpDown className="w-4 h-4" />}
                                 triggerText={
                                     sortOption === 'name-asc' ? 'Name (A-Z)' :
