@@ -204,7 +204,7 @@ export function calculateLeadChartData(
  * @param searchQuery - Optional search query to filter workstreams
  * @param selectedLead - Optional selected leads to filter by
  * @param selectedWorkPackage - Optional selected work packages to filter by
- * @returns Array of workstream chart entries sorted by workstream order
+ * @returns Array of workstream chart entries sorted by count descending
  */
 export function calculateWorkstreamChartData(
     actions: Actions,
@@ -252,16 +252,7 @@ export function calculateWorkstreamChartData(
 
     return Array.from(workstreamCounts.entries())
         .map(([workstream, count]) => ({ workstream, count }))
-        .sort((a, b) => {
-            // Sort WS1, WS2, WS3
-            const order = ['WS1', 'WS2', 'WS3'];
-            const aIndex = order.indexOf(a.workstream);
-            const bIndex = order.indexOf(b.workstream);
-            if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
-            if (aIndex !== -1) return -1;
-            if (bIndex !== -1) return 1;
-            return a.workstream.localeCompare(b.workstream);
-        });
+        .sort((a, b) => b.count - a.count); // Sort by count descending
 }
 
 /**
@@ -270,7 +261,7 @@ export function calculateWorkstreamChartData(
  * @param searchQuery - Optional search query to filter work packages
  * @param selectedLead - Optional selected leads to filter by
  * @param selectedWorkstream - Optional selected workstreams to filter by
- * @returns Array of work package chart entries sorted by number
+ * @returns Array of work package chart entries sorted by count descending
  */
 export function calculateWorkPackageChartData(
     actions: Actions,
@@ -314,17 +305,7 @@ export function calculateWorkPackageChartData(
 
     return Array.from(workpackageCounts.entries())
         .map(([workpackage, count]) => ({ workpackage, count }))
-        .sort((a, b) => {
-            // Sort by workpackage number if available
-            const aMatch = a.workpackage.match(/^(\d+):/);
-            const bMatch = b.workpackage.match(/^(\d+):/);
-            if (aMatch && bMatch) {
-                return parseInt(aMatch[1]) - parseInt(bMatch[1]);
-            }
-            if (aMatch) return -1;
-            if (bMatch) return 1;
-            return a.workpackage.localeCompare(b.workpackage);
-        });
+        .sort((a, b) => b.count - a.count); // Sort by count descending
 }
 
 /**
