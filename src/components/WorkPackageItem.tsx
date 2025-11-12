@@ -8,7 +8,7 @@ import { WorkPackageActions } from "@/components/WorkPackageActions";
 import { abbreviationMap } from "@/constants/abbreviations";
 import { formatGoalText } from "@/lib/utils";
 import type { WorkPackage } from "@/types";
-import { Info, Layers, Trophy, User } from "lucide-react";
+import { Info, Layers, Trophy, Users } from "lucide-react";
 
 interface WorkPackageItemProps {
     workPackage: WorkPackage;
@@ -117,7 +117,7 @@ export function WorkPackageItem({
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <div className="flex items-center gap-1 sm:gap-2 cursor-help">
-                                        <User className="w-4 h-4 text-gray-600" />
+                                        <Users className="w-4 h-4 text-gray-600" />
                                         <p className="text-[15px] text-gray-600 leading-5">
                                             {wp.leads.map((lead, idx) => {
                                                 const longForm = abbreviationMap[lead] || lead;
