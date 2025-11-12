@@ -51,6 +51,7 @@ interface WorkPackageItemProps {
     onToggle: () => void;
     collapsibleKey: string;
     onSelectLead?: (lead: string[]) => void;
+    onSelectWorkstream?: (workstream: string[]) => void;
 }
 
 export function WorkPackageItem({
@@ -58,6 +59,7 @@ export function WorkPackageItem({
     isOpen,
     onToggle,
     onSelectLead,
+    onSelectWorkstream,
 }: WorkPackageItemProps) {
     return (
         <Collapsible open={isOpen} onOpenChange={onToggle}>
@@ -104,7 +106,7 @@ export function WorkPackageItem({
                     {/* Report Labels and Work Package Leads */}
                     <div className="flex items-start gap-4 mb-2 flex-wrap w-full">
                         {/* Workstream Labels */}
-                        <WorkstreamLabels report={wp.report} />
+                        <WorkstreamLabels report={wp.report} onSelectWorkstream={onSelectWorkstream} />
 
                         {/* Work Package Leads */}
                         <LeadsBadge leads={wp.leads} onSelectLead={onSelectLead} />

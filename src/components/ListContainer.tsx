@@ -6,6 +6,7 @@ interface WorkPackageListProps {
     openCollapsibles: Set<string>;
     onToggleCollapsible: (key: string) => void;
     onSelectLead?: (lead: string[]) => void;
+    onSelectWorkstream?: (workstream: string[]) => void;
 }
 
 export function WorkPackageList({
@@ -13,6 +14,7 @@ export function WorkPackageList({
     openCollapsibles,
     onToggleCollapsible,
     onSelectLead,
+    onSelectWorkstream,
 }: WorkPackageListProps) {
     return (
         <div className="w-full space-y-4">
@@ -28,6 +30,7 @@ export function WorkPackageList({
                         onToggle={() => onToggleCollapsible(collapsibleKey)}
                         collapsibleKey={collapsibleKey}
                         onSelectLead={onSelectLead}
+                        onSelectWorkstream={onSelectWorkstream}
                     />
                 );
             })}
