@@ -326,12 +326,12 @@ export default function WorkPackagesPage() {
 
     // Apply work package filter (if selected) when computing leads and workstreams
     if (selectedWorkPackage) {
-      const wpMatch = selectedWorkPackage.match(/^WP:\s*(\d+):/);
+      const wpMatch = selectedWorkPackage.match(/^(\d+):/);
       if (wpMatch) {
         const wpNumber = wpMatch[1];
         filtered = filtered.filter((wp) => wp.number === wpNumber);
       } else {
-        filtered = filtered.filter((wp) => !wp.number && wp.name === selectedWorkPackage.replace(/^WP:\s*/, ''));
+        filtered = filtered.filter((wp) => !wp.number && wp.name === selectedWorkPackage);
       }
     }
 
@@ -341,7 +341,7 @@ export default function WorkPackagesPage() {
   // Get unique values for filters (filtered based on other selections)
   const uniqueWorkPackages = useMemo(() => {
     return Array.from(new Set(getFilteredWorkPackagesForOptions.map(wp => 
-      wp.number ? `WP: ${wp.number}: ${wp.name}` : `WP: ${wp.name}`
+      wp.number ? `${wp.number}: ${wp.name}` : wp.name
     ))).sort();
   }, [getFilteredWorkPackagesForOptions]);
 
@@ -473,13 +473,13 @@ export default function WorkPackagesPage() {
 
     // Work Package filter
     if (selectedWorkPackage) {
-      const wpMatch = selectedWorkPackage.match(/^WP:\s*(\d+):/);
+      const wpMatch = selectedWorkPackage.match(/^(\d+):/);
       if (wpMatch) {
         const wpNumber = wpMatch[1];
         filtered = filtered.filter((wp) => wp.number === wpNumber);
       } else {
         // Handle work packages without numbers
-        filtered = filtered.filter((wp) => !wp.number && wp.name === selectedWorkPackage.replace(/^WP:\s*/, ''));
+        filtered = filtered.filter((wp) => !wp.number && wp.name === selectedWorkPackage);
       }
     }
 
@@ -549,12 +549,12 @@ export default function WorkPackagesPage() {
 
     // Work Package filter
     if (selectedWorkPackage) {
-      const wpMatch = selectedWorkPackage.match(/^WP:\s*(\d+):/);
+      const wpMatch = selectedWorkPackage.match(/^(\d+):/);
       if (wpMatch) {
         const wpNumber = wpMatch[1];
         filteredActions = filteredActions.filter((action) => action.work_package_number === wpNumber);
       } else {
-        filteredActions = filteredActions.filter((action) => !action.work_package_number && action.work_package_name === selectedWorkPackage.replace(/^WP:\s*/, ''));
+        filteredActions = filteredActions.filter((action) => !action.work_package_number && action.work_package_name === selectedWorkPackage);
       }
     }
 
@@ -643,7 +643,7 @@ export default function WorkPackagesPage() {
               <h1 className="text-[33px] sm:text-[41px] md:text-[49px] lg:text-[57px] text-gray-800 leading-[41px] sm:leading-[49px] md:leading-[57px] lg:leading-[65px] tracking-[-0.02em] relative inline-block">
                 <span className="relative z-10 bg-clip-text">
                   <span className="font-bold">UN80 Initiative</span>
-                  <span className="font-normal"> actions</span>
+                  <span className="font-normal"> Actions</span>
                 </span>
               </h1>
               <button className="flex items-center gap-1.5 px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full text-[13px] font-medium transition-colors h-[28px]">
@@ -694,7 +694,7 @@ export default function WorkPackagesPage() {
                         <div className="relative flex flex-col items-start justify-start w-full h-full bg-[#009EDB]/10 rounded-lg px-4 py-6 transition-all hover:scale-[1.02] cursor-pointer border-0 pl-[26px]">
                         <div className="flex items-center gap-2 mb-3 w-full justify-between">
                           <p className="text-[17px] sm:text-[18px] md:text-[19px] font-normal text-[#009EDB] text-left leading-[21px] sm:leading-[23px] md:leading-[25px]">
-                            Workpackages
+                            Work packages
                           </p>
                           <BriefcaseIcon className="w-5 h-5 text-[#009EDB] flex-shrink-0 mr-[10px]" />
                         </div>
@@ -705,7 +705,7 @@ export default function WorkPackagesPage() {
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Number of workpackages: {statsData.workpackages}</p>
+                      <p>Number of work packages: {statsData.workpackages}</p>
                     </TooltipContent>
                   </Tooltip>
 
@@ -1454,17 +1454,17 @@ export default function WorkPackagesPage() {
             <div className="bg-white p-4 sm:p-5 rounded-[8px]">
               <h3 className="text-[17px] font-semibold text-slate-900 mb-2 flex items-center gap-2">
                 <Briefcase className="w-5 h-5 text-[#009EDB]" />
-                Actions per Workpackage
+                Actions per work package
               </h3>
               <p className="text-[15px] text-slate-600 mb-3">
-                Actions per Workpackage
+                Actions per work package
               </p>
               {/* Chart Search Bar */}
               <div className="relative w-full mb-4">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#009EDB] pointer-events-none z-10" />
                 <Input
                   type="text"
-                  placeholder="Search workpackages"
+                  placeholder="Search work packages"
                   value={workpackageChartSearchQuery}
                   onChange={(e) => setWorkpackageChartSearchQuery(e.target.value)}
                   className="w-full h-[36px] text-[15px] border-0 border-b border-slate-300 rounded-none pl-[40px] pr-4 py-[8px] text-slate-700 bg-white transition-all hover:border-b-[#009EDB]/60 focus:border-b-[#009EDB] focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
@@ -1479,7 +1479,7 @@ export default function WorkPackagesPage() {
                       const wpMatch = entry.workpackage.match(/^(\d+):/);
                       const wpNumber = wpMatch ? wpMatch[1] : null;
                       const wpName = wpMatch ? entry.workpackage.replace(/^\d+:\s*/, '') : entry.workpackage;
-                      const wpOption = wpNumber ? `WP: ${wpNumber}: ${wpName}` : `WP: ${wpName}`;
+                      const wpOption = wpNumber ? `${wpNumber}: ${wpName}` : wpName;
                       const isSelected = selectedWorkPackage === wpOption;
                       const isFiltered = selectedWorkPackage && selectedWorkPackage !== wpOption;
                       const displayedData = showAllWorkpackages ? workpackageChartData : workpackageChartData.slice(0, 3);
@@ -1502,7 +1502,7 @@ export default function WorkPackagesPage() {
                           <td className="py-3 pr-3">
                             <div className="flex items-center justify-between gap-3">
                               <span className="text-[14px] font-medium text-slate-900 flex-shrink-0 min-w-0">
-                                {wpNumber ? `WP: ${wpNumber}` : 'WP:'}
+                                {wpNumber ? `WP: ${wpNumber}` : 'Work package'}
                               </span>
                               <div className="flex items-center gap-2 flex-shrink-0">
                                 <span className={`text-[14px] font-semibold min-w-[20px] font-mono ${
