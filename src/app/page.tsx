@@ -86,11 +86,11 @@ export default function WorkPackagesPage() {
     return (
         <TooltipProvider delayDuration={200}>
             <div className="min-h-screen bg-white">
-                {/* Sticky Header */}
+                {/* Fixed Header */}
                 <Header />
 
-                {/* Main Container */}
-                <main className="w-full max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-8 sm:px-12 lg:px-16">
+                {/* Main Container - with padding to account for fixed header */}
+                <main className="w-full max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-8 sm:px-12 lg:px-16 pt-20">
                     <div className="space-y-6 pb-16">
                         {/* Header with context info */}
                         <ExplainerText />

@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export function Header() {
     return (
-        <header className="sticky top-0 z-40 w-full bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/60 border-b">
+        <header className="fixed top-0 left-0 right-0 z-50 w-full bg-background backdrop-blur-sm border-b">
             <div className="w-full max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-8 sm:px-12 lg:px-16 pt-3 pb-2">
                 {/* Title Section */}
                 <div className="flex flex-col lg:flex-row lg:items-center lg:gap-x-2">
