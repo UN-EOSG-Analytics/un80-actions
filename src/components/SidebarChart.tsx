@@ -122,7 +122,7 @@ export function SidebarChart({
                                             </div>
                                             <div className="flex items-center gap-1.5 shrink-0">
                                                 <span
-                                                    className={`text-[14px] font-normal ${countWidth} text-right font-mono ${isSelected ? 'text-un-blue' : 'text-un-blue'
+                                                    className={`text-[14px] font-normal ${countWidth} text-right font-mono tabular-nums ${isSelected ? 'text-un-blue' : 'text-un-blue'
                                                         }`}
                                                 >
                                                     {entry.count}
