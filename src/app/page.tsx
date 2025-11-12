@@ -25,8 +25,6 @@ import type { Actions } from "@/types/action";
 import { Briefcase, Briefcase as BriefcaseIcon, ChevronDown, FileText, Filter, Info, Layers, ListTodo, Search, Trophy, User, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-
 // Mapping of abbreviations to their long forms
 const abbreviationMap: Record<string, string> = {
     'USG DPPA': 'Under-Secretary-General for Political and Peacebuilding Affairs',

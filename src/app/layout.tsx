@@ -8,6 +8,8 @@ import "./globals.css";
 const roboto = Roboto({
     weight: ['100', '300', '400', '500', '700', '800', '900'],
     subsets: ["latin"],
+    display: 'swap',
+    variable: '--font-roboto',
 });
 
 export const metadata: Metadata = {
@@ -21,8 +23,8 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={`${roboto.className} antialiased`} style={{ fontFamily: roboto.style.fontFamily }}>
-            <body style={{ fontFamily: roboto.style.fontFamily }}>
+        <html lang="en" className={`${roboto.className} antialiased`}>
+            <body>
                 {children}
                 <GoogleAnalytics gaId="G-XYZ" />
             </body>
