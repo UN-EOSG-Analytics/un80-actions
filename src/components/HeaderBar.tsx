@@ -9,20 +9,21 @@ export function Header() {
             <div className="w-full max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-8 sm:px-12 lg:px-16 pt-3 pb-2">
                 {/* Title Section */}
                 <div className="flex flex-col lg:flex-row lg:items-center lg:gap-x-2">
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:gap-x-2">
+                    <Link href="/" className="group">
+                        <h1 className="text-4xl tracking-tight text-foreground leading-tight mt-1 transition-colors group-hover:text-un-blue cursor-pointer">
+                            <span className="font-bold leading-none">UN80 Initiative</span>
+                        </h1>
+                    </Link>
+                    
+                    <div className="flex items-center gap-x-2">
                         <Link href="/" className="group">
-                            <h1 className="text-4xl tracking-tight text-foreground leading-tight mt-1 transition-colors group-hover:text-un-blue cursor-pointer">
-                                <div className="leading-none">
-                                    <span className="font-bold">UN80 Initiative</span>
-                                    <span className="text-3xl font-normal block lg:inline lg:ml-1 lg:pl-1 lg:text-4xl">
-                                        Actions
-                                    </span>
-                                </div>
+                            <h1 className="text-3xl lg:text-4xl font-normal text-foreground leading-tight transition-colors group-hover:text-un-blue cursor-pointer">
+                                Actions
                             </h1>
                         </Link>
 
-                        {/* Beta Badge - hidden on mobile, visible on desktop */}
-                        <div className="hidden lg:block mt-1 self-start lg:self-auto">
+                        {/* Beta Badge - visible on all screen sizes, inline with Actions */}
+                        <div className="self-start">
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
