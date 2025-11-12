@@ -68,12 +68,12 @@ export function SidebarChart({
                 </span>
                 {title}
             </h3>
-            <p className="text-[15px] text-slate-600 mb-3">
+            <p className="text-[15px] text-slate-600 mb-1.5">
                 {description}
             </p>
 
             {/* Search Bar */}
-            <div className="relative w-full mb-4">
+            <div className="relative w-full mb-1">
                 <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 text-un-blue pointer-events-none z-10" />
                 <Input
                     type="text"
