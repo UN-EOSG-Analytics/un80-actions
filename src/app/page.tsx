@@ -20,524 +20,83 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { fetchActions } from "@/lib/actions";
-import { parseDate, formatDate, formatGoalText } from "@/lib/utils";
 import { abbreviationMap } from "@/constants/abbreviations";
-import type { Actions, WorkPackageStats, NextMilestone, WorkPackage } from "@/types";
+import { useActions } from "@/hooks/useActions";
+import { useChartSearch } from "@/hooks/useChartSearch";
+import { useCollapsibles } from "@/hooks/useCollapsibles";
+import { useFilters, useFilterSync } from "@/hooks/useFilters";
+import { useWorkPackageData } from "@/hooks/useWorkPackageData";
+import { formatGoalText } from "@/lib/utils";
 import { Briefcase, Briefcase as BriefcaseIcon, ChevronDown, FileText, Filter, Info, Layers, ListTodo, Search, Trophy, User, Users } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
 
 export default function WorkPackagesPage() {
-    const [actions, setActions] = useState<Actions>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedWorkPackage, setSelectedWorkPackage] = useState<string>("");
-    const [selectedLead, setSelectedLead] = useState<string>("");
-    const [selectedWorkstream, setSelectedWorkstream] = useState<string>("");
-    const [selectedBigTicket, setSelectedBigTicket] = useState<string>("");
-    const [chartSearchQuery, setChartSearchQuery] = useState<string>("");
-    const [workstreamChartSearchQuery, setWorkstreamChartSearchQuery] = useState<string>("");
-    const [workpackageChartSearchQuery, setWorkpackageChartSearchQuery] = useState<string>("");
-    const [sortOption, setSortOption] = useState<string>("");
-    const [showAllLeads, setShowAllLeads] = useState<boolean>(false);
-    const [showAllWorkstreams, setShowAllWorkstreams] = useState<boolean>(false);
-    const [showAllWorkpackages, setShowAllWorkpackages] = useState<boolean>(false);
-    const [openCollapsibles, setOpenCollapsibles] = useState<Set<string>>(new Set());
-    const [isAdvancedFilterOpen, setIsAdvancedFilterOpen] = useState<boolean>(false);
-    const [openFilterCollapsibles, setOpenFilterCollapsibles] = useState<Set<string>>(new Set());
-    const [stats, setStats] = useState<WorkPackageStats>({
-        total: 0,
-        completed: 0,
-        totalActions: 0,
-        completedActions: 0,
-    });
-    const [nextMilestone, setNextMilestone] = useState<NextMilestone | null>(null);
-    const [progressPercentage, setProgressPercentage] = useState<number>(0);
+    // Custom hooks for state management
+    const { actions, isLoading, stats, nextMilestone, progressPercentage } = useActions();
 
-    useEffect(() => {
-        setIsLoading(true);
-        fetchActions()
-            .then((data) => {
-                setActions(data);
-                setIsLoading(false);
-                // Calculate stats from data
-                const uniqueWPs = new Set(
-                    data.map((a) => `${a.report}-${a.work_package_number}`)
-                );
-                setStats({
-                    total: uniqueWPs.size,
-                    completed: 2, // This would come from actual completion data
-                    totalActions: data.length,
-                    completedActions: 0, // This would come from actual completion data
-                });
+    const {
+        filters,
+        searchQuery,
+        setSearchQuery,
+        selectedWorkPackage,
+        setSelectedWorkPackage,
+        selectedLead,
+        setSelectedLead,
+        selectedWorkstream,
+        setSelectedWorkstream,
+        selectedBigTicket,
+        setSelectedBigTicket,
+        sortOption,
+        setSortOption,
+        handleResetFilters,
+    } = useFilters();
 
-                // Calculate next upcoming milestone
-                const today = new Date();
-                today.setHours(0, 0, 0, 0); // Normalize to start of day for consistent comparison
-                const milestones = data
-                    .filter(a => a.first_milestone && a.indicative_activity)
-                    .map(a => {
-                        const milestoneDate = parseDate(a.first_milestone);
-                        return milestoneDate ? {
-                            date: milestoneDate,
-                            indicativeActivity: a.indicative_activity,
-                        } : null;
-                    })
-                    .filter((m): m is { date: Date; indicativeActivity: string } => {
-                        if (!m) return false;
-                        m.date.setHours(0, 0, 0, 0); // Normalize to start of day
-                        return m.date >= today;
-                    })
-                    .sort((a, b) => a.date.getTime() - b.date.getTime());
+    const {
+        openCollapsibles,
+        toggleCollapsible,
+        isAdvancedFilterOpen,
+        setIsAdvancedFilterOpen,
+        openFilterCollapsibles,
+        toggleFilterCollapsible,
+        closeFilterCollapsible,
+        showAllLeads,
+        setShowAllLeads,
+        showAllWorkstreams,
+        setShowAllWorkstreams,
+        showAllWorkpackages,
+        setShowAllWorkpackages,
+    } = useCollapsibles();
 
-                if (milestones.length > 0) {
-                    const next = milestones[0];
-                    setNextMilestone({
-                        date: formatDate(next.date),
-                        indicativeActivity: next.indicativeActivity,
-                    });
-                }
+    const {
+        chartSearchQuery,
+        setChartSearchQuery,
+        workstreamChartSearchQuery,
+        setWorkstreamChartSearchQuery,
+        workpackageChartSearchQuery,
+        setWorkpackageChartSearchQuery,
+    } = useChartSearch();
 
-                // Calculate progress bar percentage
-                const startDate = new Date(2025, 9, 31); // October 31, 2025 (month is 0-indexed)
-                const endDate = new Date(2027, 11, 31); // December 31, 2027
-                const now = new Date();
+    // Compute work package data using custom hook
+    const {
+        filteredWorkPackages,
+        uniqueWorkPackages,
+        uniqueLeads,
+        uniqueWorkstreams,
+        chartData,
+        workstreamChartData,
+        workpackageChartData,
+        statsData,
+    } = useWorkPackageData(
+        actions,
+        filters,
+        chartSearchQuery,
+        workstreamChartSearchQuery,
+        workpackageChartSearchQuery
+    );
 
-                const totalDuration = endDate.getTime() - startDate.getTime();
-                const elapsedDuration = now.getTime() - startDate.getTime();
-
-                // Calculate percentage, clamped between 0 and 100
-                let percentage = (elapsedDuration / totalDuration) * 100;
-                percentage = Math.max(0, Math.min(100, percentage));
-
-                setProgressPercentage(percentage);
-            })
-            .catch((error) => {
-                console.error("Failed to fetch actions:", error);
-                setIsLoading(false);
-            });
-    }, []);
-
-    // Group actions by work package (combine across reports)
-    const workPackages = useMemo(() => {
-        const wpMap = new Map<string, WorkPackage>();
-
-        actions.forEach((action) => {
-            // Use work_package_number as key to combine across reports
-            const key = action.work_package_number || 'empty';
-            if (!wpMap.has(key)) {
-                // work_package_leads is already an array
-                const leads = Array.isArray(action.work_package_leads)
-                    ? action.work_package_leads.filter(lead => lead && lead.trim().length > 0)
-                    : [];
-
-                wpMap.set(key, {
-                    report: [action.report],
-                    number: action.work_package_number || '',
-                    name: action.work_package_name,
-                    leads: leads,
-                    goal: action.work_package_goal || null,
-                    bigTicket: action.big_ticket || false,
-                    actions: [],
-                });
-            }
-            const wp = wpMap.get(key)!;
-
-            // Add report if not already included
-            if (!wp.report.includes(action.report)) {
-                wp.report.push(action.report);
-            }
-
-            // Merge leads from all reports
-            const newLeads = Array.isArray(action.work_package_leads)
-                ? action.work_package_leads.filter(lead => lead && lead.trim().length > 0)
-                : [];
-            newLeads.forEach(lead => {
-                if (!wp.leads.includes(lead)) {
-                    wp.leads.push(lead);
-                }
-            });
-
-            // Update goal if not set or if this action has a goal
-            if (action.work_package_goal && !wp.goal) {
-                wp.goal = action.work_package_goal;
-            }
-
-            // Update big_ticket status - if any action is big_ticket, mark the work package as big_ticket
-            if (action.big_ticket) {
-                wp.bigTicket = true;
-            }
-
-            // Add indicative activity if not already included
-            if (action.indicative_activity) {
-                const existingAction = wp.actions.find(a => a.text === action.indicative_activity && a.report === action.report);
-                if (!existingAction) {
-                    // work_package_leads is already an array
-                    const actionLeads = Array.isArray(action.work_package_leads)
-                        ? action.work_package_leads.filter(lead => lead && lead.trim().length > 0)
-                        : [];
-
-                    wp.actions.push({
-                        text: action.indicative_activity,
-                        documentParagraph: action.document_paragraph || '',
-                        leads: actionLeads,
-                        report: action.report,
-                        docText: action.doc_text || null,
-                    });
-                } else {
-                    // Merge leads if action already exists
-                    const actionLeads = Array.isArray(action.work_package_leads)
-                        ? action.work_package_leads.filter(lead => lead && lead.trim().length > 0)
-                        : [];
-                    actionLeads.forEach(lead => {
-                        if (!existingAction.leads.includes(lead)) {
-                            existingAction.leads.push(lead);
-                        }
-                    });
-                    // Update doc_text if not already set
-                    if (action.doc_text && !existingAction.docText) {
-                        existingAction.docText = action.doc_text;
-                    }
-                }
-            }
-        });
-
-        return Array.from(wpMap.values()).sort((a, b) => {
-            // Handle empty numbers - put them at the end
-            if (!a.number && !b.number) return a.name.localeCompare(b.name);
-            if (!a.number) return 1;
-            if (!b.number) return -1;
-
-            const numA = parseInt(a.number) || 0;
-            const numB = parseInt(b.number) || 0;
-            if (numA !== numB) return numA - numB;
-
-            // If numbers are equal, sort by name
-            return a.name.localeCompare(b.name);
-        });
-    }, [actions]);
-
-
-    // Helper function to filter work packages based on selected filters (excluding the filter being computed)
-    const getFilteredWorkPackagesForOptions = useMemo(() => {
-        let filtered = workPackages;
-
-        // Apply lead filter (if selected) when computing work packages and workstreams
-        if (selectedLead) {
-            filtered = filtered.filter((wp) => wp.leads.includes(selectedLead));
-        }
-
-        // Apply workstream filter (if selected) when computing work packages and leads
-        if (selectedWorkstream) {
-            filtered = filtered.filter((wp) => wp.report.includes(selectedWorkstream));
-        }
-
-        // Apply work package filter (if selected) when computing leads and workstreams
-        if (selectedWorkPackage) {
-            const wpMatch = selectedWorkPackage.match(/^(\d+):/);
-            if (wpMatch) {
-                const wpNumber = wpMatch[1];
-                filtered = filtered.filter((wp) => wp.number === wpNumber);
-            } else {
-                filtered = filtered.filter((wp) => !wp.number && wp.name === selectedWorkPackage);
-            }
-        }
-
-        return filtered;
-    }, [workPackages, selectedLead, selectedWorkstream, selectedWorkPackage]);
-
-    // Get unique values for filters (filtered based on other selections)
-    const uniqueWorkPackages = useMemo(() => {
-        return Array.from(new Set(getFilteredWorkPackagesForOptions.map(wp =>
-            wp.number ? `${wp.number}: ${wp.name}` : wp.name
-        ))).sort();
-    }, [getFilteredWorkPackagesForOptions]);
-
-    const uniqueLeads = useMemo(() => {
-        const leads = new Set<string>();
-        getFilteredWorkPackagesForOptions.forEach(wp => {
-            wp.leads.forEach(lead => leads.add(lead));
-        });
-        return Array.from(leads).sort();
-    }, [getFilteredWorkPackagesForOptions]);
-
-    const uniqueWorkstreams = useMemo(() => {
-        const workstreams = new Set<string>();
-        getFilteredWorkPackagesForOptions.forEach(wp => {
-            wp.report.forEach(ws => workstreams.add(ws));
-        });
-        return Array.from(workstreams).sort();
-    }, [getFilteredWorkPackagesForOptions]);
-
-    // Calculate chart data: count work packages per lead
-    const chartData = useMemo(() => {
-        const leadCounts = new Map<string, number>();
-
-        workPackages.forEach(wp => {
-            wp.leads.forEach(lead => {
-                // Filter by chart search query if provided
-                if (chartSearchQuery.trim()) {
-                    const query = chartSearchQuery.toLowerCase();
-                    if (!lead.toLowerCase().includes(query)) {
-                        return;
-                    }
-                }
-                const currentCount = leadCounts.get(lead) || 0;
-                leadCounts.set(lead, currentCount + 1);
-            });
-        });
-
-        return Array.from(leadCounts.entries())
-            .map(([lead, count]) => ({
-                lead,
-                count,
-            }))
-            .sort((a, b) => b.count - a.count); // Sort by count descending
-    }, [workPackages, chartSearchQuery]);
-
-    // Calculate chart data: count actions per workstream
-    const workstreamChartData = useMemo(() => {
-        const workstreamCounts = new Map<string, number>();
-
-        actions.forEach(action => {
-            // Filter by chart search query if provided
-            if (workstreamChartSearchQuery.trim()) {
-                const query = workstreamChartSearchQuery.toLowerCase();
-                if (!action.report.toLowerCase().includes(query)) {
-                    return;
-                }
-            }
-            const currentCount = workstreamCounts.get(action.report) || 0;
-            workstreamCounts.set(action.report, currentCount + 1);
-        });
-
-        return Array.from(workstreamCounts.entries())
-            .map(([workstream, count]) => ({
-                workstream,
-                count,
-            }))
-            .sort((a, b) => {
-                // Sort WS1, WS2, WS3
-                const order = ['WS1', 'WS2', 'WS3'];
-                const aIndex = order.indexOf(a.workstream);
-                const bIndex = order.indexOf(b.workstream);
-                if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
-                if (aIndex !== -1) return -1;
-                if (bIndex !== -1) return 1;
-                return a.workstream.localeCompare(b.workstream);
-            });
-    }, [actions, workstreamChartSearchQuery]);
-
-    // Calculate chart data: count actions per workpackage
-    const workpackageChartData = useMemo(() => {
-        const workpackageCounts = new Map<string, number>();
-
-        actions.forEach(action => {
-            const wpKey = action.work_package_number ? `${action.work_package_number}: ${action.work_package_name}` : action.work_package_name;
-            // Filter by chart search query if provided
-            if (workpackageChartSearchQuery.trim()) {
-                const query = workpackageChartSearchQuery.toLowerCase();
-                if (!wpKey.toLowerCase().includes(query)) {
-                    return;
-                }
-            }
-            const currentCount = workpackageCounts.get(wpKey) || 0;
-            workpackageCounts.set(wpKey, currentCount + 1);
-        });
-
-        return Array.from(workpackageCounts.entries())
-            .map(([workpackage, count]) => ({
-                workpackage,
-                count,
-            }))
-            .sort((a, b) => {
-                // Sort by workpackage number if available
-                const aMatch = a.workpackage.match(/^(\d+):/);
-                const bMatch = b.workpackage.match(/^(\d+):/);
-                if (aMatch && bMatch) {
-                    return parseInt(aMatch[1]) - parseInt(bMatch[1]);
-                }
-                if (aMatch) return -1;
-                if (bMatch) return 1;
-                return a.workpackage.localeCompare(b.workpackage);
-            });
-    }, [actions, workpackageChartSearchQuery]);
-
-    // Filter work packages based on search and filters
-    const filteredWorkPackages = useMemo(() => {
-        let filtered = workPackages;
-
-        // Search filter
-        if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase();
-            filtered = filtered.filter(
-                (wp) =>
-                    wp.name.toLowerCase().includes(query) ||
-                    wp.number.includes(query) ||
-                    wp.leads.some((lead) => lead.toLowerCase().includes(query)) ||
-                    wp.actions.some((action) => action.text.toLowerCase().includes(query))
-            );
-        }
-
-        // Work Package filter
-        if (selectedWorkPackage) {
-            const wpMatch = selectedWorkPackage.match(/^(\d+):/);
-            if (wpMatch) {
-                const wpNumber = wpMatch[1];
-                filtered = filtered.filter((wp) => wp.number === wpNumber);
-            } else {
-                // Handle work packages without numbers
-                filtered = filtered.filter((wp) => !wp.number && wp.name === selectedWorkPackage);
-            }
-        }
-
-        // Lead filter
-        if (selectedLead) {
-            filtered = filtered.filter((wp) => wp.leads.includes(selectedLead));
-        }
-
-        // Workstream filter
-        if (selectedWorkstream) {
-            filtered = filtered.filter((wp) => wp.report.includes(selectedWorkstream));
-        }
-
-        // Big Ticket filter
-        if (selectedBigTicket === "big-ticket") {
-            filtered = filtered.filter((wp) => wp.bigTicket === true);
-        } else if (selectedBigTicket === "other") {
-            filtered = filtered.filter((wp) => wp.bigTicket === false);
-        }
-
-        // Sort filtered work packages
-        if (sortOption) {
-            filtered = [...filtered].sort((a, b) => {
-                switch (sortOption) {
-                    case "name-asc":
-                        return a.name.localeCompare(b.name);
-                    case "name-desc":
-                        return b.name.localeCompare(a.name);
-                    case "number-asc":
-                        const numA = parseInt(a.number) || 0;
-                        const numB = parseInt(b.number) || 0;
-                        if (numA !== numB) return numA - numB;
-                        return a.name.localeCompare(b.name);
-                    case "number-desc":
-                        const numA2 = parseInt(a.number) || 0;
-                        const numB2 = parseInt(b.number) || 0;
-                        if (numA2 !== numB2) return numB2 - numA2;
-                        return a.name.localeCompare(b.name);
-                    default:
-                        return 0;
-                }
-            });
-        }
-
-        return filtered;
-    }, [workPackages, searchQuery, selectedWorkPackage, selectedLead, selectedWorkstream, selectedBigTicket, sortOption]);
-
-    // Calculate statistics based on filtered data
-    const statsData = useMemo(() => {
-        const uniqueWorkstreams = new Set<string>();
-        const uniqueLeadsSet = new Set<string>();
-
-        // Filter actions based on current filters
-        let filteredActions = actions;
-
-        // Search filter
-        if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase();
-            filteredActions = filteredActions.filter(
-                (action) =>
-                    action.work_package_name.toLowerCase().includes(query) ||
-                    action.work_package_number.includes(query) ||
-                    (Array.isArray(action.work_package_leads) && action.work_package_leads.some((lead) => lead.toLowerCase().includes(query))) ||
-                    action.indicative_activity.toLowerCase().includes(query)
-            );
-        }
-
-        // Work Package filter
-        if (selectedWorkPackage) {
-            const wpMatch = selectedWorkPackage.match(/^(\d+):/);
-            if (wpMatch) {
-                const wpNumber = wpMatch[1];
-                filteredActions = filteredActions.filter((action) => action.work_package_number === wpNumber);
-            } else {
-                filteredActions = filteredActions.filter((action) => !action.work_package_number && action.work_package_name === selectedWorkPackage);
-            }
-        }
-
-        // Lead filter
-        if (selectedLead) {
-            filteredActions = filteredActions.filter((action) =>
-                Array.isArray(action.work_package_leads) && action.work_package_leads.includes(selectedLead)
-            );
-        }
-
-        // Workstream filter
-        if (selectedWorkstream) {
-            filteredActions = filteredActions.filter((action) => action.report === selectedWorkstream);
-        }
-
-        filteredActions.forEach(action => {
-            if (action.report) {
-                uniqueWorkstreams.add(action.report);
-            }
-            if (Array.isArray(action.work_package_leads)) {
-                action.work_package_leads.forEach(lead => {
-                    const trimmed = lead?.trim();
-                    if (trimmed && trimmed.length > 0) {
-                        uniqueLeadsSet.add(trimmed);
-                    }
-                });
-            }
-        });
-
-        return {
-            workstreams: uniqueWorkstreams.size,
-            workpackages: filteredWorkPackages.length,
-            actions: filteredActions.length,
-            leads: uniqueLeadsSet.size,
-        };
-    }, [actions, searchQuery, selectedWorkPackage, selectedLead, selectedWorkstream, filteredWorkPackages]);
-
-    // Clear filters if selected value is no longer available
-    useEffect(() => {
-        if (selectedWorkPackage && !uniqueWorkPackages.includes(selectedWorkPackage)) {
-            setSelectedWorkPackage("");
-        }
-    }, [selectedWorkPackage, uniqueWorkPackages]);
-
-    useEffect(() => {
-        if (selectedLead && !uniqueLeads.includes(selectedLead)) {
-            setSelectedLead("");
-        }
-    }, [selectedLead, uniqueLeads]);
-
-    useEffect(() => {
-        if (selectedWorkstream && !uniqueWorkstreams.includes(selectedWorkstream)) {
-            setSelectedWorkstream("");
-        }
-    }, [selectedWorkstream, uniqueWorkstreams]);
-
-    const handleResetFilters = () => {
-        setSearchQuery("");
-        setSelectedWorkPackage("");
-        setSelectedLead("");
-        setSelectedWorkstream("");
-        setSelectedBigTicket("");
-    };
-
-    const toggleCollapsible = (key: string) => {
-        setOpenCollapsibles((prev) => {
-            const next = new Set(prev);
-            if (next.has(key)) {
-                next.delete(key);
-            } else {
-                next.add(key);
-            }
-            return next;
-        });
-    };
+    // Sync filters with available options
+    useFilterSync(selectedWorkPackage, uniqueWorkPackages, setSelectedWorkPackage);
+    useFilterSync(selectedLead, uniqueLeads, setSelectedLead);
+    useFilterSync(selectedWorkstream, uniqueWorkstreams, setSelectedWorkstream);
 
     return (
         <TooltipProvider delayDuration={200}>
@@ -735,14 +294,7 @@ export default function WorkPackagesPage() {
                                             <div className="flex flex-col gap-2">
                                                 <Collapsible
                                                     open={openFilterCollapsibles.has('workPackage')}
-                                                    onOpenChange={(open) => {
-                                                        setOpenFilterCollapsibles(prev => {
-                                                            const next = new Set(prev);
-                                                            if (open) next.add('workPackage');
-                                                            else next.delete('workPackage');
-                                                            return next;
-                                                        });
-                                                    }}
+                                                    onOpenChange={(open) => toggleFilterCollapsible('workPackage', open)}
                                                 >
                                                     <CollapsibleTrigger className="w-full flex items-center justify-between h-[40px] px-3 text-[15px] border border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
                                                         <div className="flex items-center gap-2">
@@ -758,11 +310,7 @@ export default function WorkPackagesPage() {
                                                                     key={wp}
                                                                     onClick={() => {
                                                                         setSelectedWorkPackage(wp === selectedWorkPackage ? "" : wp);
-                                                                        setOpenFilterCollapsibles(prev => {
-                                                                            const next = new Set(prev);
-                                                                            next.delete('workPackage');
-                                                                            return next;
-                                                                        });
+                                                                        closeFilterCollapsible('workPackage');
                                                                     }}
                                                                     className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${selectedWorkPackage === wp ? 'bg-[#E0F5FF] font-medium' : ''
                                                                         }`}
@@ -779,14 +327,7 @@ export default function WorkPackagesPage() {
                                             <div className="flex flex-col gap-2">
                                                 <Collapsible
                                                     open={openFilterCollapsibles.has('lead')}
-                                                    onOpenChange={(open) => {
-                                                        setOpenFilterCollapsibles(prev => {
-                                                            const next = new Set(prev);
-                                                            if (open) next.add('lead');
-                                                            else next.delete('lead');
-                                                            return next;
-                                                        });
-                                                    }}
+                                                    onOpenChange={(open) => toggleFilterCollapsible('lead', open)}
                                                 >
                                                     <CollapsibleTrigger className="w-full flex items-center justify-between h-[40px] px-3 text-[15px] border border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
                                                         <div className="flex items-center gap-2">
@@ -802,11 +343,7 @@ export default function WorkPackagesPage() {
                                                                     key={lead}
                                                                     onClick={() => {
                                                                         setSelectedLead(lead === selectedLead ? "" : lead);
-                                                                        setOpenFilterCollapsibles(prev => {
-                                                                            const next = new Set(prev);
-                                                                            next.delete('lead');
-                                                                            return next;
-                                                                        });
+                                                                        closeFilterCollapsible('lead');
                                                                     }}
                                                                     className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${selectedLead === lead ? 'bg-[#E0F5FF] font-medium' : ''
                                                                         }`}
@@ -823,14 +360,7 @@ export default function WorkPackagesPage() {
                                             <div className="flex flex-col gap-2">
                                                 <Collapsible
                                                     open={openFilterCollapsibles.has('workstream')}
-                                                    onOpenChange={(open) => {
-                                                        setOpenFilterCollapsibles(prev => {
-                                                            const next = new Set(prev);
-                                                            if (open) next.add('workstream');
-                                                            else next.delete('workstream');
-                                                            return next;
-                                                        });
-                                                    }}
+                                                    onOpenChange={(open) => toggleFilterCollapsible('workstream', open)}
                                                 >
                                                     <CollapsibleTrigger className="w-full flex items-center justify-between h-[40px] px-3 text-[15px] border border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
                                                         <div className="flex items-center gap-2">
@@ -846,11 +376,7 @@ export default function WorkPackagesPage() {
                                                                     key={ws}
                                                                     onClick={() => {
                                                                         setSelectedWorkstream(ws === selectedWorkstream ? "" : ws);
-                                                                        setOpenFilterCollapsibles(prev => {
-                                                                            const next = new Set(prev);
-                                                                            next.delete('workstream');
-                                                                            return next;
-                                                                        });
+                                                                        closeFilterCollapsible('workstream');
                                                                     }}
                                                                     className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${selectedWorkstream === ws ? 'bg-[#E0F5FF] font-medium' : ''
                                                                         }`}
@@ -867,14 +393,7 @@ export default function WorkPackagesPage() {
                                             <div className="flex flex-col gap-2">
                                                 <Collapsible
                                                     open={openFilterCollapsibles.has('type')}
-                                                    onOpenChange={(open) => {
-                                                        setOpenFilterCollapsibles(prev => {
-                                                            const next = new Set(prev);
-                                                            if (open) next.add('type');
-                                                            else next.delete('type');
-                                                            return next;
-                                                        });
-                                                    }}
+                                                    onOpenChange={(open) => toggleFilterCollapsible('type', open)}
                                                 >
                                                     <CollapsibleTrigger className="w-full flex items-center justify-between h-[40px] px-3 text-[15px] border border-slate-300 rounded-[8px] bg-white transition-all hover:border-[#009EDB]/60 hover:shadow-sm">
                                                         <div className="flex items-center gap-2">
@@ -892,11 +411,7 @@ export default function WorkPackagesPage() {
                                                             <div
                                                                 onClick={() => {
                                                                     setSelectedBigTicket(selectedBigTicket === "big-ticket" ? "" : "big-ticket");
-                                                                    setOpenFilterCollapsibles(prev => {
-                                                                        const next = new Set(prev);
-                                                                        next.delete('type');
-                                                                        return next;
-                                                                    });
+                                                                    closeFilterCollapsible('type');
                                                                 }}
                                                                 className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${selectedBigTicket === "big-ticket" ? 'bg-[#E0F5FF] font-medium' : ''
                                                                     }`}
@@ -906,11 +421,7 @@ export default function WorkPackagesPage() {
                                                             <div
                                                                 onClick={() => {
                                                                     setSelectedBigTicket(selectedBigTicket === "other" ? "" : "other");
-                                                                    setOpenFilterCollapsibles(prev => {
-                                                                        const next = new Set(prev);
-                                                                        next.delete('type');
-                                                                        return next;
-                                                                    });
+                                                                    closeFilterCollapsible('type');
                                                                 }}
                                                                 className={`rounded-[6px] px-3 py-2 text-[15px] cursor-pointer hover:bg-[#E0F5FF] transition-colors ${selectedBigTicket === "other" ? 'bg-[#E0F5FF] font-medium' : ''
                                                                     }`}
