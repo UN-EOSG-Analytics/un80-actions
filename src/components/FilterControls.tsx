@@ -269,34 +269,6 @@ export function FilterControls({
             {/* Advanced Filters Content - Expands Below */}
             {isAdvancedFilterOpen && (
                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-                    {/* Work Package Filter */}
-                    <FilterDropdown
-                        open={openFilterCollapsibles.has('workPackage')}
-                        onOpenChange={(open) => onToggleFilterCollapsible('workPackage', open)}
-                        icon={<Briefcase className="w-4 h-4 text-un-blue" />}
-                        triggerText={
-                            selectedWorkPackage.length === 0
-                                ? 'Select work package'
-                                : selectedWorkPackage.length === 1
-                                    ? selectedWorkPackage[0]
-                                    : `${selectedWorkPackage.length} work packages selected`
-                        }
-                        isFiltered={selectedWorkPackage.length > 0}
-                        allActive={false}
-                        options={uniqueWorkPackages.map((wp): FilterOption => ({
-                            key: wp,
-                            label: wp,
-                        }))}
-                        selectedKeys={new Set(selectedWorkPackage)}
-                        onToggle={(key) => {
-                            const newSelected = selectedWorkPackage.includes(key)
-                                ? selectedWorkPackage.filter(wp => wp !== key)
-                                : [...selectedWorkPackage, key];
-                            onSelectWorkPackage(newSelected);
-                        }}
-                        ariaLabel="Filter by work package"
-                    />
-
                     {/* Work Package Leads Filter */}
                     <FilterDropdown
                         open={openFilterCollapsibles.has('lead')}
@@ -323,6 +295,38 @@ export function FilterControls({
                             onSelectLead(newSelected);
                         }}
                         ariaLabel="Filter by work package lead"
+                        enableSearch={true}
+                        searchPlaceholder="Search leads..."
+                    />
+
+                    {/* Work Package Filter */}
+                    <FilterDropdown
+                        open={openFilterCollapsibles.has('workPackage')}
+                        onOpenChange={(open) => onToggleFilterCollapsible('workPackage', open)}
+                        icon={<Briefcase className="w-4 h-4 text-un-blue" />}
+                        triggerText={
+                            selectedWorkPackage.length === 0
+                                ? 'Select work package'
+                                : selectedWorkPackage.length === 1
+                                    ? selectedWorkPackage[0]
+                                    : `${selectedWorkPackage.length} work packages selected`
+                        }
+                        isFiltered={selectedWorkPackage.length > 0}
+                        allActive={false}
+                        options={uniqueWorkPackages.map((wp): FilterOption => ({
+                            key: wp,
+                            label: wp,
+                        }))}
+                        selectedKeys={new Set(selectedWorkPackage)}
+                        onToggle={(key) => {
+                            const newSelected = selectedWorkPackage.includes(key)
+                                ? selectedWorkPackage.filter(wp => wp !== key)
+                                : [...selectedWorkPackage, key];
+                            onSelectWorkPackage(newSelected);
+                        }}
+                        ariaLabel="Filter by work package"
+                        enableSearch={true}
+                        searchPlaceholder="Search work packages..."
                     />
 
                     {/* Workstream Filter */}
