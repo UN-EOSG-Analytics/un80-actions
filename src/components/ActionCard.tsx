@@ -11,7 +11,7 @@ interface ActionItemProps {
 
 export function ActionItem({ action, index, workPackageNumber }: ActionItemProps) {
     return (
-        <div className="bg-white border border-slate-200 rounded-[6px] p-5 transition-all hover:shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-[6px] p-5 hover:shadow-sm transition-shadow">
             {/* Activity Number and Text */}
             <div className="flex gap-3 mb-4 items-start">
                 <div className="shrink-0 w-6 h-6 rounded-full bg-un-blue/10 flex items-center justify-center mt-[3px]">

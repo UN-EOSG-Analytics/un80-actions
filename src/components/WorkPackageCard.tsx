@@ -30,7 +30,7 @@ function WorkPackageActions({ actions, workPackageNumber }: WorkPackageActionsPr
     return (
         <div className="flex flex-col gap-2">
             {/* Header */}
-            <h3 className="text-lg font-semibold text-slate-700 tracking-wider text-left">
+            <h3 className="text-lg font-semibold text-slate-700 tracking-wider text-left pb-1">
                 Indicative Actions
             </h3>
             {/* Display each indicative_activity in its own box */}
@@ -61,13 +61,13 @@ export function WorkPackageItem({
     return (
         <Collapsible open={isOpen} onOpenChange={onToggle}>
             <div
-                className={`mb-20 last:mb-0 relative border-l-4 ${isOpen
-                    ? "border-l-un-blue border border-slate-200 rounded-[6px] bg-slate-50/50"
-                    : "border-l-transparent"
+                className={`mb-20 last:mb-0 relative border-l-4 border border-transparent rounded-[6px] ${isOpen
+                    ? "border-l-un-blue border-slate-200 bg-slate-50/50 transition-colors duration-200"
+                    : "border-l-transparent transition-colors duration-200 delay-[400ms]"
                     }`}
             >
                 <CollapsibleTrigger
-                    className={`w-full flex flex-col items-start px-6 py-4 hover:no-underline rounded-[6px] transition-all hover:bg-[#E0F5FF] border-0 ${isOpen ? "rounded-b-none bg-slate-50/50" : "bg-gray-50"
+                    className={`w-full flex flex-col items-start px-6 py-4 hover:no-underline rounded-[6px] transition-colors hover:bg-[#E0F5FF] border-0 ${isOpen ? "rounded-b-none bg-slate-50/50" : "bg-gray-50"
                         }`}
                 >
                     {/* Work Package Title */}
@@ -166,11 +166,13 @@ export function WorkPackageItem({
                 </button>
 
                 {/* Collapsible Content */}
-                <CollapsibleContent className={`px-0 pb-4 pt-2 pl-6 ${isOpen ? "px-6" : ""}`}>
-                    <WorkPackageActions
-                        actions={wp.actions}
-                        workPackageNumber={wp.number}
-                    />
+                <CollapsibleContent className="px-6 pb-6 pt-0">
+                    <div className="pt-3">
+                        <WorkPackageActions
+                            actions={wp.actions}
+                            workPackageNumber={wp.number}
+                        />
+                    </div>
                 </CollapsibleContent>
             </div>
         </Collapsible>

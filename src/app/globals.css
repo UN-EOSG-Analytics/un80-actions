@@ -125,8 +125,8 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   /* Collapsible animations */
-  --animate-collapsible-down: collapsible-down 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --animate-collapsible-up: collapsible-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --animate-collapsible-down: collapsible-down 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --animate-collapsible-up: collapsible-up 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @layer base {
