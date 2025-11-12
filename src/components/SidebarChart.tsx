@@ -102,11 +102,11 @@ export function SidebarChart({
                                 >
                                     <td className="py-2 pr-0">
                                         <div className="flex items-center justify-between gap-1">
-                                            <div style={{ width: `${labelWidth}px`, flexShrink: 0 }}>
+                                            <div style={{ width: `${labelWidth}px`, flexShrink: 0 }} className="ml-0.5">
                                                 {entry.tooltip ? (
                                                     <Tooltip>
                                                         <TooltipTrigger asChild>
-                                                            <span className="text-[14px] font-medium text-slate-900 group-hover:text-un-blue transition-colors cursor-help block whitespace-nowrap">
+                                                            <span className="text-[14px] font-medium text-slate-600 group-hover:text-un-blue transition-colors cursor-help block whitespace-nowrap">
                                                                 {entry.label}
                                                             </span>
                                                         </TooltipTrigger>
@@ -115,7 +115,7 @@ export function SidebarChart({
                                                         </TooltipContent>
                                                     </Tooltip>
                                                 ) : (
-                                                    <span className="text-[14px] font-medium text-slate-900 group-hover:text-un-blue transition-colors block whitespace-nowrap">
+                                                    <span className="text-[14px] font-medium text-slate-600 group-hover:text-un-blue transition-colors block whitespace-nowrap">
                                                         {entry.label}
                                                     </span>
                                                 )}
