@@ -13,8 +13,8 @@ export function LeadsBadge({ leads }: LeadsBadgeProps) {
         <Tooltip>
             <TooltipTrigger asChild>
                 <div className="flex items-center gap-1 sm:gap-2 cursor-help">
-                    <Users className="w-4 h-4 text-gray-600" />
-                    <p className="text-base text-gray-600 leading-5">
+                    <Users className="w-4 h-4 text-un-blue" />
+                    <p className="text-base text-un-blue leading-5">
                         {leads.map((lead, idx) => {
                             const longForm = abbreviationMap[lead] || lead;
                             return (
