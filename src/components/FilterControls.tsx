@@ -96,6 +96,13 @@ export function FilterControls({
         selectedBigTicket
     );
 
+    const hasActiveAdvancedFilters = !!(
+        selectedWorkPackage.length > 0 ||
+        selectedLead.length > 0 ||
+        selectedWorkstream.length > 0 ||
+        selectedBigTicket
+    );
+
     return (
         <>
             {/* Header with Advanced Filters Toggle and Sort */}
@@ -111,10 +118,20 @@ export function FilterControls({
                     <div className="flex items-center gap-2 sm:hidden">
                         {/* Advanced Filtering Collapsible */}
                         <Collapsible open={isAdvancedFilterOpen} onOpenChange={onAdvancedFilterOpenChange}>
-                            <CollapsibleTrigger className="flex items-center gap-1.5 text-[14px] font-medium text-slate-700 hover:text-un-blue transition-colors pl-0 pr-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap">
-                                <span>Show Advanced Filters</span>
+                            <CollapsibleTrigger className={`
+                                h-10 flex items-center gap-3 px-3
+                                border rounded-lg
+                                text-base
+                                touch-manipulation transition-colors
+                                ${hasActiveAdvancedFilters
+                                    ? 'bg-un-blue/10 border-un-blue text-un-blue hover:border-un-blue'
+                                    : 'bg-white border-gray-200 text-gray-500 hover:bg-un-blue/10 hover:border-un-blue hover:text-un-blue'
+                                }
+                            `}>
+                                <Filter className="h-4 w-4 shrink-0" />
+                                <span className="truncate">Advanced Filters</span>
                                 <ChevronDown
-                                    className={`w-3 h-3 text-slate-600 transition-transform ${isAdvancedFilterOpen ? 'transform rotate-180' : ''
+                                    className={`h-4 w-4 shrink-0 transition-transform ${isAdvancedFilterOpen ? 'transform rotate-180' : ''
                                         }`}
                                 />
                             </CollapsibleTrigger>
@@ -128,9 +145,19 @@ export function FilterControls({
                                 <PopoverTrigger asChild>
                                     <button 
                                         type="button"
-                                        className="flex items-center gap-1.5 text-[14px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap"
+                                        className={`
+                                            h-10 flex items-center gap-3 px-3
+                                            border rounded-lg
+                                            text-base
+                                            touch-manipulation transition-colors
+                                            ${sortOption !== 'number-asc'
+                                                ? 'bg-un-blue/10 border-un-blue text-un-blue hover:border-un-blue'
+                                                : 'bg-white border-gray-200 text-gray-500 hover:bg-un-blue/10 hover:border-un-blue hover:text-un-blue'
+                                            }
+                                        `}
                                     >
-                                        <span>
+                                        <ArrowUpDown className="h-4 w-4 shrink-0" />
+                                        <span className="truncate">
                                             {sortOption === 'number-asc' ? 'Number (1-31)' :
                                                 sortOption === 'number-desc' ? 'Number (31-1)' :
                                                 sortOption === 'name-asc' ? 'Name (A-Z)' :
@@ -138,7 +165,7 @@ export function FilterControls({
                                                 'Sort'}
                                         </span>
                                         <ChevronDown
-                                            className={`w-3 h-3 text-slate-600 transition-transform ${openFilterCollapsibles.has('sort') ? 'transform rotate-180' : ''
+                                            className={`h-4 w-4 shrink-0 transition-transform ${openFilterCollapsibles.has('sort') ? 'transform rotate-180' : ''
                                                 }`}
                                         />
                                     </button>
@@ -184,10 +211,20 @@ export function FilterControls({
                     <div className="hidden sm:flex items-center gap-3">
                         {/* Advanced Filtering Collapsible */}
                         <Collapsible open={isAdvancedFilterOpen} onOpenChange={onAdvancedFilterOpenChange}>
-                            <CollapsibleTrigger className="flex items-center gap-1.5 text-[15px] font-medium text-slate-700 hover:text-un-blue transition-colors px-2 py-1 rounded-[6px] hover:bg-slate-50 whitespace-nowrap">
-                                <span>Show Advanced Filters</span>
+                            <CollapsibleTrigger className={`
+                                h-10 flex items-center gap-3 px-3
+                                border rounded-lg
+                                text-base
+                                touch-manipulation transition-colors
+                                ${hasActiveAdvancedFilters
+                                    ? 'bg-un-blue/10 border-un-blue text-un-blue hover:border-un-blue'
+                                    : 'bg-white border-gray-200 text-gray-500 hover:bg-un-blue/10 hover:border-un-blue hover:text-un-blue'
+                                }
+                            `}>
+                                <Filter className="h-4 w-4 shrink-0" />
+                                <span className="truncate">Advanced Filters</span>
                                 <ChevronDown
-                                    className={`w-3 h-3 text-slate-600 transition-transform ${isAdvancedFilterOpen ? 'transform rotate-180' : ''
+                                    className={`h-4 w-4 shrink-0 transition-transform ${isAdvancedFilterOpen ? 'transform rotate-180' : ''
                                         }`}
                                 />
                             </CollapsibleTrigger>
