@@ -1,55 +1,46 @@
-# UN Website Boilerplate
+# UN80 Initiative Actions
 
-https://github.com/kleinlennart/un-website-boilerplate
+This Dashboard is an annex to the [UN80 Initiative Action Plan](https://www.un.org/un80-initiative/sites/default/files/2025-11/UN80_Initiative_Action_Plan.pdf). It presents the detailed work packages across the three [UN80 Initiative](https://www.un.org/un80-initiative/en) workstreams in a single reference. This Dashboard also lists designated leads for each work package, along with their individual action items (derived from paragraphs in the [SG's reports on the UN80 Initiative](https://www.un.org/un80-initiative/en)).
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+[un80actions.un.org](https://un80actions.un.org)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm
+
+### Installation
+
+```bash
+npm install
+```
+
+### Development
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Next.js 16** - App Router
+- **Tailwind CSS v4.1** - Styling
+- **shadcn/ui** - UI Components
+- **TypeScript** - Type safety
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-
-## Good to know
-
-- https://nextjs.org/docs/app/api-reference/file-conventions/src-folder
-- https://nextjs.org/docs/app/getting-started/project-structure
-
-- The `/public` directory should remain in the root of your project.
-- Config files like `package.json`, `next.config.js` and `tsconfig.json` should remain in the root of your project.
-- `.env.*` files should remain in the root of your project.
-- `src/app` or `src/pages` will be ignored if `app` or `pages` are present in the root directory.
-- If you are using a `src` directory, consider moving other application folders such as `/components` or `/lib` into `src` for consistency.
-- If you are using a Proxy, ensure it is placed inside the `src` folder.
-- When using Tailwind CSS, add the `/src` prefix to the `content` array in your `tailwind.config.js` file to ensure proper scanning.
-- If you use TypeScript path aliases like `@/*`, update the `paths` object in `tsconfig.json` to include `src/`.
+- `/src/app` - Next.js app router pages and layouts
+- `/src/components` - React components
+- `/src/components/ui` - shadcn/ui components
+- `/src/hooks` - Custom React hooks
+- `/src/lib` - Utility functions and data processing
+- `/src/types` - TypeScript type definitions
+- `/public/data` - Static data files
+- `/python` - Data preparation scripts
