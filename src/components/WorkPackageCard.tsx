@@ -73,14 +73,14 @@ export function WorkPackageItem({
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-un-blue rounded-l-[6px] z-10 pointer-events-none" />
                 )}
                 <CollapsibleTrigger
-                    className={`w-full flex flex-col items-start px-6 py-4 hover:no-underline rounded-[6px] transition-colors hover:bg-[#E0F5FF] border-0 ${isOpen ? "rounded-b-none bg-slate-50/50" : "bg-gray-50"
+                    className={`w-full flex flex-col items-start px-6 py-4 hover:no-underline rounded-[6px] transition-colors hover:bg-[#E0F5FF] border-0 ${isOpen ? "rounded-b-none bg-slate-50/50" : "bg-slate-50"
                         }`}
                 >
                     {/* Work Package Title */}
                     <div className="text-left min-w-0 mb-2 pr-20 sm:pr-8">
                         {wp.number ? (
                             <>
-                                <span className="text-sm font-medium text-gray-400 uppercase tracking-wider leading-5">
+                                <span className="text-sm font-medium text-slate-500 uppercase tracking-wider leading-5">
                                     Work package {wp.number}
                                 </span>
                                 <h2 className="text-xl font-semibold text-slate-900 leading-7 mt-1">
@@ -97,7 +97,7 @@ export function WorkPackageItem({
                     {/* Goal from work package data */}
                     {wp.goal && (
                         <div className="pr-8 text-left mb-4 ml-0.5 border-l-2 border-un-blue pl-3">
-                            <p className="text-[15px] text-gray-500 leading-relaxed font-medium">
+                            <p className="text-slate-600 leading-relaxed font-medium">
                                 {formatGoalText(wp.goal)}
                             </p>
                         </div>
@@ -116,7 +116,7 @@ export function WorkPackageItem({
                 {/* Details Button */}
                 <button
                     type="button"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-[6px] text-sm font-medium transition-colors absolute top-4 right-2 sm:right-4"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-300 hover:bg-slate-400 text-slate-800 rounded-[6px] text-sm font-medium transition-colors absolute top-4 right-2 sm:right-4"
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -124,9 +124,9 @@ export function WorkPackageItem({
                     }}
                 >
                     {isOpen ? (
-                        <ChevronUp className="w-3.5 h-3.5 text-gray-700" />
+                        <ChevronUp className="w-3.5 h-3.5" />
                     ) : (
-                        <ChevronDown className="w-3.5 h-3.5 text-gray-700" />
+                        <ChevronDown className="w-3.5 h-3.5" />
                     )}
                     <span>Details</span>
                 </button>
