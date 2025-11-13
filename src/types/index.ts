@@ -11,50 +11,50 @@
  * Represents a UN action item with its associated metadata
  */
 export interface Action {
-    /** Report identifier (e.g., "WS2", "WS3") */
-    report: string;
+  /** Report identifier (e.g., "WS2", "WS3") */
+  report: string;
 
-    /** Work package number as a string */
-    work_package_number: string;
+  /** Work package number as a string */
+  work_package_number: string;
 
-    /** Name/title of the work package */
-    work_package_name: string;
+  /** Name/title of the work package */
+  work_package_name: string;
 
-    /** Paragraph reference in the document */
-    document_paragraph: string;
+  /** Paragraph reference in the document */
+  document_paragraph: string;
 
-    /** Unique action number as a string */
-    action_number: string;
+  /** Unique action number as a string */
+  action_number: string;
 
-    /** Description of the indicative activity */
-    indicative_activity: string;
+  /** Description of the indicative activity */
+  indicative_activity: string;
 
-    /** Whether this is a "big ticket" item */
-    big_ticket: boolean;
+  /** Whether this is a "big ticket" item */
+  big_ticket: boolean;
 
-    /** Array of work package leads */
-    work_package_leads: string[];
+  /** Array of work package leads */
+  work_package_leads: string[];
 
-    /** First milestone date in ISO format (e.g., "2026-02-28") or null */
-    first_milestone: string | null;
+  /** First milestone date in ISO format (e.g., "2026-02-28") or null */
+  first_milestone: string | null;
 
-    /** Whether Member State approval is required */
-    ms_approval: boolean;
+  /** Whether Member State approval is required */
+  ms_approval: boolean;
 
-    /** Member State body abbreviation (e.g., "GA", "SC", "ECOSOC") or null */
-    ms_body: string[];
+  /** Member State body abbreviation (e.g., "GA", "SC", "ECOSOC") or null */
+  ms_body: string[];
 
-    /** Legal considerations and requirements or null */
-    legal_consideration: string | null;
+  /** Legal considerations and requirements or null */
+  legal_consideration: string | null;
 
-    /** Array of UN budget information */
-    un_budget: string[];
+  /** Array of UN budget information */
+  un_budget: string[];
 
-    /** Work package goal description or null */
-    work_package_goal: string | null;
+  /** Work package goal description or null */
+  work_package_goal: string | null;
 
-    /** Document text or null */
-    doc_text: string | null;
+  /** Document text or null */
+  doc_text: string | null;
 }
 
 /**
@@ -70,42 +70,42 @@ export type Actions = Action[];
  * Work package statistics interface
  */
 export interface WorkPackageStats {
-    total: number;
-    completed: number;
-    totalActions: number;
-    completedActions: number;
+  total: number;
+  completed: number;
+  totalActions: number;
+  completedActions: number;
 }
 
 /**
  * Next milestone interface
  */
 export interface NextMilestone {
-    date: string;
-    indicativeActivity: string;
+  date: string;
+  indicativeActivity: string;
 }
 
 /**
  * Represents an individual action within a work package
  */
 export interface WorkPackageAction {
-    text: string;
-    documentParagraph: string;
-    leads: string[];
-    report: string;
-    docText: string | null;
+  text: string;
+  documentParagraph: string;
+  leads: string[];
+  report: string;
+  docText: string | null;
 }
 
 /**
  * Represents a grouped work package with aggregated data across reports
  */
 export interface WorkPackage {
-    report: string[];
-    number: string;
-    name: string;
-    leads: string[];
-    goal: string | null;
-    bigTicket: boolean;
-    actions: WorkPackageAction[];
+  report: string[];
+  number: string;
+  name: string;
+  leads: string[];
+  goal: string | null;
+  bigTicket: boolean;
+  actions: WorkPackageAction[];
 }
 
 // ============================================================================
@@ -116,12 +116,12 @@ export interface WorkPackage {
  * Filter state for work packages
  */
 export interface FilterState {
-    searchQuery: string;
-    selectedWorkPackage: string[];
-    selectedLead: string[];
-    selectedWorkstream: string[];
-    selectedBigTicket: string;
-    sortOption: string;
+  searchQuery: string;
+  selectedWorkPackage: string[];
+  selectedLead: string[];
+  selectedWorkstream: string[];
+  selectedBigTicket: string;
+  sortOption: string;
 }
 
 // ============================================================================
@@ -132,34 +132,34 @@ export interface FilterState {
  * Lead chart entry
  */
 export interface LeadChartEntry {
-    lead: string;
-    count: number;
+  lead: string;
+  count: number;
 }
 
 /**
  * Workstream chart entry
  */
 export interface WorkstreamChartEntry {
-    workstream: string;
-    count: number;
+  workstream: string;
+  count: number;
 }
 
 /**
  * Work package chart entry
  */
 export interface WorkPackageChartEntry {
-    workpackage: string;
-    count: number;
+  workpackage: string;
+  count: number;
 }
 
 /**
  * Statistics data for display
  */
 export interface StatsData {
-    workstreams: number;
-    workpackages: number;
-    actions: number;
-    leads: number;
+  workstreams: number;
+  workpackages: number;
+  actions: number;
+  leads: number;
 }
 
 // ============================================================================
@@ -170,17 +170,17 @@ export interface StatsData {
  * Chart search queries
  */
 export interface ChartSearchState {
-    chartSearchQuery: string;
-    workstreamChartSearchQuery: string;
-    workpackageChartSearchQuery: string;
+  chartSearchQuery: string;
+  workstreamChartSearchQuery: string;
+  workpackageChartSearchQuery: string;
 }
 
 /**
  * Collapsible visibility state
  */
 export interface CollapsibleState {
-    showAllLeads: boolean;
-    showAllWorkstreams: boolean;
-    showAllWorkpackages: boolean;
-    isAdvancedFilterOpen: boolean;
+  showAllLeads: boolean;
+  showAllWorkstreams: boolean;
+  showAllWorkpackages: boolean;
+  isAdvancedFilterOpen: boolean;
 }

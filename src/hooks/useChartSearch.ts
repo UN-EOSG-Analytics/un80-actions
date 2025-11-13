@@ -6,23 +6,25 @@ import type { ChartSearchState } from "@/types";
  * @returns Object containing chart search state and setters
  */
 export function useChartSearch() {
-    const [chartSearchQuery, setChartSearchQuery] = useState<string>("");
-    const [workstreamChartSearchQuery, setWorkstreamChartSearchQuery] = useState<string>("");
-    const [workpackageChartSearchQuery, setWorkpackageChartSearchQuery] = useState<string>("");
+  const [chartSearchQuery, setChartSearchQuery] = useState<string>("");
+  const [workstreamChartSearchQuery, setWorkstreamChartSearchQuery] =
+    useState<string>("");
+  const [workpackageChartSearchQuery, setWorkpackageChartSearchQuery] =
+    useState<string>("");
 
-    const chartSearch: ChartSearchState = {
-        chartSearchQuery,
-        workstreamChartSearchQuery,
-        workpackageChartSearchQuery,
-    };
+  const chartSearch: ChartSearchState = {
+    chartSearchQuery,
+    workstreamChartSearchQuery,
+    workpackageChartSearchQuery,
+  };
 
-    return {
-        chartSearch,
-        chartSearchQuery,
-        setChartSearchQuery,
-        workstreamChartSearchQuery,
-        setWorkstreamChartSearchQuery,
-        workpackageChartSearchQuery,
-        setWorkpackageChartSearchQuery,
-    };
+  return {
+    chartSearch,
+    chartSearchQuery,
+    setChartSearchQuery,
+    workstreamChartSearchQuery,
+    setWorkstreamChartSearchQuery,
+    workpackageChartSearchQuery,
+    setWorkpackageChartSearchQuery,
+  };
 }

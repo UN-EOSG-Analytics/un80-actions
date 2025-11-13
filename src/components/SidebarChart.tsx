@@ -1,158 +1,175 @@
-import React from 'react';
-import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import React from "react";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export interface SidebarChartEntry {
-    label: string;
-    count: number;
-    value: string;
-    tooltip?: string;
+  label: string;
+  count: number;
+  value: string;
+  tooltip?: string;
 }
 
 interface SidebarChartProps {
-    title: string;
-    description: string;
-    icon: React.ReactNode;
-    data: SidebarChartEntry[];
-    searchQuery: string;
-    onSearchChange: (query: string) => void;
-    searchPlaceholder: string;
-    selectedValue: string[];
-    onSelectValue: (value: string[]) => void;
-    showAll: boolean;
-    onToggleShowAll: () => void;
-    initialDisplayCount?: number;
-    barWidth?: number; // Width in pixels
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  data: SidebarChartEntry[];
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  searchPlaceholder: string;
+  selectedValue: string[];
+  onSelectValue: (value: string[]) => void;
+  showAll: boolean;
+  onToggleShowAll: () => void;
+  initialDisplayCount?: number;
+  barWidth?: number; // Width in pixels
 }
 
 export function SidebarChart({
-    title,
-    description,
-    icon,
-    data,
-    searchQuery,
-    onSearchChange,
-    searchPlaceholder,
-    selectedValue,
-    onSelectValue,
-    showAll,
-    onToggleShowAll,
-    initialDisplayCount = 3,
-    barWidth = 90,
+  title,
+  description,
+  icon,
+  data,
+  searchQuery,
+  onSearchChange,
+  searchPlaceholder,
+  selectedValue,
+  onSelectValue,
+  showAll,
+  onToggleShowAll,
+  initialDisplayCount = 3,
+  barWidth = 90,
 }: SidebarChartProps) {
-    const displayedData = showAll ? data : data.slice(0, initialDisplayCount);
-    const maxCount = data.length > 0 ? Math.max(...data.map(d => d.count)) : 1;
-    
-    // Calculate fixed width for count based on max count across ALL data
-    const maxCountDigits = Math.max(...data.map(d => d.count)).toString().length;
-    const countWidth = maxCountDigits === 1 ? 'w-5' : maxCountDigits === 2 ? 'w-7' : 'w-9';
-    
-    // Calculate the exact width needed for the longest label
-    // Use 7px per character for more compact spacing
-    const maxLabelLength = Math.max(...data.map(d => d.label.length));
-    const labelWidth = maxLabelLength * 7;
+  const displayedData = showAll ? data : data.slice(0, initialDisplayCount);
+  const maxCount = data.length > 0 ? Math.max(...data.map((d) => d.count)) : 1;
 
-    const handleClickBar = (value: string) => {
-        const newSelected = selectedValue.includes(value)
-            ? selectedValue.filter((v) => v !== value)
-            : [...selectedValue, value];
-        onSelectValue(newSelected);
-    };
+  // Calculate fixed width for count based on max count across ALL data
+  const maxCountDigits = Math.max(...data.map((d) => d.count)).toString()
+    .length;
+  const countWidth =
+    maxCountDigits === 1 ? "w-5" : maxCountDigits === 2 ? "w-7" : "w-9";
 
-    return (
-        <div className="bg-white pb-4 sm:pb-5 rounded-xl pl-4.5">
-            <h3 className="text-[17px] font-semibold text-slate-900 mb-2 flex items-center gap-2 h-[25px]">
-                <span className="w-5 h-5 text-un-blue flex items-center justify-center">
-                    {icon}
-                </span>
-                {title}
-            </h3>
-            <p className="text-[15px] text-slate-600 mb-1.5">
-                {description}
-            </p>
+  // Calculate the exact width needed for the longest label
+  // Use 7px per character for more compact spacing
+  const maxLabelLength = Math.max(...data.map((d) => d.label.length));
+  const labelWidth = maxLabelLength * 7;
 
-            {/* Search Bar */}
-            <div className="relative w-full mb-1">
-                <Search className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-4 text-un-blue pointer-events-none z-10" />
-                <Input
-                    type="text"
-                    placeholder={searchPlaceholder}
-                    value={searchQuery}
-                    onChange={(e) => onSearchChange(e.target.value)}
-                    className="w-full h-9 text-[15px] border-0 border-b border-slate-300 rounded-none pl-6 pr-4 py-[8px] text-slate-700 placeholder:text-slate-400 bg-white transition-all hover:border-b-un-blue/60 focus:border-b-un-blue focus:ring-0 focus:ring-offset-0 focus:shadow-none focus:outline-none shadow-none"
-                />
-            </div>
+  const handleClickBar = (value: string) => {
+    const newSelected = selectedValue.includes(value)
+      ? selectedValue.filter((v) => v !== value)
+      : [...selectedValue, value];
+    onSelectValue(newSelected);
+  };
 
-            {/* Chart Data */}
-            <div className="overflow-hidden">
-                <table className="w-full table-fixed">
-                    <tbody>
-                        {displayedData.map((entry, index) => {
-                            const percentage = (entry.count / maxCount) * 100;
-                            const isSelected = selectedValue.includes(entry.value);
-                            const isFiltered = selectedValue.length > 0 && !selectedValue.includes(entry.value);
+  return (
+    <div className="rounded-xl bg-white pb-4 pl-4.5 sm:pb-5">
+      <h3 className="mb-2 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
+        <span className="flex h-5 w-5 items-center justify-center text-un-blue">
+          {icon}
+        </span>
+        {title}
+      </h3>
+      <p className="mb-1.5 text-[15px] text-slate-600">{description}</p>
 
-                            return (
-                                <tr
-                                    key={entry.value}
-                                    onClick={() => handleClickBar(entry.value)}
-                                    className={`group cursor-pointer transition-colors hover:bg-slate-50 ${isFiltered ? 'opacity-30' : ''
-                                        } ${index < displayedData.length - 1 ? 'border-b border-slate-200' : ''}`}
-                                >
-                                    <td className="py-2 pr-0">
-                                        <div className="flex items-center justify-between gap-1">
-                                            <div style={{ width: `${labelWidth}px`, flexShrink: 0 }} className="ml-0.5">
-                                                {entry.tooltip ? (
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <span className="text-[14px] font-medium text-slate-600 group-hover:text-un-blue transition-colors cursor-help block whitespace-nowrap">
-                                                                {entry.label}
-                                                            </span>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            <p>{entry.tooltip}</p>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                ) : (
-                                                    <span className="text-[14px] font-medium text-slate-600 group-hover:text-un-blue transition-colors block whitespace-nowrap">
-                                                        {entry.label}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div className="flex items-center gap-1.5 shrink-0">
-                                                <span
-                                                    className={`text-[14px] font-normal ${countWidth} text-right font-mono tabular-nums ${isSelected ? 'text-un-blue' : 'text-un-blue'
-                                                        }`}
-                                                >
-                                                    {entry.count}
-                                                </span>
-                                                <div className="h-2 bg-slate-100 rounded-full overflow-hidden relative mr-2" style={{ width: `${barWidth}px` }}>
-                                                    <div
-                                                        className={`h-full rounded-full transition-all ${isSelected ? 'bg-un-blue' : 'bg-un-blue'
-                                                            }`}
-                                                        style={{ width: `${percentage}%` }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
+      {/* Search Bar */}
+      <div className="relative mb-1 w-full">
+        <Search className="pointer-events-none absolute top-1/2 left-0 z-10 h-4 w-4 -translate-y-1/2 transform text-un-blue" />
+        <Input
+          type="text"
+          placeholder={searchPlaceholder}
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="h-9 w-full rounded-none border-0 border-b border-slate-300 bg-white py-[8px] pr-4 pl-6 text-[15px] text-slate-700 shadow-none transition-all placeholder:text-slate-400 hover:border-b-un-blue/60 focus:border-b-un-blue focus:shadow-none focus:ring-0 focus:ring-offset-0 focus:outline-none"
+        />
+      </div>
 
-                {/* Show More/Less Button */}
-                {data.length > initialDisplayCount && (
-                    <button
-                        onClick={onToggleShowAll}
-                        className="w-full py-2 text-[14px] text-left text-un-blue hover:text-un-blue/80 transition-colors"
-                    >
-                        {showAll ? 'Show less' : `Show ${data.length - initialDisplayCount} more`}
-                    </button>
-                )}
-            </div>
-        </div>
-    );
+      {/* Chart Data */}
+      <div className="overflow-hidden">
+        <table className="w-full table-fixed">
+          <tbody>
+            {displayedData.map((entry, index) => {
+              const percentage = (entry.count / maxCount) * 100;
+              const isSelected = selectedValue.includes(entry.value);
+              const isFiltered =
+                selectedValue.length > 0 &&
+                !selectedValue.includes(entry.value);
+
+              return (
+                <tr
+                  key={entry.value}
+                  onClick={() => handleClickBar(entry.value)}
+                  className={`group cursor-pointer transition-colors hover:bg-slate-50 ${
+                    isFiltered ? "opacity-30" : ""
+                  } ${index < displayedData.length - 1 ? "border-b border-slate-200" : ""}`}
+                >
+                  <td className="py-2 pr-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <div
+                        style={{ width: `${labelWidth}px`, flexShrink: 0 }}
+                        className="ml-0.5"
+                      >
+                        {entry.tooltip ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="block cursor-help text-[14px] font-medium whitespace-nowrap text-slate-600 transition-colors group-hover:text-un-blue">
+                                {entry.label}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{entry.tooltip}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <span className="block text-[14px] font-medium whitespace-nowrap text-slate-600 transition-colors group-hover:text-un-blue">
+                            {entry.label}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex shrink-0 items-center gap-1.5">
+                        <span
+                          className={`text-[14px] font-normal ${countWidth} text-right font-mono tabular-nums ${
+                            isSelected ? "text-un-blue" : "text-un-blue"
+                          }`}
+                        >
+                          {entry.count}
+                        </span>
+                        <div
+                          className="relative mr-2 h-2 overflow-hidden rounded-full bg-slate-100"
+                          style={{ width: `${barWidth}px` }}
+                        >
+                          <div
+                            className={`h-full rounded-full transition-all ${
+                              isSelected ? "bg-un-blue" : "bg-un-blue"
+                            }`}
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+
+        {/* Show More/Less Button */}
+        {data.length > initialDisplayCount && (
+          <button
+            onClick={onToggleShowAll}
+            className="w-full py-2 text-left text-[14px] text-un-blue transition-colors hover:text-un-blue/80"
+          >
+            {showAll
+              ? "Show less"
+              : `Show ${data.length - initialDisplayCount} more`}
+          </button>
+        )}
+      </div>
+    </div>
+  );
 }

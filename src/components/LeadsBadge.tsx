@@ -1,56 +1,70 @@
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { abbreviationMap } from "@/constants/abbreviations";
 import { Users } from "lucide-react";
 
 interface LeadsBadgeProps {
-    leads: string[];
-    onSelectLead?: (lead: string[]) => void;
-    variant?: "default" | "muted";
+  leads: string[];
+  onSelectLead?: (lead: string[]) => void;
+  variant?: "default" | "muted";
 }
 
-export function LeadsBadge({ leads, onSelectLead, variant = "default" }: LeadsBadgeProps) {
-    if (leads.length === 0) return null;
+export function LeadsBadge({
+  leads,
+  onSelectLead,
+  variant = "default",
+}: LeadsBadgeProps) {
+  if (leads.length === 0) return null;
 
-    const handleLeadClick = (lead: string) => {
-        if (onSelectLead) {
-            onSelectLead([lead]);
-        }
-    };
+  const handleLeadClick = (lead: string) => {
+    if (onSelectLead) {
+      onSelectLead([lead]);
+    }
+  };
 
-    const color = variant === "muted" ? "text-slate-600" : "text-un-blue";
-    const textSize = variant === "muted" ? "text-sm" : "";
+  const color = variant === "muted" ? "text-slate-600" : "text-un-blue";
+  const textSize = variant === "muted" ? "text-sm" : "";
 
-    return (
-        <div className="flex items-center gap-1.5">
-            <Users className={`w-4 h-4 ${color} shrink-0`} />
-            <p className={`${textSize} ${color} leading-tight text-left wrap-break-word`}>
-                {leads.map((lead, idx) => {
-                    const longForm = abbreviationMap[lead] || lead;
-                    return (
-                        <span key={idx}>
-                            {idx > 0 && "; "}
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <span
-                                        className={onSelectLead ? "cursor-pointer hover:underline" : "cursor-help"}
-                                        onClick={(e) => {
-                                            if (onSelectLead) {
-                                                e.stopPropagation();
-                                                handleLeadClick(lead);
-                                            }
-                                        }}
-                                    >
-                                        {lead}
-                                    </span>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>{longForm}</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </span>
-                    );
-                })}
-            </p>
-        </div>
-    );
+  return (
+    <div className="flex items-center gap-1.5">
+      <Users className={`h-4 w-4 ${color} shrink-0`} />
+      <p
+        className={`${textSize} ${color} text-left leading-tight wrap-break-word`}
+      >
+        {leads.map((lead, idx) => {
+          const longForm = abbreviationMap[lead] || lead;
+          return (
+            <span key={idx}>
+              {idx > 0 && "; "}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span
+                    className={
+                      onSelectLead
+                        ? "cursor-pointer hover:underline"
+                        : "cursor-help"
+                    }
+                    onClick={(e) => {
+                      if (onSelectLead) {
+                        e.stopPropagation();
+                        handleLeadClick(lead);
+                      }
+                    }}
+                  >
+                    {lead}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{longForm}</p>
+                </TooltipContent>
+              </Tooltip>
+            </span>
+          );
+        })}
+      </p>
+    </div>
+  );
 }

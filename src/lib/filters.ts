@@ -1,11 +1,11 @@
-import type { 
-    Actions, 
-    WorkPackage, 
-    LeadChartEntry, 
-    WorkstreamChartEntry, 
-    WorkPackageChartEntry,
-    StatsData,
-    FilterState
+import type {
+  Actions,
+  WorkPackage,
+  LeadChartEntry,
+  WorkstreamChartEntry,
+  WorkPackageChartEntry,
+  StatsData,
+  FilterState,
 } from "@/types";
 
 /**
@@ -15,87 +15,87 @@ import type {
  * @returns Filtered work packages
  */
 export function filterWorkPackages(
-    workPackages: WorkPackage[],
-    filters: FilterState
+  workPackages: WorkPackage[],
+  filters: FilterState,
 ): WorkPackage[] {
-    let filtered = workPackages;
+  let filtered = workPackages;
 
-    // Search filter
-    if (filters.searchQuery.trim()) {
-        const query = filters.searchQuery.toLowerCase();
-        filtered = filtered.filter(
-            (wp) =>
-                wp.name.toLowerCase().includes(query) ||
-                wp.number.includes(query) ||
-                wp.leads.some((lead) => lead.toLowerCase().includes(query)) ||
-                wp.actions.some((action) => action.text.toLowerCase().includes(query))
-        );
-    }
+  // Search filter
+  if (filters.searchQuery.trim()) {
+    const query = filters.searchQuery.toLowerCase();
+    filtered = filtered.filter(
+      (wp) =>
+        wp.name.toLowerCase().includes(query) ||
+        wp.number.includes(query) ||
+        wp.leads.some((lead) => lead.toLowerCase().includes(query)) ||
+        wp.actions.some((action) => action.text.toLowerCase().includes(query)),
+    );
+  }
 
-    // Work Package filter (supports multiple selections)
-    if (filters.selectedWorkPackage && filters.selectedWorkPackage.length > 0) {
-        const selectedNumbers = filters.selectedWorkPackage.map(wp => {
-            const wpMatch = wp.match(/^(\d+):/);
-            return wpMatch ? wpMatch[1] : wp;
-        });
-        
-        filtered = filtered.filter((wp) => {
-            if (wp.number) {
-                return selectedNumbers.includes(wp.number);
-            } else {
-                return selectedNumbers.includes(wp.name);
-            }
-        });
-    }
+  // Work Package filter (supports multiple selections)
+  if (filters.selectedWorkPackage && filters.selectedWorkPackage.length > 0) {
+    const selectedNumbers = filters.selectedWorkPackage.map((wp) => {
+      const wpMatch = wp.match(/^(\d+):/);
+      return wpMatch ? wpMatch[1] : wp;
+    });
 
-    // Lead filter (supports multiple selections)
-    if (filters.selectedLead && filters.selectedLead.length > 0) {
-        filtered = filtered.filter((wp) => 
-            wp.leads.some(lead => filters.selectedLead.includes(lead))
-        );
-    }
+    filtered = filtered.filter((wp) => {
+      if (wp.number) {
+        return selectedNumbers.includes(wp.number);
+      } else {
+        return selectedNumbers.includes(wp.name);
+      }
+    });
+  }
 
-    // Workstream filter (supports multiple selections)
-    if (filters.selectedWorkstream && filters.selectedWorkstream.length > 0) {
-        filtered = filtered.filter((wp) => 
-            filters.selectedWorkstream.some(ws => wp.report.includes(ws))
-        );
-    }
+  // Lead filter (supports multiple selections)
+  if (filters.selectedLead && filters.selectedLead.length > 0) {
+    filtered = filtered.filter((wp) =>
+      wp.leads.some((lead) => filters.selectedLead.includes(lead)),
+    );
+  }
 
-    // Big Ticket filter
-    if (filters.selectedBigTicket === "big-ticket") {
-        filtered = filtered.filter((wp) => wp.bigTicket === true);
-    } else if (filters.selectedBigTicket === "other") {
-        filtered = filtered.filter((wp) => wp.bigTicket === false);
-    }
+  // Workstream filter (supports multiple selections)
+  if (filters.selectedWorkstream && filters.selectedWorkstream.length > 0) {
+    filtered = filtered.filter((wp) =>
+      filters.selectedWorkstream.some((ws) => wp.report.includes(ws)),
+    );
+  }
 
-    // Sort filtered work packages
-    if (filters.sortOption) {
-        filtered = [...filtered].sort((a, b) => {
-            switch (filters.sortOption) {
-                case "name-asc":
-                    return a.name.localeCompare(b.name);
-                case "name-desc":
-                    return b.name.localeCompare(a.name);
-                case "number-asc": {
-                    const numA = parseInt(a.number) || 0;
-                    const numB = parseInt(b.number) || 0;
-                    if (numA !== numB) return numA - numB;
-                    return a.name.localeCompare(b.name);
-                }
-                case "number-desc": {
-                    const numA = parseInt(a.number) || 0;
-                    const numB = parseInt(b.number) || 0;
-                    if (numA !== numB) return numB - numA;
-                    return a.name.localeCompare(b.name);
-                }
-                default:
-                    return 0;
-            }
-        });
-    }
+  // Big Ticket filter
+  if (filters.selectedBigTicket === "big-ticket") {
+    filtered = filtered.filter((wp) => wp.bigTicket === true);
+  } else if (filters.selectedBigTicket === "other") {
+    filtered = filtered.filter((wp) => wp.bigTicket === false);
+  }
 
-    return filtered;
+  // Sort filtered work packages
+  if (filters.sortOption) {
+    filtered = [...filtered].sort((a, b) => {
+      switch (filters.sortOption) {
+        case "name-asc":
+          return a.name.localeCompare(b.name);
+        case "name-desc":
+          return b.name.localeCompare(a.name);
+        case "number-asc": {
+          const numA = parseInt(a.number) || 0;
+          const numB = parseInt(b.number) || 0;
+          if (numA !== numB) return numA - numB;
+          return a.name.localeCompare(b.name);
+        }
+        case "number-desc": {
+          const numA = parseInt(a.number) || 0;
+          const numB = parseInt(b.number) || 0;
+          if (numA !== numB) return numB - numA;
+          return a.name.localeCompare(b.name);
+        }
+        default:
+          return 0;
+      }
+    });
+  }
+
+  return filtered;
 }
 
 /**
@@ -104,14 +104,18 @@ export function filterWorkPackages(
  * @returns Sorted array of unique work package names
  */
 export function getUniqueWorkPackages(workPackages: WorkPackage[]): string[] {
-    return Array.from(new Set(workPackages.map(wp =>
-        wp.number ? `${wp.number}: ${wp.name}` : wp.name
-    ))).sort((a, b) => {
-        // Extract numbers from strings like "1: Name" or "10: Name"
-        const numA = parseInt(a.split(':')[0]) || 0;
-        const numB = parseInt(b.split(':')[0]) || 0;
-        return numA - numB;
-    });
+  return Array.from(
+    new Set(
+      workPackages.map((wp) =>
+        wp.number ? `${wp.number}: ${wp.name}` : wp.name,
+      ),
+    ),
+  ).sort((a, b) => {
+    // Extract numbers from strings like "1: Name" or "10: Name"
+    const numA = parseInt(a.split(":")[0]) || 0;
+    const numB = parseInt(b.split(":")[0]) || 0;
+    return numA - numB;
+  });
 }
 
 /**
@@ -120,11 +124,11 @@ export function getUniqueWorkPackages(workPackages: WorkPackage[]): string[] {
  * @returns Sorted array of unique leads
  */
 export function getUniqueLeads(workPackages: WorkPackage[]): string[] {
-    const leads = new Set<string>();
-    workPackages.forEach(wp => {
-        wp.leads.forEach(lead => leads.add(lead));
-    });
-    return Array.from(leads).sort();
+  const leads = new Set<string>();
+  workPackages.forEach((wp) => {
+    wp.leads.forEach((lead) => leads.add(lead));
+  });
+  return Array.from(leads).sort();
 }
 
 /**
@@ -133,11 +137,11 @@ export function getUniqueLeads(workPackages: WorkPackage[]): string[] {
  * @returns Sorted array of unique workstreams
  */
 export function getUniqueWorkstreams(workPackages: WorkPackage[]): string[] {
-    const workstreams = new Set<string>();
-    workPackages.forEach(wp => {
-        wp.report.forEach(ws => workstreams.add(ws));
-    });
-    return Array.from(workstreams).sort();
+  const workstreams = new Set<string>();
+  workPackages.forEach((wp) => {
+    wp.report.forEach((ws) => workstreams.add(ws));
+  });
+  return Array.from(workstreams).sort();
 }
 
 /**
@@ -149,53 +153,53 @@ export function getUniqueWorkstreams(workPackages: WorkPackage[]): string[] {
  * @returns Array of lead chart entries sorted by count descending
  */
 export function calculateLeadChartData(
-    workPackages: WorkPackage[],
-    searchQuery = "",
-    selectedWorkstream: string[] = [],
-    selectedWorkPackage: string[] = []
+  workPackages: WorkPackage[],
+  searchQuery = "",
+  selectedWorkstream: string[] = [],
+  selectedWorkPackage: string[] = [],
 ): LeadChartEntry[] {
-    const leadCounts = new Map<string, number>();
+  const leadCounts = new Map<string, number>();
 
-    // Filter work packages based on other chart selections
-    let filteredWPs = workPackages;
-    
-    if (selectedWorkstream.length > 0) {
-        filteredWPs = filteredWPs.filter(wp => 
-            selectedWorkstream.some(ws => wp.report.includes(ws))
-        );
-    }
-    
-    if (selectedWorkPackage.length > 0) {
-        const selectedNumbers = selectedWorkPackage.map(wp => {
-            const wpMatch = wp.match(/^(\d+):/);
-            return wpMatch ? wpMatch[1] : wp;
-        });
-        filteredWPs = filteredWPs.filter((wp) => {
-            if (wp.number) {
-                return selectedNumbers.includes(wp.number);
-            } else {
-                return selectedNumbers.includes(wp.name);
-            }
-        });
-    }
+  // Filter work packages based on other chart selections
+  let filteredWPs = workPackages;
 
-    filteredWPs.forEach(wp => {
-        wp.leads.forEach(lead => {
-            // Filter by chart search query if provided
-            if (searchQuery.trim()) {
-                const query = searchQuery.toLowerCase();
-                if (!lead.toLowerCase().includes(query)) {
-                    return;
-                }
-            }
-            const currentCount = leadCounts.get(lead) || 0;
-            leadCounts.set(lead, currentCount + 1);
-        });
+  if (selectedWorkstream.length > 0) {
+    filteredWPs = filteredWPs.filter((wp) =>
+      selectedWorkstream.some((ws) => wp.report.includes(ws)),
+    );
+  }
+
+  if (selectedWorkPackage.length > 0) {
+    const selectedNumbers = selectedWorkPackage.map((wp) => {
+      const wpMatch = wp.match(/^(\d+):/);
+      return wpMatch ? wpMatch[1] : wp;
     });
+    filteredWPs = filteredWPs.filter((wp) => {
+      if (wp.number) {
+        return selectedNumbers.includes(wp.number);
+      } else {
+        return selectedNumbers.includes(wp.name);
+      }
+    });
+  }
 
-    return Array.from(leadCounts.entries())
-        .map(([lead, count]) => ({ lead, count }))
-        .sort((a, b) => b.count - a.count); // Sort by count descending
+  filteredWPs.forEach((wp) => {
+    wp.leads.forEach((lead) => {
+      // Filter by chart search query if provided
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        if (!lead.toLowerCase().includes(query)) {
+          return;
+        }
+      }
+      const currentCount = leadCounts.get(lead) || 0;
+      leadCounts.set(lead, currentCount + 1);
+    });
+  });
+
+  return Array.from(leadCounts.entries())
+    .map(([lead, count]) => ({ lead, count }))
+    .sort((a, b) => b.count - a.count); // Sort by count descending
 }
 
 /**
@@ -207,52 +211,53 @@ export function calculateLeadChartData(
  * @returns Array of workstream chart entries sorted by count descending
  */
 export function calculateWorkstreamChartData(
-    actions: Actions,
-    searchQuery = "",
-    selectedLead: string[] = [],
-    selectedWorkPackage: string[] = []
+  actions: Actions,
+  searchQuery = "",
+  selectedLead: string[] = [],
+  selectedWorkPackage: string[] = [],
 ): WorkstreamChartEntry[] {
-    const workstreamCounts = new Map<string, number>();
+  const workstreamCounts = new Map<string, number>();
 
-    // Filter actions based on other chart selections
-    let filteredActions = actions;
-    
-    if (selectedLead.length > 0) {
-        filteredActions = filteredActions.filter((action) =>
-            Array.isArray(action.work_package_leads) && 
-            action.work_package_leads.some(lead => selectedLead.includes(lead))
-        );
-    }
-    
-    if (selectedWorkPackage.length > 0) {
-        const selectedNumbers = selectedWorkPackage.map(wp => {
-            const wpMatch = wp.match(/^(\d+):/);
-            return wpMatch ? wpMatch[1] : wp;
-        });
-        filteredActions = filteredActions.filter((action) => {
-            if (action.work_package_number) {
-                return selectedNumbers.includes(action.work_package_number);
-            } else {
-                return selectedNumbers.includes(action.work_package_name);
-            }
-        });
-    }
+  // Filter actions based on other chart selections
+  let filteredActions = actions;
 
-    filteredActions.forEach(action => {
-        // Filter by chart search query if provided
-        if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase();
-            if (!action.report.toLowerCase().includes(query)) {
-                return;
-            }
-        }
-        const currentCount = workstreamCounts.get(action.report) || 0;
-        workstreamCounts.set(action.report, currentCount + 1);
+  if (selectedLead.length > 0) {
+    filteredActions = filteredActions.filter(
+      (action) =>
+        Array.isArray(action.work_package_leads) &&
+        action.work_package_leads.some((lead) => selectedLead.includes(lead)),
+    );
+  }
+
+  if (selectedWorkPackage.length > 0) {
+    const selectedNumbers = selectedWorkPackage.map((wp) => {
+      const wpMatch = wp.match(/^(\d+):/);
+      return wpMatch ? wpMatch[1] : wp;
     });
+    filteredActions = filteredActions.filter((action) => {
+      if (action.work_package_number) {
+        return selectedNumbers.includes(action.work_package_number);
+      } else {
+        return selectedNumbers.includes(action.work_package_name);
+      }
+    });
+  }
 
-    return Array.from(workstreamCounts.entries())
-        .map(([workstream, count]) => ({ workstream, count }))
-        .sort((a, b) => b.count - a.count); // Sort by count descending
+  filteredActions.forEach((action) => {
+    // Filter by chart search query if provided
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      if (!action.report.toLowerCase().includes(query)) {
+        return;
+      }
+    }
+    const currentCount = workstreamCounts.get(action.report) || 0;
+    workstreamCounts.set(action.report, currentCount + 1);
+  });
+
+  return Array.from(workstreamCounts.entries())
+    .map(([workstream, count]) => ({ workstream, count }))
+    .sort((a, b) => b.count - a.count); // Sort by count descending
 }
 
 /**
@@ -264,48 +269,49 @@ export function calculateWorkstreamChartData(
  * @returns Array of work package chart entries sorted by count descending
  */
 export function calculateWorkPackageChartData(
-    actions: Actions,
-    searchQuery = "",
-    selectedLead: string[] = [],
-    selectedWorkstream: string[] = []
+  actions: Actions,
+  searchQuery = "",
+  selectedLead: string[] = [],
+  selectedWorkstream: string[] = [],
 ): WorkPackageChartEntry[] {
-    const workpackageCounts = new Map<string, number>();
+  const workpackageCounts = new Map<string, number>();
 
-    // Filter actions based on other chart selections
-    let filteredActions = actions;
-    
-    if (selectedLead.length > 0) {
-        filteredActions = filteredActions.filter((action) =>
-            Array.isArray(action.work_package_leads) && 
-            action.work_package_leads.some(lead => selectedLead.includes(lead))
-        );
+  // Filter actions based on other chart selections
+  let filteredActions = actions;
+
+  if (selectedLead.length > 0) {
+    filteredActions = filteredActions.filter(
+      (action) =>
+        Array.isArray(action.work_package_leads) &&
+        action.work_package_leads.some((lead) => selectedLead.includes(lead)),
+    );
+  }
+
+  if (selectedWorkstream.length > 0) {
+    filteredActions = filteredActions.filter((action) =>
+      selectedWorkstream.includes(action.report),
+    );
+  }
+
+  filteredActions.forEach((action) => {
+    const wpKey = action.work_package_number
+      ? `${action.work_package_number}: ${action.work_package_name}`
+      : action.work_package_name;
+
+    // Filter by chart search query if provided
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      if (!wpKey.toLowerCase().includes(query)) {
+        return;
+      }
     }
-    
-    if (selectedWorkstream.length > 0) {
-        filteredActions = filteredActions.filter((action) => 
-            selectedWorkstream.includes(action.report)
-        );
-    }
+    const currentCount = workpackageCounts.get(wpKey) || 0;
+    workpackageCounts.set(wpKey, currentCount + 1);
+  });
 
-    filteredActions.forEach(action => {
-        const wpKey = action.work_package_number 
-            ? `${action.work_package_number}: ${action.work_package_name}` 
-            : action.work_package_name;
-        
-        // Filter by chart search query if provided
-        if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase();
-            if (!wpKey.toLowerCase().includes(query)) {
-                return;
-            }
-        }
-        const currentCount = workpackageCounts.get(wpKey) || 0;
-        workpackageCounts.set(wpKey, currentCount + 1);
-    });
-
-    return Array.from(workpackageCounts.entries())
-        .map(([workpackage, count]) => ({ workpackage, count }))
-        .sort((a, b) => b.count - a.count); // Sort by count descending
+  return Array.from(workpackageCounts.entries())
+    .map(([workpackage, count]) => ({ workpackage, count }))
+    .sort((a, b) => b.count - a.count); // Sort by count descending
 }
 
 /**
@@ -316,78 +322,83 @@ export function calculateWorkPackageChartData(
  * @returns Statistics data
  */
 export function calculateStatsData(
-    actions: Actions,
-    filteredWorkPackages: WorkPackage[],
-    filters: FilterState
+  actions: Actions,
+  filteredWorkPackages: WorkPackage[],
+  filters: FilterState,
 ): StatsData {
-    const uniqueWorkstreams = new Set<string>();
-    const uniqueLeadsSet = new Set<string>();
+  const uniqueWorkstreams = new Set<string>();
+  const uniqueLeadsSet = new Set<string>();
 
-    // Filter actions based on current filters
-    let filteredActions = actions;
+  // Filter actions based on current filters
+  let filteredActions = actions;
 
-    // Search filter
-    if (filters.searchQuery.trim()) {
-        const query = filters.searchQuery.toLowerCase();
-        filteredActions = filteredActions.filter(
-            (action) =>
-                action.work_package_name.toLowerCase().includes(query) ||
-                action.work_package_number.includes(query) ||
-                (Array.isArray(action.work_package_leads) && 
-                 action.work_package_leads.some((lead) => lead.toLowerCase().includes(query))) ||
-                action.indicative_activity.toLowerCase().includes(query)
-        );
-    }
+  // Search filter
+  if (filters.searchQuery.trim()) {
+    const query = filters.searchQuery.toLowerCase();
+    filteredActions = filteredActions.filter(
+      (action) =>
+        action.work_package_name.toLowerCase().includes(query) ||
+        action.work_package_number.includes(query) ||
+        (Array.isArray(action.work_package_leads) &&
+          action.work_package_leads.some((lead) =>
+            lead.toLowerCase().includes(query),
+          )) ||
+        action.indicative_activity.toLowerCase().includes(query),
+    );
+  }
 
-    // Work Package filter (supports multiple selections)
-    if (filters.selectedWorkPackage && filters.selectedWorkPackage.length > 0) {
-        const selectedNumbers = filters.selectedWorkPackage.map(wp => {
-            const wpMatch = wp.match(/^(\d+):/);
-            return wpMatch ? wpMatch[1] : wp;
-        });
-        
-        filteredActions = filteredActions.filter((action) => {
-            if (action.work_package_number) {
-                return selectedNumbers.includes(action.work_package_number);
-            } else {
-                return selectedNumbers.includes(action.work_package_name);
-            }
-        });
-    }
-
-    // Lead filter (supports multiple selections)
-    if (filters.selectedLead && filters.selectedLead.length > 0) {
-        filteredActions = filteredActions.filter((action) =>
-            Array.isArray(action.work_package_leads) && 
-            action.work_package_leads.some(lead => filters.selectedLead.includes(lead))
-        );
-    }
-
-    // Workstream filter (supports multiple selections)
-    if (filters.selectedWorkstream && filters.selectedWorkstream.length > 0) {
-        filteredActions = filteredActions.filter((action) => 
-            filters.selectedWorkstream.includes(action.report)
-        );
-    }
-
-    filteredActions.forEach(action => {
-        if (action.report) {
-            uniqueWorkstreams.add(action.report);
-        }
-        if (Array.isArray(action.work_package_leads)) {
-            action.work_package_leads.forEach(lead => {
-                const trimmed = lead?.trim();
-                if (trimmed && trimmed.length > 0) {
-                    uniqueLeadsSet.add(trimmed);
-                }
-            });
-        }
+  // Work Package filter (supports multiple selections)
+  if (filters.selectedWorkPackage && filters.selectedWorkPackage.length > 0) {
+    const selectedNumbers = filters.selectedWorkPackage.map((wp) => {
+      const wpMatch = wp.match(/^(\d+):/);
+      return wpMatch ? wpMatch[1] : wp;
     });
 
-    return {
-        workstreams: uniqueWorkstreams.size,
-        workpackages: filteredWorkPackages.length,
-        actions: filteredActions.length,
-        leads: uniqueLeadsSet.size,
-    };
+    filteredActions = filteredActions.filter((action) => {
+      if (action.work_package_number) {
+        return selectedNumbers.includes(action.work_package_number);
+      } else {
+        return selectedNumbers.includes(action.work_package_name);
+      }
+    });
+  }
+
+  // Lead filter (supports multiple selections)
+  if (filters.selectedLead && filters.selectedLead.length > 0) {
+    filteredActions = filteredActions.filter(
+      (action) =>
+        Array.isArray(action.work_package_leads) &&
+        action.work_package_leads.some((lead) =>
+          filters.selectedLead.includes(lead),
+        ),
+    );
+  }
+
+  // Workstream filter (supports multiple selections)
+  if (filters.selectedWorkstream && filters.selectedWorkstream.length > 0) {
+    filteredActions = filteredActions.filter((action) =>
+      filters.selectedWorkstream.includes(action.report),
+    );
+  }
+
+  filteredActions.forEach((action) => {
+    if (action.report) {
+      uniqueWorkstreams.add(action.report);
+    }
+    if (Array.isArray(action.work_package_leads)) {
+      action.work_package_leads.forEach((lead) => {
+        const trimmed = lead?.trim();
+        if (trimmed && trimmed.length > 0) {
+          uniqueLeadsSet.add(trimmed);
+        }
+      });
+    }
+  });
+
+  return {
+    workstreams: uniqueWorkstreams.size,
+    workpackages: filteredWorkPackages.length,
+    actions: filteredActions.length,
+    leads: uniqueLeadsSet.size,
+  };
 }
