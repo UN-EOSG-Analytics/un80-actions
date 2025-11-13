@@ -132,16 +132,16 @@ export function FilterControls({
               onOpenChange={onAdvancedFilterOpenChange}
             >
               <CollapsibleTrigger
-                className={`flex h-10 touch-manipulation items-center gap-3 rounded-lg border px-3 text-xs transition-colors ${
+                className={`flex h-8 touch-manipulation items-center gap-2 rounded-lg border px-2 text-xs transition-colors ${
                   hasActiveAdvancedFilters
                     ? "border-un-blue bg-un-blue/10 text-un-blue hover:border-un-blue"
                     : "border-gray-300 bg-white text-gray-900 hover:border-un-blue hover:bg-un-blue/10 hover:text-un-blue"
                 } `}
               >
-                <Filter className="h-4 w-4 shrink-0" />
+                <Filter className="h-3.5 w-3.5 shrink-0" />
                 <span className="truncate">Advanced Filters</span>
                 <ChevronDown
-                  className={`h-4 w-4 shrink-0 transition-transform ${
+                  className={`h-3.5 w-3.5 shrink-0 transition-transform ${
                     isAdvancedFilterOpen ? "rotate-180 transform" : ""
                   }`}
                 />
@@ -159,13 +159,13 @@ export function FilterControls({
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className={`flex h-10 touch-manipulation items-center gap-3 rounded-lg border px-3 text-xs transition-colors ${
+                    className={`flex h-8 touch-manipulation items-center gap-2 rounded-lg border px-2 text-xs transition-colors ${
                       sortOption !== "number-asc"
                         ? "border-un-blue bg-un-blue/10 text-un-blue hover:border-un-blue"
                         : "border-gray-200 bg-white text-gray-500 hover:border-un-blue hover:bg-un-blue/10 hover:text-un-blue"
                     } `}
                   >
-                    <ArrowUpDown className="h-4 w-4 shrink-0" />
+                    <ArrowUpDown className="h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">
                       {sortOption === "number-asc"
                         ? "Number (1-31)"
@@ -178,7 +178,7 @@ export function FilterControls({
                               : "Sort"}
                     </span>
                     <ChevronDown
-                      className={`h-4 w-4 shrink-0 transition-transform ${
+                      className={`h-3.5 w-3.5 shrink-0 transition-transform ${
                         openFilterCollapsibles.has("sort")
                           ? "rotate-180 transform"
                           : ""
