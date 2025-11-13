@@ -1,7 +1,6 @@
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { abbreviationMap } from "@/constants/abbreviations";
+import { LeadsBadge } from "@/components/LeadsBadge";
 import type { WorkPackageAction } from "@/types";
-import { FileText, Users } from "lucide-react";
+import { FileText } from "lucide-react";
 
 interface ActionItemProps {
     action: WorkPackageAction;
@@ -30,39 +29,7 @@ export function ActionItem({ action, index, workPackageNumber }: ActionItemProps
             {action.leads.length > 0 && (
                 <div className="ml-9 pt-3 border-t border-slate-100">
                     <div className="flex items-center gap-3 flex-wrap">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <div className="flex items-center gap-1 sm:gap-2 cursor-help">
-                                    <Users className="w-4 h-4 text-gray-500" />
-                                    <p className="text-sm text-gray-600 leading-tight">
-                                        {action.leads.map((lead, idx) => {
-                                            const longForm = abbreviationMap[lead] || lead;
-                                            return (
-                                                <span key={idx}>
-                                                    {idx > 0 && ', '}
-                                                    <span title={longForm !== lead ? longForm : undefined}>
-                                                        {lead}
-                                                    </span>
-                                                </span>
-                                            );
-                                        })}
-                                    </p>
-                                </div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>
-                                    {action.leads.map((lead, idx) => {
-                                        const longForm = abbreviationMap[lead] || lead;
-                                        return (
-                                            <span key={idx}>
-                                                {idx > 0 && ', '}
-                                                {longForm}
-                                            </span>
-                                        );
-                                    })}
-                                </p>
-                            </TooltipContent>
-                        </Tooltip>
+                        <LeadsBadge leads={action.leads} variant="muted" />
                         {(action.documentParagraph || action.report === 'WS1' || workPackageNumber === '31') && (
                             <div className="flex items-center gap-1.5">
                                 <FileText className="w-3.5 h-3.5 text-gray-500" />

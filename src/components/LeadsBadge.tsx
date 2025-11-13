@@ -5,9 +5,10 @@ import { Users } from "lucide-react";
 interface LeadsBadgeProps {
     leads: string[];
     onSelectLead?: (lead: string[]) => void;
+    variant?: "default" | "muted";
 }
 
-export function LeadsBadge({ leads, onSelectLead }: LeadsBadgeProps) {
+export function LeadsBadge({ leads, onSelectLead, variant = "default" }: LeadsBadgeProps) {
     if (leads.length === 0) return null;
 
     const handleLeadClick = (lead: string) => {
@@ -16,10 +17,14 @@ export function LeadsBadge({ leads, onSelectLead }: LeadsBadgeProps) {
         }
     };
 
+    const iconColor = variant === "muted" ? "text-gray-500" : "text-un-blue";
+    const textColor = variant === "muted" ? "text-gray-600" : "text-un-blue";
+    const textSize = variant === "muted" ? "text-sm" : "text-base";
+
     return (
         <div className="flex items-start gap-1 sm:gap-2">
-            <Users className="w-4 h-4 text-un-blue shrink-0 mt-0.5" />
-            <p className="text-base text-un-blue leading-5 text-left wrap-break-word">
+            <Users className={`w-4 h-4 ${iconColor} shrink-0 mt-0.5`} />
+            <p className={`${textSize} ${textColor} leading-5 text-left wrap-break-word`}>
                 {leads.map((lead, idx) => {
                     const longForm = abbreviationMap[lead] || lead;
                     return (
