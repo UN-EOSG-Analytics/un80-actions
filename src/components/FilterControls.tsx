@@ -121,7 +121,7 @@ export function FilterControls({
                             <CollapsibleTrigger className={`
                                 h-10 flex items-center gap-3 px-3
                                 border rounded-lg
-                                text-base
+                                text-sm
                                 touch-manipulation transition-colors
                                 ${hasActiveAdvancedFilters
                                     ? 'bg-un-blue/10 border-un-blue text-un-blue hover:border-un-blue'
@@ -148,7 +148,7 @@ export function FilterControls({
                                         className={`
                                             h-10 flex items-center gap-3 px-3
                                             border rounded-lg
-                                            text-base
+                                            text-sm
                                             touch-manipulation transition-colors
                                             ${sortOption !== 'number-asc'
                                                 ? 'bg-un-blue/10 border-un-blue text-un-blue hover:border-un-blue'
