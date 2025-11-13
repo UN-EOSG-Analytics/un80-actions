@@ -7,6 +7,7 @@ interface WorkPackageListProps {
     onToggleCollapsible: (key: string) => void;
     onSelectLead?: (lead: string[]) => void;
     onSelectWorkstream?: (workstream: string[]) => void;
+    isLoading?: boolean;
 }
 
 export function WorkPackageList({
@@ -15,8 +16,10 @@ export function WorkPackageList({
     onToggleCollapsible,
     onSelectLead,
     onSelectWorkstream,
+    isLoading = false,
 }: WorkPackageListProps) {
-    if (workPackages.length === 0) {
+    // Don't show "no results" message while loading
+    if (workPackages.length === 0 && !isLoading) {
         return (
             <div className="w-full py-12">
                 <p className="text-left text-gray-600">
@@ -24,6 +27,11 @@ export function WorkPackageList({
                 </p>
             </div>
         );
+    }
+
+    // Show nothing while loading
+    if (isLoading) {
+        return null;
     }
 
     return (
