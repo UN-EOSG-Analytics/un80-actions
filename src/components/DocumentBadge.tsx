@@ -39,8 +39,8 @@ export function DocumentBadge({ documentParagraph, report, workPackageNumber }: 
 
     return (
         <div className="flex items-center gap-1.5">
-            <FileText className="w-4 h-4 text-gray-500 shrink-0" />
-            <span className="text-sm text-gray-600 leading-tight">
+            <FileText className="w-4 h-4 text-slate-600 shrink-0" />
+            <span className="text-sm text-slate-600 leading-tight">
                 {documentText}
             </span>
         </div>

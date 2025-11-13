@@ -17,14 +17,13 @@ export function LeadsBadge({ leads, onSelectLead, variant = "default" }: LeadsBa
         }
     };
 
-    const iconColor = variant === "muted" ? "text-gray-500" : "text-un-blue";
-    const textColor = variant === "muted" ? "text-gray-600" : "text-un-blue";
+    const color = variant === "muted" ? "text-slate-600" : "text-un-blue";
     const textSize = variant === "muted" ? "text-sm" : "";
 
     return (
         <div className="flex items-center gap-1.5">
-            <Users className={`w-4 h-4 ${iconColor} shrink-0`} />
-            <p className={`${textSize} ${textColor} leading-tight text-left wrap-break-word`}>
+            <Users className={`w-4 h-4 ${color} shrink-0`} />
+            <p className={`${textSize} ${color} leading-tight text-left wrap-break-word`}>
                 {leads.map((lead, idx) => {
                     const longForm = abbreviationMap[lead] || lead;
                     return (
@@ -32,7 +31,7 @@ export function LeadsBadge({ leads, onSelectLead, variant = "default" }: LeadsBa
                             {idx > 0 && "; "}
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <span 
+                                    <span
                                         className={onSelectLead ? "cursor-pointer hover:underline" : "cursor-help"}
                                         onClick={(e) => {
                                             if (onSelectLead) {

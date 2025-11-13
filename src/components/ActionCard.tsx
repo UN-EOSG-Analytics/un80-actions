@@ -53,7 +53,7 @@ export function ActionItem({ action, index, workPackageNumber }: ActionItemProps
                     {/* Additional document text/quote - shown below metadata if available */}
                     {action.docText && (
                         <div className="pt-3 mt-3 border-t border-slate-100">
-                            <p className="text-sm text-gray-600 leading-tight">
+                            <p className="text-sm text-slate-600 leading-tight">
                                 {action.docText}
                             </p>
                         </div>
@@ -63,7 +63,7 @@ export function ActionItem({ action, index, workPackageNumber }: ActionItemProps
             {/* Document text - shown when no leads are present */}
             {action.leads.length === 0 && action.docText && (
                 <div className="ml-9 pt-3 border-t border-slate-100">
-                    <p className="text-sm text-gray-600 leading-tight">
+                    <p className="text-sm text-slate-600 leading-tight">
                         {action.docText}
                     </p>
                 </div>
