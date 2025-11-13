@@ -19,12 +19,12 @@ export function LeadsBadge({ leads, onSelectLead, variant = "default" }: LeadsBa
 
     const iconColor = variant === "muted" ? "text-gray-500" : "text-un-blue";
     const textColor = variant === "muted" ? "text-gray-600" : "text-un-blue";
-    const textSize = variant === "muted" ? "text-sm" : "text-base";
+    const textSize = variant === "muted" ? "text-sm" : "";
 
     return (
-        <div className="flex items-start gap-1 sm:gap-2">
-            <Users className={`w-4 h-4 ${iconColor} shrink-0 mt-0.5`} />
-            <p className={`${textSize} ${textColor} leading-5 text-left wrap-break-word`}>
+        <div className="flex items-center gap-1.5">
+            <Users className={`w-4 h-4 ${iconColor} shrink-0`} />
+            <p className={`${textSize} ${textColor} leading-tight text-left wrap-break-word`}>
                 {leads.map((lead, idx) => {
                     const longForm = abbreviationMap[lead] || lead;
                     return (

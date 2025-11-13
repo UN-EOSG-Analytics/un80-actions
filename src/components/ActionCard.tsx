@@ -31,7 +31,7 @@ export function ActionItem({ action, index, workPackageNumber }: ActionItemProps
                 </div>
                 {/* Action description text */}
                 <div className="flex-1">
-                    <p className="text-base font-medium text-slate-900 leading-normal">
+                    <p className="font-medium text-slate-900 leading-normal">
                         {action.text}
                     </p>
                 </div>
@@ -40,7 +40,7 @@ export function ActionItem({ action, index, workPackageNumber }: ActionItemProps
             {/* Metadata section - shown when there are leads */}
             {action.leads.length > 0 && (
                 <div className="ml-9 pt-3 border-t border-slate-100">
-                    <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-4 flex-wrap">
                         {/* Display lead organizations in muted style */}
                         <LeadsBadge leads={action.leads} variant="muted" />
                         {/* Display document reference (e.g., "A/80/400 para. 5") */}
