@@ -49,7 +49,7 @@ export function ActionItem({
             <LeadsBadge leads={action.leads} variant="muted" />
             {/* Display document reference (e.g., "A/80/400 para. 5") */}
             <DocumentBadge
-              documentParagraph={action.documentParagraph}
+              documentParagraphNumber={action.documentParagraph}
               report={action.report}
               workPackageNumber={workPackageNumber}
             />

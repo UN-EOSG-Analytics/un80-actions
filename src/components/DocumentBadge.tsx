@@ -1,13 +1,14 @@
 import { FileText } from "lucide-react";
+import { getDocumentReference } from "@/constants/documents";
 
 interface DocumentBadgeProps {
-  documentParagraph?: string;
+  documentParagraphNumber?: string;
   report?: string;
   workPackageNumber?: string;
 }
 
 export function DocumentBadge({
-  documentParagraph,
+  documentParagraphNumber: documentParagraph,
   report,
   workPackageNumber,
 }: DocumentBadgeProps) {
@@ -16,26 +17,11 @@ export function DocumentBadge({
     return null;
   }
 
-  const getDocumentText = () => {
-    if (workPackageNumber === "31") {
-      return "A/80/400";
-    }
-    if (report === "WS1") {
-      return "A/80/400";
-    }
-    if (report === "WS3" && documentParagraph) {
-      return `A/80/392 para. ${documentParagraph}`;
-    }
-    if (report === "WS2" && documentParagraph) {
-      return `A/80/318 para. ${documentParagraph}`;
-    }
-    if (documentParagraph) {
-      return `Para. ${documentParagraph}`;
-    }
-    return null;
-  };
-
-  const documentText = getDocumentText();
+  const documentText = getDocumentReference({
+    workPackageNumber,
+    report,
+    documentParagraph,
+  });
 
   if (!documentText) {
     return null;
@@ -44,7 +30,7 @@ export function DocumentBadge({
   return (
     <div className="flex items-center gap-1.5">
       <FileText className="h-4 w-4 shrink-0 text-slate-600" />
-      <span className="text-sm leading-tight text-slate-600">
+      <span className="text-sm leading-tight text-slate-600 font-mono">
         {documentText}
       </span>
     </div>

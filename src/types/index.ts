@@ -20,7 +20,7 @@ export interface Action {
   /** Name/title of the work package */
   work_package_name: string;
 
-  /** Paragraph reference in the document */
+  /** Paragraph number in the document */
   document_paragraph: string;
 
   /** Unique action number as a string */
