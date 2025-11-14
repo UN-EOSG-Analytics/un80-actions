@@ -8,7 +8,7 @@ import { WorkstreamLabels } from "@/components/WorkstreamBadge";
 import { LeadsBadge } from "@/components/LeadsBadge";
 import { formatGoalText } from "@/lib/utils";
 import type { WorkPackage, WorkPackageAction } from "@/types";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { Menu } from "lucide-react";
 
 interface WorkPackageActionsProps {
   actions: WorkPackageAction[];
@@ -124,18 +124,14 @@ export function WorkPackageItem({
         {/* Details Button */}
         <button
           type="button"
-          className="absolute top-4 right-2 flex items-center gap-1.5 rounded-[6px] bg-slate-300 px-3 py-1.5 text-sm font-medium text-slate-800 transition-colors hover:bg-slate-400 sm:right-4"
+          className="absolute top-4 right-2 flex items-center gap-1.5 rounded-[6px] bg-slate-500 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-slate-600 hover:text-white sm:right-4"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             onToggle();
           }}
         >
-          {isOpen ? (
-            <ChevronUp className="h-3.5 w-3.5" />
-          ) : (
-            <ChevronDown className="h-3.5 w-3.5" />
-          )}
+          <Menu className="h-3.5 w-3.5" />
           <span>Details</span>
         </button>
 
