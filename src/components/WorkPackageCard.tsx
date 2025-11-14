@@ -69,7 +69,7 @@ export function WorkPackageItem({
       <div
         className={`relative mb-20 rounded-[6px] last:mb-0 ${
           isOpen
-            ? "bg-slate-50/50 transition-colors duration-200"
+            ? "bg-slate-100 transition-colors duration-200"
             : "transition-colors delay-[400ms] duration-200"
         }`}
       >
@@ -78,7 +78,7 @@ export function WorkPackageItem({
         )}
         <CollapsibleTrigger
           className={`flex w-full flex-col items-start rounded-[6px] border-0 px-6 py-4 transition-colors hover:bg-[#E0F5FF] hover:no-underline ${
-            isOpen ? "rounded-b-none bg-slate-50/50" : "bg-slate-50"
+            isOpen ? "rounded-b-none bg-slate-100" : "bg-slate-100"
           }`}
         >
           {/* Work Package Title */}
