@@ -24,7 +24,7 @@ export function ActionItem({
   workPackageNumber,
 }: ActionItemProps) {
   return (
-    <div className="rounded-[6px] border border-slate-200 bg-white p-5 transition-shadow hover:shadow-sm">
+    <div className="rounded-[6px] border border-slate-200 bg-white p-5 pr-9 transition-shadow hover:shadow-sm">
       {/* Activity Number and Text */}
       <div className="mb-4 flex items-start gap-3">
         {/* Numbered circle badge */}
@@ -56,7 +56,7 @@ export function ActionItem({
           </div>
           {/* Additional document text/quote - shown below metadata if available */}
           {action.docText && (
-            <div className="mt-3 border-t border-slate-100 pt-3">
+            <div className="mt-3 ml-0.5 border-l-2 border-slate-400 pl-3">
               <p className="text-sm leading-tight text-slate-600">
                 {action.docText}
               </p>
@@ -66,7 +66,7 @@ export function ActionItem({
       )}
       {/* Document text - shown when no leads are present */}
       {action.leads.length === 0 && action.docText && (
-        <div className="ml-9 border-t border-slate-100 pt-3">
+        <div className="ml-9.5 border-l-2 border-slate-400 pl-3">
           <p className="text-sm leading-tight text-slate-600">
             {action.docText}
           </p>
