@@ -49,7 +49,7 @@ export function Header({ onReset }: HeaderProps) {
   const shouldReduceSize = isMobile && isScrolled;
 
   return (
-    <header className="fixed top-0 right-0 left-0 z-50 w-full border-b bg-background backdrop-blur-sm">
+    <header className="sm:fixed sm:top-0 sm:right-0 sm:left-0 sm:z-50 w-full border-b bg-background backdrop-blur-sm">
       <div className="mx-auto w-full max-w-4xl px-8 pt-3 pb-2 sm:px-12 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
         {/* Title Section */}
         <Link href="/" onClick={handleClick} className="group">
