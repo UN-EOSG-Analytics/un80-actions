@@ -10,9 +10,23 @@ export const DOCUMENT_NUMBERS = {
 } as const;
 
 /**
+ * Base URL for UN documents
+ */
+const UN_DOCS_BASE_URL = "https://docs.un.org/en/";
+
+/**
+ * Converts a UN document number to a URL
+ * @param documentNumber - The document number (e.g., "A/80/392")
+ * @returns Full URL to the document
+ */
+export function getDocumentUrl(documentNumber: string): string {
+  return `${UN_DOCS_BASE_URL}${documentNumber}`;
+}
+
+/**
  * Gets the formatted document reference text for display
  * @param params - Document reference parameters
- * @returns Formatted document reference string (e.g., "A/80/392 para. 54")
+ * @returns Object with formatted text and document number, or null
  */
 export function getDocumentReference({
   workPackageNumber,
@@ -22,20 +36,29 @@ export function getDocumentReference({
   workPackageNumber?: string;
   report?: string;
   documentParagraph?: string;
-}): string | null {
-  // Special case for work package 31 or WS1
-  if (workPackageNumber === "31" || report === "WS1") {
-    return DOCUMENT_NUMBERS.WS1;
+}): { text: string; documentNumber: string } | null {
+  // WS1 or special case for work package 31
+  if (report === "WS1" || workPackageNumber === "31") {
+    return {
+      text: DOCUMENT_NUMBERS.WS1,
+      documentNumber: DOCUMENT_NUMBERS.WS1,
+    };
   }
 
   // WS2 with paragraph
   if (report === "WS2" && documentParagraph) {
-    return `${DOCUMENT_NUMBERS.WS2} para. ${documentParagraph}`;
+    return {
+      text: `${DOCUMENT_NUMBERS.WS2} para. ${documentParagraph}`,
+      documentNumber: DOCUMENT_NUMBERS.WS2,
+    };
   }
 
   // WS3 with paragraph
   if (report === "WS3" && documentParagraph) {
-    return `${DOCUMENT_NUMBERS.WS3} para. ${documentParagraph}`;
+    return {
+      text: `${DOCUMENT_NUMBERS.WS3} para. ${documentParagraph}`,
+      documentNumber: DOCUMENT_NUMBERS.WS3,
+    };
   }
 
   return null;

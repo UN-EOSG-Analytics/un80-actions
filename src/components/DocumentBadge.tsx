@@ -1,5 +1,5 @@
 import { FileText } from "lucide-react";
-import { getDocumentReference } from "@/constants/documents";
+import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
 
 interface DocumentBadgeProps {
   documentParagraphNumber?: string;
@@ -17,22 +17,29 @@ export function DocumentBadge({
     return null;
   }
 
-  const documentText = getDocumentReference({
+  const documentData = getDocumentReference({
     workPackageNumber,
     report,
     documentParagraph,
   });
 
-  if (!documentText) {
+  if (!documentData) {
     return null;
   }
 
+  const documentUrl = getDocumentUrl(documentData.documentNumber);
+
   return (
-    <div className="flex items-center gap-1.5">
+    <a
+      href={documentUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-1.5 transition-colors hover:text-un-blue"
+    >
       <FileText className="h-4 w-4 shrink-0 text-slate-600" />
-      <span className="text-sm leading-tight text-slate-600 font-mono">
-        {documentText}
+      <span className="font-mono text-sm leading-tight text-slate-600">
+        {documentData.text}
       </span>
-    </div>
+    </a>
   );
 }
