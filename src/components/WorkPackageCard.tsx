@@ -102,7 +102,7 @@ export function WorkPackageItem({
           {/* Goal from work package data */}
           {wp.goal && (
             <div className="mb-4 ml-0.5 border-l-2 border-un-blue pr-8 pl-3 text-left">
-              <p className="leading-relaxed font-medium text-slate-600">
+              <p className="leading-snug font-medium text-slate-600">
                 {formatGoalText(wp.goal)}
               </p>
             </div>
