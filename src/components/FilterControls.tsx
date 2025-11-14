@@ -416,7 +416,7 @@ export function FilterControls({
       )}
 
       {/* Search Bar and Reset Button */}
-      <div className="mb-4 flex w-full items-center justify-between gap-3">
+      <div className="-mt-1 mb-4 flex w-full items-center justify-between gap-3">
         <SearchBar searchQuery={searchQuery} onSearchChange={onSearchChange} />
         {hasActiveFilters && <ResetButton onClick={onResetFilters} />}
       </div>
