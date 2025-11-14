@@ -27,18 +27,11 @@ export function Header({ onReset }: HeaderProps) {
   }, []);
 
   useEffect(() => {
-    let ticking = false;
     const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setIsScrolled(window.scrollY > 0);
-          ticking = false;
-        });
-        ticking = true;
-      }
+      setIsScrolled(window.scrollY > 10);
     };
     // Check initial scroll position
-    setIsScrolled(window.scrollY > 0);
+    setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -61,15 +54,15 @@ export function Header({ onReset }: HeaderProps) {
         {/* Title Section */}
         <Link href="/" onClick={handleClick} className="group">
           <div className="flex flex-col lg:flex-row lg:items-baseline lg:gap-x-2">
-            <h1 className={`cursor-pointer leading-tight tracking-tight text-foreground transition-[font-size,line-height] duration-500 ease-in-out will-change-[font-size,line-height] group-hover:text-un-blue ${
-              shouldReduceSize ? 'text-2xl' : 'text-4xl'
+            <h1 className={`cursor-pointer text-4xl leading-tight tracking-tight text-foreground origin-left transition-transform duration-300 ease-out will-change-transform group-hover:text-un-blue ${
+              shouldReduceSize ? 'scale-[0.67]' : 'scale-100'
             }`}>
               <span className="leading-none font-bold">UN80 Initiative</span>
             </h1>
 
             <div className="flex items-baseline gap-x-1">
-              <h1 className={`cursor-pointer leading-tight font-normal text-foreground transition-[font-size,line-height] duration-500 ease-in-out will-change-[font-size,line-height] group-hover:text-un-blue lg:text-4xl ${
-                shouldReduceSize ? 'text-xl' : 'text-3xl'
+              <h1 className={`cursor-pointer text-3xl leading-tight font-normal text-foreground origin-left transition-transform duration-300 ease-out will-change-transform group-hover:text-un-blue lg:text-4xl ${
+                shouldReduceSize ? 'scale-[0.67]' : 'scale-100'
               }`}>
                 Actions
               </h1>
