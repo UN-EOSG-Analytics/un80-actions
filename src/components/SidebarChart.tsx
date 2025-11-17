@@ -103,8 +103,12 @@ export function SidebarChart({
                 <tr
                   key={entry.value}
                   onClick={() => handleClickBar(entry.value)}
-                  className={`group cursor-pointer transition-colors hover:bg-slate-50 ${
-                    isFiltered ? "opacity-30" : ""
+                  className={`group cursor-pointer transition-colors ${
+                    isSelected
+                      ? "bg-un-blue/5 hover:bg-un-blue/10"
+                      : isFiltered
+                        ? "opacity-30 hover:bg-slate-50"
+                        : "hover:bg-slate-50"
                   } ${index < displayedData.length - 1 ? "border-b border-slate-200" : ""}`}
                 >
                   <td className="py-2 pr-0">
@@ -116,7 +120,13 @@ export function SidebarChart({
                         {entry.tooltip ? (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span className="block cursor-help text-[14px] font-medium whitespace-nowrap text-slate-600 transition-colors group-hover:text-un-blue">
+                              <span
+                                className={`block cursor-help text-[14px] font-medium whitespace-nowrap transition-colors ${
+                                  isSelected
+                                    ? "text-un-blue font-semibold"
+                                    : "text-slate-600 group-hover:text-un-blue"
+                                }`}
+                              >
                                 {entry.label}
                               </span>
                             </TooltipTrigger>
@@ -125,7 +135,13 @@ export function SidebarChart({
                             </TooltipContent>
                           </Tooltip>
                         ) : (
-                          <span className="block text-[14px] font-medium whitespace-nowrap text-slate-600 transition-colors group-hover:text-un-blue">
+                          <span
+                            className={`block text-[14px] font-medium whitespace-nowrap transition-colors ${
+                              isSelected
+                                ? "text-un-blue font-semibold"
+                                : "text-slate-600 group-hover:text-un-blue"
+                            }`}
+                          >
                             {entry.label}
                           </span>
                         )}
@@ -133,7 +149,7 @@ export function SidebarChart({
                       <div className="flex shrink-0 items-center gap-1.5">
                         <span
                           className={`text-[14px] font-normal ${countWidth} text-right font-mono tabular-nums ${
-                            isSelected ? "text-un-blue" : "text-un-blue"
+                            isSelected ? "text-un-blue font-semibold" : "text-un-blue"
                           }`}
                         >
                           {entry.count}
@@ -144,7 +160,7 @@ export function SidebarChart({
                         >
                           <div
                             className={`h-full rounded-full transition-all ${
-                              isSelected ? "bg-un-blue" : "bg-un-blue"
+                              isSelected ? "bg-un-blue" : "bg-un-blue/40"
                             }`}
                             style={{ width: `${percentage}%` }}
                           />
