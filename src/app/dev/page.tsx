@@ -1,8 +1,17 @@
-export default function DevPage() {
-    return (
-      <main style={{ padding: 40 }}>
-        <h1>Development Version</h1>
-        <p>This is a safe sandbox. The production site is unaffected.</p>
-      </main>
-    );
-  }
+
+import Homepage from "../page";
+
+export default function Dev() {
+  return (
+    <div>
+      <Homepage />
+      {/* You can add banners or warnings */}
+      <div style={{ padding: 20, background: "#fff3cd" }}>
+        <strong>DEV MODE:</strong> This is a development version.
+      </div>
+    </div>
+  );
+}
+
+// changes 
+
