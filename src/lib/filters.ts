@@ -62,11 +62,19 @@ export function filterWorkPackages(
     );
   }
 
-  // Big Ticket filter
-  if (filters.selectedBigTicket === "big-ticket") {
-    filtered = filtered.filter((wp) => wp.bigTicket === true);
-  } else if (filters.selectedBigTicket === "other") {
-    filtered = filtered.filter((wp) => wp.bigTicket === false);
+  // Big Ticket filter (supports multiple selections)
+  if (filters.selectedBigTicket && filters.selectedBigTicket.length > 0) {
+    const hasBigTicket = filters.selectedBigTicket.includes("big-ticket");
+    const hasOther = filters.selectedBigTicket.includes("other");
+    
+    if (hasBigTicket && hasOther) {
+      // Both selected, show all
+      // No filtering needed
+    } else if (hasBigTicket) {
+      filtered = filtered.filter((wp) => wp.bigTicket === true);
+    } else if (hasOther) {
+      filtered = filtered.filter((wp) => wp.bigTicket === false);
+    }
   }
 
   // Sort filtered work packages

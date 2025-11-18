@@ -40,8 +40,8 @@ interface FilterControlsProps {
   onSelectLead: (value: string[]) => void;
   selectedWorkstream: string[];
   onSelectWorkstream: (value: string[]) => void;
-  selectedBigTicket: string;
-  onSelectBigTicket: (value: string) => void;
+  selectedBigTicket: string[];
+  onSelectBigTicket: (value: string[]) => void;
 
   // Search
   searchQuery: string;
@@ -103,14 +103,14 @@ export function FilterControls({
     selectedWorkPackage.length > 0 ||
     selectedLead.length > 0 ||
     selectedWorkstream.length > 0 ||
-    selectedBigTicket
+    selectedBigTicket.length > 0
   );
 
   const hasActiveAdvancedFilters = !!(
     selectedWorkPackage.length > 0 ||
     selectedLead.length > 0 ||
     selectedWorkstream.length > 0 ||
-    selectedBigTicket
+    selectedBigTicket.length > 0
   );
 
   return (
@@ -393,22 +393,26 @@ export function FilterControls({
             onOpenChange={(open) => onToggleFilterCollapsible("type", open)}
             icon={<Package className="h-4 w-4 text-un-blue" />}
             triggerText={
-              selectedBigTicket === "big-ticket"
-                ? '"Big Ticket" Work packages'
-                : selectedBigTicket === "other"
-                  ? "Other Work packages"
-                  : "Select package type"
+              selectedBigTicket.length === 0
+                ? "Select package type"
+                : selectedBigTicket.length === 1
+                  ? selectedBigTicket[0] === "big-ticket"
+                    ? '"Big Ticket" Work packages'
+                    : "Other Work packages"
+                  : `${selectedBigTicket.length} types selected`
             }
-            isFiltered={!!selectedBigTicket}
-            allActive={!selectedBigTicket}
+            isFiltered={selectedBigTicket.length > 0}
+            allActive={selectedBigTicket.length === 0}
             options={[
               { key: "big-ticket", label: '"Big Ticket" Work packages' },
               { key: "other", label: "Other Work packages" },
             ]}
-            selectedKeys={new Set(selectedBigTicket ? [selectedBigTicket] : [])}
+            selectedKeys={new Set(selectedBigTicket)}
             onToggle={(key) => {
-              onSelectBigTicket(key === selectedBigTicket ? "" : key);
-              onCloseFilterCollapsible("type");
+              const newSelected = selectedBigTicket.includes(key)
+                ? selectedBigTicket.filter((type) => type !== key)
+                : [...selectedBigTicket, key];
+              onSelectBigTicket(newSelected);
             }}
             ariaLabel="Filter by package type"
           />

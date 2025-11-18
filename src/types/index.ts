@@ -120,7 +120,7 @@ export interface FilterState {
   selectedWorkPackage: string[];
   selectedLead: string[];
   selectedWorkstream: string[];
-  selectedBigTicket: string;
+  selectedBigTicket: string[];
   sortOption: string;
 }
 
