@@ -34,27 +34,82 @@ export function useWorkPackageData(
     [actions],
   );
 
-  // Helper function to filter work packages based on selected filters (excluding the filter being computed)
-  const getFilteredWorkPackagesForOptions = useMemo(() => {
-    // NOTE: Do NOT filter by selectedLead, selectedWorkstream, or selectedWorkPackage
-    // here for multi-select. We want to show all available options in the dropdowns.
-    return workPackages;
-  }, [workPackages]);
+  // Helper function to filter work packages with all filters except one
+  const getFilteredWorkPackagesExcludingFilter = (
+    excludeFilter: "lead" | "workstream" | "workpackage",
+  ) => {
+    let filtered = workPackages;
+
+    // Always apply search query and big ticket filter
+    if (filters.searchQuery.trim()) {
+      const query = filters.searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (wp) =>
+          wp.name.toLowerCase().includes(query) ||
+          wp.number.includes(query) ||
+          wp.leads.some((lead) => lead.toLowerCase().includes(query)) ||
+          wp.actions.some((action) => action.text.toLowerCase().includes(query)),
+      );
+    }
+
+    if (filters.selectedBigTicket && filters.selectedBigTicket.length > 0) {
+      const hasBigTicket = filters.selectedBigTicket.includes("big-ticket");
+      const hasOther = filters.selectedBigTicket.includes("other");
+      
+      if (hasBigTicket && hasOther) {
+        // Both selected, show all
+      } else if (hasBigTicket) {
+        filtered = filtered.filter((wp) => wp.bigTicket === true);
+      } else if (hasOther) {
+        filtered = filtered.filter((wp) => wp.bigTicket === false);
+      }
+    }
+
+    // Apply filters based on what's not excluded
+    if (excludeFilter !== "lead" && filters.selectedLead && filters.selectedLead.length > 0) {
+      filtered = filtered.filter((wp) =>
+        wp.leads.some((lead) => filters.selectedLead!.includes(lead)),
+      );
+    }
+
+    if (excludeFilter !== "workstream" && filters.selectedWorkstream && filters.selectedWorkstream.length > 0) {
+      filtered = filtered.filter((wp) =>
+        filters.selectedWorkstream!.some((ws) => wp.report.includes(ws)),
+      );
+    }
+
+    if (excludeFilter !== "workpackage" && filters.selectedWorkPackage && filters.selectedWorkPackage.length > 0) {
+      const selectedNumbers = filters.selectedWorkPackage.map((wp) => {
+        const wpMatch = wp.match(/^(\d+):/);
+        return wpMatch ? wpMatch[1] : wp;
+      });
+
+      filtered = filtered.filter((wp) => {
+        if (wp.number) {
+          return selectedNumbers.includes(wp.number);
+        } else {
+          return selectedNumbers.includes(wp.name);
+        }
+      });
+    }
+
+    return filtered;
+  };
 
   // Get unique values for filters (filtered based on other selections)
   const uniqueWorkPackages = useMemo(
-    () => getUniqueWorkPackages(getFilteredWorkPackagesForOptions),
-    [getFilteredWorkPackagesForOptions],
+    () => getUniqueWorkPackages(getFilteredWorkPackagesExcludingFilter("workpackage")),
+    [workPackages, filters],
   );
 
   const uniqueLeads = useMemo(
-    () => getUniqueLeads(getFilteredWorkPackagesForOptions),
-    [getFilteredWorkPackagesForOptions],
+    () => getUniqueLeads(getFilteredWorkPackagesExcludingFilter("lead")),
+    [workPackages, filters],
   );
 
   const uniqueWorkstreams = useMemo(
-    () => getUniqueWorkstreams(getFilteredWorkPackagesForOptions),
-    [getFilteredWorkPackagesForOptions],
+    () => getUniqueWorkstreams(getFilteredWorkPackagesExcludingFilter("workstream")),
+    [workPackages, filters],
   );
 
   // Calculate chart data: count work packages per lead
