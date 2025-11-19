@@ -4,7 +4,7 @@ import type {
   WorkPackageStats,
   NextMilestone,
 } from "@/types";
-import { parseDate, formatDate } from "./utils";
+import { parseDate, formatDate, normalizeLeaderName } from "./utils";
 
 /**
  * Group actions by work package number, combining across reports
@@ -20,9 +20,9 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
     if (!wpMap.has(key)) {
       // work_package_leads is already an array
       const leads = Array.isArray(action.work_package_leads)
-        ? action.work_package_leads.filter(
-            (lead) => lead && lead.trim().length > 0,
-          )
+        ? action.work_package_leads
+            .filter((lead) => lead && lead.trim().length > 0)
+            .map((lead) => normalizeLeaderName(lead.trim()))
         : [];
 
       wpMap.set(key, {
@@ -44,9 +44,9 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
 
     // Merge leads from all reports
     const newLeads = Array.isArray(action.work_package_leads)
-      ? action.work_package_leads.filter(
-          (lead) => lead && lead.trim().length > 0,
-        )
+      ? action.work_package_leads
+          .filter((lead) => lead && lead.trim().length > 0)
+          .map((lead) => normalizeLeaderName(lead.trim()))
       : [];
     newLeads.forEach((lead) => {
       if (!wp.leads.includes(lead)) {
@@ -73,9 +73,9 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
       if (!existingAction) {
         // work_package_leads is already an array
         const actionLeads = Array.isArray(action.work_package_leads)
-          ? action.work_package_leads.filter(
-              (lead) => lead && lead.trim().length > 0,
-            )
+          ? action.work_package_leads
+              .filter((lead) => lead && lead.trim().length > 0)
+              .map((lead) => normalizeLeaderName(lead.trim()))
           : [];
 
         wp.actions.push({

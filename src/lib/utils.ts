@@ -51,6 +51,24 @@ export const formatDate = (date: Date): string => {
  */
 
 /**
+ * Normalize leader names to standard format
+ * Maps variations like "ASG UNITAR" to "ED UNITAR"
+ * @param leader - Leader name to normalize
+ * @returns Normalized leader name
+ */
+export const normalizeLeaderName = (leader: string): string => {
+  if (!leader) return leader;
+  const trimmed = leader.trim();
+  
+  // Normalize "ASG UNITAR" to "ED UNITAR"
+  if (trimmed === "ASG UNITAR") {
+    return "ED UNITAR";
+  }
+  
+  return trimmed;
+};
+
+/**
  * Format goal text: lowercase everything except first letter of each sentence
  * Preserves proper capitalization for "United Nations" and "Member States"
  * @param text - Text to format

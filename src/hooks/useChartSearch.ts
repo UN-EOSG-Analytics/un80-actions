@@ -11,6 +11,8 @@ export function useChartSearch() {
     useState<string>("");
   const [workpackageChartSearchQuery, setWorkpackageChartSearchQuery] =
     useState<string>("");
+  const [leaderChecklistSearchQuery, setLeaderChecklistSearchQuery] =
+    useState<string>("");
 
   const chartSearch: ChartSearchState = {
     chartSearchQuery,
@@ -26,5 +28,7 @@ export function useChartSearch() {
     setWorkstreamChartSearchQuery,
     workpackageChartSearchQuery,
     setWorkpackageChartSearchQuery,
+    leaderChecklistSearchQuery,
+    setLeaderChecklistSearchQuery,
   };
 }

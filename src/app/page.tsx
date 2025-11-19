@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { DataCard } from "@/components/DataCard";
 import { ExplainerText } from "@/components/ExplainerText";
 import { FilterControls } from "@/components/FilterControls";
 import { Header } from "@/components/HeaderBar";
 import { SidebarCharts } from "@/components/SidebarCharts";
 import { WorkPackageList } from "@/components/ListContainer";
+import { LeaderSubmissionProgress } from "@/components/LeaderSubmissionProgress";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useActions } from "@/hooks/useActions";
 import { useChartSearch } from "@/hooks/useChartSearch";
@@ -43,6 +45,9 @@ export default function WorkPackagesPage() {
     handleResetAll,
   } = useFilters();
 
+  // State for leader checklist selection
+  const [selectedLeaders, setSelectedLeaders] = useState<string[]>([]);
+
   const {
     openCollapsibles,
     toggleCollapsible,
@@ -57,6 +62,8 @@ export default function WorkPackagesPage() {
     setShowAllWorkstreams,
     showAllWorkpackages,
     setShowAllWorkpackages,
+    showAllLeaderChecklist,
+    setShowAllLeaderChecklist,
   } = useCollapsibles();
 
   const {
@@ -66,6 +73,8 @@ export default function WorkPackagesPage() {
     setWorkstreamChartSearchQuery,
     workpackageChartSearchQuery,
     setWorkpackageChartSearchQuery,
+    leaderChecklistSearchQuery,
+    setLeaderChecklistSearchQuery,
   } = useChartSearch();
 
   // Compute work package data using custom hook
@@ -137,6 +146,11 @@ export default function WorkPackagesPage() {
               </div>
             </section>
 
+            {/* Leader Submission Progress Section */}
+            <section className="mb-10">
+              <LeaderSubmissionProgress actions={actions} />
+            </section>
+
             {/* Work Packages Breakdown Section */}
             <section className="mt-6 mb-4">
               {/* Work Packages and Chart Section */}
@@ -203,6 +217,15 @@ export default function WorkPackagesPage() {
                   showAllWorkPackages={showAllWorkpackages}
                   onToggleShowAllWorkPackages={() =>
                     setShowAllWorkpackages(!showAllWorkpackages)
+                  }
+                  actions={actions}
+                  leaderChecklistSearchQuery={leaderChecklistSearchQuery}
+                  onLeaderChecklistSearchChange={setLeaderChecklistSearchQuery}
+                  selectedLeaders={selectedLeaders}
+                  onSelectLeaders={setSelectedLeaders}
+                  showAllLeaderChecklist={showAllLeaderChecklist}
+                  onToggleShowAllLeaderChecklist={() =>
+                    setShowAllLeaderChecklist(!showAllLeaderChecklist)
                   }
                 />
               </section>

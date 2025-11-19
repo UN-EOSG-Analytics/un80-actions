@@ -1,13 +1,18 @@
 import React from "react";
 import { Users, Layers, Briefcase } from "lucide-react";
 import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
+import { LeaderSubmissionChecklist } from "./LeaderSubmissionChecklist";
 import type {
   LeadChartEntry,
   WorkstreamChartEntry,
   WorkPackageChartEntry,
+  Actions,
 } from "@/types";
 
 interface SidebarChartsProps {
+  // Actions data for checklist
+  actions: Actions;
+
   // Leads chart
   leadsData: LeadChartEntry[];
   leadsSearchQuery: string;
@@ -34,9 +39,18 @@ interface SidebarChartsProps {
   onSelectWorkPackage: (workPackage: string[]) => void;
   showAllWorkPackages: boolean;
   onToggleShowAllWorkPackages: () => void;
+
+  // Leader submission checklist
+  leaderChecklistSearchQuery: string;
+  onLeaderChecklistSearchChange: (query: string) => void;
+  selectedLeaders: string[];
+  onSelectLeaders: (leaders: string[]) => void;
+  showAllLeaderChecklist: boolean;
+  onToggleShowAllLeaderChecklist: () => void;
 }
 
 export function SidebarCharts({
+  actions,
   leadsData,
   leadsSearchQuery,
   onLeadsSearchChange,
@@ -58,6 +72,12 @@ export function SidebarCharts({
   onSelectWorkPackage,
   showAllWorkPackages,
   onToggleShowAllWorkPackages,
+  leaderChecklistSearchQuery,
+  onLeaderChecklistSearchChange,
+  selectedLeaders,
+  onSelectLeaders,
+  showAllLeaderChecklist,
+  onToggleShowAllLeaderChecklist,
 }: SidebarChartsProps) {
   const leadsChartEntries: SidebarChartEntry[] = leadsData.map((entry) => ({
     label: entry.lead,
@@ -93,6 +113,17 @@ export function SidebarCharts({
 
   return (
     <div className="flex w-full min-w-0 shrink-0 flex-col gap-3 lg:w-[320px] lg:max-w-[320px] lg:border-l lg:border-slate-200 lg:pl-6">
+      <LeaderSubmissionChecklist
+        actions={actions}
+        searchQuery={leaderChecklistSearchQuery}
+        onSearchChange={onLeaderChecklistSearchChange}
+        selectedLeaders={selectedLeaders}
+        onSelectLeaders={onSelectLeaders}
+        showAll={showAllLeaderChecklist}
+        onToggleShowAll={onToggleShowAllLeaderChecklist}
+        initialDisplayCount={10}
+      />
+
       <SidebarChart
         title="Work Packages per Leader"
         description="Number of packages by leader"

@@ -7,6 +7,7 @@ import type {
   StatsData,
   FilterState,
 } from "@/types";
+import { normalizeLeaderName } from "./utils";
 
 /**
  * Filter work packages based on filter state
@@ -193,15 +194,18 @@ export function calculateLeadChartData(
 
   filteredWPs.forEach((wp) => {
     wp.leads.forEach((lead) => {
+      // Normalize leader name (e.g., "ASG UNITAR" -> "ED UNITAR")
+      const normalizedLead = normalizeLeaderName(lead);
+      
       // Filter by chart search query if provided
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
-        if (!lead.toLowerCase().includes(query)) {
+        if (!normalizedLead.toLowerCase().includes(query)) {
           return;
         }
       }
-      const currentCount = leadCounts.get(lead) || 0;
-      leadCounts.set(lead, currentCount + 1);
+      const currentCount = leadCounts.get(normalizedLead) || 0;
+      leadCounts.set(normalizedLead, currentCount + 1);
     });
   });
 
@@ -233,7 +237,9 @@ export function calculateWorkstreamChartData(
     filteredActions = filteredActions.filter(
       (action) =>
         Array.isArray(action.work_package_leads) &&
-        action.work_package_leads.some((lead) => selectedLead.includes(lead)),
+        action.work_package_leads.some((lead) =>
+          selectedLead.includes(normalizeLeaderName(lead)),
+        ),
     );
   }
 
@@ -291,7 +297,9 @@ export function calculateWorkPackageChartData(
     filteredActions = filteredActions.filter(
       (action) =>
         Array.isArray(action.work_package_leads) &&
-        action.work_package_leads.some((lead) => selectedLead.includes(lead)),
+        action.work_package_leads.some((lead) =>
+          selectedLead.includes(normalizeLeaderName(lead)),
+        ),
     );
   }
 
@@ -349,7 +357,7 @@ export function calculateStatsData(
         action.work_package_number.includes(query) ||
         (Array.isArray(action.work_package_leads) &&
           action.work_package_leads.some((lead) =>
-            lead.toLowerCase().includes(query),
+            normalizeLeaderName(lead).toLowerCase().includes(query),
           )) ||
         action.indicative_activity.toLowerCase().includes(query),
     );
@@ -377,7 +385,7 @@ export function calculateStatsData(
       (action) =>
         Array.isArray(action.work_package_leads) &&
         action.work_package_leads.some((lead) =>
-          filters.selectedLead.includes(lead),
+          filters.selectedLead.includes(normalizeLeaderName(lead)),
         ),
     );
   }
@@ -397,7 +405,8 @@ export function calculateStatsData(
       action.work_package_leads.forEach((lead) => {
         const trimmed = lead?.trim();
         if (trimmed && trimmed.length > 0) {
-          uniqueLeadsSet.add(trimmed);
+          const normalized = normalizeLeaderName(trimmed);
+          uniqueLeadsSet.add(normalized);
         }
       });
     }
