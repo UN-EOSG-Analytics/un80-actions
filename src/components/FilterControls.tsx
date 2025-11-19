@@ -16,6 +16,7 @@ import {
   Layers,
   Users,
   Package,
+  ListTodo,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -42,6 +43,8 @@ interface FilterControlsProps {
   onSelectWorkstream: (value: string[]) => void;
   selectedBigTicket: string[];
   onSelectBigTicket: (value: string[]) => void;
+  selectedAction: string[];
+  onSelectAction: (value: string[]) => void;
 
   // Search
   searchQuery: string;
@@ -51,6 +54,7 @@ interface FilterControlsProps {
   uniqueWorkPackages: string[];
   uniqueLeads: string[];
   uniqueWorkstreams: string[];
+  uniqueActions: string[];
 
   // Reset
   onResetFilters: () => void;
@@ -72,11 +76,14 @@ export function FilterControls({
   onSelectWorkstream,
   selectedBigTicket,
   onSelectBigTicket,
+  selectedAction,
+  onSelectAction,
   searchQuery,
   onSearchChange,
   uniqueWorkPackages,
   uniqueLeads,
   uniqueWorkstreams,
+  uniqueActions,
   onResetFilters,
 }: FilterControlsProps) {
   const [isMobile, setIsMobile] = useState(false);
@@ -103,14 +110,16 @@ export function FilterControls({
     selectedWorkPackage.length > 0 ||
     selectedLead.length > 0 ||
     selectedWorkstream.length > 0 ||
-    selectedBigTicket.length > 0
+    selectedBigTicket.length > 0 ||
+    selectedAction.length > 0
   );
 
   const hasActiveAdvancedFilters = !!(
     selectedWorkPackage.length > 0 ||
     selectedLead.length > 0 ||
     selectedWorkstream.length > 0 ||
-    selectedBigTicket.length > 0
+    selectedBigTicket.length > 0 ||
+    selectedAction.length > 0
   );
 
   return (
@@ -415,6 +424,40 @@ export function FilterControls({
               onSelectBigTicket(newSelected);
             }}
             ariaLabel="Filter by package type"
+          />
+
+          {/* Action Filter */}
+          <FilterDropdown
+            open={openFilterCollapsibles.has("action")}
+            onOpenChange={(open) => onToggleFilterCollapsible("action", open)}
+            icon={<ListTodo className="h-4 w-4 text-un-blue" />}
+            triggerText={
+              selectedAction.length === 0
+                ? "Select action"
+                : selectedAction.length === 1
+                  ? selectedAction[0].length > 50
+                    ? `${selectedAction[0].substring(0, 50)}...`
+                    : selectedAction[0]
+                  : `${selectedAction.length} actions selected`
+            }
+            isFiltered={selectedAction.length > 0}
+            allActive={false}
+            options={uniqueActions.map(
+              (action): FilterOption => ({
+                key: action,
+                label: action,
+              }),
+            )}
+            selectedKeys={new Set(selectedAction)}
+            onToggle={(key) => {
+              const newSelected = selectedAction.includes(key)
+                ? selectedAction.filter((action) => action !== key)
+                : [...selectedAction, key];
+              onSelectAction(newSelected);
+            }}
+            ariaLabel="Filter by action"
+            enableSearch={true}
+            searchPlaceholder="Search actions..."
           />
         </div>
       )}

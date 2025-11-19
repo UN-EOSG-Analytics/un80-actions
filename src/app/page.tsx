@@ -36,6 +36,8 @@ export default function WorkPackagesPage() {
     setSelectedWorkstream,
     selectedBigTicket,
     setSelectedBigTicket,
+    selectedAction,
+    setSelectedAction,
     sortOption,
     setSortOption,
     handleResetFilters,
@@ -73,6 +75,7 @@ export default function WorkPackagesPage() {
     uniqueWorkPackages,
     uniqueLeads,
     uniqueWorkstreams,
+    uniqueActions,
     chartData,
     workstreamChartData,
     workpackageChartData,
@@ -93,6 +96,7 @@ export default function WorkPackagesPage() {
   );
   useFilterSync(selectedLead, uniqueLeads, setSelectedLead);
   useFilterSync(selectedWorkstream, uniqueWorkstreams, setSelectedWorkstream);
+  useFilterSync(selectedAction, uniqueActions, setSelectedAction);
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -158,11 +162,14 @@ export default function WorkPackagesPage() {
                     onSelectWorkstream={setSelectedWorkstream}
                     selectedBigTicket={selectedBigTicket}
                     onSelectBigTicket={setSelectedBigTicket}
+                    selectedAction={selectedAction}
+                    onSelectAction={setSelectedAction}
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
                     uniqueWorkPackages={uniqueWorkPackages}
                     uniqueLeads={uniqueLeads}
                     uniqueWorkstreams={uniqueWorkstreams}
+                    uniqueActions={uniqueActions}
                     onResetFilters={handleResetFilters}
                   />
 

@@ -77,6 +77,15 @@ export function filterWorkPackages(
     }
   }
 
+  // Action filter (supports multiple selections)
+  if (filters.selectedAction && filters.selectedAction.length > 0) {
+    filtered = filtered.filter((wp) =>
+      wp.actions.some((action) =>
+        filters.selectedAction.includes(action.text.trim()),
+      ),
+    );
+  }
+
   // Sort filtered work packages
   if (filters.sortOption) {
     filtered = [...filtered].sort((a, b) => {
@@ -150,6 +159,23 @@ export function getUniqueWorkstreams(workPackages: WorkPackage[]): string[] {
     wp.report.forEach((ws) => workstreams.add(ws));
   });
   return Array.from(workstreams).sort();
+}
+
+/**
+ * Get unique actions for filter options
+ * @param workPackages - Array of work packages
+ * @returns Sorted array of unique action texts
+ */
+export function getUniqueActions(workPackages: WorkPackage[]): string[] {
+  const actions = new Set<string>();
+  workPackages.forEach((wp) => {
+    wp.actions.forEach((action) => {
+      if (action.text && action.text.trim()) {
+        actions.add(action.text.trim());
+      }
+    });
+  });
+  return Array.from(actions).sort();
 }
 
 /**

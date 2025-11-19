@@ -121,6 +121,7 @@ export interface FilterState {
   selectedLead: string[];
   selectedWorkstream: string[];
   selectedBigTicket: string[];
+  selectedAction: string[];
   sortOption: string;
 }
 

@@ -6,6 +6,7 @@ import {
   getUniqueWorkPackages,
   getUniqueLeads,
   getUniqueWorkstreams,
+  getUniqueActions,
   calculateLeadChartData,
   calculateWorkstreamChartData,
   calculateWorkPackageChartData,
@@ -36,7 +37,7 @@ export function useWorkPackageData(
 
   // Helper function to filter work packages with all filters except one
   const getFilteredWorkPackagesExcludingFilter = (
-    excludeFilter: "lead" | "workstream" | "workpackage",
+    excludeFilter: "lead" | "workstream" | "workpackage" | "action",
   ) => {
     let filtered = workPackages;
 
@@ -93,6 +94,14 @@ export function useWorkPackageData(
       });
     }
 
+    if (excludeFilter !== "action" && filters.selectedAction && filters.selectedAction.length > 0) {
+      filtered = filtered.filter((wp) =>
+        wp.actions.some((action) =>
+          filters.selectedAction!.includes(action.text.trim()),
+        ),
+      );
+    }
+
     return filtered;
   };
 
@@ -109,6 +118,11 @@ export function useWorkPackageData(
 
   const uniqueWorkstreams = useMemo(
     () => getUniqueWorkstreams(getFilteredWorkPackagesExcludingFilter("workstream")),
+    [workPackages, filters],
+  );
+
+  const uniqueActions = useMemo(
+    () => getUniqueActions(getFilteredWorkPackagesExcludingFilter("action")),
     [workPackages, filters],
   );
 
@@ -184,6 +198,7 @@ export function useWorkPackageData(
     uniqueWorkPackages,
     uniqueLeads,
     uniqueWorkstreams,
+    uniqueActions,
     chartData,
     workstreamChartData,
     workpackageChartData,
