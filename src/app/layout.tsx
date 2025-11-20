@@ -4,6 +4,7 @@ import { Roboto } from "next/font/google";
 import "./globals.css";
 import { AnimatedCornerLogo } from "@/components/AnimatedCornerLogo";
 import Footer from "@/components/Footer";
+import { Providers } from "@/components/providers";
 
 // https://fonts.google.com/specimen/Roboto
 // 100 (Thin), 300 (Light), 400 (Regular), 500 (Medium), 700 (Bold), 800 (ExtraBold), 900 (Black)
@@ -27,9 +28,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${roboto.className} antialiased`}>
       <body>
-        <AnimatedCornerLogo />
-        {children}
-        <Footer />
+        <Providers>
+          <AnimatedCornerLogo />
+          {children}
+          <Footer />
+        </Providers>
         <GoogleAnalytics gaId="G-7BS4GDJ7ZQ" />
       </body>
     </html>
