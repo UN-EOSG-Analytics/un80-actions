@@ -76,6 +76,7 @@ export default function WorkPackagesPage() {
     uniqueLeads,
     uniqueWorkstreams,
     uniqueActions,
+    availableBigTicketOptions,
     chartData,
     workstreamChartData,
     workpackageChartData,
@@ -97,6 +98,11 @@ export default function WorkPackagesPage() {
   useFilterSync(selectedLead, uniqueLeads, setSelectedLead);
   useFilterSync(selectedWorkstream, uniqueWorkstreams, setSelectedWorkstream);
   useFilterSync(selectedAction, uniqueActions, setSelectedAction);
+  useFilterSync(
+    selectedBigTicket,
+    availableBigTicketOptions.map((opt) => opt.key),
+    setSelectedBigTicket,
+  );
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -170,6 +176,7 @@ export default function WorkPackagesPage() {
                     uniqueLeads={uniqueLeads}
                     uniqueWorkstreams={uniqueWorkstreams}
                     uniqueActions={uniqueActions}
+                    availableBigTicketOptions={availableBigTicketOptions}
                     onResetFilters={handleResetFilters}
                   />
 

@@ -37,11 +37,11 @@ export function useWorkPackageData(
 
   // Helper function to filter work packages with all filters except one
   const getFilteredWorkPackagesExcludingFilter = (
-    excludeFilter: "lead" | "workstream" | "workpackage" | "action",
+    excludeFilter: "lead" | "workstream" | "workpackage" | "action" | "bigticket",
   ) => {
     let filtered = workPackages;
 
-    // Always apply search query and big ticket filter
+    // Always apply search query
     if (filters.searchQuery.trim()) {
       const query = filters.searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -53,7 +53,8 @@ export function useWorkPackageData(
       );
     }
 
-    if (filters.selectedBigTicket && filters.selectedBigTicket.length > 0) {
+    // Apply big ticket filter unless it's the excluded filter
+    if (excludeFilter !== "bigticket" && filters.selectedBigTicket && filters.selectedBigTicket.length > 0) {
       const hasBigTicket = filters.selectedBigTicket.includes("big-ticket");
       const hasOther = filters.selectedBigTicket.includes("other");
       
@@ -125,6 +126,22 @@ export function useWorkPackageData(
     () => getUniqueActions(getFilteredWorkPackagesExcludingFilter("action")),
     [workPackages, filters],
   );
+
+  // Get available big ticket filter options based on current filters
+  const availableBigTicketOptions = useMemo(() => {
+    const filtered = getFilteredWorkPackagesExcludingFilter("bigticket");
+    const hasBigTicket = filtered.some((wp) => wp.bigTicket === true);
+    const hasOther = filtered.some((wp) => wp.bigTicket === false);
+    
+    const options = [];
+    if (hasBigTicket) {
+      options.push({ key: "big-ticket", label: '"Big Ticket" Work packages' });
+    }
+    if (hasOther) {
+      options.push({ key: "other", label: "Other Work packages" });
+    }
+    return options;
+  }, [workPackages, filters]);
 
   // Calculate chart data: count work packages per lead
   // Filter by selected workstream and workpackage from other charts
@@ -199,6 +216,7 @@ export function useWorkPackageData(
     uniqueLeads,
     uniqueWorkstreams,
     uniqueActions,
+    availableBigTicketOptions,
     chartData,
     workstreamChartData,
     workpackageChartData,

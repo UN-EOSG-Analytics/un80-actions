@@ -55,6 +55,7 @@ interface FilterControlsProps {
   uniqueLeads: string[];
   uniqueWorkstreams: string[];
   uniqueActions: string[];
+  availableBigTicketOptions: Array<{ key: string; label: string }>;
 
   // Reset
   onResetFilters: () => void;
@@ -84,6 +85,7 @@ export function FilterControls({
   uniqueLeads,
   uniqueWorkstreams,
   uniqueActions,
+  availableBigTicketOptions,
   onResetFilters,
 }: FilterControlsProps) {
   const [isMobile, setIsMobile] = useState(false);
@@ -412,10 +414,7 @@ export function FilterControls({
             }
             isFiltered={selectedBigTicket.length > 0}
             allActive={selectedBigTicket.length === 0}
-            options={[
-              { key: "big-ticket", label: '"Big Ticket" Work packages' },
-              { key: "other", label: "Other Work packages" },
-            ]}
+            options={availableBigTicketOptions}
             selectedKeys={new Set(selectedBigTicket)}
             onToggle={(key) => {
               const newSelected = selectedBigTicket.includes(key)
