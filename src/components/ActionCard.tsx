@@ -8,6 +8,8 @@ import type { WorkPackageAction } from "@/types";
 interface ActionItemProps {
   /** The action data to display */
   action: WorkPackageAction;
+  /** The index of this action in its parent list (0-based) */
+  index: number;
   /** The work package number (e.g., "31") for document reference formatting */
   workPackageNumber: string;
 }
@@ -18,23 +20,19 @@ interface ActionItemProps {
  */
 export function ActionItem({
   action,
+  index,
   workPackageNumber,
 }: ActionItemProps) {
-  // Use original action number if available, otherwise fallback to empty
-  const displayNumber = action.actionNumber || "";
-
   return (
     <div className="rounded-[6px] border border-slate-200 bg-white p-5 pr-9 transition-shadow hover:shadow-sm">
       {/* Activity Number and Text */}
       <div className="mb-4 flex items-start gap-3">
         {/* Numbered circle badge */}
-        {displayNumber && (
-          <div className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-un-blue/10">
-            <span className="text-xs font-semibold text-un-blue">
-              {displayNumber}
-            </span>
-          </div>
-        )}
+        <div className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-un-blue/10">
+          <span className="text-xs font-semibold text-un-blue">
+            {index + 1}
+          </span>
+        </div>
         {/* Action description text */}
         <div className="flex-1">
           <p className="leading-normal font-medium text-slate-900">

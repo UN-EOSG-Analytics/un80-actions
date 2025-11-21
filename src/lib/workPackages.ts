@@ -87,7 +87,6 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           leads: actionLeads,
           report: action.report,
           docText: action.doc_text || null,
-          actionNumber: action.action_number || "",
         });
       } else {
         // Merge leads if action already exists
@@ -104,10 +103,6 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
         // Update doc_text if not already set
         if (action.doc_text && !existingAction.docText) {
           existingAction.docText = action.doc_text;
-        }
-        // Preserve action number if not already set (keep the first one)
-        if (action.action_number && !existingAction.actionNumber) {
-          existingAction.actionNumber = action.action_number;
         }
       }
     }
