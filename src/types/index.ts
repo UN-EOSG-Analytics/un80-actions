@@ -93,6 +93,7 @@ export interface WorkPackageAction {
   leads: string[];
   report: string;
   docText: string | null;
+  actionNumber: string;
 }
 
 /**

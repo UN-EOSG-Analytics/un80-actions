@@ -186,6 +186,7 @@ export default function WorkPackagesPage() {
                     onToggleCollapsible={toggleCollapsible}
                     onSelectLead={setSelectedLead}
                     onSelectWorkstream={setSelectedWorkstream}
+                    selectedActions={selectedAction}
                     isLoading={isLoading}
                   />
                 </div>
