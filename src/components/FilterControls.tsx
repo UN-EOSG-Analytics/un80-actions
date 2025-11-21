@@ -447,7 +447,7 @@ export function FilterControls({
               (action): FilterOption => ({
                 key: action.text,
                 label: action.actionNumber
-                  ? `Action ${action.actionNumber}: ${action.text}`
+                  ? `${action.actionNumber}: ${action.text}`
                   : action.text,
               }),
             )}
