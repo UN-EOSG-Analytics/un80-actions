@@ -127,6 +127,12 @@ export function useWorkPackageData(
     [workPackages, filters],
   );
 
+  // Extract just the text for backward compatibility with filter matching
+  const uniqueActionTexts = useMemo(
+    () => uniqueActions.map((a) => a.text),
+    [uniqueActions],
+  );
+
   // Get available big ticket filter options based on current filters
   const availableBigTicketOptions = useMemo(() => {
     const filtered = getFilteredWorkPackagesExcludingFilter("bigticket");
@@ -216,6 +222,7 @@ export function useWorkPackageData(
     uniqueLeads,
     uniqueWorkstreams,
     uniqueActions,
+    uniqueActionTexts,
     availableBigTicketOptions,
     chartData,
     workstreamChartData,

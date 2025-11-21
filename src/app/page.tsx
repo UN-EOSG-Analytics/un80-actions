@@ -76,6 +76,7 @@ export default function WorkPackagesPage() {
     uniqueLeads,
     uniqueWorkstreams,
     uniqueActions,
+    uniqueActionTexts,
     availableBigTicketOptions,
     chartData,
     workstreamChartData,
@@ -97,7 +98,7 @@ export default function WorkPackagesPage() {
   );
   useFilterSync(selectedLead, uniqueLeads, setSelectedLead);
   useFilterSync(selectedWorkstream, uniqueWorkstreams, setSelectedWorkstream);
-  useFilterSync(selectedAction, uniqueActions, setSelectedAction);
+  useFilterSync(selectedAction, uniqueActionTexts, setSelectedAction);
   useFilterSync(
     selectedBigTicket,
     availableBigTicketOptions.map((opt) => opt.key),
@@ -176,6 +177,7 @@ export default function WorkPackagesPage() {
                     uniqueLeads={uniqueLeads}
                     uniqueWorkstreams={uniqueWorkstreams}
                     uniqueActions={uniqueActions}
+                    uniqueActionTexts={uniqueActionTexts}
                     availableBigTicketOptions={availableBigTicketOptions}
                     onResetFilters={handleResetFilters}
                   />

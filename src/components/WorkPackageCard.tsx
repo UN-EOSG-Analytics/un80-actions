@@ -38,9 +38,8 @@ function WorkPackageActions({
       {/* Display each indicative_activity in its own box */}
       {actions.map((action, idx) => (
         <ActionItem
-          key={`${workPackageNumber}-${action.text}-${idx}`}
+          key={`${workPackageNumber}-${action.actionNumber}-${action.text}-${idx}`}
           action={action}
-          index={idx}
           workPackageNumber={workPackageNumber}
         />
       ))}

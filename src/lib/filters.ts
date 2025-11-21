@@ -162,20 +162,34 @@ export function getUniqueWorkstreams(workPackages: WorkPackage[]): string[] {
 }
 
 /**
- * Get unique actions for filter options
+ * Get unique actions for filter options with their action numbers
  * @param workPackages - Array of work packages
- * @returns Sorted array of unique action texts
+ * @returns Array of unique actions with number and text, sorted by action number
  */
-export function getUniqueActions(workPackages: WorkPackage[]): string[] {
-  const actions = new Set<string>();
+export function getUniqueActions(
+  workPackages: WorkPackage[],
+): Array<{ text: string; actionNumber: string }> {
+  const actionsMap = new Map<string, string>(); // text -> actionNumber
   workPackages.forEach((wp) => {
     wp.actions.forEach((action) => {
       if (action.text && action.text.trim()) {
-        actions.add(action.text.trim());
+        const trimmedText = action.text.trim();
+        // Use the first action number found for each unique text
+        if (!actionsMap.has(trimmedText)) {
+          actionsMap.set(trimmedText, action.actionNumber || "");
+        }
       }
     });
   });
-  return Array.from(actions).sort();
+  return Array.from(actionsMap.entries())
+    .map(([text, actionNumber]) => ({ text, actionNumber }))
+    .sort((a, b) => {
+      // Sort by action number (numeric) first, then by text
+      const numA = parseInt(a.actionNumber) || 0;
+      const numB = parseInt(b.actionNumber) || 0;
+      if (numA !== numB) return numA - numB;
+      return a.text.localeCompare(b.text);
+    });
 }
 
 /**

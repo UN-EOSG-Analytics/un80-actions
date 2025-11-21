@@ -54,7 +54,8 @@ interface FilterControlsProps {
   uniqueWorkPackages: string[];
   uniqueLeads: string[];
   uniqueWorkstreams: string[];
-  uniqueActions: string[];
+  uniqueActions: Array<{ text: string; actionNumber: string }>;
+  uniqueActionTexts: string[];
   availableBigTicketOptions: Array<{ key: string; label: string }>;
 
   // Reset
@@ -85,6 +86,7 @@ export function FilterControls({
   uniqueLeads,
   uniqueWorkstreams,
   uniqueActions,
+  uniqueActionTexts,
   availableBigTicketOptions,
   onResetFilters,
 }: FilterControlsProps) {
@@ -443,8 +445,10 @@ export function FilterControls({
             allActive={false}
             options={uniqueActions.map(
               (action): FilterOption => ({
-                key: action,
-                label: action,
+                key: action.text,
+                label: action.actionNumber
+                  ? `Action ${action.actionNumber}: ${action.text}`
+                  : action.text,
               }),
             )}
             selectedKeys={new Set(selectedAction)}

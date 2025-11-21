@@ -87,6 +87,7 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           leads: actionLeads,
           report: action.report,
           docText: action.doc_text || null,
+          actionNumber: action.action_number || "",
         });
       } else {
         // Merge leads if action already exists

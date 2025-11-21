@@ -8,8 +8,6 @@ import type { WorkPackageAction } from "@/types";
 interface ActionItemProps {
   /** The action data to display */
   action: WorkPackageAction;
-  /** The index of this action in its parent list (0-based) */
-  index: number;
   /** The work package number (e.g., "31") for document reference formatting */
   workPackageNumber: string;
 }
@@ -20,7 +18,6 @@ interface ActionItemProps {
  */
 export function ActionItem({
   action,
-  index,
   workPackageNumber,
 }: ActionItemProps) {
   return (
@@ -30,7 +27,7 @@ export function ActionItem({
         {/* Numbered circle badge */}
         <div className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-un-blue/10">
           <span className="text-xs font-semibold text-un-blue">
-            {index + 1}
+            {action.actionNumber || ""}
           </span>
         </div>
         {/* Action description text */}
