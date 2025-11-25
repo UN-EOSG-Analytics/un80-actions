@@ -1,0 +1,71 @@
+"use client";
+
+import { useSearchParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import ActionModal from "./ActionModal";
+import { getActionByNumber } from "@/lib/actions";
+import type { Action } from "@/types";
+
+export default function ModalHandler() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const actionParam = searchParams.get("action");
+  const [action, setAction] = useState<Action | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // If there's no action param, clear state
+    if (!actionParam) {
+      setAction(null);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
+    // Parse action number
+    const actionNumber = parseInt(actionParam, 10);
+    if (isNaN(actionNumber)) {
+      console.warn(`Invalid action number: "${actionParam}"`);
+      setError("Invalid action number");
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    // Load action data
+    getActionByNumber(actionNumber)
+      .then((foundAction) => {
+        if (!foundAction) {
+          console.warn(`Action ${actionNumber} not found`);
+          setError("Action not found");
+        } else {
+          setAction(foundAction);
+        }
+      })
+      .catch((err) => {
+        console.error("Error loading action:", err);
+        setError("Failed to load action");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [actionParam]);
+
+  const handleClose = () => {
+    router.replace("/", { scroll: false }); // Remove query param, return to home without jumping
+  };
+
+  // Don't render anything if no action param
+  if (!actionParam) return null;
+
+  return (
+    <ActionModal
+      action={error ? null : action}
+      onClose={handleClose}
+      loading={loading}
+    />
+  );
+}

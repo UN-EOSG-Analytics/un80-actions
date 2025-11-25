@@ -87,3 +87,13 @@ export function countByMSApproval(actions: Actions): {
     total: actions.length,
   };
 }
+
+/**
+ * Get action by action number
+ * @param actionNumber - The unique action number to search for
+ * @returns The action with the given number, or null if not found
+ */
+export async function getActionByNumber(actionNumber: number): Promise<Action | null> {
+  const actions = await fetchActions();
+  return actions.find((action) => action.action_number === actionNumber) || null;
+}

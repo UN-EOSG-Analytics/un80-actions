@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { DocumentBadge } from "@/components/DocumentBadge";
 import { LeadsBadge } from "@/components/LeadsBadge";
 import type { WorkPackageAction } from "@/types";
@@ -20,8 +23,17 @@ export function ActionItem({
   action,
   workPackageNumber,
 }: ActionItemProps) {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push(`/?action=${action.actionNumber}`, { scroll: false });
+  };
+
   return (
-    <div className="rounded-[6px] border border-slate-200 bg-white p-5 pr-9 transition-shadow hover:shadow-sm">
+    <div 
+      onClick={handleClick}
+      className="rounded-[6px] border border-slate-200 bg-white p-5 pr-9 transition-all hover:shadow-md hover:border-slate-300 cursor-pointer"
+    >
       {/* Activity Number and Text */}
       <div className="mb-4 flex items-start gap-3">
         {/* Numbered circle badge */}
