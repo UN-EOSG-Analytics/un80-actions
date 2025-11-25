@@ -4,7 +4,7 @@ import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
 interface DocumentBadgeProps {
   documentParagraphNumber?: string;
   report?: string;
-  workPackageNumber?: string;
+  workPackageNumber?: number | '';
 }
 
 export function DocumentBadge({
@@ -13,7 +13,7 @@ export function DocumentBadge({
   workPackageNumber,
 }: DocumentBadgeProps) {
   // Don't render if no document information is available
-  if (!documentParagraph && report !== "WS1" && workPackageNumber !== "31") {
+  if (!documentParagraph && report !== "WS1" && workPackageNumber !== 31) {
     return null;
   }
 

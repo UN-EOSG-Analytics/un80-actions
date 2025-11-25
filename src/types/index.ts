@@ -15,16 +15,16 @@ export interface Action {
   report: string;
 
   /** Work package number as a string */
-  work_package_number: string;
+  work_package_number: number;
 
   /** Name/title of the work package */
   work_package_name: string;
 
   /** Paragraph number in the document */
-  document_paragraph: string;
+  document_paragraph: string | null;
 
   /** Unique action number as a string */
-  action_number: string;
+  action_number: number;
 
   /** Description of the indicative activity */
   indicative_activity: string;
@@ -93,7 +93,7 @@ export interface WorkPackageAction {
   leads: string[];
   report: string;
   docText: string | null;
-  actionNumber: string;
+  actionNumber: number;
 }
 
 /**
@@ -101,7 +101,7 @@ export interface WorkPackageAction {
  */
 export interface WorkPackage {
   report: string[];
-  number: string;
+  number: number | "";
   name: string;
   leads: string[];
   goal: string | null;

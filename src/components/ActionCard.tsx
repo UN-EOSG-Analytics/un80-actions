@@ -9,7 +9,7 @@ interface ActionItemProps {
   /** The action data to display */
   action: WorkPackageAction;
   /** The work package number (e.g., "31") for document reference formatting */
-  workPackageNumber: string;
+  workPackageNumber: number | '';
 }
 
 /**

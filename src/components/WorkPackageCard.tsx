@@ -12,7 +12,7 @@ import { Menu } from "lucide-react";
 
 interface WorkPackageActionsProps {
   actions: WorkPackageAction[];
-  workPackageNumber: string;
+  workPackageNumber: number | '';
 }
 
 function WorkPackageActions({

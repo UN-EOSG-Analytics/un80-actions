@@ -27,7 +27,7 @@ export function filterWorkPackages(
     filtered = filtered.filter(
       (wp) =>
         wp.name.toLowerCase().includes(query) ||
-        wp.number.includes(query) ||
+        String(wp.number).includes(query) ||
         wp.leads.some((lead) => lead.toLowerCase().includes(query)) ||
         wp.actions.some((action) => action.text.toLowerCase().includes(query)),
     );
@@ -42,7 +42,7 @@ export function filterWorkPackages(
 
     filtered = filtered.filter((wp) => {
       if (wp.number) {
-        return selectedNumbers.includes(wp.number);
+        return selectedNumbers.includes(String(wp.number));
       } else {
         return selectedNumbers.includes(wp.name);
       }
@@ -96,14 +96,14 @@ export function filterWorkPackages(
         case "name-desc":
           return b.name.localeCompare(a.name);
         case "number-asc": {
-          const numA = parseInt(a.number) || 0;
-          const numB = parseInt(b.number) || 0;
+          const numA = typeof a.number === 'number' ? a.number : 0;
+          const numB = typeof b.number === 'number' ? b.number : 0;
           if (numA !== numB) return numA - numB;
           return a.name.localeCompare(b.name);
         }
         case "number-desc": {
-          const numA = parseInt(a.number) || 0;
-          const numB = parseInt(b.number) || 0;
+          const numA = typeof a.number === 'number' ? a.number : 0;
+          const numB = typeof b.number === 'number' ? b.number : 0;
           if (numA !== numB) return numB - numA;
           return a.name.localeCompare(b.name);
         }
@@ -177,7 +177,7 @@ export function getUniqueActions(
         const trimmedText = action.text.trim();
         // Use the first action number found for each unique text
         if (!actionsMap.has(trimmedText)) {
-          actionsMap.set(trimmedText, action.actionNumber || "");
+          actionsMap.set(trimmedText, String(action.actionNumber || ""));
         }
       }
     });
@@ -225,7 +225,7 @@ export function calculateLeadChartData(
     });
     filteredWPs = filteredWPs.filter((wp) => {
       if (wp.number) {
-        return selectedNumbers.includes(wp.number);
+        return selectedNumbers.includes(String(wp.number));
       } else {
         return selectedNumbers.includes(wp.name);
       }
@@ -290,7 +290,7 @@ export function calculateWorkstreamChartData(
     });
     filteredActions = filteredActions.filter((action) => {
       if (action.work_package_number) {
-        return selectedNumbers.includes(action.work_package_number);
+        return selectedNumbers.includes(String(action.work_package_number));
       } else {
         return selectedNumbers.includes(action.work_package_name);
       }
@@ -394,7 +394,7 @@ export function calculateStatsData(
     filteredActions = filteredActions.filter(
       (action) =>
         action.work_package_name.toLowerCase().includes(query) ||
-        action.work_package_number.includes(query) ||
+        String(action.work_package_number).includes(query) ||
         (Array.isArray(action.work_package_leads) &&
           action.work_package_leads.some((lead) =>
             normalizeLeaderName(lead).toLowerCase().includes(query),
@@ -412,7 +412,7 @@ export function calculateStatsData(
 
     filteredActions = filteredActions.filter((action) => {
       if (action.work_package_number) {
-        return selectedNumbers.includes(action.work_package_number);
+        return selectedNumbers.includes(String(action.work_package_number));
       } else {
         return selectedNumbers.includes(action.work_package_name);
       }
