@@ -257,7 +257,7 @@ export default function ActionModal({
         )}
 
         {/* MS Approval */}
-        {action.ms_approval && (
+        {/* {action.ms_approval && (
           <div className="border-t border-gray-200 pt-6">
             <Field label="Member State Approval">
               <div className="space-y-2">
@@ -279,10 +279,10 @@ export default function ActionModal({
               </div>
             </Field>
           </div>
-        )}
+        )} */}
 
         {/* Budget */}
-        {action.un_budget.length > 0 && (
+        {/* {action.un_budget.length > 0 && (
           <div className="border-t border-gray-200 pt-6">
             <Field label="UN Budget">
               <div className="flex flex-wrap gap-2">
@@ -297,7 +297,9 @@ export default function ActionModal({
               </div>
             </Field>
           </div>
-        )}
+        )} */}
+
+
       </div>
     );
   };
