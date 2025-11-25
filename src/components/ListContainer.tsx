@@ -7,6 +7,7 @@ interface WorkPackageListProps {
   onToggleCollapsible: (key: string) => void;
   onSelectLead?: (lead: string[]) => void;
   onSelectWorkstream?: (workstream: string[]) => void;
+  selectedActions?: string[];
   isLoading?: boolean;
 }
 
@@ -16,6 +17,7 @@ export function WorkPackageList({
   onToggleCollapsible,
   onSelectLead,
   onSelectWorkstream,
+  selectedActions = [],
   isLoading = false,
 }: WorkPackageListProps) {
   // Don't show "no results" message while loading
@@ -40,10 +42,23 @@ export function WorkPackageList({
         const collapsibleKey = `${wp.report.join("-")}-${wp.number || "empty"}-${index}`;
         const isOpen = openCollapsibles.has(collapsibleKey);
 
+        // Filter actions if action filter is selected
+        const filteredActions = selectedActions.length > 0
+          ? wp.actions.filter((action) =>
+              selectedActions.includes(action.text.trim())
+            )
+          : wp.actions;
+
+        // Create a work package with filtered actions
+        const filteredWorkPackage = {
+          ...wp,
+          actions: filteredActions,
+        };
+
         return (
           <WorkPackageItem
             key={collapsibleKey}
-            workPackage={wp}
+            workPackage={filteredWorkPackage}
             isOpen={isOpen}
             onToggle={() => onToggleCollapsible(collapsibleKey)}
             collapsibleKey={collapsibleKey}

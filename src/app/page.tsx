@@ -39,6 +39,8 @@ export default function WorkPackagesPage() {
     setSelectedWorkstream,
     selectedBigTicket,
     setSelectedBigTicket,
+    selectedAction,
+    setSelectedAction,
     sortOption,
     setSortOption,
     handleResetFilters,
@@ -83,6 +85,9 @@ export default function WorkPackagesPage() {
     uniqueWorkPackages,
     uniqueLeads,
     uniqueWorkstreams,
+    uniqueActions,
+    uniqueActionTexts,
+    availableBigTicketOptions,
     chartData,
     workstreamChartData,
     workpackageChartData,
@@ -103,6 +108,12 @@ export default function WorkPackagesPage() {
   );
   useFilterSync(selectedLead, uniqueLeads, setSelectedLead);
   useFilterSync(selectedWorkstream, uniqueWorkstreams, setSelectedWorkstream);
+  useFilterSync(selectedAction, uniqueActionTexts, setSelectedAction);
+  useFilterSync(
+    selectedBigTicket,
+    availableBigTicketOptions.map((opt) => opt.key),
+    setSelectedBigTicket,
+  );
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -173,11 +184,16 @@ export default function WorkPackagesPage() {
                     onSelectWorkstream={setSelectedWorkstream}
                     selectedBigTicket={selectedBigTicket}
                     onSelectBigTicket={setSelectedBigTicket}
+                    selectedAction={selectedAction}
+                    onSelectAction={setSelectedAction}
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
                     uniqueWorkPackages={uniqueWorkPackages}
                     uniqueLeads={uniqueLeads}
                     uniqueWorkstreams={uniqueWorkstreams}
+                    uniqueActions={uniqueActions}
+                    uniqueActionTexts={uniqueActionTexts}
+                    availableBigTicketOptions={availableBigTicketOptions}
                     onResetFilters={handleResetFilters}
                   />
 
@@ -187,6 +203,7 @@ export default function WorkPackagesPage() {
                     onToggleCollapsible={toggleCollapsible}
                     onSelectLead={setSelectedLead}
                     onSelectWorkstream={setSelectedWorkstream}
+                    selectedActions={selectedAction}
                     isLoading={isLoading}
                   />
                 </div>

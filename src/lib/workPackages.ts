@@ -25,13 +25,17 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
             .map((lead) => normalizeLeaderName(lead.trim()))
         : [];
 
+      // Determine if work package is "big ticket" based on number (1-21 = big ticket, rest = other)
+      const wpNumber = parseInt(action.work_package_number || "0") || 0;
+      const isBigTicket = wpNumber >= 1 && wpNumber <= 21;
+
       wpMap.set(key, {
         report: [action.report],
         number: action.work_package_number || "",
         name: action.work_package_name,
         leads: leads,
         goal: action.work_package_goal || null,
-        bigTicket: action.big_ticket || false,
+        bigTicket: isBigTicket,
         actions: [],
       });
     }
@@ -59,10 +63,9 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
       wp.goal = action.work_package_goal;
     }
 
-    // Update big_ticket status - if any action is big_ticket, mark the work package as big_ticket
-    if (action.big_ticket) {
-      wp.bigTicket = true;
-    }
+    // Update big_ticket status based on work package number (1-21 = big ticket)
+    const wpNumber = parseInt(action.work_package_number || "0") || 0;
+    wp.bigTicket = wpNumber >= 1 && wpNumber <= 21;
 
     // Add indicative activity if not already included
     if (action.indicative_activity) {
@@ -84,6 +87,7 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           leads: actionLeads,
           report: action.report,
           docText: action.doc_text || null,
+          actionNumber: action.action_number || "",
         });
       } else {
         // Merge leads if action already exists

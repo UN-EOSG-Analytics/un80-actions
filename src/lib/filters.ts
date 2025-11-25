@@ -78,6 +78,15 @@ export function filterWorkPackages(
     }
   }
 
+  // Action filter (supports multiple selections)
+  if (filters.selectedAction && filters.selectedAction.length > 0) {
+    filtered = filtered.filter((wp) =>
+      wp.actions.some((action) =>
+        filters.selectedAction.includes(action.text.trim()),
+      ),
+    );
+  }
+
   // Sort filtered work packages
   if (filters.sortOption) {
     filtered = [...filtered].sort((a, b) => {
@@ -151,6 +160,37 @@ export function getUniqueWorkstreams(workPackages: WorkPackage[]): string[] {
     wp.report.forEach((ws) => workstreams.add(ws));
   });
   return Array.from(workstreams).sort();
+}
+
+/**
+ * Get unique actions for filter options with their action numbers
+ * @param workPackages - Array of work packages
+ * @returns Array of unique actions with number and text, sorted by action number
+ */
+export function getUniqueActions(
+  workPackages: WorkPackage[],
+): Array<{ text: string; actionNumber: string }> {
+  const actionsMap = new Map<string, string>(); // text -> actionNumber
+  workPackages.forEach((wp) => {
+    wp.actions.forEach((action) => {
+      if (action.text && action.text.trim()) {
+        const trimmedText = action.text.trim();
+        // Use the first action number found for each unique text
+        if (!actionsMap.has(trimmedText)) {
+          actionsMap.set(trimmedText, action.actionNumber || "");
+        }
+      }
+    });
+  });
+  return Array.from(actionsMap.entries())
+    .map(([text, actionNumber]) => ({ text, actionNumber }))
+    .sort((a, b) => {
+      // Sort by action number (numeric) first, then by text
+      const numA = parseInt(a.actionNumber) || 0;
+      const numB = parseInt(b.actionNumber) || 0;
+      if (numA !== numB) return numA - numB;
+      return a.text.localeCompare(b.text);
+    });
 }
 
 /**

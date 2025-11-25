@@ -93,6 +93,7 @@ export interface WorkPackageAction {
   leads: string[];
   report: string;
   docText: string | null;
+  actionNumber: string;
 }
 
 /**
@@ -121,6 +122,7 @@ export interface FilterState {
   selectedLead: string[];
   selectedWorkstream: string[];
   selectedBigTicket: string[];
+  selectedAction: string[];
   sortOption: string;
 }
 
