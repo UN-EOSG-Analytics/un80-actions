@@ -14,8 +14,12 @@ with open(input_path, "r", encoding="utf-8") as f:
 # Convert to DataFrame
 df = pd.DataFrame(data)
 
-# Assert no column is completely null (indicates error on Power Automate export)
+# Assert no column (except explicitly allowed ones) is completely null
+# This still catches export errors, but tolerates known-empty fields.
+allowed_all_null_columns = {"work_package_goal"}
 for col in df.columns:
+    if col in allowed_all_null_columns:
+        continue
     if df[col].isnull().all():
         raise AssertionError(f"Column '{col}' is completely null.")
 
