@@ -36,14 +36,21 @@ export function calculateLeaderSubmissionProgress(
 
   // Leaders who have submitted focal points
   const leadersWithFocalPointsSet = new Set([
+    "DSG",
     "ED UNITAR",
+    "ED UN Women",
     "ED UNOPS",
+    "ES ECA",
+    "ES UNFCCC",
     "HC OHCHR",
+    "SG ITU",
     "USG DGACM",
     "USG DMSPC",
     "USG DOS",
     "USG DPO",
     "USG DPPA",
+    "USG OCT",
+    "USG ODA",
     "USG Policy",
   ]);
 
@@ -132,14 +139,21 @@ export function getLeaderSubmissionStatuses(
 
   // Leaders who have submitted focal points
   const leadersWithFocalPointsSet = new Set([
+    "DSG",
     "ED UNITAR",
+    "ED UN Women",
     "ED UNOPS",
+    "ES ECA",
+    "ES UNFCCC",
     "HC OHCHR",
+    "SG ITU",
     "USG DGACM",
     "USG DMSPC",
     "USG DOS",
     "USG DPO",
     "USG DPPA",
+    "USG OCT",
+    "USG ODA",
     "USG Policy",
   ]);
 

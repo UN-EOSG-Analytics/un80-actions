@@ -19,9 +19,7 @@ export function LeaderSubmissionProgress({
 
   const firstMilestonePercentage = 0; // Always 0%
   const finalMilestonePercentage = 0; // Always 0%
-  const focalPointsPercentage = progress.totalLeaders > 0
-    ? Math.round((progress.focalPointsSubmitted / progress.totalLeaders) * 100)
-    : 0;
+  const focalPointsPercentage = Math.round((17 / 34) * 100);
 
   const ProgressCard = ({
     label,
@@ -125,8 +123,8 @@ export function LeaderSubmissionProgress({
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <ProgressCard
           label="Focal Points Submitted"
-          value={progress.focalPointsSubmitted}
-          total={progress.totalLeaders}
+          value={17}
+          total={34}
           percentage={focalPointsPercentage}
           icon={Users}
         />
