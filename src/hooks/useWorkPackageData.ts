@@ -47,7 +47,7 @@ export function useWorkPackageData(
       filtered = filtered.filter(
         (wp) =>
           wp.name.toLowerCase().includes(query) ||
-          wp.number.includes(query) ||
+          String(wp.number).includes(query) ||
           wp.leads.some((lead) => lead.toLowerCase().includes(query)) ||
           wp.actions.some((action) => action.text.toLowerCase().includes(query)),
       );
@@ -88,7 +88,7 @@ export function useWorkPackageData(
 
       filtered = filtered.filter((wp) => {
         if (wp.number) {
-          return selectedNumbers.includes(wp.number);
+          return selectedNumbers.includes(String(wp.number));
         } else {
           return selectedNumbers.includes(wp.name);
         }

@@ -4,7 +4,7 @@ import type {
   WorkPackageStats,
   NextMilestone,
 } from "@/types";
-import { parseDate, formatDate } from "./utils";
+import { parseDate, formatDate, normalizeLeaderName } from "./utils";
 
 /**
  * Group actions by work package number, combining across reports
@@ -16,17 +16,17 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
 
   actions.forEach((action) => {
     // Use work_package_number as key to combine across reports
-    const key = action.work_package_number || "empty";
+    const key = String(action.work_package_number || "empty");
     if (!wpMap.has(key)) {
       // work_package_leads is already an array
       const leads = Array.isArray(action.work_package_leads)
-        ? action.work_package_leads.filter(
-            (lead) => lead && lead.trim().length > 0,
-          )
+        ? action.work_package_leads
+            .filter((lead) => lead && lead.trim().length > 0)
+            .map((lead) => normalizeLeaderName(lead.trim()))
         : [];
 
       // Determine if work package is "big ticket" based on number (1-21 = big ticket, rest = other)
-      const wpNumber = parseInt(action.work_package_number || "0") || 0;
+      const wpNumber = action.work_package_number || 0;
       const isBigTicket = wpNumber >= 1 && wpNumber <= 21;
 
       wpMap.set(key, {
@@ -48,9 +48,9 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
 
     // Merge leads from all reports
     const newLeads = Array.isArray(action.work_package_leads)
-      ? action.work_package_leads.filter(
-          (lead) => lead && lead.trim().length > 0,
-        )
+      ? action.work_package_leads
+          .filter((lead) => lead && lead.trim().length > 0)
+          .map((lead) => normalizeLeaderName(lead.trim()))
       : [];
     newLeads.forEach((lead) => {
       if (!wp.leads.includes(lead)) {
@@ -64,7 +64,7 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
     }
 
     // Update big_ticket status based on work package number (1-21 = big ticket)
-    const wpNumber = parseInt(action.work_package_number || "0") || 0;
+    const wpNumber = action.work_package_number || 0;
     wp.bigTicket = wpNumber >= 1 && wpNumber <= 21;
 
     // Add indicative activity if not already included
@@ -76,9 +76,9 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
       if (!existingAction) {
         // work_package_leads is already an array
         const actionLeads = Array.isArray(action.work_package_leads)
-          ? action.work_package_leads.filter(
-              (lead) => lead && lead.trim().length > 0,
-            )
+          ? action.work_package_leads
+              .filter((lead) => lead && lead.trim().length > 0)
+              .map((lead) => normalizeLeaderName(lead.trim()))
           : [];
 
         wp.actions.push({
@@ -87,7 +87,7 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           leads: actionLeads,
           report: action.report,
           docText: action.doc_text || null,
-          actionNumber: action.action_number || "",
+          actionNumber: action.action_number || 0,
         });
       } else {
         // Merge leads if action already exists
@@ -115,8 +115,8 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
     if (!a.number) return 1;
     if (!b.number) return -1;
 
-    const numA = parseInt(a.number) || 0;
-    const numB = parseInt(b.number) || 0;
+    const numA = typeof a.number === 'number' ? a.number : 0;
+    const numB = typeof b.number === 'number' ? b.number : 0;
     if (numA !== numB) return numA - numB;
 
     // If numbers are equal, sort by name

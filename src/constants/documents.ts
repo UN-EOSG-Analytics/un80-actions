@@ -33,12 +33,12 @@ export function getDocumentReference({
   report,
   documentParagraph,
 }: {
-  workPackageNumber?: string;
+  workPackageNumber?: number | '';
   report?: string;
   documentParagraph?: string;
 }): { text: string; documentNumber: string } | null {
   // WS1 or special case for work package 31
-  if (report === "WS1" || workPackageNumber === "31") {
+  if (report === "WS1" || workPackageNumber === 31) {
     return {
       text: DOCUMENT_NUMBERS.WS1,
       documentNumber: DOCUMENT_NUMBERS.WS1,

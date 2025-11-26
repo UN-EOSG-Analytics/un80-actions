@@ -7,6 +7,7 @@ import type {
   StatsData,
   FilterState,
 } from "@/types";
+import { normalizeLeaderName } from "./utils";
 
 /**
  * Filter work packages based on filter state
@@ -26,7 +27,7 @@ export function filterWorkPackages(
     filtered = filtered.filter(
       (wp) =>
         wp.name.toLowerCase().includes(query) ||
-        wp.number.includes(query) ||
+        String(wp.number).includes(query) ||
         wp.leads.some((lead) => lead.toLowerCase().includes(query)) ||
         wp.actions.some((action) => action.text.toLowerCase().includes(query)),
     );
@@ -41,7 +42,7 @@ export function filterWorkPackages(
 
     filtered = filtered.filter((wp) => {
       if (wp.number) {
-        return selectedNumbers.includes(wp.number);
+        return selectedNumbers.includes(String(wp.number));
       } else {
         return selectedNumbers.includes(wp.name);
       }
@@ -95,14 +96,14 @@ export function filterWorkPackages(
         case "name-desc":
           return b.name.localeCompare(a.name);
         case "number-asc": {
-          const numA = parseInt(a.number) || 0;
-          const numB = parseInt(b.number) || 0;
+          const numA = typeof a.number === 'number' ? a.number : 0;
+          const numB = typeof b.number === 'number' ? b.number : 0;
           if (numA !== numB) return numA - numB;
           return a.name.localeCompare(b.name);
         }
         case "number-desc": {
-          const numA = parseInt(a.number) || 0;
-          const numB = parseInt(b.number) || 0;
+          const numA = typeof a.number === 'number' ? a.number : 0;
+          const numB = typeof b.number === 'number' ? b.number : 0;
           if (numA !== numB) return numB - numA;
           return a.name.localeCompare(b.name);
         }
@@ -176,7 +177,7 @@ export function getUniqueActions(
         const trimmedText = action.text.trim();
         // Use the first action number found for each unique text
         if (!actionsMap.has(trimmedText)) {
-          actionsMap.set(trimmedText, action.actionNumber || "");
+          actionsMap.set(trimmedText, String(action.actionNumber || ""));
         }
       }
     });
@@ -224,7 +225,7 @@ export function calculateLeadChartData(
     });
     filteredWPs = filteredWPs.filter((wp) => {
       if (wp.number) {
-        return selectedNumbers.includes(wp.number);
+        return selectedNumbers.includes(String(wp.number));
       } else {
         return selectedNumbers.includes(wp.name);
       }
@@ -233,15 +234,18 @@ export function calculateLeadChartData(
 
   filteredWPs.forEach((wp) => {
     wp.leads.forEach((lead) => {
+      // Normalize leader name (e.g., "ASG UNITAR" -> "ED UNITAR")
+      const normalizedLead = normalizeLeaderName(lead);
+      
       // Filter by chart search query if provided
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
-        if (!lead.toLowerCase().includes(query)) {
+        if (!normalizedLead.toLowerCase().includes(query)) {
           return;
         }
       }
-      const currentCount = leadCounts.get(lead) || 0;
-      leadCounts.set(lead, currentCount + 1);
+      const currentCount = leadCounts.get(normalizedLead) || 0;
+      leadCounts.set(normalizedLead, currentCount + 1);
     });
   });
 
@@ -273,7 +277,9 @@ export function calculateWorkstreamChartData(
     filteredActions = filteredActions.filter(
       (action) =>
         Array.isArray(action.work_package_leads) &&
-        action.work_package_leads.some((lead) => selectedLead.includes(lead)),
+        action.work_package_leads.some((lead) =>
+          selectedLead.includes(normalizeLeaderName(lead)),
+        ),
     );
   }
 
@@ -284,7 +290,7 @@ export function calculateWorkstreamChartData(
     });
     filteredActions = filteredActions.filter((action) => {
       if (action.work_package_number) {
-        return selectedNumbers.includes(action.work_package_number);
+        return selectedNumbers.includes(String(action.work_package_number));
       } else {
         return selectedNumbers.includes(action.work_package_name);
       }
@@ -331,7 +337,9 @@ export function calculateWorkPackageChartData(
     filteredActions = filteredActions.filter(
       (action) =>
         Array.isArray(action.work_package_leads) &&
-        action.work_package_leads.some((lead) => selectedLead.includes(lead)),
+        action.work_package_leads.some((lead) =>
+          selectedLead.includes(normalizeLeaderName(lead)),
+        ),
     );
   }
 
@@ -386,10 +394,10 @@ export function calculateStatsData(
     filteredActions = filteredActions.filter(
       (action) =>
         action.work_package_name.toLowerCase().includes(query) ||
-        action.work_package_number.includes(query) ||
+        String(action.work_package_number).includes(query) ||
         (Array.isArray(action.work_package_leads) &&
           action.work_package_leads.some((lead) =>
-            lead.toLowerCase().includes(query),
+            normalizeLeaderName(lead).toLowerCase().includes(query),
           )) ||
         action.indicative_activity.toLowerCase().includes(query),
     );
@@ -404,7 +412,7 @@ export function calculateStatsData(
 
     filteredActions = filteredActions.filter((action) => {
       if (action.work_package_number) {
-        return selectedNumbers.includes(action.work_package_number);
+        return selectedNumbers.includes(String(action.work_package_number));
       } else {
         return selectedNumbers.includes(action.work_package_name);
       }
@@ -417,7 +425,7 @@ export function calculateStatsData(
       (action) =>
         Array.isArray(action.work_package_leads) &&
         action.work_package_leads.some((lead) =>
-          filters.selectedLead.includes(lead),
+          filters.selectedLead.includes(normalizeLeaderName(lead)),
         ),
     );
   }
@@ -437,7 +445,8 @@ export function calculateStatsData(
       action.work_package_leads.forEach((lead) => {
         const trimmed = lead?.trim();
         if (trimmed && trimmed.length > 0) {
-          uniqueLeadsSet.add(trimmed);
+          const normalized = normalizeLeaderName(trimmed);
+          uniqueLeadsSet.add(normalized);
         }
       });
     }

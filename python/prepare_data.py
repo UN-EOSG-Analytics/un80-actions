@@ -78,6 +78,14 @@ for col in df.columns:
 df = df.replace("", None)
 
 # Sort by work_package_number then action_number ascending
+# Convert sorting columns to integers before sorting
+df["work_package_number"] = (
+    pd.to_numeric(df["work_package_number"], errors="coerce").fillna(0).astype(int)
+)
+df["action_number"] = (
+    pd.to_numeric(df["action_number"], errors="coerce").fillna(0).astype(int)
+)
+
 df = df.sort_values(by=["work_package_number", "action_number"], ascending=[True, True])
 
 
