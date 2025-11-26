@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { DocumentBadge } from "@/components/DocumentBadge";
 import { LeadsBadge } from "@/components/LeadsBadge";
 import type { WorkPackageAction } from "@/types";
@@ -24,8 +24,18 @@ export function ActionItem({
   workPackageNumber,
 }: ActionItemProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleClick = () => {
+    // Save current URL to sessionStorage before opening modal
+    const currentUrl = searchParams.toString();
+    if (currentUrl) {
+      sessionStorage.setItem('previousUrl', currentUrl);
+    } else {
+      sessionStorage.removeItem('previousUrl');
+    }
+    
+    // Navigate to clean modal URL
     router.push(`/?action=${action.actionNumber}`, { scroll: false });
   };
 

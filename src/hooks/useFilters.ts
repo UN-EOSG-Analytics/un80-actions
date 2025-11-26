@@ -27,7 +27,7 @@ export function useFilters() {
     searchParams.get("type")?.split(",").filter(Boolean) || []
   );
   const [selectedAction, setSelectedAction] = useState<string[]>(
-    searchParams.get("action")?.split(",").filter(Boolean) || []
+    searchParams.get("actions")?.split(",").filter(Boolean) || []
   );
   const [sortOption, setSortOption] = useState<string>(
     searchParams.get("sort") || "number-asc"
@@ -46,7 +46,7 @@ export function useFilters() {
     if (selectedBigTicket.length > 0)
       params.set("type", selectedBigTicket.join(","));
     if (selectedAction.length > 0)
-      params.set("action", selectedAction.join(","));
+      params.set("actions", selectedAction.join(","));
     if (sortOption !== "number-asc") params.set("sort", sortOption);
 
     const newUrl = params.toString() ? `?${params.toString()}` : "/";

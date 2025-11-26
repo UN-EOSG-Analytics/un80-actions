@@ -55,7 +55,12 @@ export default function ModalHandler() {
   }, [actionParam]);
 
   const handleClose = () => {
-    router.replace("/", { scroll: false }); // Remove query param, return to home without jumping
+    // Restore previous URL from sessionStorage
+    const previousUrl = sessionStorage.getItem('previousUrl');
+    sessionStorage.removeItem('previousUrl');
+    
+    const newUrl = previousUrl ? `?${previousUrl}` : "/";
+    router.replace(newUrl, { scroll: false });
   };
 
   // Don't render anything if no action param
