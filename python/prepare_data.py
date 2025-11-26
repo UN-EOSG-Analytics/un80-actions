@@ -97,6 +97,56 @@ df["action_number"] = (
 df = df.sort_values(by=["work_package_number", "action_number"], ascending=[True, True])
 
 
+## Data Validation ##
+
+# Expected counts from UI DataCards
+EXPECTED_WORKSTREAMS = 3
+EXPECTED_WORK_PACKAGES = 31
+EXPECTED_ACTIONS = 87
+EXPECTED_LEADS = 34
+
+# Calculate actual counts
+actual_workstreams = df["report"].nunique()
+actual_work_packages = df["work_package_number"].nunique()
+actual_actions = len(df)
+actual_leads = df["work_package_leads"].explode().nunique()
+
+# Validate counts
+validation_errors = []
+
+if actual_workstreams != EXPECTED_WORKSTREAMS:
+    validation_errors.append(
+        f"Workstreams count mismatch! Expected {EXPECTED_WORKSTREAMS}, got {actual_workstreams}"
+    )
+
+if actual_work_packages != EXPECTED_WORK_PACKAGES:
+    validation_errors.append(
+        f"Work Packages count mismatch! Expected {EXPECTED_WORK_PACKAGES}, got {actual_work_packages}"
+    )
+
+if actual_actions != EXPECTED_ACTIONS:
+    validation_errors.append(
+        f"Actions count mismatch! Expected {EXPECTED_ACTIONS}, got {actual_actions}"
+    )
+
+if actual_leads != EXPECTED_LEADS:
+    validation_errors.append(
+        f"UN System Leaders count mismatch! Expected {EXPECTED_LEADS}, got {actual_leads}"
+    )
+
+# Raise error if validation fails
+if validation_errors:
+    error_message = "\n" + "=" * 60 + "\n"
+    error_message += "DATA VALIDATION FAILED\n"
+    error_message += "=" * 60 + "\n"
+    for error in validation_errors:
+        error_message += f"❌ {error}\n"
+    error_message += "=" * 60
+    raise AssertionError(error_message)
+
+print("\n✓ All data counts match expected values")
+
+
 ## Export ##
 
 # Ensure output folder exists
