@@ -69,13 +69,16 @@ export const normalizeLeaderName = (leader: string): string => {
 };
 
 /**
- * Format goal text: lowercase everything except first letter of each sentence
- * Preserves proper capitalization for "United Nations" and "Member States"
- * @param text - Text to format
+ * Format goal text: lowercase everything except first letter of each sentence.
+ * Safely handles null/undefined input and preserves proper capitalization for
+ * "United Nations" and "Member States".
+ * @param text - Text to format (may be null/undefined)
  * @returns Formatted text with proper sentence capitalization
  */
-export const formatGoalText = (text: string): string => {
-  if (!text) return text;
+export const formatGoalText = (
+  text: string | null | undefined,
+): string => {
+  if (text == null || text === "") return "";
 
   // Preserve proper capitalization for specific terms
   const preservedTerms = [
