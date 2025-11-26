@@ -1,18 +1,66 @@
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import type { FilterState } from "@/types";
 
 /**
- * Custom hook to manage filter state
+ * Custom hook to manage filter state with URL sync
  * @returns Object containing filter state and handlers
  */
 export function useFilters() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedWorkPackage, setSelectedWorkPackage] = useState<string[]>([]);
-  const [selectedLead, setSelectedLead] = useState<string[]>([]);
-  const [selectedWorkstream, setSelectedWorkstream] = useState<string[]>([]);
-  const [selectedBigTicket, setSelectedBigTicket] = useState<string[]>([]);
-  const [selectedAction, setSelectedAction] = useState<string[]>([]);
-  const [sortOption, setSortOption] = useState<string>("number-asc");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Initialize state from URL parameters
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || ""
+  );
+  const [selectedWorkPackage, setSelectedWorkPackage] = useState<string[]>(
+    searchParams.get("wp")?.split(",").filter(Boolean) || []
+  );
+  const [selectedLead, setSelectedLead] = useState<string[]>(
+    searchParams.get("lead")?.split(",").filter(Boolean) || []
+  );
+  const [selectedWorkstream, setSelectedWorkstream] = useState<string[]>(
+    searchParams.get("ws")?.split(",").filter(Boolean) || []
+  );
+  const [selectedBigTicket, setSelectedBigTicket] = useState<string[]>(
+    searchParams.get("type")?.split(",").filter(Boolean) || []
+  );
+  const [selectedAction, setSelectedAction] = useState<string[]>(
+    searchParams.get("action")?.split(",").filter(Boolean) || []
+  );
+  const [sortOption, setSortOption] = useState<string>(
+    searchParams.get("sort") || "number-asc"
+  );
+
+  // Sync state to URL whenever filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (searchQuery) params.set("search", searchQuery);
+    if (selectedWorkPackage.length > 0)
+      params.set("wp", selectedWorkPackage.join(","));
+    if (selectedLead.length > 0) params.set("lead", selectedLead.join(","));
+    if (selectedWorkstream.length > 0)
+      params.set("ws", selectedWorkstream.join(","));
+    if (selectedBigTicket.length > 0)
+      params.set("type", selectedBigTicket.join(","));
+    if (selectedAction.length > 0)
+      params.set("action", selectedAction.join(","));
+    if (sortOption !== "number-asc") params.set("sort", sortOption);
+
+    const newUrl = params.toString() ? `?${params.toString()}` : "/";
+    router.replace(newUrl, { scroll: false });
+  }, [
+    searchQuery,
+    selectedWorkPackage,
+    selectedLead,
+    selectedWorkstream,
+    selectedBigTicket,
+    selectedAction,
+    sortOption,
+    router,
+  ]);
 
   const filters: FilterState = {
     searchQuery,
