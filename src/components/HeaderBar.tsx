@@ -75,10 +75,10 @@ export function Header({ onReset, showLogin = true }: HeaderProps) {
                   asChild
                   className="flex items-center gap-2"
                 >
-                  <Link href="/internal">
+                  <a href="/internal">
                     <LogIn className="h-4 w-4" />
                     <span>Login</span>
-                  </Link>
+                  </a>
                 </Button>
               </div>
             )}

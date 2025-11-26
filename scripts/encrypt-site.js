@@ -23,11 +23,19 @@ if (!fs.existsSync(internalHtmlPath)) {
 console.log('Encrypting:', internalHtmlPath);
 
 // Encrypt only the internal page
+// staticrypt will automatically use STATICRYPT_PASSWORD env var
 execSync(
-  `npx staticrypt "${internalHtmlPath}" ${password} -o "${internalHtmlPath}" -t ./scripts/password-template.html --short`,
+  `npx staticrypt "${internalHtmlPath}" -o "${internalHtmlPath}" -d "${outDir}/internal" -t ./scripts/password-template.html --short`,
   {
     stdio: 'inherit'
   }
 );
 
 console.log('Encryption complete!');
+
+// Clean up the default 'encrypted' directory if it was created
+const encryptedDir = './encrypted';
+if (fs.existsSync(encryptedDir)) {
+  console.log('Cleaning up temporary encrypted directory...');
+  fs.rmSync(encryptedDir, { recursive: true, force: true });
+}
