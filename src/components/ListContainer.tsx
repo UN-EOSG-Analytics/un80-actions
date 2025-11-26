@@ -43,11 +43,17 @@ export function WorkPackageList({
         const isOpen = openCollapsibles.has(collapsibleKey);
 
         // Filter actions if action filter is selected
-        const filteredActions = selectedActions.length > 0
-          ? wp.actions.filter((action) =>
-              selectedActions.includes(action.text.trim())
-            )
-          : wp.actions;
+        const filteredActions =
+          selectedActions.length > 0
+            ? wp.actions.filter((action) =>
+                selectedActions.includes(action.text.trim()),
+              )
+            : wp.actions;
+
+        // If there are no actions to display, don't render an (empty) collapsible
+        if (!filteredActions || filteredActions.length === 0) {
+          return null;
+        }
 
         // Create a work package with filtered actions
         const filteredWorkPackage = {
