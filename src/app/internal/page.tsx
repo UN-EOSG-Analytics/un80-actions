@@ -124,9 +124,6 @@ export default function WorkPackagesPage() {
         {/* Main Container - with padding to account for fixed header */}
         <main className="mx-auto w-full max-w-4xl px-8 pt-8 sm:px-12 sm:pt-24 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
           <div className="space-y-6 pb-16">
-            {/* Header with context info */}
-            <ExplainerText />
-
             {/* DataCards Section */}
             {/* <section className="mb-10">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
