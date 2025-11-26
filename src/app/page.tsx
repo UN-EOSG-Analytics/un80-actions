@@ -225,11 +225,6 @@ export default function WorkPackagesPage() {
             </section>
           </div>
         </main>
-
-        {/* Red icon at bottom right */}
-        <div className="fixed bottom-4 right-4 z-50">
-          <AlertCircle className="w-5 h-5 text-red-500" />
-        </div>
       </div>
     </TooltipProvider>
   );
