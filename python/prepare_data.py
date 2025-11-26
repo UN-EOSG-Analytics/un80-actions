@@ -14,10 +14,18 @@ with open(input_path, "r", encoding="utf-8") as f:
 # Convert to DataFrame
 df = pd.DataFrame(data)
 
+# Replace empty strings with None for proper null handling
+df = df.replace("", None)
+
+# Remove empty rows (rows where all values are NaN or None)
+df = df.dropna(how="all")
+
 # Assert no column is completely null (indicates error on Power Automate export)
 for col in df.columns:
     if df[col].isnull().all():
-        raise AssertionError(f"Column '{col}' is completely null.")
+        raise AssertionError(
+            f"Power Automate Issue: Column '{col}' is completely null."
+        )
 
 # Process date columns
 date_columns = ["first_milestone"]  # Add other date columns here if needed
