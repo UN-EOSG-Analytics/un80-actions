@@ -75,18 +75,21 @@ export function SidebarCharts({
 
   const workPackagesChartEntries: SidebarChartEntry[] = workPackagesData.map(
     (entry) => {
-      const wpMatch = entry.workpackage.match(/^(\d+):/);
+      const rawWorkpackage =
+        typeof entry.workpackage === "string" ? entry.workpackage : "";
+
+      const wpMatch = rawWorkpackage.match(/^(\d+):/);
       const wpNumber = wpMatch ? wpMatch[1] : null;
       const wpName = wpMatch
-        ? entry.workpackage.replace(/^\d+:\s*/, "")
-        : entry.workpackage;
+        ? rawWorkpackage.replace(/^\d+:\s*/, "")
+        : rawWorkpackage;
       const wpOption = wpNumber ? `${wpNumber}: ${wpName}` : wpName;
 
       return {
         label: wpNumber ? `WP${wpNumber}` : "Work package",
         count: entry.count,
         value: wpOption,
-        tooltip: wpNumber ? wpName : undefined,
+        tooltip: wpNumber && wpName ? wpName : undefined,
       };
     },
   );

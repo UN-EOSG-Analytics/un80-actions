@@ -122,16 +122,18 @@ export function filterWorkPackages(
  * @returns Sorted array of unique work package names
  */
 export function getUniqueWorkPackages(workPackages: WorkPackage[]): string[] {
-  return Array.from(
+  const unique = Array.from(
     new Set(
       workPackages.map((wp) =>
-        wp.number ? `${wp.number}: ${wp.name}` : wp.name,
+        wp.number ? `${wp.number}: ${wp.name ?? ""}` : wp.name ?? "",
       ),
     ),
-  ).sort((a, b) => {
+  ).filter((value): value is string => typeof value === "string" && value.length > 0);
+
+  return unique.sort((a, b) => {
     // Extract numbers from strings like "1: Name" or "10: Name"
-    const numA = parseInt(a.split(":")[0]) || 0;
-    const numB = parseInt(b.split(":")[0]) || 0;
+    const numA = parseInt(a.split(":")[0] || "") || 0;
+    const numB = parseInt(b.split(":")[0] || "") || 0;
     return numA - numB;
   });
 }

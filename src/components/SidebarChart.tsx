@@ -46,17 +46,23 @@ export function SidebarChart({
   barWidth = 90,
 }: SidebarChartProps) {
   const displayedData = showAll ? data : data.slice(0, initialDisplayCount);
-  const maxCount = data.length > 0 ? Math.max(...data.map((d) => d.count)) : 1;
+  const maxCount =
+    data.length > 0 ? Math.max(...data.map((d) => d.count ?? 0)) : 1;
 
   // Calculate fixed width for count based on max count across ALL data
-  const maxCountDigits = Math.max(...data.map((d) => d.count)).toString()
-    .length;
+  const maxCountDigits =
+    data.length > 0
+      ? Math.max(...data.map((d) => d.count ?? 0)).toString().length
+      : 1;
   const countWidth =
     maxCountDigits === 1 ? "w-5" : maxCountDigits === 2 ? "w-7" : "w-9";
 
   // Calculate the exact width needed for the longest label
   // Use 7px per character for more compact spacing
-  const maxLabelLength = Math.max(...data.map((d) => d.label.length));
+  const maxLabelLength =
+    data.length > 0
+      ? Math.max(...data.map((d) => (d.label ?? "").length))
+      : 0;
   const labelWidth = maxLabelLength * 7;
 
   const handleClickBar = (value: string) => {
