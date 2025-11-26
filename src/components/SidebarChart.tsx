@@ -1,11 +1,11 @@
-import React from "react";
-import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Search } from "lucide-react";
+import React from "react";
 
 export interface SidebarChartEntry {
   label: string;
@@ -84,7 +84,7 @@ export function SidebarChart({
           placeholder={searchPlaceholder}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="h-9 w-full rounded-none border-0 border-b border-slate-300 bg-white py-[8px] pr-4 pl-6 text-[15px] text-slate-700 shadow-none transition-all placeholder:text-slate-400 hover:border-b-un-blue/60 focus:border-b-un-blue focus:shadow-none focus:ring-0 focus:ring-offset-0 focus:outline-none"
+          className="h-9 w-full rounded-none border-0 border-b border-slate-300 bg-white py-2 pr-4 pl-6 text-[15px] text-slate-700 shadow-none transition-all placeholder:text-slate-400 hover:border-b-un-blue/60 focus:border-b-un-blue focus:shadow-none focus:ring-0 focus:ring-offset-0 focus:outline-none"
         />
       </div>
 
@@ -123,7 +123,7 @@ export function SidebarChart({
                               <span
                                 className={`block cursor-help text-[14px] font-medium whitespace-nowrap transition-colors ${
                                   isSelected
-                                    ? "text-un-blue font-semibold"
+                                    ? "font-semibold text-un-blue"
                                     : "text-slate-600 group-hover:text-un-blue"
                                 }`}
                               >
@@ -138,7 +138,7 @@ export function SidebarChart({
                           <span
                             className={`block text-[14px] font-medium whitespace-nowrap transition-colors ${
                               isSelected
-                                ? "text-un-blue font-semibold"
+                                ? "font-semibold text-un-blue"
                                 : "text-slate-600 group-hover:text-un-blue"
                             }`}
                           >
@@ -149,7 +149,9 @@ export function SidebarChart({
                       <div className="flex shrink-0 items-center gap-1.5">
                         <span
                           className={`text-[14px] font-normal ${countWidth} text-right font-mono tabular-nums ${
-                            isSelected ? "text-un-blue font-semibold" : "text-un-blue"
+                            isSelected
+                              ? "font-semibold text-un-blue"
+                              : "text-un-blue"
                           }`}
                         >
                           {entry.count}

@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { DataCard } from "@/components/DataCard";
 import { ExplainerText } from "@/components/ExplainerText";
 import { FilterControls } from "@/components/FilterControls";
 import { Header } from "@/components/HeaderBar";
-import { SidebarCharts } from "@/components/SidebarCharts";
+import { LeaderSubmissionChecklist } from "@/components/LeaderSubmissionChecklist";
 import { WorkPackageList } from "@/components/ListContainer";
+import { LeaderSubmissionProgress } from "@/components/LeaderSubmissionProgress";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useActions } from "@/hooks/useActions";
 import { useChartSearch } from "@/hooks/useChartSearch";
@@ -22,7 +24,8 @@ import {
 
 export default function WorkPackagesPage() {
   // Custom hooks for state management
-  const { actions, isLoading } = useActions();
+  const { actions, isLoading, stats, nextMilestone, progressPercentage } =
+    useActions();
 
   const {
     filters,
@@ -44,6 +47,9 @@ export default function WorkPackagesPage() {
     handleResetAll,
   } = useFilters();
 
+  // State for leader checklist selection
+  const [selectedLeaders, setSelectedLeaders] = useState<string[]>([]);
+
   const {
     openCollapsibles,
     toggleCollapsible,
@@ -58,6 +64,8 @@ export default function WorkPackagesPage() {
     setShowAllWorkstreams,
     showAllWorkpackages,
     setShowAllWorkpackages,
+    showAllLeaderChecklist,
+    setShowAllLeaderChecklist,
   } = useCollapsibles();
 
   const {
@@ -67,6 +75,8 @@ export default function WorkPackagesPage() {
     setWorkstreamChartSearchQuery,
     workpackageChartSearchQuery,
     setWorkpackageChartSearchQuery,
+    leaderChecklistSearchQuery,
+    setLeaderChecklistSearchQuery,
   } = useChartSearch();
 
   // Compute work package data using custom hook
@@ -109,7 +119,7 @@ export default function WorkPackagesPage() {
     <TooltipProvider delayDuration={200}>
       <div className="min-h-screen bg-white">
         {/* Fixed Header */}
-        <Header onReset={handleResetAll} />
+        <Header onReset={handleResetAll} showLogin={false} />
 
         {/* Main Container - with padding to account for fixed header */}
         <main className="mx-auto w-full max-w-4xl px-8 pt-8 sm:px-12 sm:pt-24 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
@@ -118,7 +128,7 @@ export default function WorkPackagesPage() {
             <ExplainerText />
 
             {/* DataCards Section */}
-            <section className="mb-10">
+            {/* <section className="mb-10">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <DataCard
                   title="Workstreams"
@@ -145,15 +155,36 @@ export default function WorkPackagesPage() {
                   isLoading={isLoading}
                 />
               </div>
+            </section> */}
+
+            {/* Leader Submission Progress Section */}
+            <section className="mb-10">
+              <LeaderSubmissionProgress actions={actions} />
             </section>
 
             {/* Work Packages Breakdown Section */}
             <section className="mt-6 mb-4">
               {/* Work Packages and Chart Section */}
               <section className="flex flex-col items-start gap-6 overflow-hidden lg:flex-row">
+                {/* Leader Submission Checklist */}
+                <div className="flex w-full min-w-0 shrink-0 flex-col gap-3 lg:w-[420px] lg:max-w-[420px]">
+                  <LeaderSubmissionChecklist
+                    actions={actions}
+                    searchQuery={leaderChecklistSearchQuery}
+                    onSearchChange={setLeaderChecklistSearchQuery}
+                    selectedLeaders={selectedLeaders}
+                    onSelectLeaders={setSelectedLeaders}
+                    showAll={showAllLeaderChecklist}
+                    onToggleShowAll={() =>
+                      setShowAllLeaderChecklist(!showAllLeaderChecklist)
+                    }
+                    initialDisplayCount={10}
+                  />
+                </div>
+
                 {/* Work Packages Collapsible */}
                 <div className="w-full min-w-0 flex-1 lg:max-w-[818px]">
-                  <FilterControls
+                  {/* <FilterControls
                     isAdvancedFilterOpen={isAdvancedFilterOpen}
                     onAdvancedFilterOpenChange={setIsAdvancedFilterOpen}
                     sortOption={sortOption}
@@ -180,9 +211,9 @@ export default function WorkPackagesPage() {
                     uniqueActionTexts={uniqueActionTexts}
                     availableBigTicketOptions={availableBigTicketOptions}
                     onResetFilters={handleResetFilters}
-                  />
+                  /> */}
 
-                  <WorkPackageList
+                  {/* <WorkPackageList
                     workPackages={filteredWorkPackages}
                     openCollapsibles={openCollapsibles}
                     onToggleCollapsible={toggleCollapsible}
@@ -190,39 +221,16 @@ export default function WorkPackagesPage() {
                     onSelectWorkstream={setSelectedWorkstream}
                     selectedActions={selectedAction}
                     isLoading={isLoading}
-                  />
+                  /> */}
                 </div>
 
-                {/* Charts Container */}
-                <SidebarCharts
-                  leadsData={chartData}
-                  leadsSearchQuery={chartSearchQuery}
-                  onLeadsSearchChange={setChartSearchQuery}
-                  selectedLead={selectedLead}
-                  onSelectLead={setSelectedLead}
-                  showAllLeads={showAllLeads}
-                  onToggleShowAllLeads={() => setShowAllLeads(!showAllLeads)}
-                  workstreamsData={workstreamChartData}
-                  workstreamsSearchQuery={workstreamChartSearchQuery}
-                  onWorkstreamsSearchChange={setWorkstreamChartSearchQuery}
-                  selectedWorkstream={selectedWorkstream}
-                  onSelectWorkstream={setSelectedWorkstream}
-                  showAllWorkstreams={showAllWorkstreams}
-                  onToggleShowAllWorkstreams={() =>
-                    setShowAllWorkstreams(!showAllWorkstreams)
-                  }
-                  workPackagesData={workpackageChartData}
-                  workPackagesSearchQuery={workpackageChartSearchQuery}
-                  onWorkPackagesSearchChange={setWorkpackageChartSearchQuery}
-                  selectedWorkPackage={selectedWorkPackage}
-                  onSelectWorkPackage={setSelectedWorkPackage}
-                  showAllWorkPackages={showAllWorkpackages}
-                  onToggleShowAllWorkPackages={() =>
-                    setShowAllWorkpackages(!showAllWorkpackages)
-                  }
-                />
+                
               </section>
+
+
             </section>
+
+
           </div>
         </main>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,7 @@ interface LoginDialogProps {
 }
 
 export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
+  const router = useRouter();
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,6 +40,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
         setEmail("");
         setPassword("");
         onOpenChange(false);
+        router.push("/internal");
       } else {
         setError("Invalid email or password. Please try again.");
       }
