@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { DataCard } from "@/components/DataCard";
 import { ExplainerText } from "@/components/ExplainerText";
 import { FilterControls } from "@/components/FilterControls";
@@ -20,7 +21,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-export default function WorkPackagesPage() {
+function WorkPackagesPageContent() {
   // Custom hooks for state management
   const { actions, isLoading } = useActions();
 
@@ -227,5 +228,13 @@ export default function WorkPackagesPage() {
         </main>
       </div>
     </TooltipProvider>
+  );
+}
+
+export default function WorkPackagesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <WorkPackagesPageContent />
+    </Suspense>
   );
 }
