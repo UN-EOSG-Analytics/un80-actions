@@ -1,63 +1,118 @@
-import { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useMemo, useCallback, useEffect, startTransition } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import type { FilterState } from "@/types";
 
 /**
- * Custom hook to manage filter state with URL sync
- * @returns Object containing filter state and handlers
+ * Custom hook to manage filter state with URL as single source of truth
+ * Uses router.replace with startTransition for URL updates
  */
 export function useFilters() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
 
-  // Initialize state from URL parameters
-  const [searchQuery, setSearchQuery] = useState(
-    searchParams.get("search") || ""
-  );
-  const [selectedWorkPackage, setSelectedWorkPackage] = useState<string[]>(
-    searchParams.get("wp")?.split(",").filter(Boolean) || []
-  );
-  const [selectedLead, setSelectedLead] = useState<string[]>(
-    searchParams.get("lead")?.split(",").filter(Boolean) || []
-  );
-  const [selectedWorkstream, setSelectedWorkstream] = useState<string[]>(
-    searchParams.get("ws")?.split(",").filter(Boolean) || []
-  );
-  const [selectedBigTicket, setSelectedBigTicket] = useState<string[]>(
-    searchParams.get("type")?.split(",").filter(Boolean) || []
-  );
-  const [selectedAction, setSelectedAction] = useState<string[]>(
-    searchParams.get("actions")?.split(",").filter(Boolean) || []
-  );
-  const [sortOption, setSortOption] = useState<string>(
-    searchParams.get("sort") || "number-asc"
-  );
+  // Derive all state directly from URL - URL is the single source of truth
+  const searchQuery = searchParams.get("search") || "";
+  const selectedWorkPackage = searchParams.get("wp")?.split(",").filter(Boolean) || [];
+  const selectedLead = searchParams.get("lead")?.split(",").filter(Boolean) || [];
+  const selectedWorkstream = searchParams.get("ws")?.split(",").filter(Boolean) || [];
+  const selectedBigTicket = searchParams.get("type")?.split(",").filter(Boolean) || [];
+  const selectedAction = searchParams.get("actions")?.split(",").filter(Boolean) || [];
+  const sortOption = searchParams.get("sort") || "number-asc";
 
-  // Sync state to URL whenever filters change
-  useEffect(() => {
-    const params = new URLSearchParams();
+  // Helper to build query string from params
+  const buildQueryString = useCallback((updater: (params: URLSearchParams) => void) => {
+    const params = new URLSearchParams(searchParams.toString());
+    updater(params);
+    return params.toString();
+  }, [searchParams]);
 
-    if (searchQuery) params.set("search", searchQuery);
-    if (selectedWorkPackage.length > 0) {
-      // Extract only work package numbers for URL
-      const wpNumbers = selectedWorkPackage.map((wp) => {
-        const match = wp.match(/^(\d+):/);
-        return match ? match[1] : wp;
-      });
-      params.set("wp", wpNumbers.join(","));
-    }
-    if (selectedLead.length > 0) params.set("lead", selectedLead.join(","));
-    if (selectedWorkstream.length > 0)
-      params.set("ws", selectedWorkstream.join(","));
-    if (selectedBigTicket.length > 0)
-      params.set("type", selectedBigTicket.join(","));
-    if (selectedAction.length > 0)
-      params.set("actions", selectedAction.join(","));
-    if (sortOption !== "number-asc") params.set("sort", sortOption);
+  // Helper to update URL using router.replace in a transition
+  const updateUrl = useCallback((updater: (params: URLSearchParams) => void) => {
+    const queryString = buildQueryString(updater);
+    const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
+    
+    startTransition(() => {
+      router.replace(newUrl, { scroll: false });
+    });
+  }, [buildQueryString, pathname, router]);
 
-    const newUrl = params.toString() ? `?${params.toString()}` : "/";
-    router.replace(newUrl, { scroll: false });
-  }, [
+  // Setters that update URL
+  const setSearchQuery = useCallback((value: string) => {
+    updateUrl((params) => {
+      if (value) {
+        params.set("search", value);
+      } else {
+        params.delete("search");
+      }
+    });
+  }, [updateUrl]);
+
+  const setSelectedWorkPackage = useCallback((value: string[]) => {
+    updateUrl((params) => {
+      if (value.length > 0) {
+        const wpNumbers = value.map((wp) => {
+          const match = wp.match(/^(\d+):/);
+          return match ? match[1] : wp;
+        });
+        params.set("wp", wpNumbers.join(","));
+      } else {
+        params.delete("wp");
+      }
+    });
+  }, [updateUrl]);
+
+  const setSelectedLead = useCallback((value: string[]) => {
+    updateUrl((params) => {
+      if (value.length > 0) {
+        params.set("lead", value.join(","));
+      } else {
+        params.delete("lead");
+      }
+    });
+  }, [updateUrl]);
+
+  const setSelectedWorkstream = useCallback((value: string[]) => {
+    updateUrl((params) => {
+      if (value.length > 0) {
+        params.set("ws", value.join(","));
+      } else {
+        params.delete("ws");
+      }
+    });
+  }, [updateUrl]);
+
+  const setSelectedBigTicket = useCallback((value: string[]) => {
+    updateUrl((params) => {
+      if (value.length > 0) {
+        params.set("type", value.join(","));
+      } else {
+        params.delete("type");
+      }
+    });
+  }, [updateUrl]);
+
+  const setSelectedAction = useCallback((value: string[]) => {
+    updateUrl((params) => {
+      if (value.length > 0) {
+        params.set("actions", value.join(","));
+      } else {
+        params.delete("actions");
+      }
+    });
+  }, [updateUrl]);
+
+  const setSortOption = useCallback((value: string) => {
+    updateUrl((params) => {
+      if (value !== "number-asc") {
+        params.set("sort", value);
+      } else {
+        params.delete("sort");
+      }
+    });
+  }, [updateUrl]);
+
+  const filters: FilterState = useMemo(() => ({
     searchQuery,
     selectedWorkPackage,
     selectedLead,
@@ -65,32 +120,27 @@ export function useFilters() {
     selectedBigTicket,
     selectedAction,
     sortOption,
-    router,
+  }), [
+    searchQuery,
+    selectedWorkPackage,
+    selectedLead,
+    selectedWorkstream,
+    selectedBigTicket,
+    selectedAction,
+    sortOption,
   ]);
 
-  const filters: FilterState = {
-    searchQuery,
-    selectedWorkPackage,
-    selectedLead,
-    selectedWorkstream,
-    selectedBigTicket,
-    selectedAction,
-    sortOption,
-  };
+  const handleResetFilters = useCallback(() => {
+    startTransition(() => {
+      router.replace(pathname, { scroll: false });
+    });
+  }, [pathname, router]);
 
-  const handleResetFilters = () => {
-    setSearchQuery("");
-    setSelectedWorkPackage([]);
-    setSelectedLead([]);
-    setSelectedWorkstream([]);
-    setSelectedBigTicket([]);
-    setSelectedAction([]);
-  };
-
-  const handleResetAll = () => {
-    handleResetFilters();
-    setSortOption("number-asc");
-  };
+  const handleResetAll = useCallback(() => {
+    startTransition(() => {
+      router.replace(pathname, { scroll: false });
+    });
+  }, [pathname, router]);
 
   return {
     filters,
@@ -115,26 +165,43 @@ export function useFilters() {
 
 /**
  * Hook to automatically clear filter if selected value is no longer available
+ * Only clears values if availableValues has data (to avoid clearing on initial load)
  */
 export function useFilterSync(
   selectedValue: string | string[],
   availableValues: string[],
   setValue: ((value: string[]) => void) | ((value: string) => void),
+  matchByPrefix: boolean = false, // For workpackages: match "1" with "1: Name"
 ) {
   useEffect(() => {
+    // Don't clear anything if availableValues is empty (data not loaded yet)
+    if (availableValues.length === 0) {
+      return;
+    }
+
     if (Array.isArray(selectedValue)) {
       // Handle array (multi-select)
-      const validValues = selectedValue.filter((val) =>
-        availableValues.includes(val),
-      );
+      const validValues = selectedValue.filter((val) => {
+        if (matchByPrefix) {
+          // For workpackages: match "1" with "1: Name"
+          return availableValues.some(available => available.startsWith(val + ":"));
+        }
+        return availableValues.includes(val);
+      });
       if (validValues.length !== selectedValue.length) {
         (setValue as (value: string[]) => void)(validValues);
       }
     } else {
       // Handle string (single-select)
-      if (selectedValue && !availableValues.includes(selectedValue)) {
-        (setValue as (value: string) => void)("");
+      if (selectedValue) {
+        const isValid = matchByPrefix
+          ? availableValues.some(available => available.startsWith(selectedValue + ":"))
+          : availableValues.includes(selectedValue);
+        
+        if (!isValid) {
+          (setValue as (value: string) => void)("");
+        }
       }
     }
-  }, [selectedValue, availableValues, setValue]);
+  }, [selectedValue, availableValues, setValue, matchByPrefix]);
 }

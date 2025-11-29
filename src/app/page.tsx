@@ -96,6 +96,7 @@ function WorkPackagesPageContent() {
     selectedWorkPackage,
     uniqueWorkPackages,
     setSelectedWorkPackage,
+    true, // Match by prefix: "1" matches "1: Name"
   );
   useFilterSync(selectedLead, uniqueLeads, setSelectedLead);
   useFilterSync(selectedWorkstream, uniqueWorkstreams, setSelectedWorkstream);
