@@ -38,8 +38,14 @@ export function useFilters() {
     const params = new URLSearchParams();
 
     if (searchQuery) params.set("search", searchQuery);
-    if (selectedWorkPackage.length > 0)
-      params.set("wp", selectedWorkPackage.join(","));
+    if (selectedWorkPackage.length > 0) {
+      // Extract only work package numbers for URL
+      const wpNumbers = selectedWorkPackage.map((wp) => {
+        const match = wp.match(/^(\d+):/);
+        return match ? match[1] : wp;
+      });
+      params.set("wp", wpNumbers.join(","));
+    }
     if (selectedLead.length > 0) params.set("lead", selectedLead.join(","));
     if (selectedWorkstream.length > 0)
       params.set("ws", selectedWorkstream.join(","));
