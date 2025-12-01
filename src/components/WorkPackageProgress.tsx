@@ -5,12 +5,6 @@ import type { WorkPackage } from "@/types";
 import { Progress } from "@/components/ui/progress";
 import { ChevronDown } from "lucide-react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -25,7 +19,9 @@ export function WorkPackageProgress({
   workPackages,
 }: WorkPackageProgressProps) {
   const [isOpen, setIsOpen] = useState(true);
-  const [selectedWorkPackage, setSelectedWorkPackage] = useState<WorkPackage | null>(null);
+  // Track which work packages are expanded
+  const [openWorkPackages, setOpenWorkPackages] = useState<Set<string>>(new Set());
+  
   // Calculate progress per work package
   const wpProgress = useMemo(() => {
     return workPackages
@@ -57,8 +53,19 @@ export function WorkPackageProgress({
       });
   }, [workPackages]);
 
+  const toggleWorkPackage = (wpKey: string) => {
+    setOpenWorkPackages((prev) => {
+      const next = new Set(prev);
+      if (next.has(wpKey)) {
+        next.delete(wpKey);
+      } else {
+        next.add(wpKey);
+      }
+      return next;
+    });
+  };
+
   return (
-    <>
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
         <CollapsibleTrigger className="flex w-full items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors">
@@ -73,76 +80,71 @@ export function WorkPackageProgress({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="px-6 pb-6 space-y-4">
-        {wpProgress.map((wp) => {
-          const fullWp = workPackages.find(
-            (p) => p.number === wp.number && p.name === wp.name
-          );
-          return (
-            <div
-              key={`${wp.number}-${wp.name}`}
-              onClick={() => fullWp && setSelectedWorkPackage(fullWp)}
-              className="cursor-pointer rounded-lg border border-gray-100 bg-gray-50 p-4 transition-all hover:border-un-blue/30 hover:bg-un-blue/5 hover:shadow-md"
-            >
-            <div className="mb-2 flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  {typeof wp.number === "number" && (
-                    <span className="flex h-6 w-6 items-center justify-center rounded bg-un-blue/10 text-xs font-semibold text-un-blue">
-                      {wp.number}
-                    </span>
-                  )}
-                  <h4 className="font-medium text-gray-900">{wp.name}</h4>
-                  {wp.isBigTicket && (
-                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
-                      Big Ticket
-                    </span>
-                  )}
-                </div>
-                <p className="mt-1 text-sm text-gray-600">
-                  {wp.totalActions} actions • {wp.completed} completed • {wp.inProgress} in progress
-                </p>
-              </div>
-              <div className="ml-4 text-right">
-                <p className="text-2xl font-bold text-gray-900">{wp.progress}%</p>
-                <p className="text-xs text-gray-500">Progress</p>
-              </div>
-            </div>
-            <Progress value={wp.progress} className="h-2" />
-          </div>
-          );
-        })}
+            {wpProgress.map((wp) => {
+              const fullWp = workPackages.find(
+                (p) => p.number === wp.number && p.name === wp.name
+              );
+              const wpKey = `${wp.number}-${wp.name}`;
+              const isWpOpen = openWorkPackages.has(wpKey);
+
+              return (
+                <Collapsible
+                  key={wpKey}
+                  open={isWpOpen}
+                  onOpenChange={() => toggleWorkPackage(wpKey)}
+                >
+                  <div className="rounded-lg border border-gray-100 bg-gray-50 transition-all hover:border-un-blue/30 hover:bg-un-blue/5 hover:shadow-md">
+                    <CollapsibleTrigger className="w-full p-4 text-left">
+                      <div className="mb-2 flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            {typeof wp.number === "number" && (
+                              <span className="flex h-6 w-6 items-center justify-center rounded bg-un-blue/10 text-xs font-semibold text-un-blue">
+                                {wp.number}
+                              </span>
+                            )}
+                            <h4 className="font-medium text-gray-900">{wp.name}</h4>
+                            {wp.isBigTicket && (
+                              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                                Big Ticket
+                              </span>
+                            )}
+                            <ChevronDown
+                              className={`h-4 w-4 text-gray-500 transition-transform ${
+                                isWpOpen ? "rotate-180" : ""
+                              }`}
+                            />
+                          </div>
+                          <p className="mt-1 text-sm text-gray-600">
+                            {wp.totalActions} actions • {wp.completed} completed • {wp.inProgress} in progress
+                          </p>
+                        </div>
+                        <div className="ml-4 text-right">
+                          <p className="text-2xl font-bold text-gray-900">{wp.progress}%</p>
+                          <p className="text-xs text-gray-500">Progress</p>
+                        </div>
+                      </div>
+                      <Progress value={wp.progress} className="h-2" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="border-t border-gray-200 bg-white px-4 py-4 space-y-3">
+                        {fullWp?.actions.map((action) => (
+                          <ActionItem
+                            key={action.actionNumber}
+                            action={action}
+                            workPackageNumber={fullWp.number}
+                          />
+                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+              );
+            })}
           </div>
         </CollapsibleContent>
       </div>
     </Collapsible>
-
-    {/* Dialog for showing actions */}
-    <Dialog open={!!selectedWorkPackage} onOpenChange={() => setSelectedWorkPackage(null)}>
-      <DialogContent className="max-h-[80vh] max-w-4xl overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {selectedWorkPackage && (
-              <>
-                {typeof selectedWorkPackage.number === "number" && (
-                  <span className="mr-2">WP{selectedWorkPackage.number}:</span>
-                )}
-                {selectedWorkPackage.name}
-              </>
-            )}
-          </DialogTitle>
-        </DialogHeader>
-        <div className="mt-4 space-y-4">
-          {selectedWorkPackage?.actions.map((action) => (
-            <ActionItem
-              key={action.actionNumber}
-              action={action}
-              workPackageNumber={selectedWorkPackage.number}
-            />
-          ))}
-        </div>
-      </DialogContent>
-    </Dialog>
-  </>
   );
 }
 

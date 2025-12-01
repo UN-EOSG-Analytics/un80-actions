@@ -2,14 +2,8 @@
 
 import { useMemo, useState } from "react";
 import type { Actions } from "@/types";
-import { Calendar, CheckCircle2, Clock, AlertCircle, ChevronDown } from "lucide-react";
+import { Calendar, CheckCircle2, Clock, AlertCircle, ChevronDown, Briefcase } from "lucide-react";
 import { parseDate, formatDate } from "@/lib/utils";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   Collapsible,
   CollapsibleContent,
@@ -23,10 +17,8 @@ interface MilestonesTimelineProps {
 
 export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
   const [isOpen, setIsOpen] = useState(true);
-  const [selectedMilestone, setSelectedMilestone] = useState<{
-    date: Date;
-    actions: typeof actions;
-  } | null>(null);
+  // Track which milestones are expanded
+  const [openMilestones, setOpenMilestones] = useState<Set<string>>(new Set());
 
   const milestones = useMemo(() => {
     const milestoneMap = new Map<string, { date: Date; count: number; completed: number; dateKey: string }>();
@@ -54,15 +46,26 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
       .slice(0, 12); // Next 12 milestones
   }, [actions]);
 
-  const handleMilestoneClick = (milestone: typeof milestones[0]) => {
-    const milestoneActions = actions.filter((action) => {
+  const getMilestoneActions = (milestone: typeof milestones[0]) => {
+    return actions.filter((action) => {
       if (!action.first_milestone) return false;
       const actionDate = parseDate(action.first_milestone);
       if (!actionDate) return false;
       const actionDateKey = actionDate.toISOString().split("T")[0];
       return actionDateKey === milestone.dateKey;
     });
-    setSelectedMilestone({ date: milestone.date, actions: milestoneActions });
+  };
+
+  const toggleMilestone = (dateKey: string) => {
+    setOpenMilestones((prev) => {
+      const next = new Set(prev);
+      if (next.has(dateKey)) {
+        next.delete(dateKey);
+      } else {
+        next.add(dateKey);
+      }
+      return next;
+    });
   };
 
   const now = new Date();
@@ -75,7 +78,6 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
   };
 
   return (
-    <>
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
         <CollapsibleTrigger className="flex w-full items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors">
@@ -90,123 +92,140 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="px-6 pb-6 space-y-4">
-        {milestones.length === 0 ? (
-          <p className="text-center text-gray-500">No milestones scheduled</p>
-        ) : (
-          milestones.map((milestone, index) => {
-            const status = getStatus(milestone.date, milestone.completed, milestone.count);
-            const isPast = milestone.date < now;
+            {milestones.length === 0 ? (
+              <p className="text-center text-gray-500">No milestones scheduled</p>
+            ) : (
+              milestones.map((milestone, index) => {
+                const status = getStatus(milestone.date, milestone.completed, milestone.count);
+                const isPast = milestone.date < now;
+                const isMilestoneOpen = openMilestones.has(milestone.dateKey);
+                const milestoneActions = getMilestoneActions(milestone);
 
-            return (
-              <div
-                key={index}
-                onClick={() => handleMilestoneClick(milestone)}
-                className={`flex cursor-pointer items-start gap-4 rounded-lg border p-4 transition-all hover:shadow-md ${
-                  status === "completed"
-                    ? "border-un-blue/30 bg-un-blue/5 hover:border-un-blue/50"
-                    : status === "overdue"
-                      ? "border-un-blue/30 bg-un-blue/5 hover:border-un-blue/50"
-                      : status === "upcoming"
-                        ? "border-un-blue/30 bg-un-blue/5 hover:border-un-blue/50"
-                        : "border-gray-200 bg-gray-50 hover:border-un-blue/30"
-                }`}
-              >
-                <div
-                  className={`mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-                    status === "completed"
-                      ? "bg-un-blue/20"
-                      : status === "overdue"
-                        ? "bg-un-blue/20"
-                        : status === "upcoming"
-                          ? "bg-un-blue/20"
-                          : "bg-gray-100"
-                  }`}
-                >
-                  {status === "completed" ? (
-                    <CheckCircle2 className="h-5 w-5 text-un-blue" />
-                  ) : status === "overdue" ? (
-                    <AlertCircle className="h-5 w-5 text-un-blue" />
-                  ) : (
-                    <Clock className="h-5 w-5 text-un-blue" />
-                  )}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-gray-500" />
-                    <span className="font-medium text-gray-900">
-                      {formatDate(milestone.date)}
-                    </span>
-                    {isPast && (
-                      <span className="rounded-full bg-un-blue/20 px-2 py-0.5 text-xs font-medium text-un-blue">
-                        Past Due
-                      </span>
-                    )}
-                    {status === "completed" && (
-                      <span className="rounded-full bg-un-blue/20 px-2 py-0.5 text-xs font-medium text-un-blue">
-                        Completed
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-1 text-sm text-gray-600">
-                    {milestone.completed} of {milestone.count} actions completed (
-                    {milestone.count > 0
-                      ? Math.round((milestone.completed / milestone.count) * 100)
-                      : 0}
-                    %)
-                  </p>
-                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                return (
+                  <Collapsible
+                    key={milestone.dateKey}
+                    open={isMilestoneOpen}
+                    onOpenChange={() => toggleMilestone(milestone.dateKey)}
+                  >
                     <div
-                      className="h-full bg-un-blue transition-all"
-                      style={{
-                        width: `${
-                          milestone.count > 0
-                            ? (milestone.completed / milestone.count) * 100
-                            : 0
-                        }%`,
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            );
-          })
-        )}
+                      className={`rounded-lg border transition-all hover:shadow-md ${
+                        status === "completed"
+                          ? "border-un-blue/30 bg-un-blue/5 hover:border-un-blue/50"
+                          : status === "overdue"
+                            ? "border-un-blue/30 bg-un-blue/5 hover:border-un-blue/50"
+                            : status === "upcoming"
+                              ? "border-un-blue/30 bg-un-blue/5 hover:border-un-blue/50"
+                              : "border-gray-200 bg-gray-50 hover:border-un-blue/30"
+                      }`}
+                    >
+                      <CollapsibleTrigger className="w-full p-4 text-left">
+                        <div className="flex items-start gap-4">
+                          <div
+                            className={`mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
+                              status === "completed"
+                                ? "bg-un-blue/20"
+                                : status === "overdue"
+                                  ? "bg-un-blue/20"
+                                  : status === "upcoming"
+                                    ? "bg-un-blue/20"
+                                    : "bg-gray-100"
+                            }`}
+                          >
+                            {status === "completed" ? (
+                              <CheckCircle2 className="h-5 w-5 text-un-blue" />
+                            ) : status === "overdue" ? (
+                              <AlertCircle className="h-5 w-5 text-un-blue" />
+                            ) : (
+                              <Clock className="h-5 w-5 text-un-blue" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-gray-500" />
+                              <span className="font-medium text-gray-900">
+                                {formatDate(milestone.date)}
+                              </span>
+                              {isPast && (
+                                <span className="rounded-full bg-un-blue/20 px-2 py-0.5 text-xs font-medium text-un-blue">
+                                  Past Due
+                                </span>
+                              )}
+                              {status === "completed" && (
+                                <span className="rounded-full bg-un-blue/20 px-2 py-0.5 text-xs font-medium text-un-blue">
+                                  Completed
+                                </span>
+                              )}
+                              <ChevronDown
+                                className={`ml-auto h-4 w-4 text-gray-500 transition-transform ${
+                                  isMilestoneOpen ? "rotate-180" : ""
+                                }`}
+                              />
+                            </div>
+                            <p className="mt-1 text-sm text-gray-600">
+                              {milestone.completed} of {milestone.count} actions completed (
+                              {milestone.count > 0
+                                ? Math.round((milestone.completed / milestone.count) * 100)
+                                : 0}
+                              %)
+                            </p>
+                            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                              <div
+                                className="h-full bg-un-blue transition-all"
+                                style={{
+                                  width: `${
+                                    milestone.count > 0
+                                      ? (milestone.completed / milestone.count) * 100
+                                      : 0
+                                  }%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <div className="border-t border-gray-200 bg-white px-4 py-4 space-y-4">
+                          {milestoneActions.length === 0 ? (
+                            <p className="text-sm text-gray-500">No actions for this milestone</p>
+                          ) : (
+                            milestoneActions.map((action) => {
+                              // Convert Action to WorkPackageAction format
+                              const wpAction = {
+                                text: action.indicative_activity,
+                                documentParagraph: action.document_paragraph || "",
+                                leads: action.work_package_leads || [],
+                                report: action.report,
+                                docText: action.doc_text,
+                                actionNumber: action.action_number,
+                              };
+                              return (
+                                <div key={action.action_number} className="space-y-2">
+                                  {/* Work Package Badge */}
+                                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <Briefcase className="h-4 w-4 text-un-blue" />
+                                    <span className="font-medium">
+                                      WP{action.work_package_number}: {action.work_package_name}
+                                    </span>
+                                  </div>
+                                  <ActionItem
+                                    action={wpAction}
+                                    workPackageNumber={action.work_package_number}
+                                  />
+                                </div>
+                              );
+                            })
+                          )}
+                        </div>
+                      </CollapsibleContent>
+                    </div>
+                  </Collapsible>
+                );
+              })
+            )}
           </div>
         </CollapsibleContent>
       </div>
     </Collapsible>
-
-    {/* Dialog for showing actions */}
-    <Dialog open={!!selectedMilestone} onOpenChange={() => setSelectedMilestone(null)}>
-      <DialogContent className="max-h-[80vh] max-w-4xl overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            Actions for Milestone: {selectedMilestone && formatDate(selectedMilestone.date)}
-          </DialogTitle>
-        </DialogHeader>
-        <div className="mt-4 space-y-4">
-          {selectedMilestone?.actions.map((action) => {
-            // Convert Action to WorkPackageAction format
-            const wpAction = {
-              text: action.indicative_activity,
-              documentParagraph: action.document_paragraph || "",
-              leads: action.work_package_leads || [],
-              report: action.report,
-              docText: action.doc_text,
-              actionNumber: action.action_number,
-            };
-            return (
-              <ActionItem
-                key={action.action_number}
-                action={wpAction}
-                workPackageNumber={action.work_package_number}
-              />
-            );
-          })}
-        </div>
-      </DialogContent>
-    </Dialog>
-  </>
   );
 }
 
