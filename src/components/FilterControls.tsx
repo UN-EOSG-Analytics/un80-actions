@@ -17,6 +17,7 @@ import {
   Users,
   Package,
   ListTodo,
+  Boxes,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -412,7 +413,7 @@ export function FilterControls({
             onOpenChange={(open) =>
               onToggleFilterCollapsible("wpfamily", open)
             }
-            icon={<Briefcase className="h-4 w-4 text-un-blue" />}
+            icon={<Boxes className="h-4 w-4 text-un-blue" />}
             triggerText={
               selectedWpFamily
                 ? (
