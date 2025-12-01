@@ -35,6 +35,8 @@ function WorkPackagesPageContent() {
     setSelectedLead,
     selectedWorkstream,
     setSelectedWorkstream,
+    selectedWpFamily,
+    setSelectedWpFamily,
     selectedBigTicket,
     setSelectedBigTicket,
     selectedAction,
@@ -169,6 +171,8 @@ function WorkPackagesPageContent() {
                     onSelectLead={setSelectedLead}
                     selectedWorkstream={selectedWorkstream}
                     onSelectWorkstream={setSelectedWorkstream}
+                  selectedWpFamily={selectedWpFamily}
+                  onSelectWpFamily={setSelectedWpFamily}
                     selectedBigTicket={selectedBigTicket}
                     onSelectBigTicket={setSelectedBigTicket}
                     selectedAction={selectedAction}

@@ -16,6 +16,7 @@ export function useFilters() {
   const selectedWorkPackage = searchParams.get("wp")?.split(",").filter(Boolean) || [];
   const selectedLead = searchParams.get("lead")?.split(",").filter(Boolean) || [];
   const selectedWorkstream = searchParams.get("ws")?.split(",").filter(Boolean) || [];
+  const selectedWpFamily = searchParams.get("family") || "";
   const selectedBigTicket = searchParams.get("type")?.split(",").filter(Boolean) || [];
   const selectedAction = searchParams.get("actions")?.split(",").filter(Boolean) || [];
   const sortOption = searchParams.get("sort") || "number-asc";
@@ -82,6 +83,16 @@ export function useFilters() {
     });
   }, [updateUrl]);
 
+  const setSelectedWpFamily = useCallback((value: string) => {
+    updateUrl((params) => {
+      if (value) {
+        params.set("family", value);
+      } else {
+        params.delete("family");
+      }
+    });
+  }, [updateUrl]);
+
   const setSelectedBigTicket = useCallback((value: string[]) => {
     updateUrl((params) => {
       if (value.length > 0) {
@@ -117,6 +128,7 @@ export function useFilters() {
     selectedWorkPackage,
     selectedLead,
     selectedWorkstream,
+    selectedWpFamily,
     selectedBigTicket,
     selectedAction,
     sortOption,
@@ -125,6 +137,7 @@ export function useFilters() {
     selectedWorkPackage,
     selectedLead,
     selectedWorkstream,
+    selectedWpFamily,
     selectedBigTicket,
     selectedAction,
     sortOption,
@@ -152,6 +165,8 @@ export function useFilters() {
     setSelectedLead,
     selectedWorkstream,
     setSelectedWorkstream,
+    selectedWpFamily,
+    setSelectedWpFamily,
     selectedBigTicket,
     setSelectedBigTicket,
     selectedAction,
