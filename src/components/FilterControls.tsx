@@ -417,10 +417,10 @@ export function FilterControls({
               selectedWpFamily
                 ? (
                     {
-                      family1: "Mandates, Prog's results, Coordination",
-                      family2: "Mergers, UNCTs, Regions",
-                      family3: "Unified Services",
-                      family4: "Knowledge, Expertise",
+                      family1: "Mandates, prog's, results, coordination",
+                      family2: "Mergers, UNCTs, regions",
+                      family3: "Unified services",
+                      family4: "Knowledge, expertise",
                     } as const
                   )[selectedWpFamily] ?? "Select work package family"
                 : "Select work package family"
@@ -430,11 +430,11 @@ export function FilterControls({
             options={[
               {
                 key: "family1",
-                label: "Mandates, Prog's results, Coordination",
+                label: "Mandates, prog's, results, coordination",
               },
-              { key: "family2", label: "Mergers, UNCTs, Regions" },
-              { key: "family3", label: "Unified Services" },
-              { key: "family4", label: "Knowledge, Expertise" },
+              { key: "family2", label: "Mergers, UNCTs, regions" },
+              { key: "family3", label: "Unified services" },
+              { key: "family4", label: "Knowledge, expertise" },
             ]}
             selectedKeys={
               selectedWpFamily ? new Set([selectedWpFamily]) : new Set()
