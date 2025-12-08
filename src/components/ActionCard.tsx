@@ -51,7 +51,7 @@ export function ActionItem({
   return (
     <div 
       onClick={handleClick}
-      className={`rounded-[6px] border p-5 pr-9 transition-all hover:shadow-md cursor-pointer relative ${
+      className={`rounded-[6px] border p-5 pr-9 transition-all cursor-pointer relative ${
         isCompleted 
           ? "border-un-blue/30 bg-un-blue/5 hover:border-un-blue/50" 
           : "border-slate-200 bg-white hover:border-slate-300"

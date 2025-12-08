@@ -41,7 +41,6 @@ export function WorkPackageProgress({
           completed,
           inProgress,
           progress: Math.round(progressPercentage),
-          isBigTicket: wp.bigTicket,
         };
       })
       .sort((a, b) => {
@@ -67,7 +66,7 @@ export function WorkPackageProgress({
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white">
         <CollapsibleTrigger className="flex w-full items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors">
           <h3 className="text-lg font-semibold text-gray-900">
             Work Package Progress
@@ -93,7 +92,7 @@ export function WorkPackageProgress({
                   open={isWpOpen}
                   onOpenChange={() => toggleWorkPackage(wpKey)}
                 >
-                  <div className="rounded-lg border border-gray-100 bg-gray-50 transition-all hover:border-un-blue/30 hover:bg-un-blue/5 hover:shadow-md">
+                  <div className="rounded-lg border border-gray-100 bg-gray-50 transition-all hover:border-un-blue/30 hover:bg-un-blue/5">
                     <CollapsibleTrigger className="w-full p-4 text-left">
                       <div className="mb-2 flex items-start justify-between">
                         <div className="flex-1">
@@ -104,11 +103,6 @@ export function WorkPackageProgress({
                               </span>
                             )}
                             <h4 className="font-medium text-gray-900">{wp.name}</h4>
-                            {wp.isBigTicket && (
-                              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
-                                Big Ticket
-                              </span>
-                            )}
                             <ChevronDown
                               className={`h-4 w-4 text-gray-500 transition-transform ${
                                 isWpOpen ? "rotate-180" : ""

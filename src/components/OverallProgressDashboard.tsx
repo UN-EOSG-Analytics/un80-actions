@@ -31,7 +31,7 @@ export function OverallProgressDashboard({
       {/* KPI Cards Row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Total Actions */}
-        <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-un-blue/30">
+        <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-6 transition-all hover:border-un-blue/30">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-600">Total Actions</p>
@@ -44,7 +44,7 @@ export function OverallProgressDashboard({
         </div>
 
         {/* Workstreams */}
-        <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-un-blue/30">
+        <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-6 transition-all hover:border-un-blue/30">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-600">Workstreams</p>
@@ -57,7 +57,7 @@ export function OverallProgressDashboard({
         </div>
 
         {/* Work Packages */}
-        <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-un-blue/30">
+        <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-6 transition-all hover:border-un-blue/30">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-600">Work Packages</p>
@@ -70,7 +70,7 @@ export function OverallProgressDashboard({
         </div>
 
         {/* UN System Leaders */}
-        <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-un-blue/30">
+        <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-6 transition-all hover:border-un-blue/30">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-600">UN System Leaders</p>

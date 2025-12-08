@@ -79,7 +79,7 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white">
         <CollapsibleTrigger className="flex w-full items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors">
           <h3 className="text-lg font-semibold text-gray-900">
             Upcoming Milestones
@@ -108,7 +108,7 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
                     onOpenChange={() => toggleMilestone(milestone.dateKey)}
                   >
                     <div
-                      className={`rounded-lg border transition-all hover:shadow-md ${
+                      className={`rounded-lg border transition-all ${
                         status === "completed"
                           ? "border-un-blue/30 bg-un-blue/5 hover:border-un-blue/50"
                           : status === "overdue"

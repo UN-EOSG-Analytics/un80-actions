@@ -42,7 +42,7 @@ export function LeaderSubmissionProgress({
     const offset = circumference - (percentage / 100) * circumference;
 
     return (
-      <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:shadow-md hover:border-un-blue/30">
+      <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-4 transition-all hover:border-un-blue/30">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="mb-3 flex items-center gap-2">
@@ -106,7 +106,7 @@ export function LeaderSubmissionProgress({
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-un-blue/20 to-un-blue/10 shadow-sm">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-un-blue/20 to-un-blue/10">
           <TrendingUp className="h-5 w-5 text-un-blue" />
         </div>
         <div>
