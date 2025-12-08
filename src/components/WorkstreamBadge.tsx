@@ -57,7 +57,7 @@ export function WorkstreamLabels({
                 </span>
               </TooltipTrigger>
               <TooltipContent>
-                <p>{workstreamNames[ws]}</p>
+                <p className="text-sm text-gray-600">{workstreamNames[ws]}</p>
               </TooltipContent>
             </Tooltip>
           </span>

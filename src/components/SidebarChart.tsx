@@ -137,7 +137,7 @@ export function SidebarChart({
                               </span>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>{entry.tooltip}</p>
+                              <p className="text-sm text-gray-600">{entry.tooltip}</p>
                             </TooltipContent>
                           </Tooltip>
                         ) : (
