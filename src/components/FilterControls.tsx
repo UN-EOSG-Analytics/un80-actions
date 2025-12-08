@@ -17,7 +17,6 @@ import {
   Users,
   Package,
   ListTodo,
-  Boxes,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -42,8 +41,6 @@ interface FilterControlsProps {
   onSelectLead: (value: string[]) => void;
   selectedWorkstream: string[];
   onSelectWorkstream: (value: string[]) => void;
-  selectedWpFamily: string;
-  onSelectWpFamily: (value: string) => void;
   selectedBigTicket: string[];
   onSelectBigTicket: (value: string[]) => void;
   selectedAction: string[];
@@ -79,8 +76,6 @@ export function FilterControls({
   onSelectLead,
   selectedWorkstream,
   onSelectWorkstream,
-  selectedWpFamily,
-  onSelectWpFamily,
   selectedBigTicket,
   onSelectBigTicket,
   selectedAction,
@@ -119,7 +114,6 @@ export function FilterControls({
     selectedWorkPackage.length > 0 ||
     selectedLead.length > 0 ||
     selectedWorkstream.length > 0 ||
-    selectedWpFamily ||
     selectedBigTicket.length > 0 ||
     selectedAction.length > 0
   );
@@ -128,7 +122,6 @@ export function FilterControls({
     selectedWorkPackage.length > 0 ||
     selectedLead.length > 0 ||
     selectedWorkstream.length > 0 ||
-    selectedWpFamily ||
     selectedBigTicket.length > 0 ||
     selectedAction.length > 0
   );
@@ -405,46 +398,6 @@ export function FilterControls({
               onSelectWorkstream(newSelected);
             }}
             ariaLabel="Filter by workstream"
-          />
-
-          {/* WP Families Filter */}
-          <FilterDropdown
-            open={openFilterCollapsibles.has("wpfamily")}
-            onOpenChange={(open) =>
-              onToggleFilterCollapsible("wpfamily", open)
-            }
-            icon={<Boxes className="h-4 w-4 text-un-blue" />}
-            triggerText={
-              selectedWpFamily
-                ? (
-                    {
-                      family1: "Mandates, prog's, results, coordination",
-                      family2: "Mergers, UNCTs, regions",
-                      family3: "Unified services",
-                      family4: "Knowledge, expertise",
-                    } as const
-                  )[selectedWpFamily] ?? "Select work package family"
-                : "Select work package family"
-            }
-            isFiltered={!!selectedWpFamily}
-            allActive={!selectedWpFamily}
-            options={[
-              {
-                key: "family1",
-                label: "Mandates, prog's, results, coordination",
-              },
-              { key: "family2", label: "Mergers, UNCTs, regions" },
-              { key: "family3", label: "Unified services" },
-              { key: "family4", label: "Knowledge, expertise" },
-            ]}
-            selectedKeys={
-              selectedWpFamily ? new Set([selectedWpFamily]) : new Set()
-            }
-            onToggle={(key) => {
-              const newValue = selectedWpFamily === key ? "" : key;
-              onSelectWpFamily(newValue);
-            }}
-            ariaLabel="Filter by work package family"
           />
 
           {/* Type Filter */}
