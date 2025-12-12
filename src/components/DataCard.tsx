@@ -47,7 +47,7 @@ export function DataCard({
       </TooltipTrigger>
       <TooltipContent>
         <p className="text-gray-600">
-          Total count: <span className="font-semibold text-un-blue">{isLoading ? "Loading..." : value}</span>
+          {title}: <span className="font-semibold text-un-blue">{isLoading ? "Loading..." : value}</span>
         </p>
       </TooltipContent>
     </Tooltip>
