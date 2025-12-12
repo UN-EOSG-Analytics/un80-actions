@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import type { Action } from "@/types";
 import { DocumentBadge } from "@/components/DocumentBadge";
 import { LeadsBadge } from "@/components/LeadsBadge";
+import { parseDate, formatDate } from "@/lib/utils";
 
 interface ActionModalProps {
   action: Action | null;
@@ -243,18 +244,17 @@ export default function ActionModal({
           </div>
         )}
 
-        {/* Timeline */}
-        {action.first_milestone && (
-          <div className="border-t border-gray-200 pt-6">
-            <Field label="First Milestone">
-              {new Date(action.first_milestone).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </Field>
-          </div>
-        )}
+        {/* Final Milestone Deadline */}
+        {action.final_milestone_deadline && (() => {
+          const deadlineDate = parseDate(action.final_milestone_deadline);
+          return deadlineDate ? (
+            <div className="border-t border-gray-200 pt-6">
+              <Field label="Final Milestone Deadline">
+                {formatDate(deadlineDate)}
+              </Field>
+            </div>
+          ) : null;
+        })()}
 
         {/* MS Approval */}
         {/* {action.ms_approval && (
