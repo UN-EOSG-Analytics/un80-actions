@@ -38,6 +38,12 @@ export interface Action {
   /** First milestone date in ISO format (e.g., "2026-02-28") or null */
   first_milestone: string | null;
 
+  /** Final milestone description or null */
+  final_milestone: string | null;
+
+  /** Final milestone deadline date in ISO format (e.g., "2026-02-28") or null */
+  final_milestone_deadline: string | null;
+
   /** Whether Member State approval is required */
   ms_approval: boolean;
 

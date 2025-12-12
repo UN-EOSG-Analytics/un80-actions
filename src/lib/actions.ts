@@ -8,7 +8,7 @@ import actionsData from "../../public/data/actions.json";
  * @returns Promise resolving to the actions array
  */
 export async function fetchActions(): Promise<Actions> {
-  return Promise.resolve(actionsData as Actions);
+  return Promise.resolve(actionsData as unknown as Actions);
 }
 
 /**
