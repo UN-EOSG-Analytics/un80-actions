@@ -244,39 +244,8 @@ export default function ActionModal({
           </div>
         )}
 
-        {/* Timeline */}
-        {action.first_milestone && (() => {
-          const firstMilestoneDate = parseDate(action.first_milestone);
-          return firstMilestoneDate ? (
-            <div className="border-t border-gray-200 pt-6">
-              <Field label="First Milestone">
-                {formatDate(firstMilestoneDate)}
-              </Field>
-            </div>
-          ) : null;
-        })()}
-
-        {/* Final Milestone */}
-        {action.final_milestone && (
-          <div className="border-t border-gray-200 pt-6">
-            <Field label="Final Milestone">
-              <div className="space-y-2">
-                <div className="font-medium">{action.final_milestone}</div>
-                {action.final_milestone_deadline && (() => {
-                  const deadlineDate = parseDate(action.final_milestone_deadline);
-                  return deadlineDate ? (
-                    <div className="text-sm text-gray-600">
-                      Deadline: {formatDate(deadlineDate)}
-                    </div>
-                  ) : null;
-                })()}
-              </div>
-            </Field>
-          </div>
-        )}
-
-        {/* Final Milestone Deadline (if milestone description is missing but deadline exists) */}
-        {!action.final_milestone && action.final_milestone_deadline && (() => {
+        {/* Final Milestone Deadline */}
+        {action.final_milestone_deadline && (() => {
           const deadlineDate = parseDate(action.final_milestone_deadline);
           return deadlineDate ? (
             <div className="border-t border-gray-200 pt-6">
@@ -286,6 +255,15 @@ export default function ActionModal({
             </div>
           ) : null;
         })()}
+
+        {/* Final Milestone */}
+        {action.final_milestone && (
+          <div className="border-t border-gray-200 pt-6">
+            <Field label="Final Milestone">
+              {action.final_milestone}
+            </Field>
+          </div>
+        )}
 
         {/* MS Approval */}
         {/* {action.ms_approval && (
