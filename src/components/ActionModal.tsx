@@ -244,27 +244,6 @@ export default function ActionModal({
           </div>
         )}
 
-        {/* Final Milestone Deadline */}
-        {action.final_milestone_deadline && (() => {
-          const deadlineDate = parseDate(action.final_milestone_deadline);
-          return deadlineDate ? (
-            <div className="border-t border-gray-200 pt-6">
-              <Field label="Final Milestone Deadline">
-                {formatDate(deadlineDate)}
-              </Field>
-            </div>
-          ) : null;
-        })()}
-
-        {/* Final Milestone */}
-        {action.final_milestone && (
-          <div className="border-t border-gray-200 pt-6">
-            <Field label="Final Milestone">
-              {action.final_milestone}
-            </Field>
-          </div>
-        )}
-
         {/* MS Approval */}
         {/* {action.ms_approval && (
           <div className="border-t border-gray-200 pt-6">

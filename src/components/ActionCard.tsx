@@ -48,9 +48,9 @@ export function ActionItem({
       <div className="mb-4 flex items-start gap-3">
         {/* Numbered circle badge */}
         <div className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-un-blue/10">
-          <span className="text-xs font-semibold text-un-blue">
-            {action.actionNumber || ""}
-          </span>
+            <span className="text-xs font-semibold text-un-blue">
+              {action.actionNumber || ""}
+            </span>
         </div>
         {/* Action description text */}
         <div className="flex-1">

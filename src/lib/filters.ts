@@ -9,6 +9,48 @@ import type {
 } from "@/types";
 import { normalizeLeaderName } from "./utils";
 
+// WP Families mapping (by work package number)
+const WP_FAMILY_2 = ["3", "4", "5", "6", "12"];
+const WP_FAMILY_3 = ["14", "18", "15", "2"];
+const WP_FAMILY_4 = ["2", "16", "17", "7", "8"];
+
+function getWpNumbersForFamily(
+  familyKey: string,
+  workPackages: WorkPackage[],
+): string[] {
+  // Collect Big Ticket WP numbers from data
+  const bigTicketNumbers = Array.from(
+    new Set(
+      workPackages
+        .filter(
+          (wp) => wp.bigTicket === true && typeof wp.number === "number",
+        )
+        .map((wp) => String(wp.number)),
+    ),
+  );
+
+  const otherFamiliesUnion = new Set([
+    ...WP_FAMILY_2,
+    ...WP_FAMILY_3,
+    ...WP_FAMILY_4,
+  ]);
+
+  switch (familyKey) {
+    case "family2":
+      return WP_FAMILY_2;
+    case "family3":
+      return WP_FAMILY_3;
+    case "family4":
+      return WP_FAMILY_4;
+    // family1 = "rest of Big Ticket work packages" (plus WP 2)
+    case "family1":
+    default:
+      return bigTicketNumbers.filter(
+        (n) => n === "2" || !otherFamiliesUnion.has(n),
+      );
+  }
+}
+
 /**
  * Filter work packages based on filter state
  * @param workPackages - Array of work packages to filter
@@ -46,6 +88,20 @@ export function filterWorkPackages(
       } else {
         return selectedNumbers.includes(wp.name);
       }
+    });
+  }
+
+  // WP Families filter (single select, maps to specific WP numbers)
+  if (filters.selectedWpFamily) {
+    const allowedNumbers = new Set(
+      getWpNumbersForFamily(filters.selectedWpFamily, workPackages),
+    );
+
+    filtered = filtered.filter((wp) => {
+      if (typeof wp.number === "number") {
+        return allowedNumbers.has(String(wp.number));
+      }
+      return false;
     });
   }
 
@@ -419,6 +475,17 @@ export function calculateStatsData(
         return selectedNumbers.includes(action.work_package_name);
       }
     });
+  }
+
+  // WP Families filter
+  if (filters.selectedWpFamily) {
+    const allowedNumbers = new Set(
+      getWpNumbersForFamily(filters.selectedWpFamily, filteredWorkPackages),
+    );
+
+    filteredActions = filteredActions.filter((action) =>
+      allowedNumbers.has(String(action.work_package_number)),
+    );
   }
 
   // Lead filter (supports multiple selections)

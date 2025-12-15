@@ -55,8 +55,8 @@ export function Header({ onReset, showLogin = true }: HeaderProps) {
                           beta
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent side="bottom" className="max-w-56">
-                        <p className="text-sm">
+                      <TooltipContent side="bottom" className="max-w-64">
+                        <p className="text-sm text-gray-600 leading-relaxed">
                           This dashboard is currently in its beta version and will
                           be updated on a regular basis.
                         </p>

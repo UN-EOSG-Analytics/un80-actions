@@ -46,8 +46,8 @@ export function DataCard({
         </div>
       </TooltipTrigger>
       <TooltipContent>
-        <p>
-          Number of {title}: {isLoading ? "Loading..." : value}
+        <p className="text-gray-600">
+          {title}: <span className="font-semibold text-un-blue">{isLoading ? "Loading..." : value}</span>
         </p>
       </TooltipContent>
     </Tooltip>

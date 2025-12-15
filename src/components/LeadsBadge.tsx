@@ -58,7 +58,7 @@ export function LeadsBadge({
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{longForm}</p>
+                  <p className="text-sm text-gray-600">{longForm}</p>
                 </TooltipContent>
               </Tooltip>
             </span>

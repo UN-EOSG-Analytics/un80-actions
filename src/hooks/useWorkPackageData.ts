@@ -13,6 +13,47 @@ import {
   calculateStatsData,
 } from "@/lib/filters";
 
+// Local WP Families mapping (by work package number) for option computations
+const WP_FAMILY_2 = ["3", "4", "5", "6", "12"];
+const WP_FAMILY_3 = ["14", "18", "15", "2"];
+const WP_FAMILY_4 = ["2", "16", "17", "7", "8"];
+
+function getWpNumbersForFamilyForHook(
+  familyKey: string,
+  workPackages: ReturnType<typeof groupActionsByWorkPackage>,
+): string[] {
+  const bigTicketNumbers = Array.from(
+    new Set(
+      workPackages
+        .filter(
+          (wp) => wp.bigTicket === true && typeof wp.number === "number",
+        )
+        .map((wp) => String(wp.number)),
+    ),
+  );
+
+  const otherFamiliesUnion = new Set([
+    ...WP_FAMILY_2,
+    ...WP_FAMILY_3,
+    ...WP_FAMILY_4,
+  ]);
+
+  switch (familyKey) {
+    case "family2":
+      return WP_FAMILY_2;
+    case "family3":
+      return WP_FAMILY_3;
+    case "family4":
+      return WP_FAMILY_4;
+    // family1 = "rest of Big Ticket work packages" (plus WP 2)
+    case "family1":
+    default:
+      return bigTicketNumbers.filter(
+        (n) => n === "2" || !otherFamiliesUnion.has(n),
+      );
+  }
+}
+
 /**
  * Custom hook to compute work packages and all derived data
  * @param actions - Array of actions
@@ -37,7 +78,13 @@ export function useWorkPackageData(
 
   // Helper function to filter work packages with all filters except one
   const getFilteredWorkPackagesExcludingFilter = (
-    excludeFilter: "lead" | "workstream" | "workpackage" | "action" | "bigticket",
+    excludeFilter:
+      | "lead"
+      | "workstream"
+      | "workpackage"
+      | "action"
+      | "bigticket"
+      | "wpfamily",
   ) => {
     let filtered = workPackages;
 
@@ -101,6 +148,20 @@ export function useWorkPackageData(
           filters.selectedAction!.includes(action.text.trim()),
         ),
       );
+    }
+
+    // Apply WP Families filter unless it's the excluded filter
+    if (excludeFilter !== "wpfamily" && filters.selectedWpFamily) {
+      const allowedNumbers = new Set(
+        getWpNumbersForFamilyForHook(filters.selectedWpFamily, workPackages),
+      );
+
+      filtered = filtered.filter((wp) => {
+        if (typeof wp.number === "number") {
+          return allowedNumbers.has(String(wp.number));
+        }
+        return false;
+      });
     }
 
     return filtered;

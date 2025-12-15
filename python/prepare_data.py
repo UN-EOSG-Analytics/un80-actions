@@ -28,7 +28,7 @@ for col in df.columns:
         )
 
 # Process date columns
-date_columns = ["first_milestone"]  # Add other date columns here if needed
+date_columns = ["first_milestone_deadline", "final_milestone_deadline"]  # Add other date columns here if needed
 
 for col in date_columns:
     if col in df.columns:

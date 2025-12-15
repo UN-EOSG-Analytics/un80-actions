@@ -2,6 +2,10 @@
 
 import { Suspense, useState } from "react";
 import { AlertCircle } from "lucide-react";
+import { Suspense, useState } from "react";
+import { DataCard } from "@/components/DataCard";
+import { ExplainerText } from "@/components/ExplainerText";
+import { FilterControls } from "@/components/FilterControls";
 import { Header } from "@/components/HeaderBar";
 import { LeaderSubmissionProgress } from "@/components/LeaderSubmissionProgress";
 import { LeaderSubmissionChecklist } from "@/components/LeaderSubmissionChecklist";
@@ -13,6 +17,15 @@ import { useActions } from "@/hooks/useActions";
 import { useChartSearch } from "@/hooks/useChartSearch";
 import { useCollapsibles } from "@/hooks/useCollapsibles";
 import { useWorkPackageData } from "@/hooks/useWorkPackageData";
+
+function WorkPackagesPageContent() {
+import {
+  Briefcase as BriefcaseIcon,
+  Layers,
+  ListTodo,
+  Users,
+  AlertCircle,
+} from "lucide-react";
 
 function WorkPackagesPageContent() {
   // Custom hooks for state management
@@ -104,6 +117,14 @@ function WorkPackagesPageContent() {
         </main>
       </div>
     </TooltipProvider>
+  );
+}
+
+export default function WorkPackagesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <WorkPackagesPageContent />
+    </Suspense>
   );
 }
 
