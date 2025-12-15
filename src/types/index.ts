@@ -100,6 +100,8 @@ export interface WorkPackageAction {
   report: string;
   docText: string | null;
   actionNumber: number;
+  firstMilestone: string | null;
+  finalMilestoneDeadline: string | null;
 }
 
 /**

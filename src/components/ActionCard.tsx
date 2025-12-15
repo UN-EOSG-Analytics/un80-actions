@@ -3,6 +3,8 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { DocumentBadge } from "@/components/DocumentBadge";
 import { LeadsBadge } from "@/components/LeadsBadge";
+import { CheckCircle2 } from "lucide-react";
+import { parseDate } from "@/lib/utils";
 import type { WorkPackageAction } from "@/types";
 
 /**
@@ -39,6 +41,27 @@ export function ActionItem({
     router.push(`/?action=${action.actionNumber}`, { scroll: false });
   };
 
+  // Calculate progress to determine if action is completed
+  // Icon only appears when progress reaches 100% based on elapsed time calculation
+  const isCompleted = (() => {
+    if (!action.finalMilestoneDeadline || !action.firstMilestone) return false;
+    
+    const deadlineDate = parseDate(action.finalMilestoneDeadline);
+    const startDate = parseDate(action.firstMilestone);
+    const now = new Date();
+    
+    // Both dates must be valid and startDate must be before deadlineDate
+    if (!deadlineDate || !startDate) return false;
+    if (isNaN(deadlineDate.getTime()) || isNaN(startDate.getTime())) return false;
+    if (startDate >= deadlineDate) return false;
+    
+    const totalDuration = deadlineDate.getTime() - startDate.getTime();
+    const elapsed = now.getTime() - startDate.getTime();
+    const progress = Math.min(Math.max((elapsed / totalDuration) * 100, 0), 100);
+    
+    return progress >= 100;
+  })();
+
   return (
     <div 
       onClick={handleClick}
@@ -46,12 +69,18 @@ export function ActionItem({
     >
       {/* Activity Number and Text */}
       <div className="mb-4 flex items-start gap-3">
-        {/* Numbered circle badge */}
-        <div className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-un-blue/10">
+        {/* Numbered circle badge or Completed icon */}
+        {isCompleted ? (
+          <div className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-un-blue/10">
+            <CheckCircle2 className="h-5 w-5 text-un-blue" />
+          </div>
+        ) : (
+          <div className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-un-blue/10">
             <span className="text-xs font-semibold text-un-blue">
               {action.actionNumber || ""}
             </span>
-        </div>
+          </div>
+        )}
         {/* Action description text */}
         <div className="flex-1">
           <p className="leading-normal font-medium text-slate-900">

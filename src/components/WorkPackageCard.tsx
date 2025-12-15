@@ -3,6 +3,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Progress } from "@/components/ui/progress";
 import { ActionItem } from "@/components/ActionCard";
 import { WorkstreamLabels } from "@/components/WorkstreamBadge";
 import { LeadsBadge } from "@/components/LeadsBadge";
@@ -54,6 +55,7 @@ interface WorkPackageItemProps {
   collapsibleKey: string;
   onSelectLead?: (lead: string[]) => void;
   onSelectWorkstream?: (workstream: string[]) => void;
+  showProgress?: boolean;
 }
 
 export function WorkPackageItem({
@@ -62,6 +64,7 @@ export function WorkPackageItem({
   onToggle,
   onSelectLead,
   onSelectWorkstream,
+  showProgress = false,
 }: WorkPackageItemProps) {
   return (
     <Collapsible open={isOpen} onOpenChange={onToggle}>
@@ -84,9 +87,21 @@ export function WorkPackageItem({
           <div className="mb-2 min-w-0 pr-20 text-left sm:pr-8">
             {wp.number ? (
               <>
-                <span className="text-sm leading-5 font-medium tracking-wider text-slate-500 uppercase">
-                  Work package {wp.number}
-                </span>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="text-sm leading-5 font-medium tracking-wider text-slate-500 uppercase">
+                    Work package {wp.number}
+                  </span>
+                  {/* Progress Bar */}
+                  {showProgress && (
+                    <div className="flex items-center gap-2 flex-1 min-w-[120px]">
+                      <div className="flex-1 relative max-w-[200px]">
+                        <Progress value={0} className="h-1.5" />
+                        <div className="absolute left-0 top-0 h-1.5 w-0.5 rounded-l-full bg-un-blue" />
+                      </div>
+                      <span className="text-xs font-semibold text-un-blue whitespace-nowrap">0%</span>
+                    </div>
+                  )}
+                </div>
                 <h2 className="mt-1 text-xl leading-7 font-semibold text-slate-900">
                   {wp.name}
                 </h2>
