@@ -50,7 +50,7 @@ export function DataCard({
                 "text-left font-bold text-[#2E3440] tabular-nums",
                 "text-[24px] leading-[30px] sm:text-[28px] sm:leading-[34px] md:text-[32px] md:leading-[38px]"
               )}>
-                {completed}/{value} <span className="text-[12px] sm:text-[14px] md:text-[16px] font-normal">completed</span>
+                {completed}/{value} <span className="text-[12px] sm:text-[14px] md:text-[16px] font-normal text-un-blue">completed</span>
               </p>
             ) : (
               <p className="text-left text-[37px] leading-[45px] font-bold text-[#2E3440] tabular-nums sm:text-[43px] sm:leading-[51px] md:text-[49px] md:leading-[57px]">
