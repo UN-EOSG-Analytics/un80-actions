@@ -144,24 +144,32 @@ function WorkPackagesPageContent() {
                   value={statsData.workstreams}
                   icon={Layers}
                   isLoading={isLoading}
+                  showProgress={showProgress}
+                  completed={0}
                 />
                 <DataCard
                   title="Work Packages"
                   value={statsData.workpackages}
                   icon={BriefcaseIcon}
                   isLoading={isLoading}
+                  showProgress={showProgress}
+                  completed={0}
                 />
                 <DataCard
                   title="Actions"
                   value={statsData.actions}
                   icon={ListTodo}
                   isLoading={isLoading}
+                  showProgress={showProgress}
+                  completed={0}
                 />
                 <DataCard
                   title="UN System Leaders"
                   value={statsData.leads}
                   icon={Users}
                   isLoading={isLoading}
+                  showProgress={showProgress}
+                  completed={0}
                 />
               </div>
             </section>

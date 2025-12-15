@@ -14,6 +14,8 @@ interface DataCardProps {
   icon: LucideIcon;
   className?: string;
   isLoading?: boolean;
+  showProgress?: boolean;
+  completed?: number;
 }
 
 export function DataCard({
@@ -22,6 +24,8 @@ export function DataCard({
   icon: Icon,
   className,
   isLoading = false,
+  showProgress = false,
+  completed = 0,
 }: DataCardProps) {
   return (
     <Tooltip>
@@ -39,15 +43,28 @@ export function DataCard({
                 <Icon className="h-5 w-5 text-un-blue" />
               </div>
             </div>
-            <p className="text-left text-[37px] leading-[45px] font-bold text-[#2E3440] tabular-nums sm:text-[43px] sm:leading-[51px] md:text-[49px] md:leading-[57px]">
-              {isLoading ? "" : value}
-            </p>
+            {isLoading ? (
+              <p className="text-left text-[37px] leading-[45px] font-bold text-[#2E3440] tabular-nums sm:text-[43px] sm:leading-[51px] md:text-[49px] md:leading-[57px]"></p>
+            ) : showProgress ? (
+              <p className={cn(
+                "text-left font-bold text-[#2E3440] tabular-nums",
+                "text-[24px] leading-[30px] sm:text-[28px] sm:leading-[34px] md:text-[32px] md:leading-[38px]"
+              )}>
+                {completed}/{value} <span className="text-[12px] sm:text-[14px] md:text-[16px] font-normal">completed</span>
+              </p>
+            ) : (
+              <p className="text-left text-[37px] leading-[45px] font-bold text-[#2E3440] tabular-nums sm:text-[43px] sm:leading-[51px] md:text-[49px] md:leading-[57px]">
+                {value}
+              </p>
+            )}
           </Card>
         </div>
       </TooltipTrigger>
       <TooltipContent>
         <p className="text-gray-600">
-          {title}: <span className="font-semibold text-un-blue">{isLoading ? "Loading..." : value}</span>
+          {title}: <span className="font-semibold text-un-blue">
+            {isLoading ? "Loading..." : showProgress ? `${completed}/${value} completed` : value}
+          </span>
         </p>
       </TooltipContent>
     </Tooltip>
