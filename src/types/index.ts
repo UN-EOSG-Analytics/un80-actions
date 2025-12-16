@@ -61,6 +61,9 @@ export interface Action {
 
   /** Document text or null */
   doc_text: string | null;
+
+  /** Action entities (semicolon-separated) or null */
+  action_entities: string | null;
 }
 
 /**

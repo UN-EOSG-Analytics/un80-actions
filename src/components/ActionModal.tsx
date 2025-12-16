@@ -5,7 +5,6 @@ import { X } from "lucide-react";
 import type { Action } from "@/types";
 import { DocumentBadge } from "@/components/DocumentBadge";
 import { LeadsBadge } from "@/components/LeadsBadge";
-import { Progress } from "@/components/ui/progress";
 import { parseDate, formatDate } from "@/lib/utils";
 
 interface ActionModalProps {
@@ -219,53 +218,43 @@ export default function ActionModal({
           </div>
         )}
 
-        {/* Final Milestone Deadline */}
+        {/* Key Milestone */}
         {action.final_milestone_deadline && (
           <div className="border-t border-gray-200 pt-6">
-            <Field label="Final Milestone Deadline">
+            <Field label="Key Milestone">
               <div className="space-y-4">
-                <div className="font-medium">
-                  {(() => {
-                    const deadlineDate = parseDate(action.final_milestone_deadline);
-                    return deadlineDate ? formatDate(deadlineDate) : action.final_milestone_deadline;
-                  })()}
+                {action.final_milestone && (
+                  <div className="text-gray-700">
+                    {action.final_milestone}
+                  </div>
+                )}
+                <div className="space-y-1.5">
+                  <div className="text-sm font-normal tracking-wide text-gray-600 uppercase">
+                    Key Milestone Deadline
+                  </div>
+                  <div className="font-medium">
+                    {(() => {
+                      const deadlineDate = parseDate(action.final_milestone_deadline);
+                      return deadlineDate ? formatDate(deadlineDate) : action.final_milestone_deadline;
+                    })()}
+                  </div>
                 </div>
-                {(() => {
-                  const deadlineDate = parseDate(action.final_milestone_deadline);
-                  const startDate = action.first_milestone ? parseDate(action.first_milestone) : null;
-                  const now = new Date();
-                  
-                  if (!deadlineDate) return null;
-                  
-                  let progress = 0;
-                  if (startDate && startDate < deadlineDate) {
-                    const totalDuration = deadlineDate.getTime() - startDate.getTime();
-                    const elapsed = now.getTime() - startDate.getTime();
-                    progress = Math.min(Math.max((elapsed / totalDuration) * 100, 0), 100);
-                  } else if (now >= deadlineDate) {
-                    progress = 100;
-                  }
-                  
-                  return (
-                    <div className="space-y-1.5">
-                      <div className="text-sm font-normal tracking-wide text-gray-600 uppercase">
-                        Progress
-                      </div>
-                      <div className="relative">
-                        <div className="relative">
-                          <Progress value={progress} className="h-2" />
-                          {progress === 0 && (
-                            <div className="absolute left-0 top-0 h-2 w-1 rounded-l-full bg-un-blue" />
-                          )}
-                        </div>
-                        <div className="mt-1 flex justify-between text-xs text-gray-500">
-                          <span>0%</span>
-                          <span>100%</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
+              </div>
+            </Field>
+          </div>
+        )}
+
+        {/* Action Entities */}
+        {action.action_entities && (
+          <div className="pt-2">
+            <Field label="Team Members">
+              <div>
+                {action.action_entities.split(';').map((entity, index) => (
+                  <span key={index}>
+                    {index > 0 && <span className="text-gray-400"> • </span>}
+                    {entity.trim()}
+                  </span>
+                ))}
               </div>
             </Field>
           </div>

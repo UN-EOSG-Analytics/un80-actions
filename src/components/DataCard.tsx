@@ -53,9 +53,9 @@ export function DataCard({
                 {completed}/{value} <span className="text-[12px] sm:text-[14px] md:text-[16px] font-normal text-un-blue">completed</span>
               </p>
             ) : (
-              <p className="text-left text-[37px] leading-[45px] font-bold text-[#2E3440] tabular-nums sm:text-[43px] sm:leading-[51px] md:text-[49px] md:leading-[57px]">
+            <p className="text-left text-[37px] leading-[45px] font-bold text-[#2E3440] tabular-nums sm:text-[43px] sm:leading-[51px] md:text-[49px] md:leading-[57px]">
                 {value}
-              </p>
+            </p>
             )}
           </Card>
         </div>
