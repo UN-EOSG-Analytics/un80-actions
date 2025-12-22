@@ -239,7 +239,7 @@ export default function ActionModal({
               Team Members
             </span>
             <div className="mt-1 text-base text-gray-900">
-              <div>
+              <p className="text-left leading-tight text-gray-700">
                 {action.action_entities && action.action_entities.trim() ? (
                   action.action_entities.split(';').map((entity, index, array) => (
                     <span key={index}>
@@ -248,9 +248,9 @@ export default function ActionModal({
                     </span>
                   ))
                 ) : (
-                  <span className="text-black">to be updated</span>
+                  <span>to be updated</span>
                 )}
-              </div>
+              </p>
             </div>
           </div>
         </div>
