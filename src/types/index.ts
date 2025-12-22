@@ -44,6 +44,9 @@ export interface Action {
   /** Final milestone deadline date in ISO format (e.g., "2026-02-28") or null */
   final_milestone_deadline: string | null;
 
+  /** Action entities (team members) separated by semicolons or null */
+  action_entities: string | null;
+
   /** Whether Member State approval is required */
   ms_approval: boolean;
 
