@@ -6,7 +6,6 @@ import type { Action } from "@/types";
 import { DocumentBadge } from "@/components/DocumentBadge";
 import { LeadsBadge } from "@/components/LeadsBadge";
 import { parseDate, formatDate } from "@/lib/utils";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 interface ActionModalProps {
   action: Action | null;
@@ -222,16 +221,9 @@ export default function ActionModal({
         {/* Key Milestone */}
         <div className="border-t border-gray-200 pt-6">
           <div className="space-y-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
-                  Key Milestone
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>A defined implementation step to fulfil the entire scope of each action</p>
-              </TooltipContent>
-            </Tooltip>
+            <span className="text-sm font-normal tracking-wide text-gray-600 uppercase">
+              Key Milestone
+            </span>
             <div className="mt-1 text-base text-gray-900">
               <div className="text-gray-700">
                 to be updated
@@ -243,16 +235,9 @@ export default function ActionModal({
         {/* Team Members */}
         <div>
           <div className="space-y-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
-                  Team Members
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>The UN entities designated to implement this specific action, distinct from the work package lead.</p>
-              </TooltipContent>
-            </Tooltip>
+            <span className="text-sm font-normal tracking-wide text-gray-600 uppercase">
+              Team Members
+            </span>
             <div className="mt-1 text-base text-gray-900">
               <div>
                 {action.action_entities && action.action_entities.trim() ? (
