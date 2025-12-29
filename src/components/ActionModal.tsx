@@ -234,7 +234,7 @@ export default function ActionModal({
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-gray-600">
-                  Steps which will be or have been taken towards the delivery of the proposal concerned. Key Milestones may be updated as implementation progress.
+                  Steps which will be or have been taken towards the delivery of the proposal concerned. Key milestones may be updated as implementation progresses.
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -257,7 +257,7 @@ export default function ActionModal({
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-gray-600">
-                  UN system entities that contribute to the implementation of a specific action, in support of the relevant Work Package Lead. Work Package Leads report to the UN80 Steering Commitee under the authority of the Secretary-General.
+                  UN system entities that contribute to the implementation of a specific action, in support of the relevant Work Package Lead. Work Package Leads report to the UN80 Steering Committee under the authority of the Secretary-General.
                 </p>
               </TooltipContent>
             </Tooltip>
