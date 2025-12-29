@@ -6,6 +6,11 @@ import type { Action } from "@/types";
 import { DocumentBadge } from "@/components/DocumentBadge";
 import { LeadsBadge } from "@/components/LeadsBadge";
 import { parseDate, formatDate } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ActionModalProps {
   action: Action | null;
@@ -221,9 +226,18 @@ export default function ActionModal({
         {/* Key Milestone */}
         <div className="border-t border-gray-200 pt-6">
           <div className="space-y-1">
-            <span className="text-sm font-normal tracking-wide text-gray-600 uppercase">
-              Key Milestone
-            </span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
+                  Key Milestone
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-gray-600">
+                  Steps which will be or have been taken towards the delivery of the proposal concerned. Key Milestones may be updated as implementation progress.
+                </p>
+              </TooltipContent>
+            </Tooltip>
             <div className="mt-1 text-base text-gray-900">
               <div className="text-gray-700">
                 to be updated
@@ -235,9 +249,18 @@ export default function ActionModal({
         {/* Team Members */}
         <div>
           <div className="space-y-1">
-            <span className="text-sm font-normal tracking-wide text-gray-600 uppercase">
-              Team Members
-            </span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
+                  Team Members
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-gray-600">
+                  UN system entities that contribute to the implementation of a specific action, in support of the relevant Work Package Lead. Work Package Leads report to the UN80 Steering Commitee under the authority of the Secretary-General.
+                </p>
+              </TooltipContent>
+            </Tooltip>
             <div className="mt-1 text-base text-gray-900">
               <p className="text-left leading-tight text-gray-700">
                 {action.action_entities && action.action_entities.trim() ? (
