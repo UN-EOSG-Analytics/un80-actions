@@ -12,12 +12,13 @@
       "USG DPO"
     ],
     "first_milestone":"First discussion held.",
-    "first_milestone_deadline":"2025-12-30",
+    "first_milestone_deadline":"2025-12-31",
     "final_milestone":"Clarification on delegation of relevant programmatic tasks.",
-    "final_milestone_deadline":"2026-03-30",
+    "final_milestone_deadline":"2026-03-31",
     "doc_text":"For future peace operations, we will innovate to deliver civilian mandates better. We will take steps to delegate relevant programmatic tasks such as rule of law, governance and child protection – and the associated resources – to UN system entities best equipped to deliver them.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":"DPPA;DPO"
+    "action_entities":"DPPA;DPO",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -32,12 +33,13 @@
       "USG DPO"
     ],
     "first_milestone":"Review of the future of peace operations completed",
-    "first_milestone_deadline":"2026-03-30",
+    "first_milestone_deadline":"2026-03-31",
     "final_milestone":"Review of the future of peace operations completed.",
-    "final_milestone_deadline":"2026-03-30",
+    "final_milestone_deadline":"2026-03-31",
     "doc_text":"On the basis of the Peace Operations Review, a comprehensive proposal for their reset will be presented to Member States upon conclusion of the review mandated by the Pact for the Future.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":"DPPA;DPO"
+    "action_entities":"DPPA;DPO",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -56,7 +58,8 @@
     "final_milestone_deadline":null,
     "doc_text":"Humanitarian Needs and Response Plans will become shorter and sharper, coordination structures simpler and action better aligned with local capacities.",
     "work_package_goal":"Maximizing impact",
-    "action_entities":null
+    "action_entities":null,
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -69,13 +72,14 @@
     "work_package_leads":[
       "USG OCHA"
     ],
-    "first_milestone":"Interagency supply chain pilot design endorsed, and starter locations agreed",
-    "first_milestone_deadline":"2026-01-30",
+    "first_milestone":"Interagency supply chain design endorsed by participating agencies, and starter locations agreed.",
+    "first_milestone_deadline":"2026-01-31",
     "final_milestone":"Integrated UN supply chain operational across agencies, with joint procurement and shared logistics in starter countries, improving speed and cost",
-    "final_milestone_deadline":"2026-12-30",
+    "final_milestone_deadline":"2026-08-31",
     "doc_text":"The New Humanitarian Compact proposes coordinated procurement of key items, pooled use of global freight and logistics, and unbranded in-country services open to the entire UN system. A coordination cell will link these efforts.",
     "work_package_goal":"Maximizing impact",
-    "action_entities":"OCHA;UNICEF;WFP;DOS"
+    "action_entities":"OCHA;UNICEF;WFP;DOS",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -88,13 +92,14 @@
     "work_package_leads":[
       "USG OCHA"
     ],
-    "first_milestone":"Initial package of priority common services identified, drawing on existing practices (e.g. fleet, booking, engineering, security\/emergency mgmt",
-    "first_milestone_deadline":"2026-01-30",
+    "first_milestone":"Initial package of priority common services identified, based on existing practices (e.g. fleet, booking, engineering, connectivity, security\/emergency mgmt",
+    "first_milestone_deadline":"2026-01-31",
     "final_milestone":"Priority common services expanded across several contexts with multiple agencies, with a review demonstrating clearer and more efficient shared delivery",
-    "final_milestone_deadline":"2026-12-30",
+    "final_milestone_deadline":"2026-08-31",
     "doc_text":"Scaling up common services – building on successes like the Booking Hub – could save tens of millions of dollars annually, meaning a greater share of resources could go directly to front-line humanitarian response. Linked to wider reforms, a Global Services Hub and interoperable digital platforms will help consolidate surge rosters, logistics, security, telecoms and engineering support, cutting overheads and speeding delivery.",
     "work_package_goal":"Maximizing impact",
-    "action_entities":"OCHA;UNHCR;WFP"
+    "action_entities":"OCHA;UNHCR;WFP",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -108,12 +113,13 @@
       "USG OCHA"
     ],
     "first_milestone":"Humanitarian Cluster Data Workplan agreed, with quick wins, starter countries, governance options and a joint data-sharing ambition.",
-    "first_milestone_deadline":"2026-01-30",
+    "first_milestone_deadline":"2026-01-31",
     "final_milestone":"Humanitarian Data Collaborative established, scaling platforms, financing and shared capacities and standards.",
-    "final_milestone_deadline":"2026-12-30",
+    "final_milestone_deadline":"2026-08-31",
     "doc_text":"A new Humanitarian Data Collaborative will scale common platforms, collective financing, shared centres, capacities and standards, ensuring all actors can work from one evidence base.",
     "work_package_goal":"Maximizing impact",
-    "action_entities":"OCHA;UNHCR;UNICEF;WFP;IOM"
+    "action_entities":"OCHA;UNHCR;UNICEF;WFP;IOM",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -129,10 +135,11 @@
     "first_milestone":"Principals’ Humanitarian Diplomacy mechanism launched, with agreed priorities, meeting cadence, and initial crisis list identified",
     "first_milestone_deadline":"2026-01-31",
     "final_milestone":"Collab. humanitarian diplomacy functioning system-wide with coordinated messaging, shared strategies and clear impact in priority crises",
-    "final_milestone_deadline":"2026-12-31",
+    "final_milestone_deadline":"2026-08-31",
     "doc_text":"A Collaborative Humanitarian Diplomacy Initiative will bring agencies together under the coordination of the Emergency Relief Coordinator, piloted in a few contexts and supported by DPPA, DPO and the Office of the High Commissioner for Human rights (OHCHR).",
     "work_package_goal":"Maximizing impact",
-    "action_entities":"OCHA;UNHCR;UNICEF;WFP;IOM"
+    "action_entities":"OCHA;UNHCR;UNICEF;WFP;IOM",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -146,12 +153,13 @@
       "USG OCHA"
     ],
     "first_milestone":"RBAs agree on a light, practical approach for more coherent work in fragile settings, clarifying complementary roles, choosing small number of priority countries",
-    "first_milestone_deadline":"2026-01-30",
-    "final_milestone":"In priority contexts, RBAs show clearer alignment in practice, with better sequencing and less duplication, and share a short lessons note with UN80 bodies",
-    "final_milestone_deadline":"2026-12-30",
+    "first_milestone_deadline":"2026-01-31",
+    "final_milestone":"In priority contexts, RBAs show clearer alignment in practice, with better sequencing and less duplication, and share a short lessons-learned note to UN80 bodies.",
+    "final_milestone_deadline":"2026-08-31",
     "doc_text":"Agencies are aligning responsibilities: FAO\/WFP\/IFAD on food security; UNHCR\/IOM on joint institutional approaches, incl. route-based programming; UNICEF\/WFP\/UNHCR\/IOM on beneficiary data; WHO\/UNICEF\/WFP on health and nutrition.",
     "work_package_goal":"Maximizing impact",
-    "action_entities":"WFP"
+    "action_entities":"WFP",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -164,13 +172,14 @@
     "work_package_leads":[
       "USG OCHA"
     ],
-    "first_milestone":"UNHCR and IOM select 2-3 contexts needing clearer roles on mixed movements and agree on a light, context-specific approach to improve complementarity",
-    "first_milestone_deadline":"2026-01-30",
-    "final_milestone":"In those contexts, UNHCR and IOM show better complementarity on mixed movements – clearer roles, fewer parallels, better sequencing – and share lessons with UN80",
-    "final_milestone_deadline":"2026-12-30",
+    "first_milestone":"UNHCR and IOM select 2–3 priority contexts to agree on context-specific approaches to enhance complementary operationalization of the Route-Based Approach, with comprehensive and connected interventions along routes.",
+    "first_milestone_deadline":"2026-01-31",
+    "final_milestone":"In those contexts, UNHCR and IOM demonstrate complementarity in operationalizing Route-Based programming, with clear roles, planning and coordination, and share practical observations and lessons with UN80 bodies.",
+    "final_milestone_deadline":"2026-08-31",
     "doc_text":"Agencies are aligning responsibilities: FAO\/WFP\/IFAD on food security; UNHCR\/IOM on joint institutional approaches, incl. route-based programming; UNICEF\/WFP\/UNHCR\/IOM on beneficiary data; WHO\/UNICEF\/WFP on health and nutrition.",
     "work_package_goal":"Maximizing impact",
-    "action_entities":"UNHCR;IOM"
+    "action_entities":"UNHCR;IOM",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -183,13 +192,14 @@
     "work_package_leads":[
       "USG OCHA"
     ],
-    "first_milestone":"Agencies endorse shared principles for beneficiary-data alignment and identify 1-2 contexts for early interoperability pilots across HOPE, PRIMES, SCOPE, BRAVE",
+    "first_milestone":"Agree on shared principles for beneficiary data interoperability, including privacy-by-design, consent, proportionality, and purpose limitation. Identify 1–2 priority contexts for initial interoperability application across existing agency systems (e.g. HOPE, PRIMES, SCOPE, BRAVE), based on clearly defined operational use cases.",
     "first_milestone_deadline":"2026-01-31",
-    "final_milestone":"Early pilots show less duplication and better interoperability across beneficiary-data systems, with a short lessons-learned note shared with UN80 bodies",
-    "final_milestone_deadline":"2026-12-31",
+    "final_milestone":"Demonstrate reduced duplication and improved service delivery in pilot contexts through secure, federated data exchange. Document practical lessons learned and technical patterns to inform future scaling and policy discussions.",
+    "final_milestone_deadline":"2026-08-31",
     "doc_text":"Agencies are aligning responsibilities: FAO\/WFP\/IFAD on food security; UNHCR\/IOM on joint institutional approaches, incl. route-based programming; UNICEF\/WFP\/UNHCR\/IOM on beneficiary data; WHO\/UNICEF\/WFP on health and nutrition.",
     "work_package_goal":"Maximizing impact",
-    "action_entities":"UNHCR;IOM;UNICEF;WFP"
+    "action_entities":"UNHCR;IOM;UNICEF;WFP",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -202,13 +212,14 @@
     "work_package_leads":[
       "USG OCHA"
     ],
-    "first_milestone":"Dedication discussion held with relevant agencies, with initial parameters agreed",
+    "first_milestone":"Dedicated discussion held with relevant agencies, to identify priority areas where roles and responsibilities in health and nutrition emergency response require greater clarity (including health–nutrition interfaces and acute malnutrition response), with initial parameters agreed for complementarity.",
     "first_milestone_deadline":"2026-01-31",
-    "final_milestone":"Clearly defined roles and responsibilities, with information disseminated at the field level and with Member States and Nutrition cluster partners",
-    "final_milestone_deadline":"2026-12-31",
+    "final_milestone":"Clearly defined roles and responsibilities for nutrition and health emergencies, developed separately under the respective Clusters, are compiled into concise reference material for field leadership and for Nutrition and Health Cluster partners respectively, with linkages between the two areas clearly described, and with factual observations shared with UN80 bodies.",
+    "final_milestone_deadline":"2026-08-31",
     "doc_text":"Agencies are aligning responsibilities: FAO\/WFP\/IFAD on food security; UNHCR\/IOM on joint institutional approaches, incl. route-based programming; UNICEF\/WFP\/UNHCR\/IOM on beneficiary data; WHO\/UNICEF\/WFP on health and nutrition.",
     "work_package_goal":"Maximizing impact",
-    "action_entities":"UNICEF;WFP"
+    "action_entities":"UNICEF;WFP",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -229,7 +240,8 @@
     "final_milestone_deadline":"2026-08-31",
     "doc_text":"We will conduct a thorough assessment of the benefits of a merger between UNDP and UNOPS, which could create a stronger engine for sustainable development in UN Country Teams, with greater scale. Initial analysis will be presented to the Executive Boards in February 2026.",
     "work_package_goal":"Unified support to people and planet",
-    "action_entities":"EOSG (ODSG);UNDP;UNOPS"
+    "action_entities":"EOSG (ODSG);UNDP;UNOPS",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -245,12 +257,13 @@
       "ED UN Women"
     ],
     "first_milestone":"Strategic merger assessment completed for internal consultations, including risk\/benefit considerations",
-    "first_milestone_deadline":"2026-01-30",
+    "first_milestone_deadline":"2026-01-31",
     "final_milestone":"By mid-2026, a thorough assessment is provided to Member States for a General Assembly decision",
-    "final_milestone_deadline":"2026-07-30",
+    "final_milestone_deadline":"2026-07-31",
     "doc_text":"We will conduct a thorough assessment of the benefits of a merger of UNFPA and UN Women and their respective mandates to create a unified voice and platform on gender equality and women’s rights.",
     "work_package_goal":"Unified support to people and planet",
-    "action_entities":"EOSG (ODSG);UN Women;UNFPA"
+    "action_entities":"EOSG (ODSG);UN Women;UNFPA",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -266,12 +279,13 @@
       "ED UN Women"
     ],
     "first_milestone":"Options for optimization of the UN’s work on population statistics and related activities finalized for Secretary-General's consideration and integrated in merger analysis",
-    "first_milestone_deadline":"2026-01-30",
+    "first_milestone_deadline":"2026-01-31",
     "final_milestone":"A final assessment integrated into the UN Women\/UNFPA merger process, as per timelines above",
-    "final_milestone_deadline":"2026-07-30",
+    "final_milestone_deadline":"2026-07-31",
     "doc_text":"As a subsequent step, we will also consider options to optimize normative functions on population statistics and related activities, including those currently undertaken by the Department of Economic and Social Affairs (DESA). Initial analysis will be presented to Member States in early 2026.",
     "work_package_goal":"Unified support to people and planet",
-    "action_entities":"EOSG (ODSG);UN Women;UNFPA"
+    "action_entities":"EOSG (ODSG);UN Women;UNFPA",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -290,7 +304,8 @@
     "final_milestone_deadline":"2026-08-30",
     "doc_text":"To maximize the use of resources and expertise for delivery, we will propose a model to reconfigure country teams that streamlines physical presence to fewer entities, reduces overhead costs, builds more coherent delivery, and aligns with national priorities. To this end, the system-wide working group, chaired by the Deputy Secretary-General, will make recommendations by early 2026.",
     "work_package_goal":"Reconfigured country teams with empowered leadership",
-    "action_entities":"EOSG (ODSG);UNOPS;UNSDG"
+    "action_entities":"EOSG (ODSG);UNOPS;UNSDG",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -309,7 +324,8 @@
     "final_milestone_deadline":"2026-08-30",
     "doc_text":"We will strengthen and recalibrate the Resident Coordinator system to better leverage system-wide expertise and accountability. Resident Coordinators will serve as the gateway to knowledge hubs and expertise-on-demand to mobilize specialized capacities more easily, particularly from specialized and non-resident entities.",
     "work_package_goal":"Reconfigured country teams with empowered leadership",
-    "action_entities":"EOSG (ODSG);DCO;UNSDG"
+    "action_entities":"EOSG (ODSG);DCO;UNSDG",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -328,7 +344,8 @@
     "final_milestone_deadline":"2026-08-30",
     "doc_text":"We will establish a system-wide working group, chaired by the Deputy Secretary-General, to develop proposals on how to advance a reset of regional capacities for sustainable development, with actionable recommendations to the Secretary-General. The group will also propose how to institutionalize Regional Integrated Platforms (see paragraphs 65-66 for more details on these platforms).",
     "work_package_goal":"Integrated regional support for stronger delivery",
-    "action_entities":"EOSG (ODSG);ODA;UNSDG"
+    "action_entities":"EOSG (ODSG);ODA;UNSDG",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -347,7 +364,8 @@
     "final_milestone_deadline":"2026-05-29",
     "doc_text":"We will systematize the practice of hosting regional capacities within the Regional Economic Commissions, starting with DCO regional directors and teams, as well as other Secretariat functions.",
     "work_package_goal":"Integrated regional support for stronger delivery",
-    "action_entities":"EOSG (ODSG);ODA;DCO;UNSDG"
+    "action_entities":"EOSG (ODSG);ODA;DCO;UNSDG",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -362,12 +380,13 @@
       "SG UNCTAD"
     ],
     "first_milestone":"The first meeting endorsed the concept note, agreed on hub list with leads, and committed to distinct value and collaboration with UN mechanisms",
-    "first_milestone_deadline":"2026-01-30",
+    "first_milestone_deadline":"2026-01-31",
     "final_milestone":"Established hubs deliver coherent, efficient UN-wide support, integrating data and knowledge for policy coherence and innovative solutions",
-    "final_milestone_deadline":"2026-12-30",
+    "final_milestone_deadline":"2026-12-31",
     "doc_text":"As a first step, we will establish Joint Knowledge Hubs to pool knowledge on key issues spread across UN development system entities and avoid duplications. These hubs will be co-led by the best placed entities and be anchored in joint mechanisms. They will start within the UN Secretariat, be open to other UN system entities, and link to regional and Resident Coordinator offices. These hubs are not new institutions and are not coordination committees. Instead, they will leverage existing assessed resources, eliminate overlaps, link to pooled funding mechanisms, and focus on adding real value. A provisional list of key issues for hubs to address includes: climate change; science, technology and innovation; financing for development; critical minerals; trade; and regional integration.",
     "work_package_goal":"Unified knowledge hubs and expertise on demand",
-    "action_entities":"DESA;UNCTAD"
+    "action_entities":"DESA;UNCTAD",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -386,7 +405,8 @@
     "final_milestone_deadline":"2026-09-18",
     "doc_text":"We will create a pro-active mechanism to identify and channel to Member States and country teams on-demand, UN system-wide expertise, particularly from specialized agencies and non-resident entities. Over time, this will replace duplicative UN system capacities, with co-location, delegation and regular reviews to eliminate overlaps.",
     "work_package_goal":"Unified knowledge hubs and expertise on demand",
-    "action_entities":"ITU;UNDP;FAO;ICAO;ILO;UNESCO;UNIDO;WHO;WMO;ITC;UN Women;UNOPS;ECA;ECE;ESCWA;UNCTAD;SA Reform;DESA"
+    "action_entities":"ITU;UNDP;FAO;ICAO;ILO;UNESCO;UNIDO;WHO;WMO;ITC;UN Women;UNOPS;ECA;ECE;ESCWA;UNCTAD;DESA;EOSG (SA)",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -405,7 +425,8 @@
     "final_milestone_deadline":"2026-12-20",
     "doc_text":"We will consolidate expertise across all pillars at the regional level. Capacities on peace and security, rule of law, disarmament, demobilization and reintegration, security sector reform, small arms control, mission transitions, prevention of extremist violence, and counterterrorism will join Regional Integrated Platforms, ready for surge deployment. This will serve as an extension of the expertiseon- demand mechanism outlined in the sustainable development pillar (see paragraph 46).",
     "work_package_goal":"Unified knowledge hubs and expertise on demand",
-    "action_entities":"ITU;UNDP;FAO;ICAO;ILO;UNESCO;UNIDO;WHO;WMO;ITC;UN Women;UNOPS;ECA;ECE;ESCWA;UNCTAD;SA Reform;DESA"
+    "action_entities":"ITU;UNDP;FAO;ICAO;ILO;UNESCO;UNIDO;WHO;WMO;ITC;UN Women;UNOPS;ECA;ECE;ESCWA;UNCTAD;DESA;EOSG (SA)",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -424,7 +445,8 @@
     "final_milestone_deadline":"2026-03-31",
     "doc_text":"We will establish a Human Rights Group comprising entities from across the UN system, led by the High Commissioner for Human Rights. The Group will ensure that human rights considerations are systematically integrated into UN policies and activities, while also improving efficiency and impact across the system at all levels.",
     "work_package_goal":"Unified approach to human rights",
-    "action_entities":"DPPA;OCHA;UNAIDS;OLA;UNEP;UNFPA;UNHCR;UNICEF;UN Women;UNESCO"
+    "action_entities":"DPPA;OCHA;UNAIDS;OLA;UNEP;UNFPA;UNHCR;UNICEF;UN Women;UNESCO",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -443,7 +465,8 @@
     "final_milestone_deadline":"2026-02-28",
     "doc_text":"We will undertake a review of top management fora to ease the coordination burden for senior leaders and ensure coherent action across pillars. These include the subsidiary bodies of the Chief Executives Board, the Inter-Agency Standing Committee (IASC), the UN Sustainable Development Group (UNSDG) and the Secretary-General’s Executive Committee.",
     "work_package_goal":"Form to follow function",
-    "action_entities":"EOSG (USG Policy)"
+    "action_entities":"EOSG (USG Policy)",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -462,7 +485,8 @@
     "final_milestone_deadline":"2026-02-28",
     "doc_text":"As a first step, we will consider proposals to unify administrative backend support and streamline duplicative agendas without affecting core substantive competencies.",
     "work_package_goal":"Form to follow function",
-    "action_entities":"EOSG (USG Policy)"
+    "action_entities":"EOSG (USG Policy)",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -481,7 +505,8 @@
     "final_milestone_deadline":"2026-03-31",
     "doc_text":"We will bring together all Headquarters coordination on country-specific, cross-pillar approaches to crisis prevention and centre capacities around the Regional Monthly Review platform.",
     "work_package_goal":"Form to follow function",
-    "action_entities":"EOSG (USG Policy)"
+    "action_entities":"EOSG (USG Policy)",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -500,7 +525,8 @@
     "final_milestone_deadline":"2026-03-31",
     "doc_text":"We will review existing interagency task forces and working groups to ensure coherence, reduce duplication and align work within priorities established by a unified decision-making framework.",
     "work_package_goal":"Form to follow function",
-    "action_entities":"EOSG (USG Policy)"
+    "action_entities":"EOSG (USG Policy)",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -519,7 +545,8 @@
     "final_milestone_deadline":"2025-12-31",
     "doc_text":"Simultaneously, as the assignment of the Special Coordinator for Development in the Sahel comes to an end, we plan to abolish this post and its associated office. We will ensure that all functions and responsibilities are absorbed and performed by existing entities, building on the role of relevant Resident Coordinators and UN Country Teams (UNCTs).",
     "work_package_goal":"Form to follow function",
-    "action_entities":"EOSG (USG Policy);EOSG (ODSG)"
+    "action_entities":"EOSG (USG Policy);EOSG (ODSG)",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -538,7 +565,8 @@
     "final_milestone_deadline":"2026-02-28",
     "doc_text":"We will review and make proposals to Member States regarding the Secretary-General’s some 30 special envoys, representatives, coordinators and advisers, both thematic and geographic. The goal is to create greater impact across the UN system and reduce costly duplication at the senior leadership level.",
     "work_package_goal":"Form to follow function",
-    "action_entities":"EOSG (USG Policy)"
+    "action_entities":"EOSG (USG Policy)",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -558,7 +586,8 @@
     "final_milestone_deadline":"2026-08-30",
     "doc_text":"We will establish lean Regional Integrated Platforms to unite regional leaders across all pillars around joint plans, strategies, crisis response and resource mobilization for cross-cutting issues.",
     "work_package_goal":"Simplifying access to regional expertise",
-    "action_entities":"EOSG (ODSG);ODA;DCO;UNSDG"
+    "action_entities":"EOSG (ODSG);ODA;DCO;UNSDG",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -578,7 +607,8 @@
     "final_milestone_deadline":"2026-08-30",
     "doc_text":"In this context, we will also work to harmonize how UN system entities organize their regional work to promote joint efforts.",
     "work_package_goal":"Simplifying access to regional expertise",
-    "action_entities":"EOSG (ODSG);ODA;DCO;UNSDG"
+    "action_entities":"EOSG (ODSG);ODA;DCO;UNSDG",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -593,12 +623,13 @@
       "DSG"
     ],
     "first_milestone":"Action plan for the Shared Platform Initiative with specific timelines for immediate implementation and progress report to the Secretary-General summarizing next steps finalized",
-    "first_milestone_deadline":"2026-01-30",
+    "first_milestone_deadline":"2026-01-31",
     "final_milestone":"All initiatives rolled out and implementation finalized, as country contexts required",
-    "final_milestone_deadline":"2026-07-30",
+    "final_milestone_deadline":"2026-07-31",
     "doc_text":"To that end, the Deputy Secretary-General and the Emergency Relief Coordinator have started work on a practical Shared Platform Initiative (see paragraph 71 for more details).",
     "work_package_goal":"Enabling cross-pillar delivery",
-    "action_entities":"EOSG (ODSG);OCHA"
+    "action_entities":"EOSG (ODSG);OCHA",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -618,7 +649,8 @@
     "final_milestone_deadline":"2026-07-31",
     "doc_text":"We will prepare a proposal to ensure that RC\/HCs and planning teams simplify Development Cooperation Frameworks, Humanitarian Response Plans, Peacebuilding Strategies and associated needs analyses for relevant settings.",
     "work_package_goal":"Enabling cross-pillar delivery",
-    "action_entities":"EOSG (ODSG);OCHA"
+    "action_entities":"EOSG (ODSG);OCHA;DPPA",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -639,7 +671,8 @@
     "final_milestone_deadline":"2026-10-31",
     "doc_text":"To make the shift [to shared services across pillars] credible, the Secretary-General will build on existing reform commitments to align a coalition of UN system entities around a Unified Services Roadmap based on the following action areas.",
     "work_package_goal":"Unified support services",
-    "action_entities":"HLCM;BIG"
+    "action_entities":"HLCM;BIG",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -654,13 +687,14 @@
       "ED WFP",
       "Co-Chairs BIG"
     ],
-    "first_milestone":null,
-    "first_milestone_deadline":null,
-    "final_milestone":null,
-    "final_milestone_deadline":null,
+    "first_milestone":"Proposal for harmonized in-country logistics, with initial application in Afghanistan, Haiti, Gaza (OPT), Somalia and Sudan finalized.",
+    "first_milestone_deadline":"2026-03-31",
+    "final_milestone":"Coordinated procurement of identified key items, pooled global logistics, and shared in-country logistics services are operational across the UN system, enabled by a coordination mechanism and guided by clear standard operating procedures and frameworks support the delivery of faster, more cost-effective, and more reliable assistance to people in need.",
+    "final_milestone_deadline":"2026-12-31",
     "doc_text":"The first wave, beginning in 2026, will progressively integrate supply chains, taking the New Humanitarian Compact as the concrete starting point.",
     "work_package_goal":"Unified support services",
-    "action_entities":null
+    "action_entities":"DOS;WFP;UNICEF",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -675,13 +709,14 @@
       "ED WFP",
       "Co-Chairs BIG"
     ],
-    "first_milestone":"Release of the assessment framework that will be used to guide decision making on items outlined in A32.",
+    "first_milestone":"Release of the assessment framework that will be used to guide decision making on items outlined in Action 63",
     "first_milestone_deadline":"2026-01-31",
     "final_milestone":"Final release of the outcomes of the assessment (cost, risk, complexity, ...)",
     "final_milestone_deadline":"2026-09-15",
     "doc_text":"Basic information and communication technology services, as well as payroll, human resources, finance, and enterprise resource planning (ERP) systems will follow in a sequenced roadmap with milestones.",
     "work_package_goal":"Unified support services",
-    "action_entities":"HLCM;BIG"
+    "action_entities":"HLCM;BIG",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -696,13 +731,14 @@
       "ED WFP",
       "Co-Chairs BIG"
     ],
-    "first_milestone":"Commence the Self Starter Common Back Office\/ locally shared service trainings towards accelerated unified common service backbone in countries; Launch survey to identify high impact target countries for supported roll out; Launch an Interagency task forc",
+    "first_milestone":"Commence the Self Starter Common Back Office\/ locally shared service trainings towards accelerated unified common service backbone in countries;; Launch survey to identify high impact target countries for supported roll out; Launch an Interagency task force on operationalizing Mutual Recognition to accelerate take up of this foundational enabler",
     "first_milestone_deadline":"2026-01-31",
-    "final_milestone":"Release integrated suite of services for common back office, which include knowledge management products and work towards achieving consistent comparative result reporting; Expand the reach of service offerings from BIG to the whole network at country lev",
+    "final_milestone":"Release integrated suite of services for common back office, which include knowledge management products and work towards achieving consistent comparative result reporting; Expand the reach of service offerings from BIG to the whole network at country level; Release the report of lessons learned on new Self-starter Common back office launches and the report of post-launching common shared service structure governance; Four new CBO's (minimum) to be launched in 2026",
     "final_milestone_deadline":"2026-11-15",
     "doc_text":"We will accelerate the move toward unified service backbone at country level. Building on the UNSDG’s commitments to Common Country Back Offices, and reinforced by the New Humanitarian Compact, we will eliminate costly duplication on the ground. Core humanitarian in-country services will be at the centre of these efforts, with other entities joining in compatible areas such as fleet management, common premises, ICT, procurement, booking hubs, security and other relevant services. Progress will be accelerated by global shared services, harmonizing systems so that common services on the ground become easier.",
     "work_package_goal":"Unified support services",
-    "action_entities":"BIG"
+    "action_entities":"BIG",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -719,11 +755,12 @@
     ],
     "first_milestone":"Release of the CBO Tracking Tool and CBO Self Starter Reporting methodology for new CBOs; Promote strengthened reporting practices using tracking tool across UN system",
     "first_milestone_deadline":"2026-01-31",
-    "final_milestone":"Identify potential service offerings funded by programme budget that can utilize and build on efficiency measures developed for administrative expenditure; For launched CBOs, release the preliminary efficiency gains per scaled common services in new",
+    "final_milestone":"Identify potential service offerings funded by programme budget that can utilize and build on efficiency measures developed for administrative expenditure; For launched CBOs, release the preliminary efficiency gains per scaled common services in new CBO, including common ERPs, common payroll, with UNSDCF-SDG linkages where relevant. The gain calculation to be consistent with the accepted HLCM\/ FBN definition of efficiency.",
     "final_milestone_deadline":"2026-11-15",
     "doc_text":"Contingent on progress in scaling shared services, we intend to harmonize most indirect and programme support costs. A progressive transparent rate model will create predictability and provide a strong incentive for collective action.",
     "work_package_goal":"Unified support services",
-    "action_entities":"BIG"
+    "action_entities":"BIG",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -738,13 +775,14 @@
       "Chair DTN",
       "SG ITU"
     ],
-    "first_milestone":"Systemwide baseline completed: comprehensive mapping of existing ICT capacities, spending, contracts, staffing, shared-service providers, as well as ongoing consolidation initiatives and additional potential",
+    "first_milestone":"Systemwide ICT baseline info completed: comprehensive mapping of existing ICT capacities, including contracts (spending, suppliers), people\/capacities (staffing, shared-service providers), and ongoing consolidation initiatives in HLCM, BIG, IASC, etc.",
     "first_milestone_deadline":"2026-02-16",
-    "final_milestone":"ICT Consolidation Framework Proposal endorsed by CEB: unified vendor agreements, harmonized core ICT capacities, and operational shared-service delivery model for UN system entities",
+    "final_milestone":"ICT consolidation proposal endorsed by CEB: actions for unified ICT capacities as part of Unified Services Roadmap, including operational shared service delivery and ICC realignment\/reform, indicating estimated required investments and expected efficiency gains",
     "final_milestone_deadline":"2026-05-15",
     "doc_text":"We plan to progressively consolidate the fragmented landscape of basic cloud services, network infrastructures, office software and systems under realigned common providers that can serve the entire UN system, building on lessons from the International Computing Centre. Over time, this will deliver scale, reduce duplication and lower costs.",
     "work_package_goal":"Transformation through technology and new mindsets",
-    "action_entities":"EOSG (USG Policy);SA Reform;WIPO;UNDP;WHO;HLCM"
+    "action_entities":"EOSG (USG Policy);ITU;HLCM;UNHCR;UNDP;WIPO;IOM;EOSG (SA)",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -759,13 +797,14 @@
       "Chair DTN",
       "SG ITU"
     ],
-    "first_milestone":"Portfolio of high-impact technology acceleration use cases proposed to the Steering Committee, based on priority challenges identified in UN 2.0 and UN80 reports, with tailored delivery setups identified for each use case",
+    "first_milestone":"Portfolio of 3 high-impact technology acceleration use cases proposed to the UN80 Steering Committee, drawn from UN 2.0 and UN80 reports (e.g. mandate registry \/ tools, beneficiary ID (Quint), data commons site 1.0), plus a short survey to capture demand signals and early contributors for at least 3 additional use cases for Steering Committee endorsement by mid-2026",
     "first_milestone_deadline":"2026-02-09",
     "final_milestone":"At least three priority accelerator use cases in deployment systemwide, with clear KPI improvements (e.g., documented efficiency gains and user satisfaction improvements)",
-    "final_milestone_deadline":"2026-10-31",
+    "final_milestone_deadline":"2026-09-15",
     "doc_text":"As shared ICT services scale up, savings will be partly reinvested in a new Technology Accelerator Platform (TAP), a lean joint programme accountable to the Secretary-General. TAP will be led by a group of entities from the Secretariat, specialized agencies, funds and programmes with advanced capabilities. It will help modernize business practices, scale up limited digital and AI expertise, offer surge capacity, and guide the transformation toward better solutions. The UN 2.0 team will baseline the current innovation landscape and present a proposal to the Chief Executives Board at the end of October 2025.",
     "work_package_goal":"Transformation through technology and new mindsets",
-    "action_entities":"EOSG (USG Policy);SA Reform;WIPO;UNDP;WHO;HLCM"
+    "action_entities":"EOSG (USG Policy);ITU;HLCM;UNHCR;UNDP;WIPO;WHO;IOM;EOSG (SA)",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -780,13 +819,14 @@
       "USG DESA",
       "ED UNICEF"
     ],
-    "first_milestone":null,
-    "first_milestone_deadline":null,
-    "final_milestone":null,
-    "final_milestone_deadline":null,
+    "first_milestone":"Platform Concept & Architecture: Ambition and delivery setup agreed; technological platform recommendation and cost scenarios endorsed.",
+    "first_milestone_deadline":"2026-02-28",
+    "final_milestone":"Data Commons Launch: Platform refined with 10+ additional UN entities onboarded; recommendations drafted for 2027 scaling and next development\/product priorities",
+    "final_milestone_deadline":"2026-09-15",
     "doc_text":"Hosted by a realigned shared service provider, the Data Commons initiative will connect data and statistics across the UN system into one secure backbone, interoperable by design and efficient by scale. The UN 2.0 team will prepare proposals for the Chief Executives Board at the end of October 2025 on how to guide phased implementation, leveraging the Secretary-General’s Data Strategy and the Technology Accelerator Programme.",
     "work_package_goal":"A data commons approach across all pillars",
-    "action_entities":"EOSG (USG Policy)"
+    "action_entities":"EOSG (USG Policy);DESA;UNICEF",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -801,13 +841,14 @@
       "USG DESA",
       "ED UNICEF"
     ],
-    "first_milestone":null,
-    "first_milestone_deadline":null,
-    "final_milestone":null,
-    "final_milestone_deadline":null,
+    "first_milestone":"Concept & Leadership Commitments: System-wide leadership commitment secured for public data ingestion, joint programme, and potential resource contributions.",
+    "first_milestone_deadline":"2026-02-28",
+    "final_milestone":"Sustainability: Pooled funding commitments consolidated; recommendations drafted for 2027 scaling and next development and product priorities.",
+    "final_milestone_deadline":"2025-09-30",
     "doc_text":"Building on partnerships such as the Complex Risk Analytics Fund (CRAF'd), we will scale pooled funding approaches for data to support the Data Commons, reduce duplication, and multiply value while providing incentives that overcome data-hoarding, nurture shared capacities, and encourage openness.",
     "work_package_goal":"A data commons approach across all pillars",
-    "action_entities":"EOSG (USG Policy)"
+    "action_entities":"EOSG (USG Policy);DESA;UNICEF",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -828,7 +869,8 @@
     "final_milestone_deadline":null,
     "doc_text":"The Data Commons approach will pool the know-how of data analysts, engineers, and scientists to support the UN system, the new hubs, humanitarian clusters, and country teams alike, including the provision of highly specialized expertise on demand.",
     "work_package_goal":"A data commons approach across all pillars",
-    "action_entities":"EOSG (USG Policy)"
+    "action_entities":"EOSG (USG Policy)",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -844,11 +886,12 @@
     ],
     "first_milestone":"Merger roadmap agreed by UNITAR and UNSSC, incl. needs assessment, scope, methodology, and joint plan for functional\/financial mapping. Consultations launched",
     "first_milestone_deadline":"2026-01-31",
-    "final_milestone":"Member states decide on the proposed merger based on the submitted transition plan.",
-    "final_milestone_deadline":"2026-12-01",
+    "final_milestone":"UNITAR and UNSSC Boards endorse merger proposal for submission via SG to the GA",
+    "final_milestone_deadline":"2026-06-30",
     "doc_text":"We plan to merge UN Staff System College (UNSSC) into the UN Institute for Training and Research (UNITAR) with the goal of harmonizing governance, modernizing digital platforms and expanding training opportunities for UN personnel and Member States.",
     "work_package_goal":"Two pillars, one vision",
-    "action_entities":"UNITAR"
+    "action_entities":"UNITAR",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -864,11 +907,12 @@
     ],
     "first_milestone":"UNU Council would have reviewed and endorsed the UN80 report’s recommendations to integrate UNRISD into UNU.",
     "first_milestone_deadline":"2025-12-05",
-    "final_milestone":"A public announcement of UNRISD’s integration into UNU was made, including forward looking timing.",
-    "final_milestone_deadline":"2026-12-31",
+    "final_milestone":"UNU Council endorsed implementation plan and agreed to submit it to the Secretary-General in August 2026",
+    "final_milestone_deadline":"2026-08-31",
     "doc_text":"We plan to integrate UN Research Institute for Social Development (UNRISD) into the United Nations University (UNU). UNIDIR and UNICRI would be consolidated into ODA and UNODC, respectively, to strengthen focus and reduce fragmentation. In all cases, research independence will be fully respected.",
     "work_package_goal":"Two pillars, one vision",
-    "action_entities":"UNU"
+    "action_entities":"UNU",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -884,11 +928,12 @@
     ],
     "first_milestone":"Plan in place setting out scope and key considerations of the knowledge mapping exercise and entities to be engaged",
     "first_milestone_deadline":"2026-01-31",
-    "final_milestone":"Blueprint for Joint UN Coordination Mechanism endorsed by SG.",
-    "final_milestone_deadline":"2026-12-01",
+    "final_milestone":"Blueprint for Joint UN Coordination Mechanism at CEB in May 2026.",
+    "final_milestone_deadline":"2026-04-30",
     "doc_text":"We will systematically link the training and research pillars with each other and with other relevant UN system training and research units to ensure system-wide coherence and avoid duplication. To that end, we will establish a Joint UN System Coordination Mechanism co-led by the UNU Rector and UNITAR Executive Director.",
     "work_package_goal":"Two pillars, one vision",
-    "action_entities":"UNU;UNITAR"
+    "action_entities":"UNU;UNITAR",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -908,7 +953,8 @@
     "final_milestone_deadline":"2026-06-30",
     "doc_text":"We will launch a pooled funding review, including a review of administrative agent, secretariat, governance and support cost models, as well as partnership arrangements.",
     "work_package_goal":"Accountable, agile funding aligned with collective priorities",
-    "action_entities":"DCO;UNDP;OCHA;EOSG (SA);DPPA"
+    "action_entities":"DCO;UNDP;OCHA;EOSG (SA);DPPA",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -928,7 +974,8 @@
     "final_milestone_deadline":"2026-12-15",
     "doc_text":"As part of our review, we intend to rationalize the portfolio of pooled funds, with particular focus on the Central Emergency Response Fund, the Peacebuilding Fund, the Joint SDG Fund, and the Country-Based Pooled Funds, ensuring these funds reinforce each other at country level, especially in complex, transition and crisis contexts where joined-up approaches matter most.",
     "work_package_goal":"Accountable, agile funding aligned with collective priorities",
-    "action_entities":"DCO;UNDP;OCHA;EOSG (SA);DPPA"
+    "action_entities":"DCO;UNDP;OCHA;EOSG (SA);DPPA",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -948,7 +995,8 @@
     "final_milestone_deadline":"2026-06-30",
     "doc_text":"Building on Funding Compact commitments, we will launch an exercise with the aim of ensuring that core funding, like pooled funding, becomes consistently cheaper and more attractive than fragmented approaches. This will include options to strengthen visibility for core contributors and partners.",
     "work_package_goal":"Accountable, agile funding aligned with collective priorities",
-    "action_entities":"DCO;UNDP;OCHA;EOSG (SA);DPPA"
+    "action_entities":"DCO;UNDP;OCHA;EOSG (SA);DPPA",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -968,7 +1016,8 @@
     "final_milestone_deadline":"2026-03-31",
     "doc_text":"13. Fully apply all commitments by the UN system through the Funding Compact and strengthen dialogue to this end",
     "work_package_goal":"Adapted funding modalities for impact",
-    "action_entities":"DCO;UNDP;OCHA;EOSG (SA);DPPA"
+    "action_entities":"DCO;UNDP;OCHA;EOSG (SA);DPPA",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -988,7 +1037,8 @@
     "final_milestone_deadline":"2026-02-28",
     "doc_text":"2. Improve UN Secretariat support for Member States during mandate creation, based on priorities established by Member States",
     "work_package_goal":"Improved visibility, coordination and support for member states during mandate creation",
-    "action_entities":"EOSG (USG Policy);DGACM"
+    "action_entities":"EOSG (USG Policy);DGACM",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1008,7 +1058,8 @@
     "final_milestone_deadline":"2026-08-31",
     "doc_text":"3. Strengthen support by UN entities to coordinate and promote greater visibility across the work of mandating bodies",
     "work_package_goal":"Improved visibility, coordination and support for member states during mandate creation",
-    "action_entities":"EOSG (USG Policy);DGACM"
+    "action_entities":"EOSG (USG Policy);DGACM",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1028,7 +1079,8 @@
     "final_milestone_deadline":"2026-02-28",
     "doc_text":"5. For new mandates, complement estimates of regular budget expenditures prepared by the Secretary- General (in accordance with rule 153 of the rules of procedure of the General Assembly) with additional information on related programmatic activities across the UN system and across all sources of funding",
     "work_package_goal":"Clear, concise and actionable texts that are more likely to deliver impact during implementation",
-    "action_entities":"EOSG (USG Policy);DGACM"
+    "action_entities":"EOSG (USG Policy);DGACM",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1041,13 +1093,14 @@
     "work_package_leads":[
       "CDC"
     ],
-    "first_milestone":null,
-    "first_milestone_deadline":null,
-    "final_milestone":null,
-    "final_milestone_deadline":null,
+    "first_milestone":"Assessment lead confirmed and TOR developed",
+    "first_milestone_deadline":"2026-03-31",
+    "final_milestone":"Findings and Recommendation of the assessment presented to CEB and Member States",
+    "final_milestone_deadline":"2026-09-30",
     "doc_text":"10. Strengthen internal strategic oversight of the UN system division of labour at all levels to ensure effective, efficient programmatic and operational support. This builds upon 2018 reform commitments and efforts to strengthen Resident Coordinator system leadership",
     "work_package_goal":"Strengthened the division of labour across the United Nations system to deliver greater impact",
-    "action_entities":null
+    "action_entities":"DMSPC;UNEP;UNICEF",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1060,13 +1113,14 @@
     "work_package_leads":[
       "CDC"
     ],
-    "first_milestone":null,
-    "first_milestone_deadline":null,
-    "final_milestone":null,
-    "final_milestone_deadline":null,
+    "first_milestone":"Revised budget instruction issued by PPBD accompanied by a political message from EOSG",
+    "first_milestone_deadline":"2026-01-31",
+    "final_milestone":"Budget instructions for the 2028 programme plan issued with fully developed guidance on defining comparative advantage, based on lessons learned from the 2027 process",
+    "final_milestone_deadline":"2026-12-31",
     "doc_text":"11. Ensure UN entities review mandate citations in their programmes and budgets so that entities only cite mandates for which they have demonstrable comparative advantages",
     "work_package_goal":"Strengthened the division of labour across the United Nations system to deliver greater impact",
-    "action_entities":null
+    "action_entities":"DMSPC;UNEP;UNICEF",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1079,13 +1133,14 @@
     "work_package_leads":[
       "CDC"
     ],
-    "first_milestone":null,
-    "first_milestone_deadline":null,
-    "final_milestone":null,
-    "final_milestone_deadline":null,
+    "first_milestone":"Political message from EOSG issued to entities emphasizing the need to review deliverables",
+    "first_milestone_deadline":"2026-01-31",
+    "final_milestone":"Political message from EOSG issued to entities emphasizing the need to review deliverables",
+    "final_milestone_deadline":"2026-01-31",
     "doc_text":"14. Increase use of existing mechanisms to identify opportunities to consolidate and streamline work, including recommendations by the Secretary-General to terminate specific outputs (as per Rule 105.6 of ST\/SGB\/2018\/3)",
     "work_package_goal":"Effective, systemwide mandate reviews for maximum impact",
-    "action_entities":"DPO"
+    "action_entities":"DMSPC;UNEP;UNICEF",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1104,7 +1159,8 @@
     "final_milestone_deadline":"2026-05-31",
     "doc_text":"15. Strengthen and harmonize management for results mechanisms across the UN system, including how results are measured and communicated",
     "work_package_goal":"Strengthened and harmonized mechanisms to manage for results across the United Nations system",
-    "action_entities":"EOSG (SA);ITU;OIOS"
+    "action_entities":"EOSG (SA);ITU;OIOS",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1124,7 +1180,8 @@
     "final_milestone_deadline":"2026-01-01",
     "doc_text":"We plan to establish a unified Peacebuilding and Peace Support Office, bringing together existing capacities of peacebuilding, disarmament, demobilization and reintegration, security sector reform, and justice and corrections expertise that are currently split between DPPA and DPO.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":"DPPA;DPO"
+    "action_entities":"DPPA;DPO",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1144,7 +1201,8 @@
     "final_milestone_deadline":"2026-01-01",
     "doc_text":"We plan to establish a single centre of excellence on Women, Peace and Security, bringing together the DPPA and DPO gender units.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":"DPPA;DPO"
+    "action_entities":"DPPA;DPO",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1164,7 +1222,8 @@
     "final_milestone_deadline":"2026-12-31",
     "doc_text":"To avoid duplication, we will establish mechanisms – including joint strategies and programmes – to link cross-cutting functions.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":"DPPA;DPO"
+    "action_entities":"DPPA;DPO",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1184,7 +1243,8 @@
     "final_milestone_deadline":"2026-01-01",
     "doc_text":"We plan to unify leadership within the pillar by consolidating two Assistant Secretary-General posts for the Americas, Europe, Asia-Pacific and the Middle East into one.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":"DPPA;DPO"
+    "action_entities":"DPPA;DPO",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1204,7 +1264,8 @@
     "final_milestone_deadline":"2026-01-01",
     "doc_text":"In parallel, we plan to combine the Western and Northern Africa divisions, streamlining support across the Sahel, Maghreb and Gulf of Guinea.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":"DPPA;DPO"
+    "action_entities":"DPPA;DPO",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1224,7 +1285,8 @@
     "final_milestone_deadline":"2026-12-31",
     "doc_text":"Integrate the UN Mission to Support the Hudaydah Agreement into the Office of the Special Envoy for Yemen, in line with Security Council resolution 2786 (2025).",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":"DPPA;DPO"
+    "action_entities":"DPPA;DPO",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1244,7 +1306,8 @@
     "final_milestone_deadline":"2026-12-31",
     "doc_text":"Streamline and align the UN Office for Central Africa (UNOCA) and the Office of the Special Envoy for the Great Lakes.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":"DPPA;DPO"
+    "action_entities":"DPPA;DPO",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1264,7 +1327,8 @@
     "final_milestone_deadline":"2026-12-31",
     "doc_text":"Streamline and align the Office of the Special Adviser for Cyprus with the UN Peacekeeping Force in Cyprus (UNFICYP) – while preserving the Office’s capacity to deliver its mandate.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":"DPPA;DPO"
+    "action_entities":"DPPA;DPO",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1284,7 +1348,8 @@
     "final_milestone_deadline":"2026-12-31",
     "doc_text":"Rationalize the Office of the United Nations Representative to the Geneva International Discussions (UNRGID), optimizing staffing resources and streamlining support structures while ensuring credible engagement.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":"DPPA"
+    "action_entities":"DPPA",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1304,7 +1369,8 @@
     "final_milestone_deadline":"2026-12-31",
     "doc_text":"Regional peace and development advisers will be hosted by Regional Commissions and will support these coordination mechanisms.",
     "work_package_goal":"Simplifying access to regional expertise",
-    "action_entities":"DPPA"
+    "action_entities":"DPPA",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1324,7 +1390,8 @@
     "final_milestone_deadline":"2026-12-31",
     "doc_text":"We will begin co-locating special political missions with a regional focus, regional peace and development advisors, with Regional Commissions serving as physical hosts. DPPA and DPO regional divisions will also participate remotely",
     "work_package_goal":"Simplifying access to regional expertise",
-    "action_entities":"DPPA"
+    "action_entities":"DPPA",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1344,7 +1411,8 @@
     "final_milestone_deadline":"2026-12-31",
     "doc_text":"We will consolidate expertise across all pillars at the regional level. Capacities on peace and security, rule of law, disarmament, demobilization and reintegration, security sector reform, small arms control, mission transitions, prevention of extremist violence, and counterterrorism will join Regional Integrated Platforms, ready for surge deployment. This will serve as an extension of the expertiseon- demand mechanism outlined in the sustainable development pillar (see paragraph 46).",
     "work_package_goal":"Simplifying access to regional expertise",
-    "action_entities":"DPPA;ODA;UNOCT"
+    "action_entities":"DPPA;ODA;UNOCT",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1364,7 +1432,8 @@
     "final_milestone_deadline":"2026-12-31",
     "doc_text":"We will integrate peace and development advisory support in all relevant Resident Coordinator Offices to ensure conflict risks are integrated into common country analyses.",
     "work_package_goal":"Enabling cross-pillar delivery",
-    "action_entities":"DPPA"
+    "action_entities":"DPPA",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1383,7 +1452,8 @@
     "final_milestone_deadline":null,
     "doc_text":"We plan to integrate the UN Interregional Crime and Justice Research Institute (UNICRI) into the UN Office on Drugs and Crime (UNODC), embedding UNICRI expertise within a global network. The UN Institute for Disarmament Research (UNIDIR) would be integrated into the Office for disarmament Affairs (ODA) so its analysis informs negotiations and field support. In both cases, research independence would be preserved.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":null
+    "action_entities":null,
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1402,7 +1472,8 @@
     "final_milestone_deadline":null,
     "doc_text":"We will begin co-locating special political missions with a regional focus, regional peace and development advisors, with Regional Commissions serving as physical hosts. DPPA and DPO regional divisions will also participate remotely",
     "work_package_goal":"Simplifying access to regional expertise",
-    "action_entities":null
+    "action_entities":null,
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1422,7 +1493,8 @@
     "final_milestone_deadline":"2026-07-31",
     "doc_text":"We plan to integrate the UN Interregional Crime and Justice Research Institute (UNICRI) into the UN Office on Drugs and Crime (UNODC), embedding UNICRI expertise within a global network. The UN Institute for Disarmament Research (UNIDIR) would be integrated into the Office for disarmament Affairs (ODA) so its analysis informs negotiations and field support. In both cases, research independence would be preserved.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":"UNODC"
+    "action_entities":"UNODC",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1442,7 +1514,8 @@
     "final_milestone_deadline":"2026-06-30",
     "doc_text":"We plan to reinforce cooperation on counterterrorism and violent extremism, with clearer reporting lines, joint planning, and resource mobilization. In this context, the Director overseeing the UNODC Terrorism Prevention Branch would also report to the Under-Secretary-General for Counter-Terrorism.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":"UNOCT"
+    "action_entities":"UNOCT",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1462,7 +1535,8 @@
     "final_milestone_deadline":"2026-03-31",
     "doc_text":"We plan to reinforce cooperation on counterterrorism and violent extremism, with clearer reporting lines, joint planning, and resource mobilization. In this context, the Director overseeing the UNODC Terrorism Prevention Branch would also report to the Under-Secretary-General for Counter-Terrorism.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":"UNOCT;UNODC"
+    "action_entities":"UNOCT;UNODC",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1482,7 +1556,8 @@
     "final_milestone_deadline":"2026-12-10",
     "doc_text":"We plan to sunset UNAIDS by the end of 2026. This would entail mainstreaming capacity and expertise into relevant entities of the UN development system in 2027.",
     "work_package_goal":"Unified support to people and planet",
-    "action_entities":"UNAIDS"
+    "action_entities":"UNAIDS",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1501,7 +1576,8 @@
     "final_milestone_deadline":null,
     "doc_text":"The Secretary-General stands ready to provide further analysis to Member States on other potential mergers they may wish to explore.",
     "work_package_goal":"Unified support to people and planet",
-    "action_entities":null
+    "action_entities":null,
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1521,7 +1597,8 @@
     "final_milestone_deadline":"2026-09-18",
     "doc_text":"Environmental issues are growing in importance, and environmental responsibilities are dispersed across UN entities. We will undertake a thorough assessment of current arrangements and make proposals on possible structural changes and programme realignments on environmental issues.",
     "work_package_goal":"Unified knowledge hubs and expertise on demand",
-    "action_entities":"UNDP;DPPA;UNCTAD;IFAD;OHCHR"
+    "action_entities":"UNDP;DPPA;UNCTAD;IFAD;OHCHR",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1542,7 +1619,8 @@
     "final_milestone_deadline":null,
     "doc_text":"We will realign macroeconomic analysis capacities across DESA, UN Trade and Development (UNCTAD), and the Regional Commissions to create a unified \"single entry point\" for Member States, anchored in joint mechanisms.",
     "work_package_goal":"Unified support to people and planet",
-    "action_entities":null
+    "action_entities":null,
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1563,7 +1641,8 @@
     "final_milestone_deadline":null,
     "doc_text":"We plan to realign UN Secretariat support for least developed countries (LDCs), landlocked developing countries (LLDCs) and small island developing states (SIDS) across DESA, UNCTAD and the Office of the High Representative for LDCs, LLDCs and SIDS (OHRLLS). This realignment would strengthen and optimize organizational arrangements and support for these countries.",
     "work_package_goal":"Unified support to people and planet",
-    "action_entities":null
+    "action_entities":null,
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1582,7 +1661,8 @@
     "final_milestone_deadline":null,
     "doc_text":"1. Accelerate the creation of comprehensive registries of existing mandate texts issued by all mandating bodies",
     "work_package_goal":"Improved visibility, coordination and support for Member States during mandate creation",
-    "action_entities":"EOSG (USG Policy)"
+    "action_entities":"EOSG (USG Policy)",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1601,7 +1681,8 @@
     "final_milestone_deadline":null,
     "doc_text":"4. Develop tools using artificial intelligence to assist with mandate drafting, including by producing summarized information to enable Member States’ decision-making, flagging potential complementarities or duplications in draft texts or meeting agendas across mandating bodies",
     "work_package_goal":"Improved visibility, coordination and support for Member States during mandate creation",
-    "action_entities":"EOSG (USG Policy)"
+    "action_entities":"EOSG (USG Policy)",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1616,11 +1697,12 @@
     ],
     "first_milestone":"Issue guidance on word limits and compliance",
     "first_milestone_deadline":"2026-02-28",
-    "final_milestone":"Update guidance on word limits and compliance, based on outcomes workstream 2 negotations.",
+    "final_milestone":"Update guidance on word limits and compliance, based on outcomes of workstream 2.",
     "final_milestone_deadline":"2026-04-30",
     "doc_text":"6. Provide shorter reports and reduce maximum word counts",
     "work_package_goal":"Maximized value of meetings and reports and appropriate balance between supporting functions for Member States and direct impact",
-    "action_entities":null
+    "action_entities":"DGACM;DESA;DPPA;DPO;OHCHR",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1633,13 +1715,14 @@
     "work_package_leads":[
       "CDC"
     ],
-    "first_milestone":null,
-    "first_milestone_deadline":null,
-    "final_milestone":null,
-    "final_milestone_deadline":null,
+    "first_milestone":"Conduct a survey to identify reports\/notes that could potentially be consolidated or have their reporting frequency adjusted.",
+    "first_milestone_deadline":"2026-01-31",
+    "final_milestone":"Building on the outcome of workstream 2, first action plan implemented to reduce\/improve overlap, fragmentation and periodicity of reporting.",
+    "final_milestone_deadline":"2026-06-30",
     "doc_text":"7. Combine reports covering similar issues and contexts wherever feasible",
     "work_package_goal":"Maximized value of meetings and reports and appropriate balance between supporting functions for Member States and direct impact",
-    "action_entities":null
+    "action_entities":"DGACM;DESA;DPPA;DPO;OHCHR",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1654,11 +1737,12 @@
     ],
     "first_milestone":"Endorsement of interim guidelines on reporting format options for different types of information requests",
     "first_milestone_deadline":"2026-02-28",
-    "final_milestone":"Issuance of full guidelines on reporting format options for different types of information requests, in line with workstream outcomes",
+    "final_milestone":"Issuance of full guidelines on reporting format options for different types of information requests, in line with the outcome of workstream 2.",
     "final_milestone_deadline":"2026-06-30",
     "doc_text":"8. Introduce different report formats based on needs and content type; first reports could be longer followed by shorter updates, visual dashboards, in-person briefings or other formats",
     "work_package_goal":"Maximized value of meetings and reports and appropriate balance between supporting functions for Member States and direct impact",
-    "action_entities":null
+    "action_entities":"DGACM;DESA;DPPA;DPO;OHCHR",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1671,13 +1755,14 @@
     "work_package_leads":[
       "CDC"
     ],
-    "first_milestone":"Test-ED",
-    "first_milestone_deadline":"2025-12-12",
-    "final_milestone":"Test-ED",
-    "final_milestone_deadline":"2025-12-27",
+    "first_milestone":"Clarity on technical feasibility of download counts on ODS and Digital Library",
+    "first_milestone_deadline":"2026-01-10",
+    "final_milestone":"Depending on feasibility, implement download count solution",
+    "final_milestone_deadline":"2026-02-28",
     "doc_text":"9. Publish download statistics for all reports to inform further discussions on reporting practices",
     "work_package_goal":"Maximized value of meetings and reports and appropriate balance between supporting functions for Member States and direct impact",
-    "action_entities":"ODA;DCO;UNCTAD"
+    "action_entities":"DGACM",
+    "is_subaction":false
   },
   {
     "report":"WS1",
@@ -1697,7 +1782,29 @@
     "final_milestone_deadline":"2026-07-31",
     "doc_text":null,
     "work_package_goal":null,
-    "action_entities":"DOS"
+    "action_entities":"DOS",
+    "is_subaction":false
+  },
+  {
+    "report":"WS1",
+    "work_package_number":31,
+    "work_package_name":"UN Secretariat efficiencies and improvement",
+    "document_paragraph":null,
+    "action_number":94,
+    "indicative_activity":"Implement residual actions from Phase I of the Working Group on Efficiencies, as per Rev. estimates for programme budget 2026 and support account for 25\/26, not included in or relevant for WP#14",
+    "big_ticket":false,
+    "work_package_leads":[
+      "USG DMSPC",
+      "USG DOS"
+    ],
+    "first_milestone":"Core payroll functions for five existing payroll offices consolidated into the proposed Global Payroll Centres.",
+    "first_milestone_deadline":"2026-01-31",
+    "final_milestone":"Global Payroll Centre fully operational in New York, Nairobi and Entebbe",
+    "final_milestone_deadline":"2026-10-31",
+    "doc_text":null,
+    "work_package_goal":null,
+    "action_entities":"DOS",
+    "is_subaction":true
   },
   {
     "report":"WS1",
@@ -1717,6 +1824,91 @@
     "final_milestone_deadline":"2026-12-31",
     "doc_text":null,
     "work_package_goal":null,
-    "action_entities":"DOS"
+    "action_entities":"DOS",
+    "is_subaction":false
+  },
+  {
+    "report":"WS1",
+    "work_package_number":31,
+    "work_package_name":"UN Secretariat efficiencies and improvement",
+    "document_paragraph":null,
+    "action_number":95,
+    "indicative_activity":"Implement residual actions from Phase II of the Working Group on Efficiencies, not to be included in or relevant for WP#14",
+    "big_ticket":false,
+    "work_package_leads":[
+      "USG DMSPC",
+      "USG DOS"
+    ],
+    "first_milestone":null,
+    "first_milestone_deadline":null,
+    "final_milestone":null,
+    "final_milestone_deadline":null,
+    "doc_text":null,
+    "work_package_goal":null,
+    "action_entities":null,
+    "is_subaction":true
+  },
+  {
+    "report":"WS1",
+    "work_package_number":31,
+    "work_package_name":"UN Secretariat efficiencies and improvement",
+    "document_paragraph":null,
+    "action_number":95,
+    "indicative_activity":"Implement residual actions from Phase II of the Working Group on Efficiencies, not to be included in or relevant for WP#14",
+    "big_ticket":false,
+    "work_package_leads":[
+      "USG DMSPC",
+      "USG DOS"
+    ],
+    "first_milestone":"Pilot begins of Data Center Consolidation initiative, Pending approval of Phase I of the Secretariat ICT Consolidation and Digital Hubs: establishment of first Digital hub in Valencia.",
+    "first_milestone_deadline":"2026-01-31",
+    "final_milestone":"Pilot is concluded, lessons learned exercise completed, Phase I plan created.",
+    "final_milestone_deadline":"2026-12-31",
+    "doc_text":null,
+    "work_package_goal":null,
+    "action_entities":"OICT",
+    "is_subaction":true
+  },
+  {
+    "report":"WS1",
+    "work_package_number":31,
+    "work_package_name":"UN Secretariat efficiencies and improvement",
+    "document_paragraph":null,
+    "action_number":95,
+    "indicative_activity":"Implement residual actions from Phase II of the Working Group on Efficiencies, not to be included in or relevant for WP#14",
+    "big_ticket":false,
+    "work_package_leads":[
+      "USG DMSPC",
+      "USG DOS"
+    ],
+    "first_milestone":"At the end of December 2025, phase one of the consolidation review is completed. Jan 2026 expected endorsement of consolidation.",
+    "first_milestone_deadline":"2026-01-31",
+    "final_milestone":"Subject to Steering Group endorsement. Implementation not expected before Dec 2026.",
+    "final_milestone_deadline":"2026-12-31",
+    "doc_text":null,
+    "work_package_goal":null,
+    "action_entities":"RSCE",
+    "is_subaction":true
+  },
+  {
+    "report":"WS1",
+    "work_package_number":31,
+    "work_package_name":"UN Secretariat efficiencies and improvement",
+    "document_paragraph":null,
+    "action_number":95,
+    "indicative_activity":"Implement residual actions from Phase II of the Working Group on Efficiencies, not to be included in or relevant for WP#14",
+    "big_ticket":false,
+    "work_package_leads":[
+      "USG DMSPC",
+      "USG DOS"
+    ],
+    "first_milestone":"Phase 1 Travel Processing Office Consolidation Complete and Operational.",
+    "first_milestone_deadline":"2026-12-31",
+    "final_milestone":"Phase 2 Travel Processing Office Consolidation (Regional Hubs) Established. Full operational readiness subject to implementation of new travel management company contracts\/procurement process (likely through 2028).",
+    "final_milestone_deadline":"2027-12-31",
+    "doc_text":null,
+    "work_package_goal":null,
+    "action_entities":"DOS",
+    "is_subaction":true
   }
 ]
