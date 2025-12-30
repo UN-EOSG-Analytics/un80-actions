@@ -214,45 +214,22 @@ export default function ActionModal({
           )}
         </div>
 
-        {/* Document Reference */}
+        {/* Work Package Leads */}
         {action.work_package_leads.length > 0 && (
           <div className="">
-            <Field label="Leads">
+            <Field label="Work package leads">
               <LeadsBadge leads={action.work_package_leads} variant="default" />
             </Field>
           </div>
         )}
 
-        {/* Key Milestone */}
-        <div className="border-t border-gray-200 pt-6">
-          <div className="space-y-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
-                  Key Milestone
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-gray-600">
-                  Steps which will be or have been taken towards the delivery of the proposal concerned. Key milestones may be updated as implementation progresses.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-            <div className="mt-1 text-base text-gray-900">
-              <div className="text-gray-700">
-                to be updated
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Team Members */}
+        {/* Team Members for Indicative Action */}
         <div>
           <div className="space-y-1">
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
-                  Team Members
+                  Team members for indicative action
                 </span>
               </TooltipTrigger>
               <TooltipContent>
@@ -274,6 +251,43 @@ export default function ActionModal({
                   <span>to be updated</span>
                 )}
               </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Upcoming Milestone */}
+        <div className="border-t border-gray-200 pt-6">
+          <div className="space-y-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
+                  Upcoming milestone
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-gray-600">
+                  Steps which will be or have been taken towards the delivery of the proposal concerned. Key milestones may be updated as implementation progresses.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+            <div className="mt-1 text-base text-gray-900">
+              <div className="text-gray-700">
+                to be updated
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Updates */}
+        <div className="border-t border-gray-200 pt-6">
+          <div className="space-y-1">
+            <span className="text-sm font-normal tracking-wide text-gray-600 uppercase">
+              Updates
+            </span>
+            <div className="mt-1 text-base text-gray-900">
+              <div className="text-gray-700">
+                to be updated
+              </div>
             </div>
           </div>
         </div>
