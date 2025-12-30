@@ -99,16 +99,68 @@ df = df.sort_values(by=["work_package_number", "action_number"], ascending=[True
 
 ## Data Validation ##
 
-# Expected counts from UI DataCards
+# Identify subactions (actions that should not be displayed on dashboard)
+# Subactions are duplicate entries with the same action_number, work_package_number, and report
+# We keep the first occurrence (or one with document_paragraph if any has it) and mark others as subactions
+def identify_subactions(df):
+    df = df.copy()
+    df["is_subaction"] = False
+    
+    # Group by action_number, work_package_number, and report
+    grouped = df.groupby(["action_number", "work_package_number", "report"])
+    
+    for (action_num, wp_num, report), group in grouped:
+        if len(group) > 1:
+            # Multiple entries for the same action - identify which ones are subactions
+            # Priority: keep entries with document_paragraph, then keep first occurrence
+            group_indices = group.index.tolist()
+            
+            # Check if any have document_paragraph
+            has_doc_para = group["document_paragraph"].notna() & (
+                group["document_paragraph"].astype(str).str.strip() != ""
+            )
+            
+            if has_doc_para.any():
+                # Keep entries with document_paragraph, mark others as subactions
+                keep_indices = group[has_doc_para].index.tolist()
+                subaction_indices = [idx for idx in group_indices if idx not in keep_indices]
+            else:
+                # No document_paragraph in any - keep first, mark rest as subactions
+                keep_index = group_indices[0]
+                subaction_indices = group_indices[1:]
+            
+            # Mark subactions
+            df.loc[subaction_indices, "is_subaction"] = True
+    
+    return df["is_subaction"]
+
+# Add is_subaction column
+df["is_subaction"] = identify_subactions(df)
+
+# Debug: Print subaction detection results
+num_subactions = df["is_subaction"].sum()
+print(f"\n📊 Subaction detection: {num_subactions} subactions found out of {len(df)} total actions")
+
+# If we didn't detect exactly 5 subactions, show which ones were detected for debugging
+if num_subactions != 5:
+    print(f"⚠️  Warning: Expected 5 subactions but detected {num_subactions}")
+    if num_subactions > 0:
+        print("Detected subactions:")
+        subactions = df[df["is_subaction"]]
+        for idx, row in subactions.iterrows():
+            print(f"  - Action {row['action_number']} in WP {row['work_package_number']} ({row['report']})")
+
+# Expected counts from UI DataCards (excluding subactions)
 EXPECTED_WORKSTREAMS = 3
 EXPECTED_WORK_PACKAGES = 31
-EXPECTED_ACTIONS = 87
+EXPECTED_ACTIONS = 87  # 92 total - 5 subactions
 EXPECTED_LEADS = 34
 
-# Calculate actual counts
+# Calculate actual counts (excluding subactions for actions count)
+df_non_subactions = df[~df["is_subaction"]]
 actual_workstreams = df["report"].nunique()
 actual_work_packages = df["work_package_number"].nunique()
-actual_actions = len(df)
+actual_actions = len(df_non_subactions)  # Count only non-subactions
 actual_leads = df["work_package_leads"].explode().nunique()
 
 # Validate counts
@@ -156,4 +208,4 @@ output_path.parent.mkdir(parents=True, exist_ok=True)
 df.to_json(output_path, orient="records", force_ascii=False, indent=2)
 
 print(f"✓ Cleaned JSON written to {output_path.resolve()}")
-print(f"✓ Processed {len(df)} records")
+print(f"✓ Processed {len(df)} records ({len(df_non_subactions)} actions, {df['is_subaction'].sum()} subactions)")

@@ -44,6 +44,12 @@ export interface Action {
   /** Final milestone deadline date in ISO format (e.g., "2026-02-28") or null */
   final_milestone_deadline: string | null;
 
+  /** Action entities (team members) separated by semicolons or null */
+  action_entities: string | null;
+
+  /** Whether this is a subaction (not displayed on dashboard) */
+  is_subaction?: boolean;
+
   /** Whether Member State approval is required */
   ms_approval: boolean;
 
@@ -61,9 +67,6 @@ export interface Action {
 
   /** Document text or null */
   doc_text: string | null;
-
-  /** Action entities (semicolon-separated) or null */
-  action_entities: string | null;
 }
 
 /**
@@ -105,6 +108,7 @@ export interface WorkPackageAction {
   actionNumber: number;
   firstMilestone: string | null;
   finalMilestoneDeadline: string | null;
+  actionEntities: string | null;
 }
 
 /**
@@ -135,6 +139,7 @@ export interface FilterState {
   selectedWpFamily: string;
   selectedBigTicket: string[];
   selectedAction: string[];
+  selectedTeamMember: string[];
   sortOption: string;
 }
 
@@ -174,6 +179,7 @@ export interface StatsData {
   workpackages: number;
   actions: number;
   leads: number;
+  teamMembers: number;
 }
 
 // ============================================================================

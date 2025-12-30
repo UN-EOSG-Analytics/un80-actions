@@ -18,6 +18,7 @@ import {
   Layers,
   ListTodo,
   Users,
+  User,
   AlertCircle,
 } from "lucide-react";
 
@@ -40,6 +41,8 @@ function WorkPackagesPageContent() {
     setSelectedBigTicket,
     selectedAction,
     setSelectedAction,
+    selectedTeamMember,
+    setSelectedTeamMember,
     sortOption,
     setSortOption,
     handleResetFilters,
@@ -79,6 +82,7 @@ function WorkPackagesPageContent() {
     uniqueWorkstreams,
     uniqueActions,
     uniqueActionTexts,
+    uniqueTeamMembers,
     availableBigTicketOptions,
     chartData,
     workstreamChartData,
@@ -102,6 +106,7 @@ function WorkPackagesPageContent() {
   useFilterSync(selectedLead, uniqueLeads, setSelectedLead);
   useFilterSync(selectedWorkstream, uniqueWorkstreams, setSelectedWorkstream);
   useFilterSync(selectedAction, uniqueActionTexts, setSelectedAction);
+  useFilterSync(selectedTeamMember, uniqueTeamMembers, setSelectedTeamMember);
   useFilterSync(
     selectedBigTicket,
     availableBigTicketOptions.map((opt) => opt.key),
@@ -138,7 +143,7 @@ function WorkPackagesPageContent() {
 
             {/* DataCards Section */}
             <section className="mb-10">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                 <DataCard
                   title="Workstreams"
                   value={statsData.workstreams}
@@ -171,6 +176,12 @@ function WorkPackagesPageContent() {
                   showProgress={showProgress}
                   completed={0}
                 />
+                <DataCard
+                  title="Team Members"
+                  value={statsData.teamMembers}
+                  icon={User}
+                  isLoading={isLoading}
+                />
               </div>
             </section>
 
@@ -198,6 +209,8 @@ function WorkPackagesPageContent() {
                     onSelectBigTicket={setSelectedBigTicket}
                     selectedAction={selectedAction}
                     onSelectAction={setSelectedAction}
+                    selectedTeamMember={selectedTeamMember}
+                    onSelectTeamMember={setSelectedTeamMember}
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
                     uniqueWorkPackages={uniqueWorkPackages}
@@ -205,6 +218,7 @@ function WorkPackagesPageContent() {
                     uniqueWorkstreams={uniqueWorkstreams}
                     uniqueActions={uniqueActions}
                     uniqueActionTexts={uniqueActionTexts}
+                    uniqueTeamMembers={uniqueTeamMembers}
                     availableBigTicketOptions={availableBigTicketOptions}
                     onResetFilters={handleResetFilters}
                   />
@@ -216,6 +230,7 @@ function WorkPackagesPageContent() {
                     onSelectLead={setSelectedLead}
                     onSelectWorkstream={setSelectedWorkstream}
                     selectedActions={selectedAction}
+                    selectedTeamMembers={selectedTeamMember}
                     isLoading={isLoading}
                     showProgress={showProgress}
                   />

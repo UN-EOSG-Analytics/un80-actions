@@ -19,6 +19,7 @@ export function useFilters() {
   const selectedWpFamily = searchParams.get("family") || "";
   const selectedBigTicket = searchParams.get("type")?.split(",").filter(Boolean) || [];
   const selectedAction = searchParams.get("actions")?.split(",").filter(Boolean) || [];
+  const selectedTeamMember = searchParams.get("team")?.split(",").filter(Boolean) || [];
   const sortOption = searchParams.get("sort") || "number-asc";
 
   // Helper to build query string from params
@@ -113,6 +114,16 @@ export function useFilters() {
     });
   }, [updateUrl]);
 
+  const setSelectedTeamMember = useCallback((value: string[]) => {
+    updateUrl((params) => {
+      if (value.length > 0) {
+        params.set("team", value.join(","));
+      } else {
+        params.delete("team");
+      }
+    });
+  }, [updateUrl]);
+
   const setSortOption = useCallback((value: string) => {
     updateUrl((params) => {
       if (value !== "number-asc") {
@@ -131,6 +142,7 @@ export function useFilters() {
     selectedWpFamily,
     selectedBigTicket,
     selectedAction,
+    selectedTeamMember,
     sortOption,
   }), [
     searchQuery,
@@ -140,6 +152,7 @@ export function useFilters() {
     selectedWpFamily,
     selectedBigTicket,
     selectedAction,
+    selectedTeamMember,
     sortOption,
   ]);
 
@@ -171,6 +184,8 @@ export function useFilters() {
     setSelectedBigTicket,
     selectedAction,
     setSelectedAction,
+    selectedTeamMember,
+    setSelectedTeamMember,
     sortOption,
     setSortOption,
     handleResetFilters,

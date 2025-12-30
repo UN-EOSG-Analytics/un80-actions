@@ -15,6 +15,7 @@ import {
   Filter,
   Layers,
   Users,
+  User,
   Package,
   ListTodo,
 } from "lucide-react";
@@ -45,6 +46,8 @@ interface FilterControlsProps {
   onSelectBigTicket: (value: string[]) => void;
   selectedAction: string[];
   onSelectAction: (value: string[]) => void;
+  selectedTeamMember: string[];
+  onSelectTeamMember: (value: string[]) => void;
 
   // Search
   searchQuery: string;
@@ -56,6 +59,7 @@ interface FilterControlsProps {
   uniqueWorkstreams: string[];
   uniqueActions: Array<{ text: string; actionNumber: string }>;
   uniqueActionTexts: string[];
+  uniqueTeamMembers: string[];
   availableBigTicketOptions: Array<{ key: string; label: string }>;
 
   // Reset
@@ -80,6 +84,8 @@ export function FilterControls({
   onSelectBigTicket,
   selectedAction,
   onSelectAction,
+  selectedTeamMember,
+  onSelectTeamMember,
   searchQuery,
   onSearchChange,
   uniqueWorkPackages,
@@ -87,6 +93,7 @@ export function FilterControls({
   uniqueWorkstreams,
   uniqueActions,
   uniqueActionTexts,
+  uniqueTeamMembers,
   availableBigTicketOptions,
   onResetFilters,
 }: FilterControlsProps) {
@@ -115,7 +122,8 @@ export function FilterControls({
     selectedLead.length > 0 ||
     selectedWorkstream.length > 0 ||
     selectedBigTicket.length > 0 ||
-    selectedAction.length > 0
+    selectedAction.length > 0 ||
+    selectedTeamMember.length > 0
   );
 
   const hasActiveAdvancedFilters = !!(
@@ -123,7 +131,8 @@ export function FilterControls({
     selectedLead.length > 0 ||
     selectedWorkstream.length > 0 ||
     selectedBigTicket.length > 0 ||
-    selectedAction.length > 0
+    selectedAction.length > 0 ||
+    selectedTeamMember.length > 0
   );
 
   return (
@@ -461,6 +470,38 @@ export function FilterControls({
             ariaLabel="Filter by action"
             enableSearch={true}
             searchPlaceholder="Search actions..."
+          />
+
+          {/* Team Member Filter */}
+          <FilterDropdown
+            open={openFilterCollapsibles.has("teamMember")}
+            onOpenChange={(open) => onToggleFilterCollapsible("teamMember", open)}
+            icon={<User className="h-4 w-4 text-un-blue" />}
+            triggerText={
+              selectedTeamMember.length === 0
+                ? "Select team member"
+                : selectedTeamMember.length === 1
+                  ? selectedTeamMember[0]
+                  : `${selectedTeamMember.length} team members selected`
+            }
+            isFiltered={selectedTeamMember.length > 0}
+            allActive={false}
+            options={uniqueTeamMembers.map(
+              (member): FilterOption => ({
+                key: member,
+                label: member,
+              }),
+            )}
+            selectedKeys={new Set(selectedTeamMember)}
+            onToggle={(key) => {
+              const newSelected = selectedTeamMember.includes(key)
+                ? selectedTeamMember.filter((member) => member !== key)
+                : [...selectedTeamMember, key];
+              onSelectTeamMember(newSelected);
+            }}
+            ariaLabel="Filter by team member"
+            enableSearch={true}
+            searchPlaceholder="Search team members..."
           />
         </div>
       )}

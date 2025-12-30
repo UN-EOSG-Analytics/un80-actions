@@ -7,6 +7,7 @@ import {
   getUniqueLeads,
   getUniqueWorkstreams,
   getUniqueActions,
+  getUniqueTeamMembers,
   calculateLeadChartData,
   calculateWorkstreamChartData,
   calculateWorkPackageChartData,
@@ -76,6 +77,22 @@ export function useWorkPackageData(
     [actions],
   );
 
+  // Helper function to filter actions within work packages by team members
+  const filterActionsByTeamMembers = (wp: typeof workPackages[0]): typeof workPackages[0] => {
+    if (filters.selectedTeamMember && filters.selectedTeamMember.length > 0) {
+      const filteredActions = wp.actions.filter((action) => {
+        if (!action.actionEntities) return false;
+        const entities = action.actionEntities.split(';').map(e => e.trim()).filter(Boolean);
+        return filters.selectedTeamMember!.some(selected => entities.includes(selected));
+      });
+      return {
+        ...wp,
+        actions: filteredActions,
+      };
+    }
+    return wp;
+  };
+
   // Helper function to filter work packages with all filters except one
   const getFilteredWorkPackagesExcludingFilter = (
     excludeFilter:
@@ -84,7 +101,8 @@ export function useWorkPackageData(
       | "workpackage"
       | "action"
       | "bigticket"
-      | "wpfamily",
+      | "wpfamily"
+      | "teammember",
   ) => {
     let filtered = workPackages;
 
@@ -98,6 +116,12 @@ export function useWorkPackageData(
           wp.leads.some((lead) => lead.toLowerCase().includes(query)) ||
           wp.actions.some((action) => action.text.toLowerCase().includes(query)),
       );
+    }
+
+    // Apply team member filter at action level (unless it's the excluded filter)
+    // This filters actions within work packages, not the work packages themselves
+    if (excludeFilter !== "teammember" && filters.selectedTeamMember && filters.selectedTeamMember.length > 0) {
+      filtered = filtered.map(filterActionsByTeamMembers).filter((wp) => wp.actions.length > 0);
     }
 
     // Apply big ticket filter unless it's the excluded filter
@@ -194,6 +218,11 @@ export function useWorkPackageData(
     [uniqueActions],
   );
 
+  const uniqueTeamMembers = useMemo(
+    () => getUniqueTeamMembers(getFilteredWorkPackagesExcludingFilter("teammember")),
+    [workPackages, filters],
+  );
+
   // Get available big ticket filter options based on current filters
   const availableBigTicketOptions = useMemo(() => {
     const filtered = getFilteredWorkPackagesExcludingFilter("bigticket");
@@ -284,6 +313,7 @@ export function useWorkPackageData(
     uniqueWorkstreams,
     uniqueActions,
     uniqueActionTexts,
+    uniqueTeamMembers,
     availableBigTicketOptions,
     chartData,
     workstreamChartData,

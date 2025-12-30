@@ -6,6 +6,11 @@ import type { Action } from "@/types";
 import { DocumentBadge } from "@/components/DocumentBadge";
 import { LeadsBadge } from "@/components/LeadsBadge";
 import { parseDate, formatDate } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ActionModalProps {
   action: Action | null;
@@ -199,7 +204,7 @@ export default function ActionModal({
           </Field>
 
           {action.work_package_goal && (
-            <Field label="Goal">
+            <Field label="Work Package goal">
               <div className="mt-2 border-l-2 border-un-blue bg-slate-50 py-3 pr-4 pl-4">
                 <p className="text-sm leading-snug font-medium text-slate-600">
                   {action.work_package_goal}
@@ -209,56 +214,96 @@ export default function ActionModal({
           )}
         </div>
 
-        {/* Document Reference */}
+        {/* Work Package Leads */}
         {action.work_package_leads.length > 0 && (
           <div className="">
-            <Field label="Leads">
+            <Field label="Work package leads">
               <LeadsBadge leads={action.work_package_leads} variant="default" />
             </Field>
           </div>
         )}
 
-        {/* Key Milestone */}
-        {action.final_milestone_deadline && (
-          <div className="border-t border-gray-200 pt-6">
-            <Field label="Key Milestone">
-              <div className="space-y-4">
-                {action.final_milestone && (
-                  <div className="text-gray-700">
-                    {action.final_milestone}
-                  </div>
-                )}
-                <div className="space-y-1.5">
-                  <div className="text-sm font-normal tracking-wide text-gray-600 uppercase">
-                    Key Milestone Deadline
-                  </div>
-                  <div className="font-medium">
-                    {(() => {
-                      const deadlineDate = parseDate(action.final_milestone_deadline);
-                      return deadlineDate ? formatDate(deadlineDate) : action.final_milestone_deadline;
-                    })()}
-                  </div>
-                </div>
-              </div>
-            </Field>
+        {/* Visual separator between Work Package and Action sections */}
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t-2 border-gray-300"></div>
           </div>
-        )}
+          <div className="relative flex justify-start">
+            <span className="bg-white pl-0 pr-3 text-xs font-medium uppercase tracking-wider text-gray-500">
+              Action Details
+            </span>
+          </div>
+        </div>
 
-        {/* Action Entities */}
-        {action.action_entities && (
-          <div className="pt-2">
-            <Field label="Team Members">
-              <div>
-                {action.action_entities.split(';').map((entity, index) => (
-                  <span key={index}>
-                    {index > 0 && <span className="text-gray-400"> • </span>}
-                    {entity.trim()}
-                  </span>
-                ))}
-              </div>
-            </Field>
+        {/* Action-specific information starts here */}
+        {/* Team Members for Indicative Action */}
+        <div className="pt-0">
+          <div className="space-y-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
+                  Team members for indicative action
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-gray-600">
+                  UN system entities that contribute to the implementation of a specific action, in support of the relevant Work Package Lead. Work Package Leads report to the UN80 Steering Committee under the authority of the Secretary-General.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+            <div className="mt-1 text-base text-gray-900">
+              <p className="text-left leading-tight text-gray-700">
+                {action.action_entities && action.action_entities.trim() ? (
+                  action.action_entities.split(';').map((entity, index, array) => (
+                    <span key={index}>
+                      {entity.trim()}
+                      {index < array.length - 1 && <span className="text-gray-400"> • </span>}
+                    </span>
+                  ))
+                ) : (
+                  <span>to be updated</span>
+                )}
+              </p>
+            </div>
           </div>
-        )}
+        </div>
+
+        {/* Upcoming Milestone */}
+        <div className="-mt-2 pt-0">
+          <div className="space-y-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
+                  Upcoming milestone
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-gray-600">
+                  Steps which will be taken towards the delivery of the proposal concerned. Upcoming milestones may be updated as implementation progresses.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+            <div className="mt-1 text-base text-gray-900">
+              <div className="text-gray-700">
+                to be updated
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Updates */}
+        <div className="-mt-2 pt-0">
+          <div className="space-y-1">
+            <span className="text-sm font-normal tracking-wide text-gray-600 uppercase">
+              Updates
+            </span>
+            <div className="mt-1 text-base text-gray-900">
+              <div className="text-gray-700">
+                to be updated
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Document Reference */}
         {action.document_paragraph && (

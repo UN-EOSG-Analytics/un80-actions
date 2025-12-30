@@ -56,6 +56,40 @@ export const formatDate = (date: Date): string => {
  * @param leader - Leader name to normalize
  * @returns Normalized leader name
  */
+/**
+ * Normalize team member name for counting
+ * - Excludes "SA Reform"
+ * - Treats "EOSG (ODSG)", "EOSG(USG Policy)", and "EOSG (SA)" as one (normalized to "EOSG")
+ * @param teamMember - Team member name to normalize
+ * @returns Normalized team member name or null if should be excluded
+ */
+export const normalizeTeamMember = (teamMember: string): string | null => {
+  if (!teamMember || !teamMember.trim()) return null;
+  
+  const trimmed = teamMember.trim();
+  
+  // Exclude "SA Reform"
+  if (trimmed === "SA Reform") {
+    return null;
+  }
+  
+  // Normalize EOSG variants to "EOSG"
+  // Check for exact matches first, then check if it starts with "EOSG"
+  if (trimmed === "EOSG (ODSG)" || 
+      trimmed === "EOSG(USG Policy)" || 
+      trimmed === "EOSG (SA)" ||
+      trimmed === "EOSG") {
+    return "EOSG";
+  }
+  
+  // If it starts with "EOSG" but isn't one of the known variants, still normalize to "EOSG"
+  if (trimmed.startsWith("EOSG")) {
+    return "EOSG";
+  }
+  
+  return trimmed;
+};
+
 export const normalizeLeaderName = (leader: string): string => {
   if (!leader) return leader;
   const trimmed = leader.trim();

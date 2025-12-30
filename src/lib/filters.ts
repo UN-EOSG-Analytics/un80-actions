@@ -7,7 +7,7 @@ import type {
   StatsData,
   FilterState,
 } from "@/types";
-import { normalizeLeaderName } from "./utils";
+import { normalizeLeaderName, normalizeTeamMember } from "./utils";
 
 // WP Families mapping (by work package number)
 const WP_FAMILY_2 = ["3", "4", "5", "6", "12"];
@@ -143,6 +143,9 @@ export function filterWorkPackages(
     );
   }
 
+  // Note: Team Member filter is applied at the action level in ListContainer,
+  // not at the work package level, so we don't filter work packages here
+
   // Sort filtered work packages
   if (filters.sortOption) {
     filtered = [...filtered].sort((a, b) => {
@@ -218,6 +221,24 @@ export function getUniqueWorkstreams(workPackages: WorkPackage[]): string[] {
     wp.report.forEach((ws) => workstreams.add(ws));
   });
   return Array.from(workstreams).sort();
+}
+
+/**
+ * Get unique team members (action entities) for filter options
+ * @param workPackages - Array of work packages
+ * @returns Sorted array of unique team member names
+ */
+export function getUniqueTeamMembers(workPackages: WorkPackage[]): string[] {
+  const teamMembers = new Set<string>();
+  workPackages.forEach((wp) => {
+    wp.actions.forEach((action) => {
+      if (action.actionEntities && action.actionEntities.trim()) {
+        const entities = action.actionEntities.split(';').map(e => e.trim()).filter(Boolean);
+        entities.forEach((entity) => teamMembers.add(entity));
+      }
+    });
+  });
+  return Array.from(teamMembers).sort();
 }
 
 /**
@@ -506,6 +527,8 @@ export function calculateStatsData(
     );
   }
 
+  const uniqueTeamMembersSet = new Set<string>();
+
   filteredActions.forEach((action) => {
     if (action.report) {
       uniqueWorkstreams.add(action.report);
@@ -519,6 +542,16 @@ export function calculateStatsData(
         }
       });
     }
+    // Count team members (action_entities)
+    if (action.action_entities && action.action_entities.trim()) {
+      const entities = action.action_entities.split(';').map(e => e.trim()).filter(Boolean);
+      entities.forEach((entity) => {
+        const normalized = normalizeTeamMember(entity);
+        if (normalized) {
+          uniqueTeamMembersSet.add(normalized);
+        }
+      });
+    }
   });
 
   return {
@@ -526,5 +559,6 @@ export function calculateStatsData(
     workpackages: filteredWorkPackages.length,
     actions: filteredActions.length,
     leads: uniqueLeadsSet.size,
+    teamMembers: uniqueTeamMembersSet.size,
   };
 }
