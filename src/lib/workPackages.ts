@@ -88,6 +88,7 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           report: action.report,
           docText: action.doc_text || null,
           actionNumber: action.action_number || 0,
+          actionEntities: action.action_entities || null,
         });
       } else {
         // Merge leads if action already exists
@@ -104,6 +105,10 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
         // Update doc_text if not already set
         if (action.doc_text && !existingAction.docText) {
           existingAction.docText = action.doc_text;
+        }
+        // Update actionEntities if not already set
+        if (action.action_entities && !existingAction.actionEntities) {
+          existingAction.actionEntities = action.action_entities;
         }
       }
     }

@@ -8,6 +8,7 @@ interface WorkPackageListProps {
   onSelectLead?: (lead: string[]) => void;
   onSelectWorkstream?: (workstream: string[]) => void;
   selectedActions?: string[];
+  selectedTeamMembers?: string[];
   isLoading?: boolean;
 }
 
@@ -18,6 +19,7 @@ export function WorkPackageList({
   onSelectLead,
   onSelectWorkstream,
   selectedActions = [],
+  selectedTeamMembers = [],
   isLoading = false,
 }: WorkPackageListProps) {
   // Don't show "no results" message while loading
@@ -43,12 +45,21 @@ export function WorkPackageList({
         const isOpen = openCollapsibles.has(collapsibleKey);
 
         // Filter actions if action filter is selected
-        const filteredActions =
+        let filteredActions =
           selectedActions.length > 0
           ? wp.actions.filter((action) =>
                 selectedActions.includes(action.text.trim()),
             )
           : wp.actions;
+
+        // Filter actions by team members if team member filter is selected
+        if (selectedTeamMembers.length > 0) {
+          filteredActions = filteredActions.filter((action) => {
+            if (!action.actionEntities) return false;
+            const entities = action.actionEntities.split(';').map(e => e.trim()).filter(Boolean);
+            return selectedTeamMembers.some(selected => entities.includes(selected));
+          });
+        }
 
         // If there are no actions to display, don't render an (empty) collapsible
         if (!filteredActions || filteredActions.length === 0) {

@@ -103,6 +103,7 @@ export interface WorkPackageAction {
   report: string;
   docText: string | null;
   actionNumber: number;
+  actionEntities: string | null;
 }
 
 /**
@@ -133,6 +134,7 @@ export interface FilterState {
   selectedWpFamily: string;
   selectedBigTicket: string[];
   selectedAction: string[];
+  selectedTeamMember: string[];
   sortOption: string;
 }
 
@@ -172,6 +174,7 @@ export interface StatsData {
   workpackages: number;
   actions: number;
   leads: number;
+  teamMembers: number;
 }
 
 // ============================================================================
