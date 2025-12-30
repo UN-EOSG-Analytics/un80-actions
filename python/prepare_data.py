@@ -99,16 +99,41 @@ df = df.sort_values(by=["work_package_number", "action_number"], ascending=[True
 
 ## Data Validation ##
 
-# Expected counts from UI DataCards
+# Identify subactions (actions that should not be displayed on dashboard)
+# Subactions are identified by having empty document_paragraph AND being duplicates
+# of another action with the same action_number and work_package_number
+# TODO: Update this logic based on how subactions are actually identified in the data
+def is_subaction(row, df):
+    # If document_paragraph is empty/null, check if there's another action with same
+    # action_number and work_package_number that has a document_paragraph
+    if pd.isna(row.get("document_paragraph")) or str(row.get("document_paragraph", "")).strip() == "":
+        same_action = df[
+            (df["action_number"] == row["action_number"]) &
+            (df["work_package_number"] == row["work_package_number"]) &
+            (df["report"] == row["report"])
+        ]
+        # If there's another action with the same identifiers that has a document_paragraph,
+        # this is likely a subaction
+        if len(same_action) > 1:
+            has_doc_para = same_action["document_paragraph"].notna() & (same_action["document_paragraph"] != "")
+            if has_doc_para.any():
+                return True
+    return False
+
+# Add is_subaction column
+df["is_subaction"] = df.apply(lambda row: is_subaction(row, df), axis=1)
+
+# Expected counts from UI DataCards (excluding subactions)
 EXPECTED_WORKSTREAMS = 3
 EXPECTED_WORK_PACKAGES = 31
-EXPECTED_ACTIONS = 87
+EXPECTED_ACTIONS = 87  # 92 total - 5 subactions
 EXPECTED_LEADS = 34
 
-# Calculate actual counts
+# Calculate actual counts (excluding subactions for actions count)
+df_non_subactions = df[~df["is_subaction"]]
 actual_workstreams = df["report"].nunique()
 actual_work_packages = df["work_package_number"].nunique()
-actual_actions = len(df)
+actual_actions = len(df_non_subactions)  # Count only non-subactions
 actual_leads = df["work_package_leads"].explode().nunique()
 
 # Validate counts
@@ -156,4 +181,4 @@ output_path.parent.mkdir(parents=True, exist_ok=True)
 df.to_json(output_path, orient="records", force_ascii=False, indent=2)
 
 print(f"✓ Cleaned JSON written to {output_path.resolve()}")
-print(f"✓ Processed {len(df)} records")
+print(f"✓ Processed {len(df)} records ({len(df_non_subactions)} actions, {df['is_subaction'].sum()} subactions)")

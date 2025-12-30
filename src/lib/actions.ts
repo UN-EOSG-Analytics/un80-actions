@@ -5,10 +5,13 @@ import actionsData from "../../public/data/actions.json";
 /**
  * Fetch actions data from the JSON file
  * Note: JSON is imported directly (no network request) for optimal performance on GitHub Pages
- * @returns Promise resolving to the actions array
+ * Filters out subactions (actions with is_subaction = true) - they are stored in data but not displayed on dashboard
+ * @returns Promise resolving to the actions array (excluding subactions)
  */
 export async function fetchActions(): Promise<Actions> {
-  return Promise.resolve(actionsData as unknown as Actions);
+  const allActions = actionsData as unknown as Actions;
+  // Filter out subactions - they are stored in data but not displayed on dashboard
+  return Promise.resolve(allActions.filter((action) => !action.is_subaction));
 }
 
 /**

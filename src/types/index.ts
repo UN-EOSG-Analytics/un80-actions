@@ -47,6 +47,9 @@ export interface Action {
   /** Action entities (team members) separated by semicolons or null */
   action_entities: string | null;
 
+  /** Whether this is a subaction (not displayed on dashboard) */
+  is_subaction?: boolean;
+
   /** Whether Member State approval is required */
   ms_approval: boolean;
 
