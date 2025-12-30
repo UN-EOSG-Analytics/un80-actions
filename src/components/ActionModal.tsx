@@ -269,7 +269,7 @@ export default function ActionModal({
         </div>
 
         {/* Upcoming Milestone */}
-        <div className="pt-1">
+        <div className="-mt-2 pt-0">
           <div className="space-y-1">
             <Tooltip>
               <TooltipTrigger asChild>
@@ -292,7 +292,7 @@ export default function ActionModal({
         </div>
 
         {/* Updates */}
-        <div className="pt-1">
+        <div className="-mt-2 pt-0">
           <div className="space-y-1">
             <span className="text-sm font-normal tracking-wide text-gray-600 uppercase">
               Updates
