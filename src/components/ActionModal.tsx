@@ -204,7 +204,7 @@ export default function ActionModal({
           </Field>
 
           {action.work_package_goal && (
-            <Field label="Goal">
+            <Field label="Work Package goal">
               <div className="mt-2 border-l-2 border-un-blue bg-slate-50 py-3 pr-4 pl-4">
                 <p className="text-sm leading-snug font-medium text-slate-600">
                   {action.work_package_goal}
@@ -223,8 +223,21 @@ export default function ActionModal({
           </div>
         )}
 
+        {/* Visual separator between Work Package and Action sections */}
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t-2 border-gray-300"></div>
+          </div>
+          <div className="relative flex justify-start">
+            <span className="bg-white pl-0 pr-3 text-xs font-medium uppercase tracking-wider text-gray-500">
+              Action Details
+            </span>
+          </div>
+        </div>
+
+        {/* Action-specific information starts here */}
         {/* Team Members for Indicative Action */}
-        <div>
+        <div className="pt-0">
           <div className="space-y-1">
             <Tooltip>
               <TooltipTrigger asChild>
@@ -256,7 +269,7 @@ export default function ActionModal({
         </div>
 
         {/* Upcoming Milestone */}
-        <div className="border-t border-gray-200 pt-6">
+        <div className="pt-1">
           <div className="space-y-1">
             <Tooltip>
               <TooltipTrigger asChild>
@@ -266,7 +279,7 @@ export default function ActionModal({
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-gray-600">
-                  Steps which will be or have been taken towards the delivery of the proposal concerned. Key milestones may be updated as implementation progresses.
+                  Steps which will be taken towards the delivery of the proposal concerned. Upcoming milestones may be updated as implementation progresses.
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -279,7 +292,7 @@ export default function ActionModal({
         </div>
 
         {/* Updates */}
-        <div className="border-t border-gray-200 pt-6">
+        <div className="pt-1">
           <div className="space-y-1">
             <span className="text-sm font-normal tracking-wide text-gray-600 uppercase">
               Updates
