@@ -136,6 +136,9 @@ if unmatched_actions:
     for action_num in sorted(unmatched_actions):
         print(f"  - Action {action_num}")
 
+# Replace NaN values with None before converting to dict
+actions_df = actions_df.where(pd.notna(actions_df), None)
+
 # Convert back to list of dictionaries
 actions_list = actions_df.to_dict("records")
 
