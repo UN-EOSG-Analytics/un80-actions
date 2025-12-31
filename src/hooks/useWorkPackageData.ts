@@ -13,6 +13,7 @@ import {
   calculateWorkPackageChartData,
   calculateStatsData,
 } from "@/lib/filters";
+import { normalizeTeamMember } from "@/lib/utils";
 
 // Local WP Families mapping (by work package number) for option computations
 const WP_FAMILY_2 = ["3", "4", "5", "6", "12"];
@@ -83,7 +84,12 @@ export function useWorkPackageData(
       const filteredActions = wp.actions.filter((action) => {
         if (!action.actionEntities) return false;
         const entities = action.actionEntities.split(';').map(e => e.trim()).filter(Boolean);
-        return filters.selectedTeamMember!.some(selected => entities.includes(selected));
+        // Normalize both the selected team members and the entities for comparison
+        const normalizedSelected = filters.selectedTeamMember!.map(normalizeTeamMember).filter(Boolean) as string[];
+        return entities.some(entity => {
+          const normalizedEntity = normalizeTeamMember(entity);
+          return normalizedEntity && normalizedSelected.includes(normalizedEntity);
+        });
       });
       return {
         ...wp,

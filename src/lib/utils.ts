@@ -77,7 +77,11 @@ export const normalizeTeamMember = (teamMember: string): string | null => {
   // Check for exact matches first, then check if it starts with "EOSG"
   if (trimmed === "EOSG (ODSG)" || 
       trimmed === "EOSG(USG Policy)" || 
+      trimmed === "EOSG (USG Policy)" ||
       trimmed === "EOSG (SA)" ||
+      trimmed === "EOSG ODSG" ||
+      trimmed === "EOSG USG Policy" ||
+      trimmed === "EOSG SA" ||
       trimmed === "EOSG") {
     return "EOSG";
   }

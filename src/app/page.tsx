@@ -177,7 +177,7 @@ function WorkPackagesPageContent() {
                   completed={0}
                 />
                 <DataCard
-                  title="Team Members"
+                  title="UN System Entities"
                   value={statsData.teamMembers}
                   icon={User}
                   isLoading={isLoading}
