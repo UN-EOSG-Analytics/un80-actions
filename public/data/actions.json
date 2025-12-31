@@ -21,7 +21,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Delegation of relevant programmatic tasks clarified",
     "upcoming_milestone_deadline": "2026-03-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -45,7 +46,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Review of the future of peace operations completed",
     "upcoming_milestone_deadline": "2026-03-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -68,7 +70,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Humanitarian Response Plans with revamped format and digitization published",
     "upcoming_milestone_deadline": null,
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -91,7 +94,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Integrated UN supply chain operational across agencies, with joint procurement and shared logistics in starter countries",
     "upcoming_milestone_deadline": "2026-08-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -114,7 +118,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Priority common services expanded across several contexts with multiple agencies",
     "upcoming_milestone_deadline": "2026-08-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -137,7 +142,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Humanitarian Data Collaborative established, scaling platforms, financing and shared capacities and standards",
     "upcoming_milestone_deadline": "2026-08-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -160,7 +166,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Collab. humanitarian diplomacy functioning system-wide with coordinated messaging, shared strategies and clear impact in priority crises",
     "upcoming_milestone_deadline": "2026-08-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -183,7 +190,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Rome-based Agencies with clearer alignment in practice, with better sequencing and less duplication",
     "upcoming_milestone_deadline": "2026-08-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -206,7 +214,8 @@
     "is_subaction": false,
     "upcoming_milestone": "UNHCR and IOM shown better complementarity in operationalizing Route-Based programming",
     "upcoming_milestone_deadline": "2026-08-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -229,7 +238,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Early pilots with less duplication and better interoperability across beneficiary-data systems",
     "upcoming_milestone_deadline": "2026-08-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -252,7 +262,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Concise reference material compiled for field leadership and for Nutrition and Health Cluster partners",
     "upcoming_milestone_deadline": "2026-08-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -277,7 +288,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Draft initial assessment analysis of the ‘as is’ with high level merger options, pros, cons, risk analysis for internal consultations completed",
     "upcoming_milestone_deadline": "2026-01-18",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -302,7 +314,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Strategic merger assessment completed for internal consultations, including risk/benefit considerations",
     "upcoming_milestone_deadline": "2026-01-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -327,7 +340,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Options for optimization of the UN’s work on population statistics and related activities finalized for Secretary-General's consideration and integrated in merger analysis",
     "upcoming_milestone_deadline": "2026-01-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -350,7 +364,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Proposal for model to reconfigure country teams with clear actions under Secretary-General's purview and those requiring further intergovernmental process made available",
     "upcoming_milestone_deadline": "2026-08-29",
-    "updates": "Outline of the draft proposals presented to the Secretary-General for guidance"
+    "updates": "- Outline of the draft proposals presented to the Secretary-General for guidance",
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -373,7 +388,8 @@
     "is_subaction": false,
     "upcoming_milestone": "The parameters for the recalibration of the RC system defined and being consulted with Member States (e.g., change in DCO structure, more tailored approach)",
     "upcoming_milestone_deadline": "2026-01-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -396,7 +412,8 @@
     "is_subaction": false,
     "upcoming_milestone": "All aspects of the regional reset under the Secretary-General’s prerogative implemented, with outcomes emerging from relevant intergovernmental processes on elements requiring new mandates",
     "upcoming_milestone_deadline": "2026-08-29",
-    "updates": "System-wide working group convened and draft outline finalized and shared with the Secretary-General for guidance"
+    "updates": "- System-wide working group convened and draft outline finalized and shared with the Secretary-General for guidance",
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -419,7 +436,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Initial proposal for co-hosting developed for internal consultation",
     "upcoming_milestone_deadline": "2026-01-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -443,7 +461,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Concept note endorsed on internal meeting",
     "upcoming_milestone_deadline": "2026-01-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -466,7 +485,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Expertise on demand fully operational system-wide: expertise catalogue launched, protocols institutionalized, proven replacement of duplicative capacities",
     "upcoming_milestone_deadline": "2026-09-17",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -489,7 +509,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Expertise on demand fully operational system-wide: expertise catalogue launched, protocols institutionalized, proven replacement of duplicative capacities",
     "upcoming_milestone_deadline": "2026-12-19",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -512,7 +533,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Human Rights Group established",
     "upcoming_milestone_deadline": "2026-03-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -535,7 +557,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Proposal for streamlining of fora for implementation finalized",
     "upcoming_milestone_deadline": "2026-02-27",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -558,7 +581,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Proposal for streamlining of fora for implementation finalized",
     "upcoming_milestone_deadline": "2026-02-27",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -581,7 +605,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Interagency task forces and working groups streamlined around Regional Monthly Review",
     "upcoming_milestone_deadline": "2026-03-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -604,7 +629,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Interagency task forces and working groups streamlined around Regional Monthly Review",
     "upcoming_milestone_deadline": "2026-03-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -627,7 +653,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Action completed",
     "upcoming_milestone_deadline": null,
-    "updates": "Special Coordinator for Development in the Sahel retired and its associated office through secondment moved back to primary entities"
+    "updates": "- Special Coordinator for Development in the Sahel retired and its associated office through secondment moved back to primary entities",
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -650,7 +677,8 @@
     "is_subaction": false,
     "upcoming_milestone": null,
     "upcoming_milestone_deadline": null,
-    "updates": "Mapping of all special envoys finalized for Secretary-General's review"
+    "updates": "- Mapping of all special envoys finalized for Secretary-General's review",
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -674,7 +702,8 @@
     "is_subaction": false,
     "upcoming_milestone": "All aspects of the regional reset including Regional Integrated Platforms under the Secretary-General’s prerogative implemented, with outcomes emerging from relevant intergovernmental processes on elements requiring new mandates",
     "upcoming_milestone_deadline": "2026-08-29",
-    "updates": "System-wide working group convened and draft outline finalized and shared with the Secretary-General for guidance"
+    "updates": "- System-wide working group convened and draft outline finalized and shared with the Secretary-General for guidance",
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -698,7 +727,8 @@
     "is_subaction": false,
     "upcoming_milestone": "All aspects of the regional reset including Regional Integrated Platforms under the Secretary-General’s prerogative implemented, with outcomes emerging from relevant intergovernmental processes on elements requiring new mandates",
     "upcoming_milestone_deadline": "2026-08-29",
-    "updates": "System-wide working group convened and draft outline finalized and shared with the Secretary-General for guidance"
+    "updates": "- System-wide working group convened and draft outline finalized and shared with the Secretary-General for guidance",
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -722,7 +752,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Action plan for the Shared Platform Initiative and progress report to the Secretary-General summarizing next steps finalized",
     "upcoming_milestone_deadline": "2026-01-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -746,7 +777,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Draft proposal for simplifying country-level planning process where necessary finalized for Secretary-General",
     "upcoming_milestone_deadline": "2026-01-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -771,7 +803,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Outcome report on the Unified Services Roadmap released, outlining progress, results and suggested next steps",
     "upcoming_milestone_deadline": "2026-10-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -796,7 +829,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Outcomes on assessment for integration of basic ICT services and payroll, human resources, finance, and ERP systems released",
     "upcoming_milestone_deadline": "2026-09-14",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -821,7 +855,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Final outcomes of the assessment on country-level unified service backbone released",
     "upcoming_milestone_deadline": "2026-11-14",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -846,7 +881,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Common back-office (CBO) tracking tool and self starter reporting methodology for new CBOs released",
     "upcoming_milestone_deadline": "2026-01-31",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -871,7 +907,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Proposal for harmonized in-country logistics, with initial application in Afghanistan, Haiti, Gaza (OPT), Somalia and Sudan finalized",
     "upcoming_milestone_deadline": "2026-03-31",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -896,7 +933,8 @@
     "is_subaction": false,
     "upcoming_milestone": "ICT consolidation proposal endorsed by CEB",
     "upcoming_milestone_deadline": "2026-05-14",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -921,7 +959,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Portfolio of 3 high-impact technology acceleration use cases proposed to the UN80 Steering Committee",
     "upcoming_milestone_deadline": "2026-02-08",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -946,7 +985,8 @@
     "is_subaction": false,
     "upcoming_milestone": "UN system Data Commons launched",
     "upcoming_milestone_deadline": "2026-09-14",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -971,7 +1011,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Pooled funding commitments consolidated",
     "upcoming_milestone_deadline": "2025-09-29",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -996,7 +1037,8 @@
     "is_subaction": false,
     "upcoming_milestone": null,
     "upcoming_milestone_deadline": null,
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1020,7 +1062,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Merger roadmap agreed by UNITAR and UNSSC, incl. needs assessment, scope, methodology, and joint plan for functional/financial mapping",
     "upcoming_milestone_deadline": "2026-01-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1044,7 +1087,8 @@
     "is_subaction": false,
     "upcoming_milestone": "UNRISD's administrative framework (financial, communications, HR, legal) reviewed by UNU, to gather information regarding integration",
     "upcoming_milestone_deadline": "2026-03-31",
-    "updates": "UNU Council endorsed the UN80 Initiative report’s recommendations to integrate UNRISD into UNU"
+    "updates": "- UNU Council endorsed the UN80 Initiative report’s recommendations to integrate UNRISD into UNU",
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1068,7 +1112,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Blueprint for the Joint UN Coordination Mechanism submitted at the CEB",
     "upcoming_milestone_deadline": "2026-04-29",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1092,7 +1137,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Analysis, mapping and categorization of all pooled funding and data finalized",
     "upcoming_milestone_deadline": "2026-01-29",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1116,7 +1162,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Analysis, mapping and categorization of all pooled funding and data finalized",
     "upcoming_milestone_deadline": "2026-01-29",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1140,7 +1187,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Draft paper on strengthening the case for core funding finalized",
     "upcoming_milestone_deadline": "2026-01-29",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS2",
@@ -1164,7 +1212,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Final mapping of Funding Compact and recommendations for system-wide integration completed",
     "upcoming_milestone_deadline": "2026-03-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS2",
@@ -1188,7 +1237,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Survey on mandate creation support launched to Member State delegates",
     "upcoming_milestone_deadline": "2026-01-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS2",
@@ -1212,7 +1262,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Survey to assess available support of mandate creation system-wide launched and distributed to different UN system secretariats",
     "upcoming_milestone_deadline": "2026-01-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS2",
@@ -1236,7 +1287,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Initial concept note finalized between EOSG, DGACM, and OPPFB",
     "upcoming_milestone_deadline": "2026-01-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS2",
@@ -1259,7 +1311,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Assessment lead confirmed and TOR developed",
     "upcoming_milestone_deadline": "2026-03-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS2",
@@ -1282,7 +1335,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Revised budget instruction issued by PPBD accompanied by a political message from EOSG",
     "upcoming_milestone_deadline": "2026-01-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS2",
@@ -1305,7 +1359,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Political message from EOSG issued to entities emphasizing the need to review deliverables",
     "upcoming_milestone_deadline": "2026-01-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS2",
@@ -1328,7 +1383,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Final action plan released outlining an implementable system-wide pathway for a results-based management mechanism and communication standards",
     "upcoming_milestone_deadline": "2026-05-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1352,7 +1408,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Unified PBPSO established and one ASG post abolished as approved in Revised Budget Estimate for 2026",
     "upcoming_milestone_deadline": "2025-12-31",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1376,7 +1433,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Gender units in DPPA and DPO consolidated and operational with reporting line to both USGs, as approved in Revised Budget Estimate for 2026",
     "upcoming_milestone_deadline": "2025-12-31",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1400,7 +1458,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Proposal on planned joint mechanism linking cross-cutting functions finalized",
     "upcoming_milestone_deadline": "2026-03-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1424,7 +1483,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Two ASG posts and offices consolidated, as approved in Revised Budget Estimate for 2026",
     "upcoming_milestone_deadline": "2025-12-31",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1448,7 +1508,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Western and North Africa divisions combined, as approved in Revised Budget Estimate for 2026",
     "upcoming_milestone_deadline": "2025-12-31",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1472,7 +1533,8 @@
     "is_subaction": false,
     "upcoming_milestone": "UN Mission to Support the Hudaydah Agreement into the Office of the Special Envoy for Yemen integrated, as approved in Revised Budget Estimate for 2026",
     "upcoming_milestone_deadline": "2026-12-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1496,7 +1558,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Proposal for integration of UN Office for Central Africa (UNOCA) and the Office of the Special Envoy for the Great Lakes submitted to the relevant intergovernmental bodies",
     "upcoming_milestone_deadline": "2026-12-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1520,7 +1583,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Alignment between Office of the Special Adviser for Cyprus with the UN Peacekeeping Force in Cyprus (UNFICYP) implemented, as approved in Revised Budget Estimate for 2026",
     "upcoming_milestone_deadline": "2026-12-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1544,7 +1608,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Structural changes in the Office of the United Nations Representative to the Geneva International Discussions (UNRGID) implemented, as approved in Revised Budget Estimate for 2026",
     "upcoming_milestone_deadline": "2026-12-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1568,7 +1633,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Proposals for regional placement of Peace and Development Advisors in regional economic communities finalized, including financial needs",
     "upcoming_milestone_deadline": "2026-03-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1592,7 +1658,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Final proposals to advance closer collaboration between special political missions and regional economic communities finalized",
     "upcoming_milestone_deadline": "2026-03-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1616,7 +1683,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Concept note to align surge capacity finalized",
     "upcoming_milestone_deadline": "2026-03-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1640,7 +1708,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Proposals to integrate peace and development advisory support in all relevant Resident Coordinator Offices finalized, including financial needs",
     "upcoming_milestone_deadline": "2026-12-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1663,7 +1732,8 @@
     "is_subaction": false,
     "upcoming_milestone": null,
     "upcoming_milestone_deadline": null,
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1686,7 +1756,8 @@
     "is_subaction": false,
     "upcoming_milestone": null,
     "upcoming_milestone_deadline": null,
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1708,9 +1779,10 @@
     "work_package_goal": "Joined up and networked for lasting impact",
     "action_entities": "UNODC",
     "is_subaction": false,
-    "upcoming_milestone": "Proposal to integrate the UN Interregional Crime and Justice Research Institute (UNICRI) into the UN Office on Drugs and Crime (UNODC) submitted to relevant intergovernmental bodies",
-    "upcoming_milestone_deadline": "2026-07-30",
-    "updates": null
+    "upcoming_milestone": "Concept note to integrate the UN Interregional Crime and Justice Research Institute (UNICRI) into the UN Office on Drugs and Crime (UNODC) submitted to the Secretary-General",
+    "upcoming_milestone_deadline": "2026-04-29",
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1734,7 +1806,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Global Counter-Terrorism Coordination Compact Committee decided and collectively committed to specific measures to reinforce cooperation on counterterrorism and violent extremism",
     "upcoming_milestone_deadline": "2026-06-29",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1758,7 +1831,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Reporting arrangements for the Director overseeing the UNODC Terrorism Prevention Branch adjusted to include the Under-Secretary-General for Counter-Terrorism",
     "upcoming_milestone_deadline": "2026-03-30",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1780,9 +1854,10 @@
     "work_package_goal": "Unified support to people and planet",
     "action_entities": "UNAIDS",
     "is_subaction": false,
-    "upcoming_milestone": "Final transformation plan to mainstreaming capacity and expertise of UNAIDS into relevant entities of the UN development system submitted to the Board",
-    "upcoming_milestone_deadline": "2026-12-09",
-    "updates": null
+    "upcoming_milestone": "Terms of Reference for a Working Group to develop a plan on the further transition and integration of UNAIDS into the UN system and beyond, in coherence with the UN80 Initiative, finalized",
+    "upcoming_milestone_deadline": "2026-01-31",
+    "updates": "- UNAIDS Programme Coordinating Board decision issued, containing process for delivering a final plan for full transformation of UNAIDS that is aligned with UN80 Initiative and adoption of Global AIDS Strategy 2026–2031",
+    "link_updates": "https://www.unaids.org/sites/default/files/2025-12/PCB57_Decisions_EN.pdf"
   },
   {
     "report": "WS3",
@@ -1805,7 +1880,8 @@
     "is_subaction": false,
     "upcoming_milestone": null,
     "upcoming_milestone_deadline": null,
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1829,7 +1905,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Assessment to reinforce environmental science, strengthen coordination on environmental issues, and explore joint knowledge hubs and potential strategic alignments completed",
     "upcoming_milestone_deadline": "2026-09-17",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1854,7 +1931,8 @@
     "is_subaction": false,
     "upcoming_milestone": null,
     "upcoming_milestone_deadline": null,
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS3",
@@ -1879,7 +1957,8 @@
     "is_subaction": false,
     "upcoming_milestone": null,
     "upcoming_milestone_deadline": null,
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS2",
@@ -1902,7 +1981,8 @@
     "is_subaction": false,
     "upcoming_milestone": null,
     "upcoming_milestone_deadline": null,
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS2",
@@ -1925,7 +2005,8 @@
     "is_subaction": false,
     "upcoming_milestone": null,
     "upcoming_milestone_deadline": null,
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS2",
@@ -1948,7 +2029,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Guidance on word limits and compliance for the Secretary-General's report issued",
     "upcoming_milestone_deadline": "2026-02-27",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS2",
@@ -1969,9 +2051,10 @@
     "work_package_goal": "Maximized value of meetings and reports and appropriate balance between supporting functions for Member States and direct impact",
     "action_entities": "DGACM;DESA;DPPA;DPO;OHCHR",
     "is_subaction": false,
-    "upcoming_milestone": "Building on the outcome of workstream 2, first action plan implemented to reduce improve overlap, fragmentation and periodicity of reporting",
+    "upcoming_milestone": "Building on the outcome of UN80 Initiative workstream 2, first action plan implemented to reduce improve overlap, fragmentation and periodicity of reporting",
     "upcoming_milestone_deadline": "2026-06-29",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS2",
@@ -1994,7 +2077,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Full guidelines on reporting format options for different types of information requests issued, in line with workstream outcomes",
     "upcoming_milestone_deadline": "2026-06-29",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS2",
@@ -2017,7 +2101,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Download count solution implemented",
     "upcoming_milestone_deadline": "2026-02-27",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS1",
@@ -2041,7 +2126,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Global Payroll Centre fully operational in New York, Nairobi and Entebbe",
     "upcoming_milestone_deadline": "2026-10-31",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS1",
@@ -2065,7 +2151,8 @@
     "is_subaction": true,
     "upcoming_milestone": "Global Payroll Centre fully operational in New York, Nairobi and Entebbe",
     "upcoming_milestone_deadline": "2026-10-31",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS1",
@@ -2089,7 +2176,8 @@
     "is_subaction": false,
     "upcoming_milestone": "Phase I of travel processing office consolidation completed and operational",
     "upcoming_milestone_deadline": "2026-12-31",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS1",
@@ -2113,7 +2201,8 @@
     "is_subaction": true,
     "upcoming_milestone": "Phase I of travel processing office consolidation completed and operational",
     "upcoming_milestone_deadline": "2026-12-31",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS1",
@@ -2137,7 +2226,8 @@
     "is_subaction": true,
     "upcoming_milestone": "Phase I of travel processing office consolidation completed and operational",
     "upcoming_milestone_deadline": "2026-12-31",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS1",
@@ -2161,7 +2251,8 @@
     "is_subaction": true,
     "upcoming_milestone": "Phase I of travel processing office consolidation completed and operational",
     "upcoming_milestone_deadline": "2026-12-31",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   },
   {
     "report": "WS1",
@@ -2185,6 +2276,7 @@
     "is_subaction": true,
     "upcoming_milestone": "Phase I of travel processing office consolidation completed and operational",
     "upcoming_milestone_deadline": "2026-12-31",
-    "updates": null
+    "updates": null,
+    "link_updates": null
   }
 ]

@@ -51,8 +51,8 @@ if "delivery_date" in updates_df.columns:
     updates_df["delivery_date"] = updates_df["delivery_date"].replace("NaT", None)
     updates_df["delivery_date"] = updates_df["delivery_date"].replace("", None)
 
-# Clean string columns (upcoming_milestone and updates)
-string_columns = ["upcoming_milestone", "updates"]
+# Clean string columns (upcoming_milestone, updates, and link_updates)
+string_columns = ["upcoming_milestone", "updates", "link_updates"]
 
 for col in string_columns:
     if col in updates_df.columns:
@@ -95,6 +95,7 @@ for _, row in updates_df_unique.iterrows():
         "upcoming_milestone": row.get("upcoming_milestone"),
         "delivery_date": row.get("delivery_date"),
         "updates": row.get("updates"),
+        "link_updates": row.get("link_updates"),
     }
 
 # Ensure the new fields exist in actions_df (initialize with None if they don't)
@@ -104,6 +105,8 @@ if "upcoming_milestone_deadline" not in actions_df.columns:
     actions_df["upcoming_milestone_deadline"] = None
 if "updates" not in actions_df.columns:
     actions_df["updates"] = None
+if "link_updates" not in actions_df.columns:
+    actions_df["link_updates"] = None
 
 # Merge updates into actions
 merged_count = 0
@@ -124,6 +127,10 @@ for idx, action in actions_df.iterrows():
         # Add updates field
         if update_data["updates"] is not None and str(update_data["updates"]).strip():
             actions_df.at[idx, "updates"] = update_data["updates"]
+        
+        # Add link_updates field
+        if update_data["link_updates"] is not None and str(update_data["link_updates"]).strip():
+            actions_df.at[idx, "link_updates"] = update_data["link_updates"]
         
         merged_count += 1
 

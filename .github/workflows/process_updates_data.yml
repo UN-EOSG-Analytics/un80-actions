@@ -5,6 +5,7 @@ on:
     push:
         branches:
             - main
+            - dev
         paths:
             - 'data/input/actions_updates_raw.json'
 
@@ -33,7 +34,7 @@ jobs:
               run: |
                   git config --global user.name "github-actions[bot]"
                   git config --global user.email "github-actions[bot]@users.noreply.github.com"
-                  git add .
+                  git add public/data/actions.json
                   git commit -m "chore: automated updates data processing [GitHub Actions]" || exit 0
-                  git push
+                  git push origin HEAD
 
