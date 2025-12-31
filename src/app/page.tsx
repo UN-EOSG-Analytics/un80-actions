@@ -152,7 +152,7 @@ function WorkPackagesPageContent() {
                   isLoading={isLoading}
                 />
                 <DataCard
-                  title="Team Members"
+                  title="UN System Entities"
                   value={statsData.teamMembers}
                   icon={User}
                   isLoading={isLoading}

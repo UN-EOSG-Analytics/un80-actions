@@ -1,5 +1,6 @@
 import { WorkPackageItem } from "@/components/WorkPackageCard";
 import type { WorkPackage } from "@/types";
+import { normalizeTeamMember } from "@/lib/utils";
 
 interface WorkPackageListProps {
   workPackages: WorkPackage[];
@@ -57,7 +58,12 @@ export function WorkPackageList({
           filteredActions = filteredActions.filter((action) => {
             if (!action.actionEntities) return false;
             const entities = action.actionEntities.split(';').map(e => e.trim()).filter(Boolean);
-            return selectedTeamMembers.some(selected => entities.includes(selected));
+            // Normalize both the selected team members and the entities for comparison
+            const normalizedSelected = selectedTeamMembers.map(normalizeTeamMember).filter(Boolean) as string[];
+            return entities.some(entity => {
+              const normalizedEntity = normalizeTeamMember(entity);
+              return normalizedEntity && normalizedSelected.includes(normalizedEntity);
+            });
           });
         }
 

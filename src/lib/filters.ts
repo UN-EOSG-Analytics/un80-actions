@@ -234,7 +234,12 @@ export function getUniqueTeamMembers(workPackages: WorkPackage[]): string[] {
     wp.actions.forEach((action) => {
       if (action.actionEntities && action.actionEntities.trim()) {
         const entities = action.actionEntities.split(';').map(e => e.trim()).filter(Boolean);
-        entities.forEach((entity) => teamMembers.add(entity));
+        entities.forEach((entity) => {
+          const normalized = normalizeTeamMember(entity);
+          if (normalized) {
+            teamMembers.add(normalized);
+          }
+        });
       }
     });
   });
