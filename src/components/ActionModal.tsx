@@ -228,7 +228,7 @@ export default function ActionModal({
             <div className="w-full border-t-2 border-gray-300"></div>
           </div>
           <div className="relative flex justify-start">
-            <span className="bg-white pl-0 pr-3 text-xs font-medium uppercase tracking-wider text-gray-500">
+            <span className="bg-white pl-0 pr-3 text-sm font-bold uppercase tracking-wider text-black">
               Action Details
             </span>
           </div>
@@ -236,7 +236,7 @@ export default function ActionModal({
 
         {/* Action-specific information starts here */}
         {/* Team Members for Indicative Action */}
-        <div className="pt-0">
+        <div className="-mt-2 pt-0">
           <div className="space-y-1">
             <Tooltip>
               <TooltipTrigger asChild>
