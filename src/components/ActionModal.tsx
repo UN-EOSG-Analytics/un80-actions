@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { X } from "lucide-react";
 import type { Action } from "@/types";
-import { DocumentBadge } from "@/components/DocumentBadge";
 import { LeadsBadge } from "@/components/LeadsBadge";
 import { parseDate, formatDate } from "@/lib/utils";
 import {
@@ -304,32 +303,6 @@ export default function ActionModal({
             </div>
           </div>
         </div>
-
-        {/* Document Reference */}
-        {action.document_paragraph && (
-          <div className="border-t border-gray-200 pt-6">
-            <Field label="Document Reference">
-              <DocumentBadge
-                documentParagraphNumber={action.document_paragraph}
-                report={action.report}
-                workPackageNumber={action.work_package_number}
-              />
-            </Field>
-          </div>
-        )}
-
-        {/* Document Text */}
-        {action.doc_text && (
-          <div className="">
-            <Field label="">
-              <div className="mt-2 border-l-2 border-slate-400 bg-slate-50 py-3 pr-4 pl-4">
-                <p className="text-sm leading-relaxed text-slate-700">
-                  &ldquo;{action.doc_text}&rdquo;
-                </p>
-              </div>
-            </Field>
-          </div>
-        )}
 
         {/* MS Approval */}
         {/* {action.ms_approval && (
