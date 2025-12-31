@@ -1,0 +1,39 @@
+name: Process updates JSON data
+
+on:
+    workflow_dispatch: # Allows manual trigger
+    push:
+        branches:
+            - main
+        paths:
+            - 'data/input/actions_updates_raw.json'
+
+permissions:
+    contents: write # This grants permission to push changes
+
+jobs:
+    update-data:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Set up uv
+              uses: astral-sh/setup-uv@v6
+              with:
+                  enable-cache: true
+
+            - name: Install dependencies from lockfile
+              run: uv sync --frozen # Guarantees reproducible installs: The exact versions in the lock file are installed.
+
+            - name: Run updates data processing script
+              run: uv run python python/prepare_updates_data.py
+
+            - name: Commit and push changes
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                  git add .
+                  git commit -m "chore: automated updates data processing [GitHub Actions]" || exit 0
+                  git push
+
