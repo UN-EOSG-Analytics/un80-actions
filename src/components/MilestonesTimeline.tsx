@@ -197,6 +197,9 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
                                 report: action.report,
                                 docText: action.doc_text,
                                 actionNumber: action.action_number,
+                                firstMilestone: action.first_milestone,
+                                finalMilestoneDeadline: action.final_milestone_deadline,
+                                actionEntities: action.action_entities,
                               };
                               return (
                                 <div key={action.action_number} className="space-y-2">
