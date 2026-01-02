@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import { DataCard } from "@/components/DataCard";
 import { ExplainerText } from "@/components/ExplainerText";
 import { FilterControls } from "@/components/FilterControls";
@@ -25,7 +25,6 @@ import {
 function WorkPackagesPageContent() {
   // Custom hooks for state management
   const { actions, isLoading } = useActions();
-  const [showProgress, setShowProgress] = useState(false);
 
   const {
     filters,
@@ -122,22 +121,6 @@ function WorkPackagesPageContent() {
         {/* Main Container - with padding to account for fixed header */}
         <main className="mx-auto w-full max-w-4xl px-8 pt-8 sm:px-12 sm:pt-24 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
           <div className="space-y-6 pb-16">
-            {/* Show Progress Toggle - Top Right */}
-            <div className="flex justify-end -mb-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <span className="text-sm font-medium text-gray-700">Show progress</span>
-                <div className="relative inline-block w-11 h-6">
-                  <input
-                    type="checkbox"
-                    checked={showProgress}
-                    onChange={(e) => setShowProgress(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-un-blue"></div>
-                </div>
-              </label>
-            </div>
-
             {/* Header with context info */}
             <ExplainerText />
 
@@ -149,32 +132,24 @@ function WorkPackagesPageContent() {
                   value={statsData.workstreams}
                   icon={Layers}
                   isLoading={isLoading}
-                  showProgress={showProgress}
-                  completed={0}
                 />
                 <DataCard
                   title="Work Packages"
                   value={statsData.workpackages}
                   icon={BriefcaseIcon}
                   isLoading={isLoading}
-                  showProgress={showProgress}
-                  completed={0}
                 />
                 <DataCard
                   title="Actions"
                   value={statsData.actions}
                   icon={ListTodo}
                   isLoading={isLoading}
-                  showProgress={showProgress}
-                  completed={0}
                 />
                 <DataCard
                   title="UN System Leaders"
                   value={statsData.leads}
                   icon={Users}
                   isLoading={isLoading}
-                  showProgress={showProgress}
-                  completed={0}
                 />
                 <DataCard
                   title="UN System Entities"
@@ -232,7 +207,6 @@ function WorkPackagesPageContent() {
                     selectedActions={selectedAction}
                     selectedTeamMembers={selectedTeamMember}
                     isLoading={isLoading}
-                    showProgress={showProgress}
                   />
                 </div>
 
