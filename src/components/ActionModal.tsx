@@ -285,7 +285,7 @@ export default function ActionModal({
               </TooltipContent>
             </Tooltip>
             <div className="mt-2 border-l-2 border-un-blue bg-slate-50 py-3 pr-4 pl-4">
-              <p className="text-sm leading-snug font-medium text-slate-600">
+              <p className="text-base leading-snug font-medium text-slate-600">
                 To be updated
               </p>
             </div>
