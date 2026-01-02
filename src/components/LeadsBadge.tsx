@@ -10,12 +10,16 @@ interface LeadsBadgeProps {
   leads: string[];
   onSelectLead?: (lead: string[]) => void;
   variant?: "default" | "muted";
+  showIcon?: boolean;
+  color?: string;
 }
 
 export function LeadsBadge({
   leads,
   onSelectLead,
   variant = "default",
+  showIcon = true,
+  color: customColor,
 }: LeadsBadgeProps) {
   if (leads.length === 0) return null;
 
@@ -25,14 +29,14 @@ export function LeadsBadge({
     }
   };
 
-  const color = variant === "muted" ? "text-slate-600" : "text-un-blue";
+  const textColor = customColor || (variant === "muted" ? "text-slate-600" : "text-un-blue");
   const textSize = variant === "muted" ? "text-sm" : "";
 
   return (
     <div className="flex items-center gap-1.5">
-      <Users className={`h-4 w-4 ${color} shrink-0`} />
+      {showIcon && <Users className={`h-4 w-4 ${textColor} shrink-0`} />}
       <p
-        className={`${textSize} ${color} text-left leading-tight wrap-break-word`}
+        className={`${textSize} ${textColor} text-left leading-tight wrap-break-word`}
       >
         {leads.map((lead, idx) => {
           const longForm = abbreviationMap[lead] || lead;

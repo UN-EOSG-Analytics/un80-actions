@@ -204,10 +204,10 @@ export default function ActionModal({
 
           {action.work_package_goal && (
             <Field label="Work Package goal">
-              <div className="mt-2 border-l-2 border-un-blue bg-slate-50 py-3 pr-4 pl-4">
-                <p className="text-sm leading-snug font-medium text-slate-600">
+              <div className="mt-1 text-base text-gray-900">
+                <div className="text-gray-700">
                   {action.work_package_goal}
-                </p>
+                </div>
               </div>
             </Field>
           )}
@@ -217,7 +217,9 @@ export default function ActionModal({
         {action.work_package_leads.length > 0 && (
           <div className="">
             <Field label="Work package leads">
-              <LeadsBadge leads={action.work_package_leads} variant="default" />
+              <div className="mt-1 text-base text-gray-900">
+                <LeadsBadge leads={action.work_package_leads} variant="default" showIcon={false} color="text-gray-600" />
+              </div>
             </Field>
           </div>
         )}
@@ -228,7 +230,7 @@ export default function ActionModal({
             <div className="w-full border-t-2 border-gray-300"></div>
           </div>
           <div className="relative flex justify-start">
-            <span className="bg-white pl-0 pr-3 text-sm font-bold uppercase tracking-wider text-black">
+            <span className="bg-white pl-0 pr-3 text-sm font-bold uppercase tracking-wider text-un-blue">
               Action Details
             </span>
           </div>
@@ -282,14 +284,14 @@ export default function ActionModal({
                 </p>
               </TooltipContent>
             </Tooltip>
-            <div className="mt-1 text-base text-gray-900">
-              <div className="text-gray-700">
+            <div className="mt-2 border-l-2 border-un-blue bg-slate-50 py-3 pr-4 pl-4">
+              <p className="text-sm leading-snug font-medium text-slate-600">
                 {action.upcoming_milestone && action.upcoming_milestone.trim() ? (
                   action.upcoming_milestone
                 ) : (
                   "To be updated"
                 )}
-              </div>
+              </p>
               {action.upcoming_milestone_deadline && (
                 <div className="mt-1.5 text-sm text-gray-600">
                   {(() => {
@@ -309,13 +311,33 @@ export default function ActionModal({
               Updates
             </span>
             <div className="mt-1 text-base text-gray-900">
-              <div className="text-gray-700">
-                {action.updates && action.updates.trim() ? (
-                  action.updates
-                ) : (
-                  "To be updated"
-                )}
-              </div>
+              {action.updates && action.updates.trim() ? (
+                <div className="text-gray-700">
+                  {action.updates.split('\n').map((line, index) => {
+                    const trimmedLine = line.trim();
+                    // If line starts with a dash, replace it with a bullet point
+                    if (trimmedLine.startsWith('-')) {
+                      return (
+                        <div key={index} className="flex items-start">
+                          <span className="mr-2">•</span>
+                          <span>{trimmedLine.substring(1).trim()}</span>
+                        </div>
+                      );
+                    }
+                    // If line is not empty, display it
+                    if (trimmedLine) {
+                      return (
+                        <div key={index} className={index > 0 ? "mt-1" : ""}>
+                          {trimmedLine}
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+              ) : (
+                <div className="text-gray-700">To be updated</div>
+              )}
               {action.link_updates && action.link_updates.trim() && (
                 <div className="mt-2">
                   <a
@@ -390,7 +412,7 @@ export default function ActionModal({
     >
       <div
         ref={modalRef}
-        className={`h-full w-full overflow-y-auto bg-white shadow-2xl transition-transform duration-300 ease-out sm:w-2/3 md:w-1/2 lg:w-1/3 ${
+        className={`h-full w-full overflow-y-auto bg-white shadow-2xl transition-transform duration-300 ease-out sm:w-3/4 md:w-1/2 lg:w-1/2 ${
           isVisible && !isClosing ? "translate-x-0" : "translate-x-full"
         }`}
         onClick={(e) => e.stopPropagation()}
