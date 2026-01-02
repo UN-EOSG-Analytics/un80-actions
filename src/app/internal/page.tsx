@@ -41,6 +41,7 @@ function WorkPackagesPageContent() {
       selectedWpFamily: "",
       selectedBigTicket: [],
       selectedAction: [],
+      selectedTeamMember: [],
       sortOption: "number-asc",
     },
     "",
