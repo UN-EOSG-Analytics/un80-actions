@@ -11,6 +11,7 @@ interface WorkPackageListProps {
   selectedActions?: string[];
   selectedTeamMembers?: string[];
   isLoading?: boolean;
+  showProgress?: boolean;
 }
 
 export function WorkPackageList({
@@ -22,6 +23,7 @@ export function WorkPackageList({
   selectedActions = [],
   selectedTeamMembers = [],
   isLoading = false,
+  showProgress = false,
 }: WorkPackageListProps) {
   // Don't show "no results" message while loading
   if (workPackages.length === 0 && !isLoading) {
@@ -87,6 +89,7 @@ export function WorkPackageList({
             collapsibleKey={collapsibleKey}
             onSelectLead={onSelectLead}
             onSelectWorkstream={onSelectWorkstream}
+            showProgress={showProgress}
           />
         );
       })}

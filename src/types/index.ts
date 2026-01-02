@@ -67,6 +67,18 @@ export interface Action {
 
   /** Document text or null */
   doc_text: string | null;
+
+  /** Upcoming milestone description or null */
+  upcoming_milestone: string | null;
+
+  /** Upcoming milestone deadline date in ISO format (e.g., "2026-02-28") or null */
+  upcoming_milestone_deadline: string | null;
+
+  /** Updates text or null */
+  updates: string | null;
+
+  /** Link to updates document or null */
+  link_updates: string | null;
 }
 
 /**
@@ -106,6 +118,8 @@ export interface WorkPackageAction {
   report: string;
   docText: string | null;
   actionNumber: number;
+  firstMilestone: string | null;
+  finalMilestoneDeadline: string | null;
   actionEntities: string | null;
 }
 
