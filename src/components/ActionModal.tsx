@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { X } from "lucide-react";
 import type { Action } from "@/types";
 import { LeadsBadge } from "@/components/LeadsBadge";
-import { parseDate, formatDate } from "@/lib/utils";
+import { parseDate, formatDate, formatDateMonthYear } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
@@ -284,8 +284,20 @@ export default function ActionModal({
             </Tooltip>
             <div className="mt-1 text-base text-gray-900">
               <div className="text-gray-700">
-                to be updated
+                {action.upcoming_milestone && action.upcoming_milestone.trim() ? (
+                  action.upcoming_milestone
+                ) : (
+                  "To be updated"
+                )}
               </div>
+              {action.upcoming_milestone_deadline && (
+                <div className="mt-1.5 text-sm text-gray-600">
+                  {(() => {
+                    const deadlineDate = parseDate(action.upcoming_milestone_deadline);
+                    return deadlineDate ? formatDateMonthYear(deadlineDate) : "To be updated";
+                  })()}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -298,8 +310,24 @@ export default function ActionModal({
             </span>
             <div className="mt-1 text-base text-gray-900">
               <div className="text-gray-700">
-                to be updated
+                {action.updates && action.updates.trim() ? (
+                  action.updates
+                ) : (
+                  "To be updated"
+                )}
               </div>
+              {action.link_updates && action.link_updates.trim() && (
+                <div className="mt-2">
+                  <a
+                    href={action.link_updates}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-un-blue hover:text-un-blue/80 underline"
+                  >
+                    View related document
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>
