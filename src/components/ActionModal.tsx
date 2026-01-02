@@ -286,20 +286,8 @@ export default function ActionModal({
             </Tooltip>
             <div className="mt-2 border-l-2 border-un-blue bg-slate-50 py-3 pr-4 pl-4">
               <p className="text-sm leading-snug font-medium text-slate-600">
-                {action.upcoming_milestone && action.upcoming_milestone.trim() ? (
-                  action.upcoming_milestone
-                ) : (
-                  "To be updated"
-                )}
+                To be updated
               </p>
-              {action.upcoming_milestone_deadline && (
-                <div className="mt-1.5 text-sm text-gray-600">
-                  {(() => {
-                    const deadlineDate = parseDate(action.upcoming_milestone_deadline);
-                    return deadlineDate ? formatDateMonthYear(deadlineDate) : "To be updated";
-                  })()}
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -311,45 +299,7 @@ export default function ActionModal({
               Updates
             </span>
             <div className="mt-1 text-base text-gray-900">
-              {action.updates && action.updates.trim() ? (
-                <div className="text-gray-700">
-                  {action.updates.split('\n').map((line, index) => {
-                    const trimmedLine = line.trim();
-                    // If line starts with a dash, replace it with a bullet point
-                    if (trimmedLine.startsWith('-')) {
-                      return (
-                        <div key={index} className="flex items-start">
-                          <span className="mr-2">•</span>
-                          <span>{trimmedLine.substring(1).trim()}</span>
-                        </div>
-                      );
-                    }
-                    // If line is not empty, display it
-                    if (trimmedLine) {
-                      return (
-                        <div key={index} className={index > 0 ? "mt-1" : ""}>
-                          {trimmedLine}
-                        </div>
-                      );
-                    }
-                    return null;
-                  })}
-                </div>
-              ) : (
-                <div className="text-gray-700">To be updated</div>
-              )}
-              {action.link_updates && action.link_updates.trim() && (
-                <div className="mt-2">
-                  <a
-                    href={action.link_updates}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-un-blue hover:text-un-blue/80 underline"
-                  >
-                    View related document
-                  </a>
-                </div>
-              )}
+              <div className="text-gray-700">To be updated</div>
             </div>
           </div>
         </div>
