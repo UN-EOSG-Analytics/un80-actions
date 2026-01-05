@@ -295,9 +295,18 @@ export default function ActionModal({
         {/* Updates */}
         <div className="-mt-2 pt-0">
           <div className="space-y-1">
-            <span className="text-sm font-normal tracking-wide text-gray-600 uppercase">
-              Updates
-            </span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
+                  Updates
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-gray-600">
+                  A summary of recent progress on the action.
+                </p>
+              </TooltipContent>
+            </Tooltip>
             <div className="mt-1 text-base text-gray-900">
               <div className="text-gray-700">To be updated</div>
             </div>
