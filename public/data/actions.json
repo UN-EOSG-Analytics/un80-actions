@@ -1824,7 +1824,7 @@
     "final_milestone_deadline":"2026-09-30",
     "doc_text":null,
     "work_package_goal":null,
-    "action_entities":"DOS;DMSPC",
+    "action_entities":"RSCE;DOS;DMSPC",
     "is_subaction":false
   },
   {
