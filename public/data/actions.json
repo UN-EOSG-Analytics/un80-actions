@@ -2172,7 +2172,7 @@
     "final_milestone_deadline": "2026-09-30",
     "doc_text": null,
     "work_package_goal": null,
-    "action_entities": "RSCE;DOS;DMSPC",
+    "action_entities": "DOS;DMSPC",
     "is_subaction": false,
     "upcoming_milestone": "Phase I of travel processing office consolidation completed and operational",
     "upcoming_milestone_deadline": "2026-12-31",

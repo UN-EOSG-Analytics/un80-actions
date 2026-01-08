@@ -32,11 +32,15 @@ export default function ModalHandler() {
       return;
     }
 
+    // Get firstMilestone from URL if present (for subactions)
+    const milestoneParam = searchParams.get("milestone");
+    const firstMilestone = milestoneParam ? decodeURIComponent(milestoneParam) : null;
+
     setLoading(true);
     setError(null);
 
     // Load action data
-    getActionByNumber(actionNumber)
+    getActionByNumber(actionNumber, firstMilestone)
       .then((foundAction) => {
         if (!foundAction) {
           console.warn(`Action ${actionNumber} not found`);
@@ -52,7 +56,7 @@ export default function ModalHandler() {
       .finally(() => {
         setLoading(false);
       });
-  }, [actionParam]);
+  }, [actionParam, searchParams]);
 
   const handleClose = () => {
     // Restore previous URL from sessionStorage

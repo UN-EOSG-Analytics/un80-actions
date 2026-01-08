@@ -309,7 +309,7 @@ export default function ActionModal({
             </Tooltip>
             <div className="mt-1 text-base text-gray-900">
               <div className="text-gray-700">To be updated</div>
-            </div>
+              </div>
           </div>
         </div>
 

@@ -85,23 +85,12 @@ for col in df.columns:
 # Replace empty strings with None for proper null handling in JSON
 df = df.replace("", None)
 
-# Sort by work_package_number then action_number ascending
-# Convert sorting columns to integers before sorting
-df["work_package_number"] = (
-    pd.to_numeric(df["work_package_number"], errors="coerce").fillna(0).astype(int)
-)
-df["action_number"] = (
-    pd.to_numeric(df["action_number"], errors="coerce").fillna(0).astype(int)
-)
-
-df = df.sort_values(by=["work_package_number", "action_number"], ascending=[True, True])
-
-
 ## Data Validation ##
 
 # Identify subactions (actions that should not be displayed on dashboard)
 # Subactions are duplicate entries with the same action_number, work_package_number, and report
 # We keep the first occurrence (or one with document_paragraph if any has it) and mark others as subactions
+# IMPORTANT: This must be done BEFORE sorting to preserve the original order within each action group
 def identify_subactions(df):
     df = df.copy()
     df["is_subaction"] = False
@@ -112,7 +101,7 @@ def identify_subactions(df):
     for (action_num, wp_num, report), group in grouped:
         if len(group) > 1:
             # Multiple entries for the same action - identify which ones are subactions
-            # Priority: keep entries with document_paragraph, then keep first occurrence
+            # Priority: keep entries with document_paragraph, then keep first occurrence (by original index order)
             group_indices = group.index.tolist()
             
             # Check if any have document_paragraph
@@ -125,7 +114,7 @@ def identify_subactions(df):
                 keep_indices = group[has_doc_para].index.tolist()
                 subaction_indices = [idx for idx in group_indices if idx not in keep_indices]
             else:
-                # No document_paragraph in any - keep first, mark rest as subactions
+                # No document_paragraph in any - keep first (by original index order), mark rest as subactions
                 keep_index = group_indices[0]
                 subaction_indices = group_indices[1:]
             
@@ -134,8 +123,19 @@ def identify_subactions(df):
     
     return df["is_subaction"]
 
-# Add is_subaction column
+# Add is_subaction column BEFORE sorting to preserve original order
 df["is_subaction"] = identify_subactions(df)
+
+# Sort by work_package_number then action_number ascending
+# Convert sorting columns to integers before sorting
+df["work_package_number"] = (
+    pd.to_numeric(df["work_package_number"], errors="coerce").fillna(0).astype(int)
+)
+df["action_number"] = (
+    pd.to_numeric(df["action_number"], errors="coerce").fillna(0).astype(int)
+)
+
+df = df.sort_values(by=["work_package_number", "action_number"], ascending=[True, True])
 
 # Debug: Print subaction detection results
 num_subactions = df["is_subaction"].sum()

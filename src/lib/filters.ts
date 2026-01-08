@@ -559,10 +559,13 @@ export function calculateStatsData(
     }
   });
 
+  // Count only non-subactions for the actions card (exclude subactions from count)
+  const nonSubactionCount = filteredActions.filter((action) => !action.is_subaction).length;
+
   return {
     workstreams: uniqueWorkstreams.size,
     workpackages: filteredWorkPackages.length,
-    actions: filteredActions.length,
+    actions: nonSubactionCount,
     leads: uniqueLeadsSet.size,
     teamMembers: uniqueTeamMembersSet.size,
   };

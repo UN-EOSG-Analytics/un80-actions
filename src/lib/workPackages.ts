@@ -68,11 +68,21 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
     wp.bigTicket = wpNumber >= 1 && wpNumber <= 21;
 
     // Add indicative activity if not already included
+    // For subactions (actions 94 and 95), always add as separate entries even if text is the same
     if (action.indicative_activity) {
-      const existingAction = wp.actions.find(
-        (a) =>
-          a.text === action.indicative_activity && a.report === action.report,
-      );
+      const isSubactionFor94Or95 = action.is_subaction && (action.action_number === 94 || action.action_number === 95);
+      
+      // For subactions of 94/95, always add as new entry (don't deduplicate)
+      // For other actions, check for duplicates
+      const existingAction = isSubactionFor94Or95 
+        ? null  // Always add subactions as new entries
+        : wp.actions.find(
+            (a) =>
+              a.text === action.indicative_activity && 
+              a.report === action.report &&
+              a.actionNumber === action.action_number,
+          );
+      
       if (!existingAction) {
         // work_package_leads is already an array
         const actionLeads = Array.isArray(action.work_package_leads)

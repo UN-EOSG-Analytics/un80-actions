@@ -6,12 +6,17 @@ import actionsData from "../../public/data/actions.json";
  * Fetch actions data from the JSON file
  * Note: JSON is imported directly (no network request) for optimal performance on GitHub Pages
  * Filters out subactions (actions with is_subaction = true) - they are stored in data but not displayed on dashboard
- * @returns Promise resolving to the actions array (excluding subactions)
+ * Exception: Subactions for actions 94 and 95 are included to display them in work package 31
+ * @returns Promise resolving to the actions array (excluding most subactions, but including subactions for actions 94 and 95)
  */
 export async function fetchActions(): Promise<Actions> {
   const allActions = actionsData as unknown as Actions;
-  // Filter out subactions - they are stored in data but not displayed on dashboard
-  return Promise.resolve(allActions.filter((action) => !action.is_subaction));
+  // Include regular actions and subactions for actions 94 and 95
+  return Promise.resolve(
+    allActions.filter(
+      (action) => !action.is_subaction || action.action_number === 94 || action.action_number === 95,
+    ),
+  );
 }
 
 /**
@@ -94,9 +99,26 @@ export function countByMSApproval(actions: Actions): {
 /**
  * Get action by action number
  * @param actionNumber - The unique action number to search for
- * @returns The action with the given number, or null if not found
+ * @param firstMilestone - Optional first milestone to distinguish subactions with the same action number
+ * @returns The action with the given number (and optionally matching first milestone), or null if not found
  */
-export async function getActionByNumber(actionNumber: number): Promise<Action | null> {
+export async function getActionByNumber(
+  actionNumber: number,
+  firstMilestone?: string | null
+): Promise<Action | null> {
   const actions = await fetchActions();
-  return actions.find((action) => action.action_number === actionNumber) || null;
+  const matchingActions = actions.filter((action) => action.action_number === actionNumber);
+  
+  // If no firstMilestone specified, return the first match (main action)
+  if (!firstMilestone) {
+    return matchingActions[0] || null;
+  }
+  
+  // If firstMilestone is specified, find exact match
+  const exactMatch = matchingActions.find(
+    (action) => action.first_milestone === firstMilestone
+  );
+  
+  // If exact match found, return it; otherwise return first match (main action)
+  return exactMatch || matchingActions[0] || null;
 }

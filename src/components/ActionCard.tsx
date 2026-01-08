@@ -37,8 +37,15 @@ export function ActionItem({
       sessionStorage.removeItem('previousUrl');
     }
     
+    // Build URL with action number and optionally first_milestone for subactions
+    let url = `/?action=${action.actionNumber}`;
+    if (action.firstMilestone) {
+      // Encode firstMilestone to handle special characters and use it to identify subactions
+      url += `&milestone=${encodeURIComponent(action.firstMilestone)}`;
+    }
+    
     // Navigate to clean modal URL
-    router.push(`/?action=${action.actionNumber}`, { scroll: false });
+    router.push(url, { scroll: false });
   };
 
   // Calculate progress to determine if action is completed
