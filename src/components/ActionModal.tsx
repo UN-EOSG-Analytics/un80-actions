@@ -157,6 +157,12 @@ export default function ActionModal({
           <div className="flex-1">
             <h2 className="text-lg leading-tight font-semibold text-gray-900 sm:text-xl">
               {action.indicative_activity}
+              {action.sub_action_details && (
+                <>
+                  {" "}
+                  <span className="font-bold text-gray-600">– {action.sub_action_details}</span>
+                </>
+              )}
             </h2>
           </div>
         </div>

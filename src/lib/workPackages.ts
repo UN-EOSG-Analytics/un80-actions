@@ -101,6 +101,7 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           firstMilestone: action.first_milestone || null,
           finalMilestoneDeadline: action.final_milestone_deadline || null,
           actionEntities: action.action_entities || null,
+          subActionDetails: action.sub_action_details || null,
         });
       } else {
         // Merge leads if action already exists
@@ -128,6 +129,10 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
         // Update actionEntities if not already set
         if (action.action_entities && !existingAction.actionEntities) {
           existingAction.actionEntities = action.action_entities;
+        }
+        // Update subActionDetails if not already set
+        if (action.sub_action_details && !existingAction.subActionDetails) {
+          existingAction.subActionDetails = action.sub_action_details;
         }
       }
     }

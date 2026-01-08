@@ -79,6 +79,9 @@ export interface Action {
 
   /** Link to updates document or null */
   link_updates: string | null;
+
+  /** Sub-action details description or null (for subactions) */
+  sub_action_details: string | null;
 }
 
 /**
@@ -121,6 +124,7 @@ export interface WorkPackageAction {
   firstMilestone: string | null;
   finalMilestoneDeadline: string | null;
   actionEntities: string | null;
+  subActionDetails: string | null;
 }
 
 /**

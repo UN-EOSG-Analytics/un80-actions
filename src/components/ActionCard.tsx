@@ -92,6 +92,12 @@ export function ActionItem({
         <div className="flex-1">
           <p className="leading-normal font-medium text-slate-900">
             {action.text}
+            {action.subActionDetails && (
+              <>
+                {" "}
+                <span className="font-bold text-slate-600">– {action.subActionDetails}</span>
+              </>
+            )}
           </p>
         </div>
       </div>
