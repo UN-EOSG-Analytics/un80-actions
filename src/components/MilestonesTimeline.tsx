@@ -200,6 +200,7 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
                                 firstMilestone: action.first_milestone,
                                 finalMilestoneDeadline: action.final_milestone_deadline,
                                 actionEntities: action.action_entities,
+                                subActionDetails: action.sub_action_details || null,
                               };
                               return (
                                 <div key={action.action_number} className="space-y-2">
