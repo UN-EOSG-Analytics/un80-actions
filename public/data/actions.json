@@ -1933,7 +1933,7 @@
     "final_milestone_deadline":null,
     "doc_text":null,
     "work_package_goal":null,
-    "action_entities":null,
+    "action_entities":"DOS;DMSPC;DGACM",
     "sub_action_details":"Contractual translation & documentation",
     "is_subaction":true
   },
