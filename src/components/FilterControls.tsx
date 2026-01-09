@@ -7,6 +7,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import {
   ArrowUpDown,
   Briefcase,
@@ -64,6 +66,10 @@ interface FilterControlsProps {
 
   // Reset
   onResetFilters: () => void;
+
+  // Progress toggle
+  showProgress?: boolean;
+  onShowProgressChange?: (show: boolean) => void;
 }
 
 export function FilterControls({
@@ -96,6 +102,8 @@ export function FilterControls({
   uniqueTeamMembers,
   availableBigTicketOptions,
   onResetFilters,
+  showProgress = false,
+  onShowProgressChange,
 }: FilterControlsProps) {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -506,10 +514,24 @@ export function FilterControls({
         </div>
       )}
 
-      {/* Search Bar and Reset Button */}
+      {/* Search Bar, Progress Toggle, and Reset Button */}
       <div className="-mt-1 mb-4 flex w-full items-center justify-between gap-3">
         <SearchBar searchQuery={searchQuery} onSearchChange={onSearchChange} />
-        {hasActiveFilters && <ResetButton onClick={onResetFilters} />}
+        <div className="flex items-center gap-3">
+          {onShowProgressChange && (
+            <div className="flex items-center gap-2">
+              <Label htmlFor="show-progress" className="text-sm text-gray-700 cursor-pointer">
+                Show progress
+              </Label>
+              <Switch
+                id="show-progress"
+                checked={showProgress}
+                onCheckedChange={onShowProgressChange}
+              />
+            </div>
+          )}
+          {hasActiveFilters && <ResetButton onClick={onResetFilters} />}
+        </div>
       </div>
     </>
   );

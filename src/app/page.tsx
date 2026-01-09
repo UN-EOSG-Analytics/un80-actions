@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { DataCard } from "@/components/DataCard";
 import { ExplainerText } from "@/components/ExplainerText";
 import { FilterControls } from "@/components/FilterControls";
@@ -25,6 +25,7 @@ import {
 function WorkPackagesPageContent() {
   // Custom hooks for state management
   const { actions, isLoading } = useActions();
+  const [showProgress, setShowProgress] = useState(false);
 
   const {
     filters,
@@ -132,30 +133,40 @@ function WorkPackagesPageContent() {
                   value={statsData.workstreams}
                   icon={Layers}
                   isLoading={isLoading}
+                  showProgress={showProgress}
+                  completed={0}
                 />
                 <DataCard
                   title="Work Packages"
                   value={statsData.workpackages}
                   icon={BriefcaseIcon}
                   isLoading={isLoading}
+                  showProgress={showProgress}
+                  completed={0}
                 />
                 <DataCard
                   title="Actions"
                   value={statsData.actions}
                   icon={ListTodo}
                   isLoading={isLoading}
+                  showProgress={showProgress}
+                  completed={0}
                 />
                 <DataCard
                   title="UN System Leaders"
                   value={statsData.leads}
                   icon={Users}
                   isLoading={isLoading}
+                  showProgress={showProgress}
+                  completed={0}
                 />
                 <DataCard
                   title="UN System Entities"
                   value={statsData.teamMembers}
                   icon={User}
                   isLoading={isLoading}
+                  showProgress={showProgress}
+                  completed={0}
                 />
               </div>
             </section>
@@ -196,6 +207,8 @@ function WorkPackagesPageContent() {
                     uniqueTeamMembers={uniqueTeamMembers}
                     availableBigTicketOptions={availableBigTicketOptions}
                     onResetFilters={handleResetFilters}
+                    showProgress={showProgress}
+                    onShowProgressChange={setShowProgress}
                   />
 
                   <WorkPackageList
@@ -207,6 +220,7 @@ function WorkPackagesPageContent() {
                     selectedActions={selectedAction}
                     selectedTeamMembers={selectedTeamMember}
                     isLoading={isLoading}
+                    showProgress={showProgress}
                   />
                 </div>
 

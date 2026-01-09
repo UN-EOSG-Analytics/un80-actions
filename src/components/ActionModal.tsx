@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { X } from "lucide-react";
 import type { Action } from "@/types";
 import { LeadsBadge } from "@/components/LeadsBadge";
+import { MilestoneTimeline } from "@/components/MilestoneTimeline";
 import { parseDate, formatDate, formatDateMonthYear } from "@/lib/utils";
 import {
   Tooltip,
@@ -275,28 +276,81 @@ export default function ActionModal({
           </div>
         </div>
 
-        {/* Upcoming Milestone */}
-        <div className="-mt-2 pt-0">
-          <div className="space-y-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
-                  Upcoming milestone
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-gray-600">
-                  Steps which will be taken towards the delivery of the proposal concerned. Upcoming milestones may be updated as implementation progresses.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-            <div className="mt-2 border-l-2 border-un-blue bg-slate-50 py-3 pr-4 pl-4">
-              <p className="text-base leading-snug font-medium text-slate-600">
-                To be updated
-              </p>
+        {/* Milestones Timeline - Only for Work Package 1 */}
+        {action.work_package_number === 1 ? (
+          <div className="-mt-2 pt-0">
+            <div className="space-y-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
+                    Milestones
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-gray-600">
+                    Steps which will be taken towards the delivery of the proposal concerned. Completed milestones are crossed out.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+              <div className="mt-4">
+                <MilestoneTimeline
+                  milestones={[
+                    ...(action.first_milestone
+                      ? [
+                          {
+                            label: action.first_milestone,
+                            deadline: action.first_milestone_deadline,
+                            isReached: false, // Will be calculated based on deadline
+                          },
+                        ]
+                      : []),
+                    ...(action.final_milestone
+                      ? [
+                          {
+                            label: action.final_milestone,
+                            deadline: action.final_milestone_deadline,
+                            isReached: false, // Will be calculated based on deadline
+                          },
+                        ]
+                      : []),
+                    ...(action.upcoming_milestone
+                      ? [
+                          {
+                            label: action.upcoming_milestone,
+                            deadline: action.upcoming_milestone_deadline,
+                            isReached: false,
+                          },
+                        ]
+                      : []),
+                  ]}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          /* Upcoming Milestone - For other work packages */
+          <div className="-mt-2 pt-0">
+            <div className="space-y-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
+                    Upcoming milestone
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-gray-600">
+                    Steps which will be taken towards the delivery of the proposal concerned. Upcoming milestones may be updated as implementation progresses.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+              <div className="mt-2 border-l-2 border-un-blue bg-slate-50 py-3 pr-4 pl-4">
+                <p className="text-base leading-snug font-medium text-slate-600">
+                  To be updated
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Updates */}
         <div className="-mt-2 pt-0">
