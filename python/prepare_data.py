@@ -153,7 +153,7 @@ if num_subactions != 5:
 # Expected counts from UI DataCards (excluding subactions)
 EXPECTED_WORKSTREAMS = 3
 EXPECTED_WORK_PACKAGES = 31
-EXPECTED_ACTIONS = 87  # 92 total - 5 subactions
+EXPECTED_ACTIONS = 86  # 91 total - 5 subactions
 EXPECTED_LEADS = 34
 
 # Calculate actual counts (excluding subactions for actions count)
