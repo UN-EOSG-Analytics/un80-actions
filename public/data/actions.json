@@ -54,13 +54,13 @@
     "work_package_leads":[
       "USG OCHA"
     ],
-    "first_milestone":null,
-    "first_milestone_deadline":null,
-    "final_milestone":null,
-    "final_milestone_deadline":null,
+    "first_milestone":"By Q1 2026, publication of 2026 Humanitarian Response Plans (HNRPs) that are shorter, sharper and increasingly digitized",
+    "first_milestone_deadline":"2026-03-30",
+    "final_milestone":"By Q1 2026, publication of 2026 Humanitarian Response Plans (HNRPs) that are shorter, sharper and increasingly digitized",
+    "final_milestone_deadline":"2026-03-30",
     "doc_text":"Humanitarian Needs and Response Plans will become shorter and sharper, coordination structures simpler and action better aligned with local capacities.",
     "work_package_goal":"Maximizing impact",
-    "action_entities":null,
+    "action_entities":"OCHA",
     "sub_action_details":null,
     "is_subaction":false
   },
@@ -1713,10 +1713,10 @@
     "work_package_leads":[
       "USG Policy"
     ],
-    "first_milestone":null,
-    "first_milestone_deadline":null,
-    "final_milestone":null,
-    "final_milestone_deadline":null,
+    "first_milestone":"mandates.un.org updated with data for the 2027 Programme Budget and 2026\/27 Peacekeeping Budgets and a proposal for sustainability finalized",
+    "first_milestone_deadline":"2026-03-15",
+    "final_milestone":"mandates.un.org includes full text for 80 percent of mandate sources and links to mandate registries for at least 10 non-UN Secretariat entities",
+    "final_milestone_deadline":"2026-09-15",
     "doc_text":"1. Accelerate the creation of comprehensive registries of existing mandate texts issued by all mandating bodies",
     "work_package_goal":"Improved visibility, coordination and support for Member States during mandate creation",
     "action_entities":"EOSG (USG Policy)",
@@ -1734,10 +1734,10 @@
     "work_package_leads":[
       "USG Policy"
     ],
-    "first_milestone":null,
-    "first_milestone_deadline":null,
-    "final_milestone":null,
-    "final_milestone_deadline":null,
+    "first_milestone":"Potential approaches consulted with stakeholders via technical briefings and surveys, systemchart.un.org launched, and open.un.org updated",
+    "first_milestone_deadline":"2026-03-15",
+    "final_milestone":"Improved portfolio of tools to support Member States across the mandate lifecycle available, including to provide consolidated, timely, and comparable information on mandates, resources, activities, and results across the UN system",
+    "final_milestone_deadline":"2026-09-15",
     "doc_text":"4. Develop tools using artificial intelligence to assist with mandate drafting, including by producing summarized information to enable Member States’ decision-making, flagging potential complementarities or duplications in draft texts or meeting agendas across mandating bodies",
     "work_package_goal":"Improved visibility, coordination and support for Member States during mandate creation",
     "action_entities":"EOSG (USG Policy)",
@@ -1951,9 +1951,9 @@
       "USG DOS"
     ],
     "first_milestone":"31 December 2025: Phase one of the consolidation review completed",
-    "first_milestone_deadline":"2025-12-31",
+    "first_milestone_deadline":"2025-12-30",
     "final_milestone":"Subject to Steering Group endorsement and the approval of business case. Implementation not expected before December 2026",
-    "final_milestone_deadline":"2026-12-31",
+    "final_milestone_deadline":"2026-12-30",
     "doc_text":null,
     "work_package_goal":null,
     "action_entities":"RSCE;DMSPC;DOS",
@@ -1973,9 +1973,9 @@
       "USG DOS"
     ],
     "first_milestone":"31 December 2025: Endorsement of business case by Steering Group (to be implemented in phases)",
-    "first_milestone_deadline":"2025-12-31",
+    "first_milestone_deadline":"2025-12-30",
     "final_milestone":"No later than 31 December 2026: Phase 1 Travel Processing Office consolidation completed and operational. 31 December 2027: Phase 2 Travel Processing Office Consolidation (Regional Hubs) established. Full operational readiness subject to implementation of new travel management company contracts\/procurement process (likely through 2028)",
-    "final_milestone_deadline":"2026-12-31",
+    "final_milestone_deadline":"2026-12-30",
     "doc_text":null,
     "work_package_goal":null,
     "action_entities":"DOS;DMSPC",
