@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { X } from "lucide-react";
 import type { Action } from "@/types";
 import { LeadsBadge } from "@/components/LeadsBadge";
-import { parseDate, formatDate, formatDateMonthYear } from "@/lib/utils";
+import { parseDate, formatDate, formatDateMonthYear, normalizeTeamMemberForDisplay } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
@@ -261,12 +261,19 @@ export default function ActionModal({
             <div className="mt-1 text-base text-gray-900">
               <p className="text-left leading-tight text-gray-700">
                 {action.action_entities && action.action_entities.trim() ? (
-                  action.action_entities.split(';').map((entity, index, array) => (
-                    <span key={index}>
-                      {entity.trim()}
-                      {index < array.length - 1 && <span className="text-gray-400"> • </span>}
-                    </span>
-                  ))
+                  action.action_entities
+                    .split(';')
+                    .map((entity) => normalizeTeamMemberForDisplay(entity.trim()))
+                    .filter((entity, index, array) => {
+                      // Remove duplicates after normalization
+                      return array.indexOf(entity) === index;
+                    })
+                    .map((entity, index, array) => (
+                      <span key={index}>
+                        {entity}
+                        {index < array.length - 1 && <span className="text-gray-400"> • </span>}
+                      </span>
+                    ))
                 ) : (
                   <span>to be updated</span>
                 )}

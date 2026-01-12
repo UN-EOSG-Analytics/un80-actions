@@ -78,6 +78,25 @@ export const formatDateMonthYear = (date: Date): string => {
  * @param teamMember - Team member name to normalize
  * @returns Normalized team member name or null if should be excluded
  */
+/**
+ * Normalize team member name for display
+ * - Normalizes all "EOSG (xxx)" variants to "EOSG"
+ * @param teamMember - Team member name to normalize
+ * @returns Normalized team member name
+ */
+export const normalizeTeamMemberForDisplay = (teamMember: string): string => {
+  if (!teamMember || !teamMember.trim()) return teamMember;
+  
+  const trimmed = teamMember.trim();
+  
+  // Normalize all EOSG variants (including "EOSG (xxx)") to "EOSG"
+  if (trimmed.startsWith("EOSG")) {
+    return "EOSG";
+  }
+  
+  return trimmed;
+};
+
 export const normalizeTeamMember = (teamMember: string): string | null => {
   if (!teamMember || !teamMember.trim()) return null;
   
