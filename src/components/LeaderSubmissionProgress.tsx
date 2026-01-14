@@ -21,21 +21,68 @@ export function LeaderSubmissionProgress({
   const finalMilestonePercentage = 0; // Always 0%
   const focalPointsPercentage = Math.round((17 / 34) * 100);
 
-  const ProgressCard = ({
-    label,
-    value,
-    total,
-    percentage,
-    icon: Icon,
-    separator = "of",
-  }: {
-    label: string;
-    value: number;
-    total: number;
-    percentage: number;
-    icon: React.ComponentType<{ className?: string }>;
-    separator?: string;
-  }) => {
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-un-blue/20 to-un-blue/10">
+          <TrendingUp className="h-5 w-5 text-un-blue" />
+        </div>
+        <div>
+          <h3 className="text-xl font-bold text-gray-900">
+            UN Leaders Submission Progress
+          </h3>
+          <p className="mt-0.5 text-sm text-gray-600">
+            Tracking submissions from {progress.totalLeaders} UN System Leaders
+          </p>
+        </div>
+      </div>
+
+      {/* Progress Cards Grid */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <ProgressCard
+          label="Focal Points Submitted"
+          value={17}
+          total={34}
+          percentage={focalPointsPercentage}
+          icon={Users}
+        />
+        <ProgressCard
+          label="First Milestone Submitted"
+          value={0}
+          total={87}
+          percentage={firstMilestonePercentage}
+          icon={CheckCircle2}
+        />
+        <ProgressCard
+          label="Final Milestone Submitted"
+          value={0}
+          total={87}
+          percentage={finalMilestonePercentage}
+          icon={Calendar}
+        />
+      </div>
+    </div>
+  );
+}
+
+interface ProgressCardProps {
+  label: string;
+  value: number;
+  total: number;
+  percentage: number;
+  icon: React.ComponentType<{ className?: string }>;
+  separator?: string;
+}
+
+function ProgressCard({
+  label,
+  value,
+  total,
+  percentage,
+  icon: Icon,
+  separator = "of",
+}: ProgressCardProps) {
     // Calculate circumference for circular progress (radius = 40, so circumference = 2 * π * 40 ≈ 251)
     const radius = 40;
     const circumference = 2 * Math.PI * radius;
@@ -104,49 +151,4 @@ export function LeaderSubmissionProgress({
         </div>
       </div>
     );
-  };
-
-  return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-un-blue/20 to-un-blue/10">
-          <TrendingUp className="h-5 w-5 text-un-blue" />
-        </div>
-        <div>
-          <h3 className="text-xl font-bold text-gray-900">
-            UN Leaders Submission Progress
-          </h3>
-          <p className="mt-0.5 text-sm text-gray-600">
-            Tracking submissions from {progress.totalLeaders} UN System Leaders
-          </p>
-        </div>
-      </div>
-
-      {/* Progress Cards Grid */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <ProgressCard
-          label="Focal Points Submitted"
-          value={17}
-          total={34}
-          percentage={focalPointsPercentage}
-          icon={Users}
-        />
-        <ProgressCard
-          label="First Milestone Submitted"
-          value={0}
-          total={87}
-          percentage={firstMilestonePercentage}
-          icon={CheckCircle2}
-        />
-        <ProgressCard
-          label="Final Milestone Submitted"
-          value={0}
-          total={87}
-          percentage={finalMilestonePercentage}
-          icon={Calendar}
-        />
-      </div>
-    </div>
-  );
 }

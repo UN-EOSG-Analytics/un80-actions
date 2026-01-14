@@ -33,6 +33,17 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
       { date: Date; count: number; completed: number; dateKey: string }
     >();
 
+    // Use a deterministic hash function instead of Math.random()
+    const hash = (str: string) => {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+      return Math.abs(hash);
+    };
+
     actions.forEach((action) => {
       if (action.first_milestone) {
         const date = parseDate(action.first_milestone);
@@ -48,8 +59,9 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
           }
           const milestone = milestoneMap.get(dateKey)!;
           milestone.count++;
-          // Simulate 30% completion rate for milestones
-          if (Math.random() < 0.3) {
+          // Use deterministic hash-based distribution instead of Math.random()
+          const actionHash = hash(`${action.action_number}-${action.first_milestone}`);
+          if ((actionHash % 100) / 100 < 0.3) {
             milestone.completed++;
           }
         }
@@ -113,7 +125,7 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
                 No milestones scheduled
               </p>
             ) : (
-              milestones.map((milestone, index) => {
+              milestones.map((milestone) => {
                 const status = getStatus(
                   milestone.date,
                   milestone.completed,

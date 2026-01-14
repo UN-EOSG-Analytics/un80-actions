@@ -3,9 +3,6 @@
 import { useMemo } from "react";
 import type { Actions, WorkPackage } from "@/types";
 import {
-  CheckCircle2,
-  Clock,
-  AlertCircle,
   TrendingUp,
   Layers,
   Briefcase,
@@ -19,7 +16,6 @@ interface OverallProgressDashboardProps {
 
 export function OverallProgressDashboard({
   actions,
-  workPackages,
 }: OverallProgressDashboardProps) {
   // Calculate overall statistics
   const stats = useMemo(() => {

@@ -58,7 +58,6 @@ interface FilterControlsProps {
   uniqueLeads: string[];
   uniqueWorkstreams: string[];
   uniqueActions: Array<{ text: string; actionNumber: string }>;
-  uniqueActionTexts: string[];
   uniqueTeamMembers: string[];
   availableBigTicketOptions: Array<{ key: string; label: string }>;
 
@@ -92,7 +91,6 @@ export function FilterControls({
   uniqueLeads,
   uniqueWorkstreams,
   uniqueActions,
-  uniqueActionTexts,
   uniqueTeamMembers,
   availableBigTicketOptions,
   onResetFilters,

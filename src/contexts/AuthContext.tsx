@@ -22,8 +22,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const authData = JSON.parse(storedAuth);
         if (authData.isAuthenticated && authData.user) {
-          setIsAuthenticated(true);
-          setUser(authData.user);
+          // Use setTimeout to avoid synchronous setState in effect
+          setTimeout(() => {
+            setIsAuthenticated(true);
+            setUser(authData.user);
+          }, 0);
         }
       } catch (error) {
         console.error("Error parsing stored auth data:", error);

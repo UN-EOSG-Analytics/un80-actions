@@ -17,9 +17,12 @@ export default function ModalHandler() {
   useEffect(() => {
     // If there's no action param, clear state
     if (!actionParam) {
-      setAction(null);
-      setError(null);
-      setLoading(false);
+      // Use setTimeout to avoid synchronous setState in effect
+      setTimeout(() => {
+        setAction(null);
+        setError(null);
+        setLoading(false);
+      }, 0);
       return;
     }
 
@@ -27,8 +30,10 @@ export default function ModalHandler() {
     const actionNumber = parseInt(actionParam, 10);
     if (isNaN(actionNumber)) {
       console.warn(`Invalid action number: "${actionParam}"`);
-      setError("Invalid action number");
-      setLoading(false);
+      setTimeout(() => {
+        setError("Invalid action number");
+        setLoading(false);
+      }, 0);
       return;
     }
 
@@ -38,8 +43,10 @@ export default function ModalHandler() {
       ? decodeURIComponent(milestoneParam)
       : null;
 
-    setLoading(true);
-    setError(null);
+    setTimeout(() => {
+      setLoading(true);
+      setError(null);
+    }, 0);
 
     // Load action data
     getActionByNumber(actionNumber, firstMilestone)

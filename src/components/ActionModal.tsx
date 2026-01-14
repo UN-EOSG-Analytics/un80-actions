@@ -4,12 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { X } from "lucide-react";
 import type { Action } from "@/types";
 import { LeadsBadge } from "@/components/LeadsBadge";
-import {
-  parseDate,
-  formatDate,
-  formatDateMonthYear,
-  normalizeTeamMemberForDisplay,
-} from "@/lib/utils";
+import { normalizeTeamMemberForDisplay } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,

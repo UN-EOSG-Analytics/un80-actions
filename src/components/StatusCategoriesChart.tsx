@@ -30,6 +30,17 @@ export function StatusCategoriesChart({ actions }: StatusCategoriesChartProps) {
       }
     >();
 
+    // Use a deterministic hash function instead of Math.random()
+    const hash = (str: string) => {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+      return Math.abs(hash);
+    };
+
     actions.forEach((action) => {
       const ws = action.report || "Unknown";
       if (!workstreamMap.has(ws)) {
@@ -42,8 +53,9 @@ export function StatusCategoriesChart({ actions }: StatusCategoriesChartProps) {
       }
       const stats = workstreamMap.get(ws)!;
 
-      // Simulate status distribution: 30% planned, 40% in progress, 20% completed, 10% delayed
-      const rand = Math.random();
+      // Use deterministic hash-based distribution instead of Math.random()
+      const actionHash = hash(`${action.action_number}-${action.report}`);
+      const rand = (actionHash % 100) / 100;
       if (rand < 0.2) stats.completed++;
       else if (rand < 0.6) stats.inProgress++;
       else if (rand < 0.9) stats.planned++;
@@ -64,29 +76,6 @@ export function StatusCategoriesChart({ actions }: StatusCategoriesChartProps) {
         return totalB - totalA;
       });
   }, [actions]);
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      const total =
-        data.Planned + data["In Progress"] + data.Completed + data.Delayed;
-      return (
-        <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
-          <p className="mb-2 font-semibold text-gray-900">{data.workstream}</p>
-          {payload.map((entry: any, index: number) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: {entry.value} (
-              {((entry.value / total) * 100).toFixed(1)}%)
-            </p>
-          ))}
-          <p className="mt-2 border-t border-gray-200 pt-2 text-sm font-medium text-gray-900">
-            Total: {total} actions
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -117,4 +106,43 @@ export function StatusCategoriesChart({ actions }: StatusCategoriesChartProps) {
       </ResponsiveContainer>
     </div>
   );
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    name: string;
+    value: number;
+    color: string;
+    payload: {
+      workstream: string;
+      Planned: number;
+      "In Progress": number;
+      Completed: number;
+      Delayed: number;
+    };
+  }>;
+}
+
+function CustomTooltip({ active, payload }: CustomTooltipProps) {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    const total =
+      data.Planned + data["In Progress"] + data.Completed + data.Delayed;
+    return (
+      <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
+        <p className="mb-2 font-semibold text-gray-900">{data.workstream}</p>
+        {payload.map((entry, index: number) => (
+            <p key={index} className="text-sm" style={{ color: entry.color }}>
+              {entry.name}: {entry.value} (
+              {((entry.value / total) * 100).toFixed(1)}%)
+            </p>
+          ))}
+          <p className="mt-2 border-t border-gray-200 pt-2 text-sm font-medium text-gray-900">
+            Total: {total} actions
+          </p>
+        </div>
+      );
+    }
+    return null;
 }

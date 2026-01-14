@@ -55,8 +55,6 @@ export function calculateLeaderSubmissionProgress(
   ]);
 
   // Track which leaders have submitted each type of data
-  const leadersWithMilestones = new Set<string>();
-  const leadersWithDueDates = new Set<string>();
   const leadersWithFocalPoints = new Set<string>();
 
   // Group actions by work package to check due dates
@@ -87,12 +85,6 @@ export function calculateLeaderSubmissionProgress(
         workPackagesByLeader.set(normalizedLead, new Set());
       }
       workPackagesByLeader.get(normalizedLead)!.add(workPackageKey);
-
-      // Milestones: no one has submitted milestones (always 0)
-      // leadersWithMilestones remains empty
-
-      // Due dates: no one has submitted due dates (always 0)
-      // leadersWithDueDates remains empty
     });
   });
 
@@ -161,8 +153,6 @@ export function getLeaderSubmissionStatuses(
   ]);
 
   // Track which leaders have submitted each type of data
-  const leadersWithMilestones = new Set<string>();
-  const leadersWithDueDates = new Set<string>();
   const leadersWithFocalPoints = new Set<string>();
 
   // Group actions by work package to check due dates
@@ -193,12 +183,6 @@ export function getLeaderSubmissionStatuses(
         workPackagesByLeader.set(normalizedLead, new Set());
       }
       workPackagesByLeader.get(normalizedLead)!.add(workPackageKey);
-
-      // Milestones: no one has submitted milestones (always false)
-      // leadersWithMilestones remains empty
-
-      // Due dates: no one has submitted due dates (always false)
-      // leadersWithDueDates remains empty
     });
   });
 

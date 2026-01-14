@@ -19,7 +19,6 @@ import {
   ListTodo,
   Users,
   User,
-  AlertCircle,
 } from "lucide-react";
 
 function WorkPackagesPageContent() {
