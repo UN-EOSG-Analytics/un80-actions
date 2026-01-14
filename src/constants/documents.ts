@@ -33,7 +33,7 @@ export function getDocumentReference({
   report,
   documentParagraph,
 }: {
-  workPackageNumber?: number | '';
+  workPackageNumber?: number | "";
   report?: string;
   documentParagraph?: string;
 }): { text: string; documentNumber: string } | null {

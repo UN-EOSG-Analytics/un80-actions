@@ -50,21 +50,29 @@ export function WorkPackageList({
         // Filter actions if action filter is selected
         let filteredActions =
           selectedActions.length > 0
-          ? wp.actions.filter((action) =>
+            ? wp.actions.filter((action) =>
                 selectedActions.includes(action.text.trim()),
-            )
-          : wp.actions;
+              )
+            : wp.actions;
 
         // Filter actions by team members if team member filter is selected
         if (selectedTeamMembers.length > 0) {
           filteredActions = filteredActions.filter((action) => {
             if (!action.actionEntities) return false;
-            const entities = action.actionEntities.split(';').map(e => e.trim()).filter(Boolean);
+            const entities = action.actionEntities
+              .split(";")
+              .map((e) => e.trim())
+              .filter(Boolean);
             // Normalize both the selected team members and the entities for comparison
-            const normalizedSelected = selectedTeamMembers.map(normalizeTeamMember).filter(Boolean) as string[];
-            return entities.some(entity => {
+            const normalizedSelected = selectedTeamMembers
+              .map(normalizeTeamMember)
+              .filter(Boolean) as string[];
+            return entities.some((entity) => {
               const normalizedEntity = normalizeTeamMember(entity);
-              return normalizedEntity && normalizedSelected.includes(normalizedEntity);
+              return (
+                normalizedEntity &&
+                normalizedSelected.includes(normalizedEntity)
+              );
             });
           });
         }

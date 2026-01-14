@@ -4,7 +4,7 @@ import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
 interface DocumentBadgeProps {
   documentParagraphNumber?: string;
   report?: string;
-  workPackageNumber?: number | '';
+  workPackageNumber?: number | "";
 }
 
 export function DocumentBadge({

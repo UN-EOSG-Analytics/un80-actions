@@ -1,7 +1,16 @@
 "use client";
 
 import { useMemo } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 import type { Actions } from "@/types";
 
 interface StatusCategoriesChartProps {
@@ -11,15 +20,28 @@ interface StatusCategoriesChartProps {
 export function StatusCategoriesChart({ actions }: StatusCategoriesChartProps) {
   const chartData = useMemo(() => {
     // Group by workstream and calculate status distribution
-    const workstreamMap = new Map<string, { planned: number; inProgress: number; completed: number; delayed: number }>();
+    const workstreamMap = new Map<
+      string,
+      {
+        planned: number;
+        inProgress: number;
+        completed: number;
+        delayed: number;
+      }
+    >();
 
     actions.forEach((action) => {
       const ws = action.report || "Unknown";
       if (!workstreamMap.has(ws)) {
-        workstreamMap.set(ws, { planned: 0, inProgress: 0, completed: 0, delayed: 0 });
+        workstreamMap.set(ws, {
+          planned: 0,
+          inProgress: 0,
+          completed: 0,
+          delayed: 0,
+        });
       }
       const stats = workstreamMap.get(ws)!;
-      
+
       // Simulate status distribution: 30% planned, 40% in progress, 20% completed, 10% delayed
       const rand = Math.random();
       if (rand < 0.2) stats.completed++;
@@ -46,13 +68,15 @@ export function StatusCategoriesChart({ actions }: StatusCategoriesChartProps) {
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
-      const total = data.Planned + data["In Progress"] + data.Completed + data.Delayed;
+      const total =
+        data.Planned + data["In Progress"] + data.Completed + data.Delayed;
       return (
         <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
           <p className="mb-2 font-semibold text-gray-900">{data.workstream}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: {entry.value} ({((entry.value / total) * 100).toFixed(1)}%)
+              {entry.name}: {entry.value} (
+              {((entry.value / total) * 100).toFixed(1)}%)
             </p>
           ))}
           <p className="mt-2 border-t border-gray-200 pt-2 text-sm font-medium text-gray-900">
@@ -70,7 +94,10 @@ export function StatusCategoriesChart({ actions }: StatusCategoriesChartProps) {
         Status by Workstream
       </h3>
       <ResponsiveContainer width="100%" height={400}>
-        <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+        <BarChart
+          data={chartData}
+          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+        >
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
             dataKey="workstream"
@@ -91,8 +118,3 @@ export function StatusCategoriesChart({ actions }: StatusCategoriesChartProps) {
     </div>
   );
 }
-
-
-
-
-

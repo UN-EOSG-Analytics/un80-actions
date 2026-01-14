@@ -53,12 +53,10 @@ function TooltipContent({
       >
         <div className="relative">
           {/* Subtle gradient overlay */}
-          <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-un-blue/5 to-transparent pointer-events-none" />
+          <div className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-br from-un-blue/5 to-transparent" />
           <div className="relative">{children}</div>
         </div>
-        <TooltipPrimitive.Arrow 
-          className="z-50 size-2.5 fill-white drop-shadow-sm" 
-        />
+        <TooltipPrimitive.Arrow className="z-50 size-2.5 fill-white drop-shadow-sm" />
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
   );

@@ -20,8 +20,10 @@ export function WorkPackageProgress({
 }: WorkPackageProgressProps) {
   const [isOpen, setIsOpen] = useState(true);
   // Track which work packages are expanded
-  const [openWorkPackages, setOpenWorkPackages] = useState<Set<string>>(new Set());
-  
+  const [openWorkPackages, setOpenWorkPackages] = useState<Set<string>>(
+    new Set(),
+  );
+
   // Calculate progress per work package
   const wpProgress = useMemo(() => {
     return workPackages
@@ -30,9 +32,10 @@ export function WorkPackageProgress({
         // Simulate progress: 20% completed, 40% in progress, 40% planned
         const completed = Math.floor(totalActions * 0.2);
         const inProgress = Math.floor(totalActions * 0.4);
-        const progressPercentage = totalActions > 0
-          ? ((completed + inProgress * 0.5) / totalActions) * 100
-          : 0;
+        const progressPercentage =
+          totalActions > 0
+            ? ((completed + inProgress * 0.5) / totalActions) * 100
+            : 0;
 
         return {
           number: wp.number,
@@ -67,7 +70,7 @@ export function WorkPackageProgress({
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <div className="rounded-xl border border-gray-200 bg-white">
-        <CollapsibleTrigger className="flex w-full items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors">
+        <CollapsibleTrigger className="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-gray-50">
           <h3 className="text-lg font-semibold text-gray-900">
             Work Package Progress
           </h3>
@@ -78,10 +81,10 @@ export function WorkPackageProgress({
           />
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="px-6 pb-6 space-y-4">
+          <div className="space-y-4 px-6 pb-6">
             {wpProgress.map((wp) => {
               const fullWp = workPackages.find(
-                (p) => p.number === wp.number && p.name === wp.name
+                (p) => p.number === wp.number && p.name === wp.name,
               );
               const wpKey = `${wp.number}-${wp.name}`;
               const isWpOpen = openWorkPackages.has(wpKey);
@@ -102,7 +105,9 @@ export function WorkPackageProgress({
                                 {wp.number}
                               </span>
                             )}
-                            <h4 className="font-medium text-gray-900">{wp.name}</h4>
+                            <h4 className="font-medium text-gray-900">
+                              {wp.name}
+                            </h4>
                             <ChevronDown
                               className={`h-4 w-4 text-gray-500 transition-transform ${
                                 isWpOpen ? "rotate-180" : ""
@@ -110,18 +115,21 @@ export function WorkPackageProgress({
                             />
                           </div>
                           <p className="mt-1 text-sm text-gray-600">
-                            {wp.totalActions} actions • {wp.completed} completed • {wp.inProgress} in progress
+                            {wp.totalActions} actions • {wp.completed} completed
+                            • {wp.inProgress} in progress
                           </p>
                         </div>
                         <div className="ml-4 text-right">
-                          <p className="text-2xl font-bold text-gray-900">{wp.progress}%</p>
+                          <p className="text-2xl font-bold text-gray-900">
+                            {wp.progress}%
+                          </p>
                           <p className="text-xs text-gray-500">Progress</p>
                         </div>
                       </div>
                       <Progress value={wp.progress} className="h-2" />
                     </CollapsibleTrigger>
                     <CollapsibleContent>
-                      <div className="border-t border-gray-200 bg-white px-4 py-4 space-y-3">
+                      <div className="space-y-3 border-t border-gray-200 bg-white px-4 py-4">
                         {fullWp?.actions.map((action) => (
                           <ActionItem
                             key={action.actionNumber}
@@ -141,4 +149,3 @@ export function WorkPackageProgress({
     </Collapsible>
   );
 }
-

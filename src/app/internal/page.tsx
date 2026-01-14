@@ -20,15 +20,11 @@ function WorkPackagesPageContent() {
 
   const [selectedLeaders, setSelectedLeaders] = useState<string[]>([]);
 
-  const {
-    showAllLeaderChecklist,
-    setShowAllLeaderChecklist,
-  } = useCollapsibles();
+  const { showAllLeaderChecklist, setShowAllLeaderChecklist } =
+    useCollapsibles();
 
-  const {
-    leaderChecklistSearchQuery,
-    setLeaderChecklistSearchQuery,
-  } = useChartSearch();
+  const { leaderChecklistSearchQuery, setLeaderChecklistSearchQuery } =
+    useChartSearch();
 
   // Compute work package data
   const { workPackages } = useWorkPackageData(

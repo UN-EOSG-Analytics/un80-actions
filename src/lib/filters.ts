@@ -22,9 +22,7 @@ function getWpNumbersForFamily(
   const bigTicketNumbers = Array.from(
     new Set(
       workPackages
-        .filter(
-          (wp) => wp.bigTicket === true && typeof wp.number === "number",
-        )
+        .filter((wp) => wp.bigTicket === true && typeof wp.number === "number")
         .map((wp) => String(wp.number)),
     ),
   );
@@ -123,7 +121,7 @@ export function filterWorkPackages(
   if (filters.selectedBigTicket && filters.selectedBigTicket.length > 0) {
     const hasBigTicket = filters.selectedBigTicket.includes("big-ticket");
     const hasOther = filters.selectedBigTicket.includes("other");
-    
+
     if (hasBigTicket && hasOther) {
       // Both selected, show all
       // No filtering needed
@@ -155,14 +153,14 @@ export function filterWorkPackages(
         case "name-desc":
           return b.name.localeCompare(a.name);
         case "number-asc": {
-          const numA = typeof a.number === 'number' ? a.number : 0;
-          const numB = typeof b.number === 'number' ? b.number : 0;
+          const numA = typeof a.number === "number" ? a.number : 0;
+          const numB = typeof b.number === "number" ? b.number : 0;
           if (numA !== numB) return numA - numB;
           return a.name.localeCompare(b.name);
         }
         case "number-desc": {
-          const numA = typeof a.number === 'number' ? a.number : 0;
-          const numB = typeof b.number === 'number' ? b.number : 0;
+          const numA = typeof a.number === "number" ? a.number : 0;
+          const numB = typeof b.number === "number" ? b.number : 0;
           if (numA !== numB) return numB - numA;
           return a.name.localeCompare(b.name);
         }
@@ -184,10 +182,12 @@ export function getUniqueWorkPackages(workPackages: WorkPackage[]): string[] {
   const unique = Array.from(
     new Set(
       workPackages.map((wp) =>
-        wp.number ? `${wp.number}: ${wp.name ?? ""}` : wp.name ?? "",
+        wp.number ? `${wp.number}: ${wp.name ?? ""}` : (wp.name ?? ""),
       ),
     ),
-  ).filter((value): value is string => typeof value === "string" && value.length > 0);
+  ).filter(
+    (value): value is string => typeof value === "string" && value.length > 0,
+  );
 
   return unique.sort((a, b) => {
     // Extract numbers from strings like "1: Name" or "10: Name"
@@ -233,7 +233,10 @@ export function getUniqueTeamMembers(workPackages: WorkPackage[]): string[] {
   workPackages.forEach((wp) => {
     wp.actions.forEach((action) => {
       if (action.actionEntities && action.actionEntities.trim()) {
-        const entities = action.actionEntities.split(';').map(e => e.trim()).filter(Boolean);
+        const entities = action.actionEntities
+          .split(";")
+          .map((e) => e.trim())
+          .filter(Boolean);
         entities.forEach((entity) => {
           const normalized = normalizeTeamMember(entity);
           if (normalized) {
@@ -320,7 +323,7 @@ export function calculateLeadChartData(
     wp.leads.forEach((lead) => {
       // Normalize leader name (e.g., "ASG UNITAR" -> "ED UNITAR")
       const normalizedLead = normalizeLeaderName(lead);
-      
+
       // Filter by chart search query if provided
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
@@ -549,7 +552,10 @@ export function calculateStatsData(
     }
     // Count team members (action_entities)
     if (action.action_entities && action.action_entities.trim()) {
-      const entities = action.action_entities.split(';').map(e => e.trim()).filter(Boolean);
+      const entities = action.action_entities
+        .split(";")
+        .map((e) => e.trim())
+        .filter(Boolean);
       entities.forEach((entity) => {
         const normalized = normalizeTeamMember(entity);
         if (normalized) {
@@ -560,7 +566,9 @@ export function calculateStatsData(
   });
 
   // Count only non-subactions for the actions card (exclude subactions from count)
-  const nonSubactionCount = filteredActions.filter((action) => !action.is_subaction).length;
+  const nonSubactionCount = filteredActions.filter(
+    (action) => !action.is_subaction,
+  ).length;
 
   return {
     workstreams: uniqueWorkstreams.size,

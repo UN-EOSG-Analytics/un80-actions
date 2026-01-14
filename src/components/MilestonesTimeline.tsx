@@ -2,7 +2,14 @@
 
 import { useMemo, useState } from "react";
 import type { Actions } from "@/types";
-import { Calendar, CheckCircle2, Clock, AlertCircle, ChevronDown, Briefcase } from "lucide-react";
+import {
+  Calendar,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  ChevronDown,
+  Briefcase,
+} from "lucide-react";
 import { parseDate, formatDate } from "@/lib/utils";
 import {
   Collapsible,
@@ -21,7 +28,10 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
   const [openMilestones, setOpenMilestones] = useState<Set<string>>(new Set());
 
   const milestones = useMemo(() => {
-    const milestoneMap = new Map<string, { date: Date; count: number; completed: number; dateKey: string }>();
+    const milestoneMap = new Map<
+      string,
+      { date: Date; count: number; completed: number; dateKey: string }
+    >();
 
     actions.forEach((action) => {
       if (action.first_milestone) {
@@ -29,7 +39,12 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
         if (date) {
           const dateKey = date.toISOString().split("T")[0];
           if (!milestoneMap.has(dateKey)) {
-            milestoneMap.set(dateKey, { date, count: 0, completed: 0, dateKey });
+            milestoneMap.set(dateKey, {
+              date,
+              count: 0,
+              completed: 0,
+              dateKey,
+            });
           }
           const milestone = milestoneMap.get(dateKey)!;
           milestone.count++;
@@ -46,7 +61,7 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
       .slice(0, 12); // Next 12 milestones
   }, [actions]);
 
-  const getMilestoneActions = (milestone: typeof milestones[0]) => {
+  const getMilestoneActions = (milestone: (typeof milestones)[0]) => {
     return actions.filter((action) => {
       if (!action.first_milestone) return false;
       const actionDate = parseDate(action.first_milestone);
@@ -73,14 +88,15 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
   const getStatus = (date: Date, completed: number, total: number) => {
     if (completed === total) return "completed";
     if (date < now) return "overdue";
-    if (date.getTime() - now.getTime() < 30 * 24 * 60 * 60 * 1000) return "upcoming";
+    if (date.getTime() - now.getTime() < 30 * 24 * 60 * 60 * 1000)
+      return "upcoming";
     return "planned";
   };
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <div className="rounded-xl border border-gray-200 bg-white">
-        <CollapsibleTrigger className="flex w-full items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors">
+        <CollapsibleTrigger className="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-gray-50">
           <h3 className="text-lg font-semibold text-gray-900">
             Upcoming Milestones
           </h3>
@@ -91,12 +107,18 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
           />
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="px-6 pb-6 space-y-4">
+          <div className="space-y-4 px-6 pb-6">
             {milestones.length === 0 ? (
-              <p className="text-center text-gray-500">No milestones scheduled</p>
+              <p className="text-center text-gray-500">
+                No milestones scheduled
+              </p>
             ) : (
               milestones.map((milestone, index) => {
-                const status = getStatus(milestone.date, milestone.completed, milestone.count);
+                const status = getStatus(
+                  milestone.date,
+                  milestone.completed,
+                  milestone.count,
+                );
                 const isPast = milestone.date < now;
                 const isMilestoneOpen = openMilestones.has(milestone.dateKey);
                 const milestoneActions = getMilestoneActions(milestone);
@@ -162,9 +184,13 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
                               />
                             </div>
                             <p className="mt-1 text-sm text-gray-600">
-                              {milestone.completed} of {milestone.count} actions completed (
+                              {milestone.completed} of {milestone.count} actions
+                              completed (
                               {milestone.count > 0
-                                ? Math.round((milestone.completed / milestone.count) * 100)
+                                ? Math.round(
+                                    (milestone.completed / milestone.count) *
+                                      100,
+                                  )
                                 : 0}
                               %)
                             </p>
@@ -174,7 +200,9 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
                                 style={{
                                   width: `${
                                     milestone.count > 0
-                                      ? (milestone.completed / milestone.count) * 100
+                                      ? (milestone.completed /
+                                          milestone.count) *
+                                        100
                                       : 0
                                   }%`,
                                 }}
@@ -184,36 +212,47 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
                         </div>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
-                        <div className="border-t border-gray-200 bg-white px-4 py-4 space-y-4">
+                        <div className="space-y-4 border-t border-gray-200 bg-white px-4 py-4">
                           {milestoneActions.length === 0 ? (
-                            <p className="text-sm text-gray-500">No actions for this milestone</p>
+                            <p className="text-sm text-gray-500">
+                              No actions for this milestone
+                            </p>
                           ) : (
                             milestoneActions.map((action) => {
                               // Convert Action to WorkPackageAction format
                               const wpAction = {
                                 text: action.indicative_activity,
-                                documentParagraph: action.document_paragraph || "",
+                                documentParagraph:
+                                  action.document_paragraph || "",
                                 leads: action.work_package_leads || [],
                                 report: action.report,
                                 docText: action.doc_text,
                                 actionNumber: action.action_number,
                                 firstMilestone: action.first_milestone,
-                                finalMilestoneDeadline: action.final_milestone_deadline,
+                                finalMilestoneDeadline:
+                                  action.final_milestone_deadline,
                                 actionEntities: action.action_entities,
-                                subActionDetails: action.sub_action_details || null,
+                                subActionDetails:
+                                  action.sub_action_details || null,
                               };
                               return (
-                                <div key={action.action_number} className="space-y-2">
+                                <div
+                                  key={action.action_number}
+                                  className="space-y-2"
+                                >
                                   {/* Work Package Badge */}
                                   <div className="flex items-center gap-2 text-sm text-gray-600">
                                     <Briefcase className="h-4 w-4 text-un-blue" />
                                     <span className="font-medium">
-                                      WP{action.work_package_number}: {action.work_package_name}
+                                      WP{action.work_package_number}:{" "}
+                                      {action.work_package_name}
                                     </span>
                                   </div>
                                   <ActionItem
                                     action={wpAction}
-                                    workPackageNumber={action.work_package_number}
+                                    workPackageNumber={
+                                      action.work_package_number
+                                    }
                                   />
                                 </div>
                               );
@@ -232,4 +271,3 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
     </Collapsible>
   );
 }
-

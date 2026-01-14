@@ -1,7 +1,16 @@
 "use client";
 
 import { useMemo } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 import type { Actions } from "@/types";
 import { normalizeLeaderName } from "@/lib/utils";
 
@@ -9,12 +18,17 @@ interface ResponsibleEntitiesProgressProps {
   actions: Actions;
 }
 
-export function ResponsibleEntitiesProgress({ actions }: ResponsibleEntitiesProgressProps) {
+export function ResponsibleEntitiesProgress({
+  actions,
+}: ResponsibleEntitiesProgressProps) {
   const chartData = useMemo(() => {
     const leaderMap = new Map<string, { total: number; completed: number }>();
 
     actions.forEach((action) => {
-      if (action.work_package_leads && Array.isArray(action.work_package_leads)) {
+      if (
+        action.work_package_leads &&
+        Array.isArray(action.work_package_leads)
+      ) {
         action.work_package_leads.forEach((lead) => {
           if (lead && lead.trim()) {
             const normalized = normalizeLeaderName(lead.trim());
@@ -57,9 +71,7 @@ export function ResponsibleEntitiesProgress({ actions }: ResponsibleEntitiesProg
       return (
         <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
           <p className="mb-2 font-semibold text-gray-900">{data.leader}</p>
-          <p className="text-sm text-gray-600">
-            Total Actions: {data.total}
-          </p>
+          <p className="text-sm text-gray-600">Total Actions: {data.total}</p>
           <p className="text-sm text-gray-600">
             Completed: {data.completed} ({data.progress.toFixed(1)}%)
           </p>
@@ -99,4 +111,3 @@ export function ResponsibleEntitiesProgress({ actions }: ResponsibleEntitiesProg
     </div>
   );
 }
-

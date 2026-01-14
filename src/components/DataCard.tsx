@@ -46,24 +46,34 @@ export function DataCard({
             {isLoading ? (
               <p className="text-left text-[37px] leading-[45px] font-bold text-[#2E3440] tabular-nums sm:text-[43px] sm:leading-[51px] md:text-[49px] md:leading-[57px]"></p>
             ) : showProgress ? (
-              <p className={cn(
-                "text-left font-bold text-[#2E3440] tabular-nums",
-                "text-[24px] leading-[30px] sm:text-[28px] sm:leading-[34px] md:text-[32px] md:leading-[38px]"
-              )}>
-                {completed}/{value} <span className="text-[12px] sm:text-[14px] md:text-[16px] font-normal text-un-blue">completed</span>
+              <p
+                className={cn(
+                  "text-left font-bold text-[#2E3440] tabular-nums",
+                  "text-[24px] leading-[30px] sm:text-[28px] sm:leading-[34px] md:text-[32px] md:leading-[38px]",
+                )}
+              >
+                {completed}/{value}{" "}
+                <span className="text-[12px] font-normal text-un-blue sm:text-[14px] md:text-[16px]">
+                  completed
+                </span>
               </p>
             ) : (
-            <p className="text-left text-[37px] leading-[45px] font-bold text-[#2E3440] tabular-nums sm:text-[43px] sm:leading-[51px] md:text-[49px] md:leading-[57px]">
+              <p className="text-left text-[37px] leading-[45px] font-bold text-[#2E3440] tabular-nums sm:text-[43px] sm:leading-[51px] md:text-[49px] md:leading-[57px]">
                 {value}
-            </p>
+              </p>
             )}
           </Card>
         </div>
       </TooltipTrigger>
       <TooltipContent>
         <p className="text-gray-600">
-          {title}: <span className="font-semibold text-un-blue">
-            {isLoading ? "Loading..." : showProgress ? `${completed}/${value} completed` : value}
+          {title}:{" "}
+          <span className="font-semibold text-un-blue">
+            {isLoading
+              ? "Loading..."
+              : showProgress
+                ? `${completed}/${value} completed`
+                : value}
           </span>
         </p>
       </TooltipContent>

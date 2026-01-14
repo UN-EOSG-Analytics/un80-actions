@@ -63,7 +63,10 @@ export function calculateLeaderSubmissionProgress(
   const workPackagesByLeader = new Map<string, Set<string>>();
 
   actions.forEach((action) => {
-    if (!action.work_package_leads || !Array.isArray(action.work_package_leads)) {
+    if (
+      !action.work_package_leads ||
+      !Array.isArray(action.work_package_leads)
+    ) {
       return;
     }
 
@@ -166,7 +169,10 @@ export function getLeaderSubmissionStatuses(
   const workPackagesByLeader = new Map<string, Set<string>>();
 
   actions.forEach((action) => {
-    if (!action.work_package_leads || !Array.isArray(action.work_package_leads)) {
+    if (
+      !action.work_package_leads ||
+      !Array.isArray(action.work_package_leads)
+    ) {
       return;
     }
 
@@ -206,4 +212,3 @@ export function getLeaderSubmissionStatuses(
       hasDueDate: false, // No one has submitted due dates
     }));
 }
-

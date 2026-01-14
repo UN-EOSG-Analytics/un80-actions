@@ -55,7 +55,11 @@ export function LeaderSubmissionProgress({
                   <span className="text-2xl font-bold text-gray-900">
                     {value}
                   </span>
-                  <span className="text-sm text-gray-500">{separator === "/" ? `${separator}${total}` : `${separator} ${total}`}</span>
+                  <span className="text-sm text-gray-500">
+                    {separator === "/"
+                      ? `${separator}${total}`
+                      : `${separator} ${total}`}
+                  </span>
                 </div>
               </div>
             </div>
@@ -113,7 +117,7 @@ export function LeaderSubmissionProgress({
           <h3 className="text-xl font-bold text-gray-900">
             UN Leaders Submission Progress
           </h3>
-          <p className="text-sm text-gray-600 mt-0.5">
+          <p className="mt-0.5 text-sm text-gray-600">
             Tracking submissions from {progress.totalLeaders} UN System Leaders
           </p>
         </div>
@@ -146,4 +150,3 @@ export function LeaderSubmissionProgress({
     </div>
   );
 }
-

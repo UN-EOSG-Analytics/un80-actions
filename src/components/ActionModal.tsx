@@ -4,7 +4,12 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { X } from "lucide-react";
 import type { Action } from "@/types";
 import { LeadsBadge } from "@/components/LeadsBadge";
-import { parseDate, formatDate, formatDateMonthYear, normalizeTeamMemberForDisplay } from "@/lib/utils";
+import {
+  parseDate,
+  formatDate,
+  formatDateMonthYear,
+  normalizeTeamMemberForDisplay,
+} from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
@@ -160,7 +165,9 @@ export default function ActionModal({
               {action.sub_action_details && (
                 <>
                   {" "}
-                  <span className="font-bold text-gray-600">– {action.sub_action_details}</span>
+                  <span className="font-bold text-gray-600">
+                    – {action.sub_action_details}
+                  </span>
                 </>
               )}
             </h2>
@@ -211,9 +218,7 @@ export default function ActionModal({
           {action.work_package_goal && (
             <Field label="Work Package goal">
               <div className="mt-1 text-base text-gray-900">
-                <div className="text-gray-700">
-                  {action.work_package_goal}
-                </div>
+                <div className="text-gray-700">{action.work_package_goal}</div>
               </div>
             </Field>
           )}
@@ -224,7 +229,12 @@ export default function ActionModal({
           <div className="">
             <Field label="Work package leads">
               <div className="mt-1 text-base text-gray-900">
-                <LeadsBadge leads={action.work_package_leads} variant="default" showIcon={false} color="text-gray-600" />
+                <LeadsBadge
+                  leads={action.work_package_leads}
+                  variant="default"
+                  showIcon={false}
+                  color="text-gray-600"
+                />
               </div>
             </Field>
           </div>
@@ -236,7 +246,7 @@ export default function ActionModal({
             <div className="w-full border-t-2 border-gray-300"></div>
           </div>
           <div className="relative flex justify-start">
-            <span className="bg-white pl-0 pr-3 text-sm font-bold uppercase tracking-wider text-un-blue">
+            <span className="bg-white pr-3 pl-0 text-sm font-bold tracking-wider text-un-blue uppercase">
               Action Details
             </span>
           </div>
@@ -248,13 +258,16 @@ export default function ActionModal({
           <div className="space-y-1">
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
+                <span className="cursor-help text-sm font-normal tracking-wide text-gray-600 uppercase">
                   Team members for indicative action
                 </span>
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-gray-600">
-                  UN system entities that contribute to the implementation of a specific action, in support of the relevant Work Package Lead. Work Package Leads report to the UN80 Steering Committee under the authority of the Secretary-General.
+                  UN system entities that contribute to the implementation of a
+                  specific action, in support of the relevant Work Package Lead.
+                  Work Package Leads report to the UN80 Steering Committee under
+                  the authority of the Secretary-General.
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -262,8 +275,10 @@ export default function ActionModal({
               <p className="text-left leading-tight text-gray-700">
                 {action.action_entities && action.action_entities.trim() ? (
                   action.action_entities
-                    .split(';')
-                    .map((entity) => normalizeTeamMemberForDisplay(entity.trim()))
+                    .split(";")
+                    .map((entity) =>
+                      normalizeTeamMemberForDisplay(entity.trim()),
+                    )
                     .filter((entity, index, array) => {
                       // Remove duplicates after normalization
                       return array.indexOf(entity) === index;
@@ -271,7 +286,9 @@ export default function ActionModal({
                     .map((entity, index, array) => (
                       <span key={index}>
                         {entity}
-                        {index < array.length - 1 && <span className="text-gray-400"> • </span>}
+                        {index < array.length - 1 && (
+                          <span className="text-gray-400"> • </span>
+                        )}
                       </span>
                     ))
                 ) : (
@@ -287,13 +304,15 @@ export default function ActionModal({
           <div className="space-y-1">
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
+                <span className="cursor-help text-sm font-normal tracking-wide text-gray-600 uppercase">
                   Upcoming milestone
                 </span>
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-gray-600">
-                  Steps which will be taken towards the delivery of the proposal concerned. Upcoming milestones may be updated as implementation progresses.
+                  Steps which will be taken towards the delivery of the proposal
+                  concerned. Upcoming milestones may be updated as
+                  implementation progresses.
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -310,7 +329,7 @@ export default function ActionModal({
           <div className="space-y-1">
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
+                <span className="cursor-help text-sm font-normal tracking-wide text-gray-600 uppercase">
                   Updates
                 </span>
               </TooltipTrigger>
@@ -322,7 +341,7 @@ export default function ActionModal({
             </Tooltip>
             <div className="mt-1 text-base text-gray-900">
               <div className="text-gray-700">To be updated</div>
-              </div>
+            </div>
           </div>
         </div>
 
@@ -368,8 +387,6 @@ export default function ActionModal({
             </Field>
           </div>
         )} */}
-
-
       </div>
     );
   };

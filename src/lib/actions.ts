@@ -14,7 +14,10 @@ export async function fetchActions(): Promise<Actions> {
   // Include regular actions and subactions for actions 94 and 95
   return Promise.resolve(
     allActions.filter(
-      (action) => !action.is_subaction || action.action_number === 94 || action.action_number === 95,
+      (action) =>
+        !action.is_subaction ||
+        action.action_number === 94 ||
+        action.action_number === 95,
     ),
   );
 }
@@ -104,21 +107,23 @@ export function countByMSApproval(actions: Actions): {
  */
 export async function getActionByNumber(
   actionNumber: number,
-  firstMilestone?: string | null
+  firstMilestone?: string | null,
 ): Promise<Action | null> {
   const actions = await fetchActions();
-  const matchingActions = actions.filter((action) => action.action_number === actionNumber);
-  
+  const matchingActions = actions.filter(
+    (action) => action.action_number === actionNumber,
+  );
+
   // If no firstMilestone specified, return the first match (main action)
   if (!firstMilestone) {
     return matchingActions[0] || null;
   }
-  
+
   // If firstMilestone is specified, find exact match
   const exactMatch = matchingActions.find(
-    (action) => action.first_milestone === firstMilestone
+    (action) => action.first_milestone === firstMilestone,
   );
-  
+
   // If exact match found, return it; otherwise return first match (main action)
   return exactMatch || matchingActions[0] || null;
 }
