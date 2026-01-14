@@ -21,7 +21,7 @@
     "sub_action_details": null,
     "is_subaction": false,
     "upcoming_milestone": "Possible delegation of relevant programmatic tasks clarified among entities",
-    "upcoming_milestone_deadline": "2026-03-30",
+    "upcoming_milestone_deadline": "2026-06-10",
     "updates": null,
     "link_updates": null
   },
@@ -46,7 +46,7 @@
     "action_entities": "DPPA;DPO",
     "sub_action_details": null,
     "is_subaction": false,
-    "upcoming_milestone": "Review of the future of peace operations (requested in GA resolution 79/1) submitted for the Secretary-General's consideration",
+    "upcoming_milestone": "Draft review of the future of peace operations (requested in GA resolution 79/1) submitted for the Secretary-General's consideration",
     "upcoming_milestone_deadline": "2026-03-30",
     "updates": null,
     "link_updates": null
@@ -681,7 +681,7 @@
     "sub_action_details": null,
     "is_subaction": false,
     "upcoming_milestone": "Proposals for changes in special envoy, representative, coordinator and adviser positions finalized for the Secretary-General's consideration",
-    "upcoming_milestone_deadline": "2026-02-27",
+    "upcoming_milestone_deadline": "2025-12-30",
     "updates": "- Mapping of special envoys, representatives, coordinators and advisers finalized for Secretary-General's review",
     "link_updates": null
   },
@@ -839,7 +839,7 @@
     "sub_action_details": "Harmonized in-country logistics",
     "is_subaction": false,
     "upcoming_milestone": "Proposal for integrated supply chain in starter countries submitted for Secretary-General's consideration",
-    "upcoming_milestone_deadline": "2026-03-31",
+    "upcoming_milestone_deadline": "2026-01-31",
     "updates": null,
     "link_updates": null
   },
@@ -2061,7 +2061,7 @@
     "action_entities": "EOSG (USG Policy)",
     "sub_action_details": null,
     "is_subaction": false,
-    "upcoming_milestone": "systemchart.un.org launched, open.un.org updated, and technical briefings for delegates set up",
+    "upcoming_milestone": "First set of digital tools launched and technical briefings for delegates set up",
     "upcoming_milestone_deadline": "2026-03-15",
     "updates": null,
     "link_updates": null
@@ -2188,7 +2188,7 @@
     "sub_action_details": "Centralized account payable in New York",
     "is_subaction": false,
     "upcoming_milestone": "Global payroll centre fully operational in New York, Nairobi and Entebbe",
-    "upcoming_milestone_deadline": "2026-10-31",
+    "upcoming_milestone_deadline": "2026-09-29",
     "updates": "- Proposals on payroll consolidation was approved in GA resolution 80/xxx for implementation throughout 2026",
     "link_updates": null
   },
@@ -2214,7 +2214,7 @@
     "sub_action_details": "Payroll consolidation",
     "is_subaction": true,
     "upcoming_milestone": "Global payroll centre fully operational in New York, Nairobi and Entebbe",
-    "upcoming_milestone_deadline": "2026-10-31",
+    "upcoming_milestone_deadline": "2026-09-29",
     "updates": "- Proposals on payroll consolidation was approved in GA resolution 80/xxx for implementation throughout 2026",
     "link_updates": null
   },
