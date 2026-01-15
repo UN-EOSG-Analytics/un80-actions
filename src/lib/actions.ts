@@ -1,4 +1,5 @@
 import type { Action, Actions } from "@/types";
+import { normalizeLeaderName } from "./utils";
 // Import JSON directly for faster loading - data is bundled at build time instead of fetched at runtime
 import actionsData from "../../public/data/actions.json";
 
@@ -126,4 +127,35 @@ export async function getActionByNumber(
 
   // If exact match found, return it; otherwise return first match (main action)
   return exactMatch || matchingActions[0] || null;
+}
+
+/**
+ * Get aggregated work package leads for a given work package number
+ * Aggregates leads from all actions in the work package
+ * @param workPackageNumber - The work package number
+ * @returns Array of unique normalized leader names
+ */
+export async function getWorkPackageLeads(
+  workPackageNumber: number | string,
+): Promise<string[]> {
+  const actions = await fetchActions();
+  
+  const wpActions = actions.filter(
+    (action) => action.work_package_number === workPackageNumber,
+  );
+
+  const allLeads = new Set<string>();
+  
+  wpActions.forEach((action) => {
+    if (action.work_package_leads && Array.isArray(action.work_package_leads)) {
+      action.work_package_leads.forEach((lead) => {
+        if (lead && lead.trim().length > 0) {
+          const normalized = normalizeLeaderName(lead.trim());
+          allLeads.add(normalized);
+        }
+      });
+    }
+  });
+
+  return Array.from(allLeads).sort();
 }

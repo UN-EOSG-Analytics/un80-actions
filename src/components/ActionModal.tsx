@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import type { Action } from "@/types";
 import { LeadsBadge } from "@/components/LeadsBadge";
 import { normalizeTeamMemberForDisplay } from "@/lib/utils";
+import { getWorkPackageLeads } from "@/lib/actions";
 import {
   Tooltip,
   TooltipContent,
@@ -27,6 +28,7 @@ export default function ActionModal({
   const modalRef = useRef<HTMLDivElement>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [workPackageLeads, setWorkPackageLeads] = useState<string[]>([]);
 
   // Animation state management
   useEffect(() => {
@@ -77,6 +79,23 @@ export default function ActionModal({
       handleClose();
     }
   };
+
+  // Fetch aggregated work package leads when action changes
+  useEffect(() => {
+    if (action && action.work_package_number) {
+      getWorkPackageLeads(action.work_package_number)
+        .then((leads) => {
+          setWorkPackageLeads(leads);
+        })
+        .catch((err) => {
+          console.error("Error fetching work package leads:", err);
+          // Fallback to action's own leads if aggregation fails
+          setWorkPackageLeads(action.work_package_leads || []);
+        });
+    } else {
+      setWorkPackageLeads([]);
+    }
+  }, [action]);
 
   // Prevent body scroll when modal is open while maintaining scrollbar space
   useEffect(() => {
@@ -220,12 +239,12 @@ export default function ActionModal({
         </div>
 
         {/* Work Package Leads */}
-        {action.work_package_leads.length > 0 && (
+        {workPackageLeads.length > 0 && (
           <div className="">
             <Field label="Work package leads">
               <div className="mt-1 text-base text-gray-900">
                 <LeadsBadge
-                  leads={action.work_package_leads}
+                  leads={workPackageLeads}
                   variant="default"
                   showIcon={false}
                   color="text-gray-600"
@@ -336,7 +355,7 @@ export default function ActionModal({
             </Tooltip>
             <div className="mt-1 text-base text-gray-900">
               <div className="text-gray-700">To be updated</div>
-            </div>
+              </div>
           </div>
         </div>
 

@@ -76,12 +76,12 @@ interface ProgressCardProps {
 }
 
 function ProgressCard({
-  label,
-  value,
-  total,
-  percentage,
-  icon: Icon,
-  separator = "of",
+    label,
+    value,
+    total,
+    percentage,
+    icon: Icon,
+    separator = "of",
 }: ProgressCardProps) {
     // Calculate circumference for circular progress (radius = 40, so circumference = 2 * π * 40 ≈ 251)
     const radius = 40;
@@ -148,7 +148,7 @@ function ProgressCard({
               </div>
             </div>
           </div>
-        </div>
       </div>
-    );
+    </div>
+  );
 }

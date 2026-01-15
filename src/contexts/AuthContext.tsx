@@ -24,8 +24,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (authData.isAuthenticated && authData.user) {
           // Use setTimeout to avoid synchronous setState in effect
           setTimeout(() => {
-            setIsAuthenticated(true);
-            setUser(authData.user);
+          setIsAuthenticated(true);
+          setUser(authData.user);
           }, 0);
         }
       } catch (error) {
