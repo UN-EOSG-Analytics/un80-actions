@@ -86,11 +86,13 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           );
 
       if (!existingAction) {
-        // work_package_leads is already an array
-        const actionLeads = Array.isArray(action.work_package_leads)
-          ? action.work_package_leads
-              .filter((lead) => lead && lead.trim().length > 0)
-              .map((lead) => normalizeLeaderName(lead.trim()))
+        // Use action_leads (semicolon-separated string) for individual actions
+        const actionLeads = action.action_leads
+          ? action.action_leads
+              .split(";")
+              .map((lead) => lead.trim())
+              .filter((lead) => lead.length > 0)
+              .map((lead) => normalizeLeaderName(lead))
           : [];
 
         wp.actions.push({
@@ -106,11 +108,13 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           subActionDetails: action.sub_action_details || null,
         });
       } else {
-        // Merge leads if action already exists
-        const actionLeads = Array.isArray(action.work_package_leads)
-          ? action.work_package_leads.filter(
-              (lead) => lead && lead.trim().length > 0,
-            )
+        // Merge leads if action already exists (use action_leads)
+        const actionLeads = action.action_leads
+          ? action.action_leads
+              .split(";")
+              .map((lead) => lead.trim())
+              .filter((lead) => lead.length > 0)
+              .map((lead) => normalizeLeaderName(lead))
           : [];
         actionLeads.forEach((lead) => {
           if (!existingAction.leads.includes(lead)) {

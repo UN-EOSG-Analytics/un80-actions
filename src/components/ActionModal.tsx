@@ -267,6 +267,25 @@ export default function ActionModal({
         </div>
 
         {/* Action-specific information starts here */}
+        {/* Action Leads */}
+        {action.action_leads && action.action_leads.trim() && (
+          <div className="">
+            <Field label="Action leads">
+              <div className="mt-1 text-base text-gray-900">
+                <LeadsBadge
+                  leads={action.action_leads
+                    .split(";")
+                    .map((lead) => lead.trim())
+                    .filter((lead) => lead.length > 0)}
+                  variant="default"
+                  showIcon={false}
+                  color="text-gray-600"
+                />
+              </div>
+            </Field>
+          </div>
+        )}
+
         {/* Team Members for Indicative Action */}
         <div className="-mt-2 pt-0">
           <div className="space-y-1">

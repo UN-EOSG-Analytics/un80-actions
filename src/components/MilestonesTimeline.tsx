@@ -232,11 +232,18 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
                           ) : (
                             milestoneActions.map((action) => {
                               // Convert Action to WorkPackageAction format
+                              // Use action_leads (semicolon-separated string) for individual actions
+                              const actionLeads = action.action_leads
+                                ? action.action_leads
+                                    .split(";")
+                                    .map((lead) => lead.trim())
+                                    .filter((lead) => lead.length > 0)
+                                : [];
                               const wpAction = {
                                 text: action.indicative_activity,
                                 documentParagraph:
                                   action.document_paragraph || "",
-                                leads: action.work_package_leads || [],
+                                leads: actionLeads,
                                 report: action.report,
                                 docText: action.doc_text,
                                 actionNumber: action.action_number,
