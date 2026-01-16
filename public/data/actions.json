@@ -631,7 +631,7 @@
     "sub_action_details": null,
     "is_subaction": false,
     "upcoming_milestone": "Interagency task forces and working groups streamlined around Regional Monthly Review",
-    "upcoming_milestone_deadline": "2026-03-30",
+    "upcoming_milestone_deadline": "2026-09-15",
     "updates": null,
     "link_updates": null
   },
@@ -680,9 +680,9 @@
     "action_entities": "EOSG (USG Policy)",
     "sub_action_details": null,
     "is_subaction": false,
-    "upcoming_milestone": "Proposals for changes in special envoy, representative, coordinator and adviser positions finalized for the Secretary-General's consideration",
+    "upcoming_milestone": "Consideration of any changes in Special Envoy roster finalized by the Secretary-General",
     "upcoming_milestone_deadline": "2026-02-27",
-    "updates": "- Mapping of special envoys, representatives, coordinators and advisers finalized for Secretary-General's review",
+    "updates": "- Mapping of special envoys, representatives, coordinators and advisers finalized for the Secretary-General's review",
     "link_updates": null
   },
   {
@@ -1000,7 +1000,7 @@
     "action_entities": "EOSG (USG Policy);DESA;UNICEF;ILO;ECLAC;ECA;UNIDO",
     "sub_action_details": null,
     "is_subaction": false,
-    "upcoming_milestone": "UN System Data Commons site live with public data and statistics from 30+ entities",
+    "upcoming_milestone": "UN System Data Commons site live with public data and statistics from at least 20+ entities",
     "upcoming_milestone_deadline": "2026-09-14",
     "updates": null,
     "link_updates": null
@@ -1130,7 +1130,7 @@
     "action_entities": "UNU;UNITAR",
     "sub_action_details": null,
     "is_subaction": false,
-    "upcoming_milestone": "Blueprint for the Joint UN Coordination Mechanism submitted to the Chief Executives Board",
+    "upcoming_milestone": "Blueprint for the Joint UN Coordination Mechanism submitted to the UN System Chief Executives Board",
     "upcoming_milestone_deadline": "2026-04-29",
     "updates": null,
     "link_updates": null
@@ -1261,7 +1261,7 @@
     "sub_action_details": null,
     "is_subaction": false,
     "upcoming_milestone": "Invitation to participate in survey shared with Member State delegates",
-    "upcoming_milestone_deadline": "2026-01-30",
+    "upcoming_milestone_deadline": "2026-02-28",
     "updates": null,
     "link_updates": null
   },
@@ -1286,8 +1286,8 @@
     "action_entities": "EOSG (USG Policy);DGACM",
     "sub_action_details": null,
     "is_subaction": false,
-    "upcoming_milestone": "Survey to assess available support of mandate creation system-wide launched",
-    "upcoming_milestone_deadline": "2026-01-30",
+    "upcoming_milestone": "Mapping of available support of mandate creation system-wide finalized for the Secretary-General's consideration",
+    "upcoming_milestone_deadline": "2026-03-31",
     "updates": null,
     "link_updates": null
   },
@@ -1313,7 +1313,7 @@
     "sub_action_details": null,
     "is_subaction": false,
     "upcoming_milestone": "Initial concept note finalized for the Secretary-General's consideration",
-    "upcoming_milestone_deadline": "2026-01-30",
+    "upcoming_milestone_deadline": "2026-03-31",
     "updates": null,
     "link_updates": null
   },
@@ -1929,7 +1929,7 @@
     "action_entities": null,
     "sub_action_details": null,
     "is_subaction": false,
-    "upcoming_milestone": null,
+    "upcoming_milestone": "(Pending proposals)",
     "upcoming_milestone_deadline": null,
     "updates": null,
     "link_updates": null
@@ -1955,7 +1955,7 @@
     "action_entities": "UNDP;DPPA;UNCTAD;IFAD;OHCHR;UNEP;UNFCCC",
     "sub_action_details": null,
     "is_subaction": false,
-    "upcoming_milestone": "Assessment to reinforce environmental science, strengthen coordination on environmental issues, and explore joint knowledge hubs and potential strategic alignments finalized for the Secretary-General's consideration",
+    "upcoming_milestone": "Assessment of current arrangements and proposals on possible structural changes and programme realignments on environmental issues finalized for the Secretary-General’s consideration",
     "upcoming_milestone_deadline": "2026-09-17",
     "updates": null,
     "link_updates": null
@@ -2135,7 +2135,7 @@
     "sub_action_details": null,
     "is_subaction": false,
     "upcoming_milestone": "Draft action plan prepared for the Secretary-General's consideration",
-    "upcoming_milestone_deadline": "2026-02-27",
+    "upcoming_milestone_deadline": "2026-04-30",
     "updates": null,
     "link_updates": null
   },
@@ -2159,8 +2159,8 @@
     "action_entities": "DGACM;DGC;OICT;EOSG (USG Policy)",
     "sub_action_details": null,
     "is_subaction": false,
-    "upcoming_milestone": "Initial download count solution implemented",
-    "upcoming_milestone_deadline": "2026-02-27",
+    "upcoming_milestone": "Download count solution implemented",
+    "upcoming_milestone_deadline": "2026-03-31",
     "updates": null,
     "link_updates": null
   },
