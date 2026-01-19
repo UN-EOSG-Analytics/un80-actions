@@ -5,7 +5,8 @@ import { X } from "lucide-react";
 import type { Action } from "@/types";
 import { LeadsBadge } from "@/components/LeadsBadge";
 import { MilestoneTimeline } from "@/components/MilestoneTimeline";
-import { parseDate, formatDate, formatDateMonthYear } from "@/lib/utils";
+import { parseDate, formatDate, formatDateMonthYear, normalizeTeamMemberForDisplay } from "@/lib/utils";
+import { getWorkPackageLeads } from "@/lib/actions";
 import {
   Tooltip,
   TooltipContent,
@@ -28,6 +29,7 @@ export default function ActionModal({
   const modalRef = useRef<HTMLDivElement>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [workPackageLeads, setWorkPackageLeads] = useState<string[]>([]);
 
   // Animation state management
   useEffect(() => {
@@ -78,6 +80,23 @@ export default function ActionModal({
       handleClose();
     }
   };
+
+  // Fetch aggregated work package leads when action changes
+  useEffect(() => {
+    if (action && action.work_package_number) {
+      getWorkPackageLeads(action.work_package_number)
+        .then((leads) => {
+          setWorkPackageLeads(leads);
+        })
+        .catch((err) => {
+          console.error("Error fetching work package leads:", err);
+          // Fallback to action's own leads if aggregation fails
+          setWorkPackageLeads(action.work_package_leads || []);
+        });
+    } else {
+      setWorkPackageLeads([]);
+    }
+  }, [action]);
 
   // Prevent body scroll when modal is open while maintaining scrollbar space
   useEffect(() => {
@@ -161,7 +180,9 @@ export default function ActionModal({
               {action.sub_action_details && (
                 <>
                   {" "}
-                  <span className="font-bold text-gray-600">– {action.sub_action_details}</span>
+                  <span className="font-bold text-gray-600">
+                    – {action.sub_action_details}
+                  </span>
                 </>
               )}
             </h2>
@@ -212,20 +233,23 @@ export default function ActionModal({
           {action.work_package_goal && (
             <Field label="Work Package goal">
               <div className="mt-1 text-base text-gray-900">
-                <div className="text-gray-700">
-                  {action.work_package_goal}
-                </div>
+                <div className="text-gray-700">{action.work_package_goal}</div>
               </div>
             </Field>
           )}
         </div>
 
         {/* Work Package Leads */}
-        {action.work_package_leads.length > 0 && (
+        {workPackageLeads.length > 0 && (
           <div className="">
             <Field label="Work package leads">
               <div className="mt-1 text-base text-gray-900">
-                <LeadsBadge leads={action.work_package_leads} variant="default" showIcon={false} color="text-gray-600" />
+                <LeadsBadge
+                  leads={workPackageLeads}
+                  variant="default"
+                  showIcon={false}
+                  color="text-gray-600"
+                />
               </div>
             </Field>
           </div>
@@ -237,37 +261,70 @@ export default function ActionModal({
             <div className="w-full border-t-2 border-gray-300"></div>
           </div>
           <div className="relative flex justify-start">
-            <span className="bg-white pl-0 pr-3 text-sm font-bold uppercase tracking-wider text-un-blue">
+            <span className="bg-white pr-3 pl-0 text-sm font-bold tracking-wider text-un-blue uppercase">
               Action Details
             </span>
           </div>
         </div>
 
         {/* Action-specific information starts here */}
+        {/* Action Leads */}
+        {action.action_leads && action.action_leads.trim() && (
+          <div className="">
+            <Field label="Action leads">
+              <div className="mt-1 text-base text-gray-900">
+                <LeadsBadge
+                  leads={action.action_leads
+                    .split(";")
+                    .map((lead) => lead.trim())
+                    .filter((lead) => lead.length > 0)}
+                  variant="default"
+                  showIcon={false}
+                  color="text-gray-600"
+                />
+              </div>
+            </Field>
+          </div>
+        )}
+
         {/* Team Members for Indicative Action */}
         <div className="-mt-2 pt-0">
           <div className="space-y-1">
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
+                <span className="cursor-help text-sm font-normal tracking-wide text-gray-600 uppercase">
                   Team members for indicative action
                 </span>
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-gray-600">
-                  UN system entities that contribute to the implementation of a specific action, in support of the relevant Work Package Lead. Work Package Leads report to the UN80 Steering Committee under the authority of the Secretary-General.
+                  UN system entities that contribute to the implementation of a
+                  specific action, in support of the relevant Work Package Lead.
+                  Work Package Leads report to the UN80 Steering Committee under
+                  the authority of the Secretary-General.
                 </p>
               </TooltipContent>
             </Tooltip>
             <div className="mt-1 text-base text-gray-900">
               <p className="text-left leading-tight text-gray-700">
                 {action.action_entities && action.action_entities.trim() ? (
-                  action.action_entities.split(';').map((entity, index, array) => (
-                    <span key={index}>
-                      {entity.trim()}
-                      {index < array.length - 1 && <span className="text-gray-400"> • </span>}
-                    </span>
-                  ))
+                  action.action_entities
+                    .split(";")
+                    .map((entity) =>
+                      normalizeTeamMemberForDisplay(entity.trim()),
+                    )
+                    .filter((entity, index, array) => {
+                      // Remove duplicates after normalization
+                      return array.indexOf(entity) === index;
+                    })
+                    .map((entity, index, array) => (
+                      <span key={index}>
+                        {entity}
+                        {index < array.length - 1 && (
+                          <span className="text-gray-400"> • </span>
+                        )}
+                      </span>
+                    ))
                 ) : (
                   <span>to be updated</span>
                 )}
@@ -276,8 +333,8 @@ export default function ActionModal({
           </div>
         </div>
 
-        {/* Milestones Timeline - Only for Work Package 1 */}
-        {action.work_package_number === 1 ? (
+        {/* Milestones Timeline */}
+        {(action.first_milestone || action.final_milestone || action.upcoming_milestone) && (
           <div className="-mt-2 pt-0">
             <div className="space-y-1">
               <Tooltip>
@@ -327,29 +384,6 @@ export default function ActionModal({
               </div>
             </div>
           </div>
-        ) : (
-          /* Upcoming Milestone - For other work packages */
-          <div className="-mt-2 pt-0">
-            <div className="space-y-1">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
-                    Upcoming milestone
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-gray-600">
-                    Steps which will be taken towards the delivery of the proposal concerned. Upcoming milestones may be updated as implementation progresses.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-              <div className="mt-2 border-l-2 border-un-blue bg-slate-50 py-3 pr-4 pl-4">
-                <p className="text-base leading-snug font-medium text-slate-600">
-                  To be updated
-                </p>
-              </div>
-            </div>
-          </div>
         )}
 
         {/* Updates */}
@@ -357,7 +391,7 @@ export default function ActionModal({
           <div className="space-y-1">
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
+                <span className="cursor-help text-sm font-normal tracking-wide text-gray-600 uppercase">
                   Updates
                 </span>
               </TooltipTrigger>
@@ -415,8 +449,6 @@ export default function ActionModal({
             </Field>
           </div>
         )} */}
-
-
       </div>
     );
   };

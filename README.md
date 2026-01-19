@@ -44,3 +44,18 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - `/src/types` - TypeScript type definitions
 - `/public/data` - Static data files
 - `/python` - Data preparation scripts
+
+
+## Maintenance 
+
+```bash
+npm run format
+
+npm run lint
+npm run lint -- --fix
+
+npm outdated
+npm update
+
+npm audit
+```

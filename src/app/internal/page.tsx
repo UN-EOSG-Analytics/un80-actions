@@ -15,20 +15,15 @@ import { useWorkPackageData } from "@/hooks/useWorkPackageData";
 
 function WorkPackagesPageContent() {
   // Custom hooks for state management
-  const { actions, isLoading, stats, nextMilestone, progressPercentage } =
-    useActions();
+  const { actions } = useActions();
 
   const [selectedLeaders, setSelectedLeaders] = useState<string[]>([]);
 
-  const {
-    showAllLeaderChecklist,
-    setShowAllLeaderChecklist,
-  } = useCollapsibles();
+  const { showAllLeaderChecklist, setShowAllLeaderChecklist } =
+    useCollapsibles();
 
-  const {
-    leaderChecklistSearchQuery,
-    setLeaderChecklistSearchQuery,
-  } = useChartSearch();
+  const { leaderChecklistSearchQuery, setLeaderChecklistSearchQuery } =
+    useChartSearch();
 
   // Compute work package data
   const { workPackages } = useWorkPackageData(

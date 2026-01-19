@@ -34,7 +34,9 @@ export default function ModalHandler() {
 
     // Get firstMilestone from URL if present (for subactions)
     const milestoneParam = searchParams.get("milestone");
-    const firstMilestone = milestoneParam ? decodeURIComponent(milestoneParam) : null;
+    const firstMilestone = milestoneParam
+      ? decodeURIComponent(milestoneParam)
+      : null;
 
     setLoading(true);
     setError(null);
@@ -60,9 +62,9 @@ export default function ModalHandler() {
 
   const handleClose = () => {
     // Restore previous URL from sessionStorage
-    const previousUrl = sessionStorage.getItem('previousUrl');
-    sessionStorage.removeItem('previousUrl');
-    
+    const previousUrl = sessionStorage.getItem("previousUrl");
+    sessionStorage.removeItem("previousUrl");
+
     const newUrl = previousUrl ? `?${previousUrl}` : "/";
     router.replace(newUrl, { scroll: false });
   };

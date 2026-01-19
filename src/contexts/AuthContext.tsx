@@ -22,8 +22,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const authData = JSON.parse(storedAuth);
         if (authData.isAuthenticated && authData.user) {
+          // Use setTimeout to avoid synchronous setState in effect
+          setTimeout(() => {
           setIsAuthenticated(true);
           setUser(authData.user);
+          }, 0);
         }
       } catch (error) {
         console.error("Error parsing stored auth data:", error);
@@ -36,10 +39,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // TODO: Replace with actual API call to your authentication service
     // For now, this is a simple client-side check
     // In production, you would make an API call to your backend
-    
+
     // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 500));
-    
+
     // For demo purposes, accept any non-empty email and password
     // In production, validate credentials against your backend
     if (email.trim() && password.trim()) {
@@ -47,16 +50,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: true,
         user: { email: email.trim() },
       };
-      
+
       setIsAuthenticated(true);
       setUser(authData.user);
-      
+
       // Store in localStorage (in production, use httpOnly cookies or secure tokens)
       localStorage.setItem("auth", JSON.stringify(authData));
-      
+
       return true;
     }
-    
+
     return false;
   };
 
@@ -80,6 +83,3 @@ export function useAuth() {
   }
   return context;
 }
-
-
-

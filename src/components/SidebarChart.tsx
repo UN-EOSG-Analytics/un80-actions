@@ -1,8 +1,8 @@
 import { Input } from "@/components/ui/input";
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Search } from "lucide-react";
 import React from "react";
@@ -60,9 +60,7 @@ export function SidebarChart({
   // Calculate the exact width needed for the longest label
   // Use 7px per character for more compact spacing
   const maxLabelLength =
-    data.length > 0
-      ? Math.max(...data.map((d) => (d.label ?? "").length))
-      : 0;
+    data.length > 0 ? Math.max(...data.map((d) => (d.label ?? "").length)) : 0;
   const labelWidth = maxLabelLength * 7;
 
   const handleClickBar = (value: string) => {
@@ -137,7 +135,9 @@ export function SidebarChart({
                               </span>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p className="text-sm text-gray-600">{entry.tooltip}</p>
+                              <p className="text-sm text-gray-600">
+                                {entry.tooltip}
+                              </p>
                             </TooltipContent>
                           </Tooltip>
                         ) : (

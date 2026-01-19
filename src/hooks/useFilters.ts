@@ -13,148 +13,190 @@ export function useFilters() {
 
   // Derive all state directly from URL - URL is the single source of truth
   const searchQuery = searchParams.get("search") || "";
-  const selectedWorkPackage = searchParams.get("wp")?.split(",").filter(Boolean) || [];
-  const selectedLead = searchParams.get("lead")?.split(",").filter(Boolean) || [];
-  const selectedWorkstream = searchParams.get("ws")?.split(",").filter(Boolean) || [];
+  const selectedWorkPackage =
+    searchParams.get("wp")?.split(",").filter(Boolean) || [];
+  const selectedLead =
+    searchParams.get("lead")?.split(",").filter(Boolean) || [];
+  const selectedWorkstream =
+    searchParams.get("ws")?.split(",").filter(Boolean) || [];
   const selectedWpFamily = searchParams.get("family") || "";
-  const selectedBigTicket = searchParams.get("type")?.split(",").filter(Boolean) || [];
-  const selectedAction = searchParams.get("actions")?.split(",").filter(Boolean) || [];
-  const selectedTeamMember = searchParams.get("team")?.split(",").filter(Boolean) || [];
+  const selectedBigTicket =
+    searchParams.get("type")?.split(",").filter(Boolean) || [];
+  const selectedAction =
+    searchParams.get("actions")?.split(",").filter(Boolean) || [];
+  const selectedTeamMember =
+    searchParams.get("team")?.split(",").filter(Boolean) || [];
   const sortOption = searchParams.get("sort") || "number-asc";
 
   // Helper to build query string from params
-  const buildQueryString = useCallback((updater: (params: URLSearchParams) => void) => {
-    const params = new URLSearchParams(searchParams.toString());
-    updater(params);
-    return params.toString();
-  }, [searchParams]);
+  const buildQueryString = useCallback(
+    (updater: (params: URLSearchParams) => void) => {
+      const params = new URLSearchParams(searchParams.toString());
+      updater(params);
+      return params.toString();
+    },
+    [searchParams],
+  );
 
   // Helper to update URL using router.replace in a transition
-  const updateUrl = useCallback((updater: (params: URLSearchParams) => void) => {
-    const queryString = buildQueryString(updater);
-    const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
-    
-    startTransition(() => {
-      router.replace(newUrl, { scroll: false });
-    });
-  }, [buildQueryString, pathname, router]);
+  const updateUrl = useCallback(
+    (updater: (params: URLSearchParams) => void) => {
+      const queryString = buildQueryString(updater);
+      const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
+
+      startTransition(() => {
+        router.replace(newUrl, { scroll: false });
+      });
+    },
+    [buildQueryString, pathname, router],
+  );
 
   // Setters that update URL
-  const setSearchQuery = useCallback((value: string) => {
-    updateUrl((params) => {
-      if (value) {
-        params.set("search", value);
-      } else {
-        params.delete("search");
-      }
-    });
-  }, [updateUrl]);
+  const setSearchQuery = useCallback(
+    (value: string) => {
+      updateUrl((params) => {
+        if (value) {
+          params.set("search", value);
+        } else {
+          params.delete("search");
+        }
+      });
+    },
+    [updateUrl],
+  );
 
-  const setSelectedWorkPackage = useCallback((value: string[]) => {
-    updateUrl((params) => {
-      if (value.length > 0) {
-        const wpNumbers = value.map((wp) => {
-          const match = wp.match(/^(\d+):/);
-          return match ? match[1] : wp;
-        });
-        params.set("wp", wpNumbers.join(","));
-      } else {
-        params.delete("wp");
-      }
-    });
-  }, [updateUrl]);
+  const setSelectedWorkPackage = useCallback(
+    (value: string[]) => {
+      updateUrl((params) => {
+        if (value.length > 0) {
+          const wpNumbers = value.map((wp) => {
+            const match = wp.match(/^(\d+):/);
+            return match ? match[1] : wp;
+          });
+          params.set("wp", wpNumbers.join(","));
+        } else {
+          params.delete("wp");
+        }
+      });
+    },
+    [updateUrl],
+  );
 
-  const setSelectedLead = useCallback((value: string[]) => {
-    updateUrl((params) => {
-      if (value.length > 0) {
-        params.set("lead", value.join(","));
-      } else {
-        params.delete("lead");
-      }
-    });
-  }, [updateUrl]);
+  const setSelectedLead = useCallback(
+    (value: string[]) => {
+      updateUrl((params) => {
+        if (value.length > 0) {
+          params.set("lead", value.join(","));
+        } else {
+          params.delete("lead");
+        }
+      });
+    },
+    [updateUrl],
+  );
 
-  const setSelectedWorkstream = useCallback((value: string[]) => {
-    updateUrl((params) => {
-      if (value.length > 0) {
-        params.set("ws", value.join(","));
-      } else {
-        params.delete("ws");
-      }
-    });
-  }, [updateUrl]);
+  const setSelectedWorkstream = useCallback(
+    (value: string[]) => {
+      updateUrl((params) => {
+        if (value.length > 0) {
+          params.set("ws", value.join(","));
+        } else {
+          params.delete("ws");
+        }
+      });
+    },
+    [updateUrl],
+  );
 
-  const setSelectedWpFamily = useCallback((value: string) => {
-    updateUrl((params) => {
-      if (value) {
-        params.set("family", value);
-      } else {
-        params.delete("family");
-      }
-    });
-  }, [updateUrl]);
+  const setSelectedWpFamily = useCallback(
+    (value: string) => {
+      updateUrl((params) => {
+        if (value) {
+          params.set("family", value);
+        } else {
+          params.delete("family");
+        }
+      });
+    },
+    [updateUrl],
+  );
 
-  const setSelectedBigTicket = useCallback((value: string[]) => {
-    updateUrl((params) => {
-      if (value.length > 0) {
-        params.set("type", value.join(","));
-      } else {
-        params.delete("type");
-      }
-    });
-  }, [updateUrl]);
+  const setSelectedBigTicket = useCallback(
+    (value: string[]) => {
+      updateUrl((params) => {
+        if (value.length > 0) {
+          params.set("type", value.join(","));
+        } else {
+          params.delete("type");
+        }
+      });
+    },
+    [updateUrl],
+  );
 
-  const setSelectedAction = useCallback((value: string[]) => {
-    updateUrl((params) => {
-      if (value.length > 0) {
-        params.set("actions", value.join(","));
-      } else {
-        params.delete("actions");
-      }
-    });
-  }, [updateUrl]);
+  const setSelectedAction = useCallback(
+    (value: string[]) => {
+      updateUrl((params) => {
+        if (value.length > 0) {
+          params.set("actions", value.join(","));
+        } else {
+          params.delete("actions");
+        }
+      });
+    },
+    [updateUrl],
+  );
 
-  const setSelectedTeamMember = useCallback((value: string[]) => {
-    updateUrl((params) => {
-      if (value.length > 0) {
-        params.set("team", value.join(","));
-      } else {
-        params.delete("team");
-      }
-    });
-  }, [updateUrl]);
+  const setSelectedTeamMember = useCallback(
+    (value: string[]) => {
+      updateUrl((params) => {
+        if (value.length > 0) {
+          params.set("team", value.join(","));
+        } else {
+          params.delete("team");
+        }
+      });
+    },
+    [updateUrl],
+  );
 
-  const setSortOption = useCallback((value: string) => {
-    updateUrl((params) => {
-      if (value !== "number-asc") {
-        params.set("sort", value);
-      } else {
-        params.delete("sort");
-      }
-    });
-  }, [updateUrl]);
+  const setSortOption = useCallback(
+    (value: string) => {
+      updateUrl((params) => {
+        if (value !== "number-asc") {
+          params.set("sort", value);
+        } else {
+          params.delete("sort");
+        }
+      });
+    },
+    [updateUrl],
+  );
 
-  const filters: FilterState = useMemo(() => ({
-    searchQuery,
-    selectedWorkPackage,
-    selectedLead,
-    selectedWorkstream,
-    selectedWpFamily,
-    selectedBigTicket,
-    selectedAction,
-    selectedTeamMember,
-    sortOption,
-  }), [
-    searchQuery,
-    selectedWorkPackage,
-    selectedLead,
-    selectedWorkstream,
-    selectedWpFamily,
-    selectedBigTicket,
-    selectedAction,
-    selectedTeamMember,
-    sortOption,
-  ]);
+  const filters: FilterState = useMemo(
+    () => ({
+      searchQuery,
+      selectedWorkPackage,
+      selectedLead,
+      selectedWorkstream,
+      selectedWpFamily,
+      selectedBigTicket,
+      selectedAction,
+      selectedTeamMember,
+      sortOption,
+    }),
+    [
+      searchQuery,
+      selectedWorkPackage,
+      selectedLead,
+      selectedWorkstream,
+      selectedWpFamily,
+      selectedBigTicket,
+      selectedAction,
+      selectedTeamMember,
+      sortOption,
+    ],
+  );
 
   const handleResetFilters = useCallback(() => {
     startTransition(() => {
@@ -214,7 +256,9 @@ export function useFilterSync(
       const validValues = selectedValue.filter((val) => {
         if (matchByPrefix) {
           // For workpackages: match "1" with "1: Name"
-          return availableValues.some(available => available.startsWith(val + ":"));
+          return availableValues.some((available) =>
+            available.startsWith(val + ":"),
+          );
         }
         return availableValues.includes(val);
       });
@@ -225,9 +269,11 @@ export function useFilterSync(
       // Handle string (single-select)
       if (selectedValue) {
         const isValid = matchByPrefix
-          ? availableValues.some(available => available.startsWith(selectedValue + ":"))
+          ? availableValues.some((available) =>
+              available.startsWith(selectedValue + ":"),
+            )
           : availableValues.includes(selectedValue);
-        
+
         if (!isValid) {
           (setValue as (value: string) => void)("");
         }

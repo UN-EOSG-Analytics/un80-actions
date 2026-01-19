@@ -55,15 +55,16 @@ export function calculateLeaderSubmissionProgress(
   ]);
 
   // Track which leaders have submitted each type of data
-  const leadersWithMilestones = new Set<string>();
-  const leadersWithDueDates = new Set<string>();
   const leadersWithFocalPoints = new Set<string>();
 
   // Group actions by work package to check due dates
   const workPackagesByLeader = new Map<string, Set<string>>();
 
   actions.forEach((action) => {
-    if (!action.work_package_leads || !Array.isArray(action.work_package_leads)) {
+    if (
+      !action.work_package_leads ||
+      !Array.isArray(action.work_package_leads)
+    ) {
       return;
     }
 
@@ -84,12 +85,6 @@ export function calculateLeaderSubmissionProgress(
         workPackagesByLeader.set(normalizedLead, new Set());
       }
       workPackagesByLeader.get(normalizedLead)!.add(workPackageKey);
-
-      // Milestones: no one has submitted milestones (always 0)
-      // leadersWithMilestones remains empty
-
-      // Due dates: no one has submitted due dates (always 0)
-      // leadersWithDueDates remains empty
     });
   });
 
@@ -158,15 +153,16 @@ export function getLeaderSubmissionStatuses(
   ]);
 
   // Track which leaders have submitted each type of data
-  const leadersWithMilestones = new Set<string>();
-  const leadersWithDueDates = new Set<string>();
   const leadersWithFocalPoints = new Set<string>();
 
   // Group actions by work package to check due dates
   const workPackagesByLeader = new Map<string, Set<string>>();
 
   actions.forEach((action) => {
-    if (!action.work_package_leads || !Array.isArray(action.work_package_leads)) {
+    if (
+      !action.work_package_leads ||
+      !Array.isArray(action.work_package_leads)
+    ) {
       return;
     }
 
@@ -187,12 +183,6 @@ export function getLeaderSubmissionStatuses(
         workPackagesByLeader.set(normalizedLead, new Set());
       }
       workPackagesByLeader.get(normalizedLead)!.add(workPackageKey);
-
-      // Milestones: no one has submitted milestones (always false)
-      // leadersWithMilestones remains empty
-
-      // Due dates: no one has submitted due dates (always false)
-      // leadersWithDueDates remains empty
     });
   });
 
@@ -206,4 +196,3 @@ export function getLeaderSubmissionStatuses(
       hasDueDate: false, // No one has submitted due dates
     }));
 }
-

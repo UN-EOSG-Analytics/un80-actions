@@ -17,7 +17,7 @@ interface HeaderProps {
 
 export function Header({ onReset, showLogin = true }: HeaderProps) {
   const router = useRouter();
-  
+
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     if (onReset) {
@@ -29,14 +29,16 @@ export function Header({ onReset, showLogin = true }: HeaderProps) {
 
   return (
     <>
-      <header className="sm:fixed sm:top-0 sm:right-0 sm:left-0 sm:z-50 w-full border-b bg-background backdrop-blur-sm">
+      <header className="w-full border-b bg-background backdrop-blur-sm sm:fixed sm:top-0 sm:right-0 sm:left-0 sm:z-50">
         <div className="mx-auto w-full max-w-4xl px-8 pt-3 pb-2 sm:px-12 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
           <div className="flex items-start justify-between gap-4">
             {/* Title Section */}
             <Link href="/" onClick={handleClick} className="group">
               <div className="flex flex-col lg:flex-row lg:items-baseline lg:gap-x-2">
                 <h1 className="cursor-pointer text-4xl leading-tight tracking-tight text-foreground group-hover:text-un-blue">
-                  <span className="leading-none font-bold">UN80 Initiative</span>
+                  <span className="leading-none font-bold">
+                    UN80 Initiative
+                  </span>
                 </h1>
 
                 <div className="flex items-baseline gap-x-1">
@@ -56,9 +58,9 @@ export function Header({ onReset, showLogin = true }: HeaderProps) {
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent side="bottom" className="max-w-64">
-                        <p className="text-sm text-gray-600 leading-relaxed">
-                          This dashboard is currently in its beta version and will
-                          be updated on a regular basis.
+                        <p className="text-sm leading-relaxed text-gray-600">
+                          This dashboard is currently in its beta version and
+                          will be updated on a regular basis.
                         </p>
                       </TooltipContent>
                     </Tooltip>

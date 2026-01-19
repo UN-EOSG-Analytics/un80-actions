@@ -19,7 +19,6 @@ import {
   ListTodo,
   Users,
   User,
-  AlertCircle,
 } from "lucide-react";
 
 function WorkPackagesPageContent() {
@@ -203,7 +202,6 @@ function WorkPackagesPageContent() {
                     uniqueLeads={uniqueLeads}
                     uniqueWorkstreams={uniqueWorkstreams}
                     uniqueActions={uniqueActions}
-                    uniqueActionTexts={uniqueActionTexts}
                     uniqueTeamMembers={uniqueTeamMembers}
                     availableBigTicketOptions={availableBigTicketOptions}
                     onResetFilters={handleResetFilters}

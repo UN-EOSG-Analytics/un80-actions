@@ -60,7 +60,6 @@ interface FilterControlsProps {
   uniqueLeads: string[];
   uniqueWorkstreams: string[];
   uniqueActions: Array<{ text: string; actionNumber: string }>;
-  uniqueActionTexts: string[];
   uniqueTeamMembers: string[];
   availableBigTicketOptions: Array<{ key: string; label: string }>;
 
@@ -98,7 +97,6 @@ export function FilterControls({
   uniqueLeads,
   uniqueWorkstreams,
   uniqueActions,
-  uniqueActionTexts,
   uniqueTeamMembers,
   availableBigTicketOptions,
   onResetFilters,
@@ -483,7 +481,9 @@ export function FilterControls({
           {/* Team Member Filter */}
           <FilterDropdown
             open={openFilterCollapsibles.has("teamMember")}
-            onOpenChange={(open) => onToggleFilterCollapsible("teamMember", open)}
+            onOpenChange={(open) =>
+              onToggleFilterCollapsible("teamMember", open)
+            }
             icon={<User className="h-4 w-4 text-un-blue" />}
             triggerText={
               selectedTeamMember.length === 0

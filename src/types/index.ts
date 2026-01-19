@@ -85,6 +85,9 @@ export interface Action {
 
   /** Sub-action details description or null (for subactions) */
   sub_action_details: string | null;
+
+  /** Action leads (semicolon-separated string) or null */
+  action_leads: string | null;
 }
 
 /**

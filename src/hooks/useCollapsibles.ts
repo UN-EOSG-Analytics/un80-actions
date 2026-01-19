@@ -17,7 +17,8 @@ export function useCollapsibles() {
   const [showAllWorkstreams, setShowAllWorkstreams] = useState<boolean>(false);
   const [showAllWorkpackages, setShowAllWorkpackages] =
     useState<boolean>(false);
-  const [showAllLeaderChecklist, setShowAllLeaderChecklist] = useState<boolean>(false);
+  const [showAllLeaderChecklist, setShowAllLeaderChecklist] =
+    useState<boolean>(false);
 
   const toggleCollapsible = useCallback((key: string) => {
     setOpenCollapsibles((prev) => {

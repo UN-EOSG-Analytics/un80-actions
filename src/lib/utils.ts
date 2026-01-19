@@ -53,8 +53,18 @@ export const formatDate = (date: Date): string => {
  */
 export const formatDateMonthYear = (date: Date): string => {
   const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
   const month = monthNames[date.getMonth()];
   const year = date.getFullYear();
@@ -78,46 +88,67 @@ export const formatDateMonthYear = (date: Date): string => {
  * @param teamMember - Team member name to normalize
  * @returns Normalized team member name or null if should be excluded
  */
+/**
+ * Normalize team member name for display
+ * - Normalizes all "EOSG (xxx)" variants to "EOSG"
+ * @param teamMember - Team member name to normalize
+ * @returns Normalized team member name
+ */
+export const normalizeTeamMemberForDisplay = (teamMember: string): string => {
+  if (!teamMember || !teamMember.trim()) return teamMember;
+
+  const trimmed = teamMember.trim();
+
+  // Normalize all EOSG variants (including "EOSG (xxx)") to "EOSG"
+  if (trimmed.startsWith("EOSG")) {
+    return "EOSG";
+  }
+
+  return trimmed;
+};
+
 export const normalizeTeamMember = (teamMember: string): string | null => {
   if (!teamMember || !teamMember.trim()) return null;
-  
+
   const trimmed = teamMember.trim();
-  
+
   // Exclude "SA Reform"
   if (trimmed === "SA Reform") {
     return null;
   }
-  
+
   // Normalize EOSG variants to "EOSG"
   // Check for exact matches first, then check if it starts with "EOSG"
-  if (trimmed === "EOSG (ODSG)" || 
-      trimmed === "EOSG(USG Policy)" || 
-      trimmed === "EOSG (USG Policy)" ||
-      trimmed === "EOSG (SA)" ||
-      trimmed === "EOSG ODSG" ||
-      trimmed === "EOSG USG Policy" ||
-      trimmed === "EOSG SA" ||
-      trimmed === "EOSG") {
+  if (
+    trimmed === "EOSG (ODSG)" ||
+    trimmed === "EOSG(USG Policy)" ||
+    trimmed === "EOSG (USG Policy)" ||
+    trimmed === "EOSG (SA)" ||
+    trimmed === "EOSG ODSG" ||
+    trimmed === "EOSG USG Policy" ||
+    trimmed === "EOSG SA" ||
+    trimmed === "EOSG"
+  ) {
     return "EOSG";
   }
-  
+
   // If it starts with "EOSG" but isn't one of the known variants, still normalize to "EOSG"
   if (trimmed.startsWith("EOSG")) {
     return "EOSG";
   }
-  
+
   return trimmed;
 };
 
 export const normalizeLeaderName = (leader: string): string => {
   if (!leader) return leader;
   const trimmed = leader.trim();
-  
+
   // Normalize "ASG UNITAR" to "ED UNITAR"
   if (trimmed === "ASG UNITAR") {
     return "ED UNITAR";
   }
-  
+
   return trimmed;
 };
 

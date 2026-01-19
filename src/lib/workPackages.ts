@@ -70,25 +70,29 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
     // Add indicative activity if not already included
     // For subactions (actions 94 and 95), always add as separate entries even if text is the same
     if (action.indicative_activity) {
-      const isSubactionFor94Or95 = action.is_subaction && (action.action_number === 94 || action.action_number === 95);
-      
+      const isSubactionFor94Or95 =
+        action.is_subaction &&
+        (action.action_number === 94 || action.action_number === 95);
+
       // For subactions of 94/95, always add as new entry (don't deduplicate)
       // For other actions, check for duplicates
-      const existingAction = isSubactionFor94Or95 
-        ? null  // Always add subactions as new entries
+      const existingAction = isSubactionFor94Or95
+        ? null // Always add subactions as new entries
         : wp.actions.find(
             (a) =>
-              a.text === action.indicative_activity && 
+              a.text === action.indicative_activity &&
               a.report === action.report &&
               a.actionNumber === action.action_number,
           );
-      
+
       if (!existingAction) {
-        // work_package_leads is already an array
-        const actionLeads = Array.isArray(action.work_package_leads)
-          ? action.work_package_leads
-              .filter((lead) => lead && lead.trim().length > 0)
-              .map((lead) => normalizeLeaderName(lead.trim()))
+        // Use action_leads (semicolon-separated string) for individual actions
+        const actionLeads = action.action_leads
+          ? action.action_leads
+              .split(";")
+              .map((lead) => lead.trim())
+              .filter((lead) => lead.length > 0)
+              .map((lead) => normalizeLeaderName(lead))
           : [];
 
         wp.actions.push({
@@ -104,11 +108,13 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           subActionDetails: action.sub_action_details || null,
         });
       } else {
-        // Merge leads if action already exists
-        const actionLeads = Array.isArray(action.work_package_leads)
-          ? action.work_package_leads.filter(
-              (lead) => lead && lead.trim().length > 0,
-            )
+        // Merge leads if action already exists (use action_leads)
+        const actionLeads = action.action_leads
+          ? action.action_leads
+              .split(";")
+              .map((lead) => lead.trim())
+              .filter((lead) => lead.length > 0)
+              .map((lead) => normalizeLeaderName(lead))
           : [];
         actionLeads.forEach((lead) => {
           if (!existingAction.leads.includes(lead)) {
@@ -123,8 +129,12 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
         if (action.first_milestone && !existingAction.firstMilestone) {
           existingAction.firstMilestone = action.first_milestone;
         }
-        if (action.final_milestone_deadline && !existingAction.finalMilestoneDeadline) {
-          existingAction.finalMilestoneDeadline = action.final_milestone_deadline;
+        if (
+          action.final_milestone_deadline &&
+          !existingAction.finalMilestoneDeadline
+        ) {
+          existingAction.finalMilestoneDeadline =
+            action.final_milestone_deadline;
         }
         // Update actionEntities if not already set
         if (action.action_entities && !existingAction.actionEntities) {
@@ -144,8 +154,8 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
     if (!a.number) return 1;
     if (!b.number) return -1;
 
-    const numA = typeof a.number === 'number' ? a.number : 0;
-    const numB = typeof b.number === 'number' ? b.number : 0;
+    const numA = typeof a.number === "number" ? a.number : 0;
+    const numB = typeof b.number === "number" ? b.number : 0;
     if (numA !== numB) return numA - numB;
 
     // If numbers are equal, sort by name

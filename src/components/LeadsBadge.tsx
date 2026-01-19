@@ -29,7 +29,8 @@ export function LeadsBadge({
     }
   };
 
-  const textColor = customColor || (variant === "muted" ? "text-slate-600" : "text-un-blue");
+  const textColor =
+    customColor || (variant === "muted" ? "text-slate-600" : "text-un-blue");
   const textSize = variant === "muted" ? "text-sm" : "";
 
   return (

@@ -14,17 +14,14 @@ interface ActionItemProps {
   /** The action data to display */
   action: WorkPackageAction;
   /** The work package number (e.g., "31") for document reference formatting */
-  workPackageNumber: number | '';
+  workPackageNumber: number | "";
 }
 
 /**
  * Displays a single action item within a work package.
  * Shows the action text, leads, document references, and optional doc text.
  */
-export function ActionItem({
-  action,
-  workPackageNumber,
-}: ActionItemProps) {
+export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -32,18 +29,18 @@ export function ActionItem({
     // Save current URL to sessionStorage before opening modal
     const currentUrl = searchParams.toString();
     if (currentUrl) {
-      sessionStorage.setItem('previousUrl', currentUrl);
+      sessionStorage.setItem("previousUrl", currentUrl);
     } else {
-      sessionStorage.removeItem('previousUrl');
+      sessionStorage.removeItem("previousUrl");
     }
-    
+
     // Build URL with action number and optionally first_milestone for subactions
     let url = `/?action=${action.actionNumber}`;
     if (action.firstMilestone) {
       // Encode firstMilestone to handle special characters and use it to identify subactions
       url += `&milestone=${encodeURIComponent(action.firstMilestone)}`;
     }
-    
+
     // Navigate to clean modal URL
     router.push(url, { scroll: false });
   };
@@ -52,27 +49,31 @@ export function ActionItem({
   // Icon only appears when progress reaches 100% based on elapsed time calculation
   const isCompleted = (() => {
     if (!action.finalMilestoneDeadline || !action.firstMilestone) return false;
-    
+
     const deadlineDate = parseDate(action.finalMilestoneDeadline);
     const startDate = parseDate(action.firstMilestone);
     const now = new Date();
-    
+
     // Both dates must be valid and startDate must be before deadlineDate
     if (!deadlineDate || !startDate) return false;
-    if (isNaN(deadlineDate.getTime()) || isNaN(startDate.getTime())) return false;
+    if (isNaN(deadlineDate.getTime()) || isNaN(startDate.getTime()))
+      return false;
     if (startDate >= deadlineDate) return false;
-    
+
     const totalDuration = deadlineDate.getTime() - startDate.getTime();
     const elapsed = now.getTime() - startDate.getTime();
-    const progress = Math.min(Math.max((elapsed / totalDuration) * 100, 0), 100);
-    
+    const progress = Math.min(
+      Math.max((elapsed / totalDuration) * 100, 0),
+      100,
+    );
+
     return progress >= 100;
   })();
 
   return (
-    <div 
+    <div
       onClick={handleClick}
-      className="rounded-[6px] border border-slate-200 bg-white p-5 pr-9 transition-all hover:shadow-md hover:border-slate-300 cursor-pointer"
+      className="cursor-pointer rounded-[6px] border border-slate-200 bg-white p-5 pr-9 transition-all hover:border-slate-300 hover:shadow-md"
     >
       {/* Activity Number and Text */}
       <div className="mb-4 flex items-start gap-3">
@@ -95,7 +96,9 @@ export function ActionItem({
             {action.subActionDetails && (
               <>
                 {" "}
-                <span className="font-bold text-slate-600">– {action.subActionDetails}</span>
+                <span className="font-bold text-slate-600">
+                  – {action.subActionDetails}
+                </span>
               </>
             )}
           </p>
