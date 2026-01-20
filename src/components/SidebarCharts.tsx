@@ -1,10 +1,16 @@
 import React from "react";
-import { Users, Layers, Briefcase } from "lucide-react";
+import { Users, Layers, Briefcase, Calendar, ChevronDown, ChevronUp, Clock, CheckCircle } from "lucide-react";
 import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type {
   LeadChartEntry,
   WorkstreamChartEntry,
   WorkPackageChartEntry,
+  UpcomingMilestoneChartEntry,
 } from "@/types";
 
 interface SidebarChartsProps {
@@ -34,6 +40,22 @@ interface SidebarChartsProps {
   onSelectWorkPackage: (workPackage: string[]) => void;
   showAllWorkPackages: boolean;
   onToggleShowAllWorkPackages: () => void;
+
+  // Upcoming milestones chart
+  upcomingMilestonesData: UpcomingMilestoneChartEntry[];
+  upcomingMilestonesSearchQuery: string;
+  onUpcomingMilestonesSearchChange: (query: string) => void;
+  showAllUpcomingMilestones: boolean;
+  onToggleShowAllUpcomingMilestones: () => void;
+
+  // Milestones per month chart
+  milestonesPerMonthSearchQuery: string;
+  onMilestonesPerMonthSearchChange: (query: string) => void;
+  showAllMilestonesPerMonth: boolean;
+  onToggleShowAllMilestonesPerMonth: () => void;
+
+  // Decision status chart
+  totalActions: number;
 }
 
 export function SidebarCharts({
@@ -58,6 +80,16 @@ export function SidebarCharts({
   onSelectWorkPackage,
   showAllWorkPackages,
   onToggleShowAllWorkPackages,
+  upcomingMilestonesData,
+  upcomingMilestonesSearchQuery,
+  onUpcomingMilestonesSearchChange,
+  showAllUpcomingMilestones,
+  onToggleShowAllUpcomingMilestones,
+  milestonesPerMonthSearchQuery,
+  onMilestonesPerMonthSearchChange,
+  showAllMilestonesPerMonth,
+  onToggleShowAllMilestonesPerMonth,
+  totalActions,
 }: SidebarChartsProps) {
   const leadsChartEntries: SidebarChartEntry[] = leadsData.map((entry) => ({
     label: entry.lead,
@@ -94,8 +126,209 @@ export function SidebarCharts({
     },
   );
 
+  // Format upcoming milestones with dates and urgency, filter for January only
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const januaryStart = new Date(currentYear, 0, 1); // January 1st of current year
+  const januaryEnd = new Date(currentYear, 0, 31, 23, 59, 59); // January 31st of current year
+  
+  const upcomingMilestonesChartEntries: SidebarChartEntry[] = upcomingMilestonesData
+    .filter((entry) => {
+      // Only show milestones with deadlines in January
+      if (!entry.deadline) return false;
+      const deadlineDate = new Date(entry.deadline);
+      return deadlineDate >= januaryStart && deadlineDate <= januaryEnd;
+    })
+    .map((entry) => {
+      const deadlineDate = entry.deadline ? new Date(entry.deadline) : null;
+      const daysUntilDeadline = deadlineDate
+        ? Math.ceil((deadlineDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+        : null;
+      
+      const isUpcoming = daysUntilDeadline !== null && daysUntilDeadline >= 0 && daysUntilDeadline <= 90;
+      const isUrgent = daysUntilDeadline !== null && daysUntilDeadline >= 0 && daysUntilDeadline <= 30;
+      
+      let deadlineText = "";
+      if (deadlineDate) {
+        const formattedDate = deadlineDate.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+        if (daysUntilDeadline === null || daysUntilDeadline < 0) {
+          deadlineText = `Past: ${formattedDate}`;
+        } else if (daysUntilDeadline === 0) {
+          deadlineText = `Due today: ${formattedDate}`;
+        } else if (daysUntilDeadline === 1) {
+          deadlineText = `Due tomorrow: ${formattedDate}`;
+        } else if (daysUntilDeadline <= 7) {
+          deadlineText = `Due in ${daysUntilDeadline} days: ${formattedDate}`;
+        } else if (daysUntilDeadline <= 30) {
+          deadlineText = `Due in ${Math.ceil(daysUntilDeadline / 7)} weeks: ${formattedDate}`;
+        } else {
+          deadlineText = `Due ${formattedDate}`;
+        }
+      }
+
+      return {
+        label: entry.milestone,
+        count: entry.count,
+        value: entry.milestone,
+        tooltip: deadlineText || undefined,
+        deadline: entry.deadline,
+        isUrgent: isUrgent || false,
+        isUpcoming: isUpcoming || false,
+        actionNumber: entry.actionNumber,
+        workPackageNumber: entry.workPackageNumber,
+        workPackageName: entry.workPackageName,
+      };
+    });
+
+  // Determine how many milestones to show
+  const milestonesToShow = showAllUpcomingMilestones 
+    ? upcomingMilestonesChartEntries 
+    : upcomingMilestonesChartEntries.slice(0, 4);
+  const hasMoreMilestones = upcomingMilestonesChartEntries.length > 4;
+
+  // Calculate milestones per month
+  const monthNames = ["January", "February", "March", "April", "May", "June", 
+                      "July", "August", "September", "October", "November", "December"];
+  const milestonesPerMonthMap = new Map<number, number>();
+  
+  upcomingMilestonesData.forEach((entry) => {
+    if (entry.deadline) {
+      const deadlineDate = new Date(entry.deadline);
+      const month = deadlineDate.getMonth();
+      milestonesPerMonthMap.set(month, (milestonesPerMonthMap.get(month) || 0) + entry.count);
+    }
+  });
+
+  const milestonesPerMonthEntries: SidebarChartEntry[] = Array.from(milestonesPerMonthMap.entries())
+    .sort((a, b) => a[0] - b[0]) // Sort by month number
+    .filter(([, count]) => count > 0) // Only include months with milestones
+    .filter(([monthIndex]) => {
+      // Filter by search query if provided
+      if (!milestonesPerMonthSearchQuery) return true;
+      const monthName = monthNames[monthIndex];
+      return monthName?.toLowerCase().includes(milestonesPerMonthSearchQuery.toLowerCase());
+    })
+    .map(([monthIndex, count]) => ({
+      label: monthNames[monthIndex],
+      count: count,
+      value: monthNames[monthIndex],
+    }));
+
   return (
     <div className="flex w-full min-w-0 shrink-0 flex-col gap-3 lg:w-[320px] lg:max-w-[320px] lg:border-l lg:border-slate-200 lg:pl-6">
+      {/* Upcoming Milestones */}
+      {upcomingMilestonesChartEntries.length > 0 && (
+        <div className="rounded-xl bg-white pb-4 pl-4.5 sm:pb-5">
+          {/* Header - Same style as other sidebar charts */}
+          <h3 className="mb-2 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
+            <span className="flex h-5 w-5 items-center justify-center text-un-blue">
+              <Calendar className="h-5 w-5" />
+            </span>
+            Upcoming Milestones
+          </h3>
+          <p className="mb-3 text-[15px] text-slate-600">{upcomingMilestonesChartEntries.length} upcoming deadlines</p>
+
+          {/* Milestones List */}
+          <div className="space-y-1">
+            {milestonesToShow.map((entry, index) => {
+              const deadlineDate = entry.deadline ? new Date(entry.deadline) : null;
+              const monthShort = deadlineDate 
+                ? deadlineDate.toLocaleDateString("en-US", { month: "short" }).toUpperCase()
+                : null;
+              
+              return (
+                <Tooltip key={index}>
+                  <TooltipTrigger asChild>
+                    <div 
+                      className="flex items-start gap-3 py-2.5 pr-2 cursor-help transition-colors hover:bg-slate-50 rounded-md"
+                    >
+                      {/* Month Badge */}
+                      <div className="flex items-center justify-center min-w-[40px] h-[32px] rounded-lg border bg-un-blue/10 border-un-blue/20 text-un-blue">
+                        <span className="text-[10px] font-bold tracking-wide">{monthShort || "—"}</span>
+                      </div>
+                      
+                      {/* Milestone Content */}
+                      <div className="flex-1 min-w-0 py-0.5">
+                        <p className="text-[14px] font-medium leading-tight line-clamp-2 text-slate-700">
+                          {entry.label}
+                        </p>
+                        {/* Action & Work Package Info */}
+                        {(entry.workPackageNumber || entry.actionNumber) && (
+                          <p className="text-[11px] mt-1 text-slate-400">
+                            {entry.workPackageNumber && (
+                              <span>WP{entry.workPackageNumber}</span>
+                            )}
+                            {entry.workPackageNumber && entry.actionNumber && (
+                              <span> · </span>
+                            )}
+                            {entry.actionNumber && (
+                              <span>Action {entry.actionNumber}</span>
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="left" className="max-w-[280px]">
+                    <p className="text-sm font-medium">{entry.label}</p>
+                    {(entry.workPackageNumber || entry.actionNumber) && (
+                      <p className="text-xs text-slate-400 mt-1">
+                        {entry.workPackageNumber && `WP${entry.workPackageNumber}`}
+                        {entry.workPackageNumber && entry.actionNumber && " · "}
+                        {entry.actionNumber && `Action ${entry.actionNumber}`}
+                      </p>
+                    )}
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })}
+          </div>
+          
+          {/* Show More/Less Button */}
+          {hasMoreMilestones && (
+            <button
+              onClick={onToggleShowAllUpcomingMilestones}
+              className="mt-2 flex w-full items-center justify-center gap-1 text-xs font-medium text-un-blue hover:text-un-blue/80 transition-colors"
+            >
+              {showAllUpcomingMilestones ? (
+                <>
+                  <ChevronUp className="w-3.5 h-3.5" />
+                  Show less
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="w-3.5 h-3.5" />
+                  Show {upcomingMilestonesChartEntries.length - 4} more
+                </>
+              )}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Milestones per Month */}
+      {milestonesPerMonthEntries.length > 0 && (
+        <SidebarChart
+          title="Milestones per Month"
+          description="Number of milestones by month"
+          icon={<Calendar />}
+          data={milestonesPerMonthEntries}
+          searchQuery={milestonesPerMonthSearchQuery}
+          onSearchChange={onMilestonesPerMonthSearchChange}
+          searchPlaceholder="Search months"
+          selectedValue={[]}
+          onSelectValue={() => {}}
+          showAll={showAllMilestonesPerMonth}
+          onToggleShowAll={onToggleShowAllMilestonesPerMonth}
+          initialDisplayCount={6}
+          barWidth={105}
+        />
+      )}
+
       <SidebarChart
         title="Work Packages per Leader"
         description="Number of packages by leader"
@@ -127,21 +360,49 @@ export function SidebarCharts({
         barWidth={105}
       />
 
-      <SidebarChart
-        title="Actions per Work Package"
-        description="Number of actions per work package"
-        icon={<Briefcase />}
-        data={workPackagesChartEntries}
-        searchQuery={workPackagesSearchQuery}
-        onSearchChange={onWorkPackagesSearchChange}
-        searchPlaceholder="Search work packages"
-        selectedValue={selectedWorkPackage}
-        onSelectValue={onSelectWorkPackage}
-        showAll={showAllWorkPackages}
-        onToggleShowAll={onToggleShowAllWorkPackages}
-        initialDisplayCount={10}
-        barWidth={105}
-      />
+      {/* Decision Status Chart */}
+      {totalActions > 0 && (
+        <div className="rounded-xl bg-white pb-4 pl-4.5 sm:pb-5">
+          <h3 className="mb-2 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
+            <span className="flex h-5 w-5 items-center justify-center text-un-blue">
+              <Clock className="h-5 w-5" />
+            </span>
+            Decision Status
+          </h3>
+          <p className="mb-3 text-[15px] text-slate-600">Progress on action decisions</p>
+          
+          <div className="space-y-2 pr-4">
+            {/* Further Work Ongoing */}
+            <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5">
+              <div className="flex h-2.5 w-2.5 shrink-0 rounded-full bg-amber-500 animate-pulse" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-amber-800">Further Work Ongoing</span>
+                  <span className="text-sm font-bold text-amber-700">{totalActions}</span>
+                </div>
+                <div className="mt-1.5 h-2 w-full rounded-full bg-amber-200">
+                  <div className="h-full rounded-full bg-amber-500" style={{ width: "100%" }} />
+                </div>
+              </div>
+            </div>
+
+            {/* Decision Taken */}
+            <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5">
+              <CheckCircle className="h-4 w-4 shrink-0 text-slate-400" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-slate-600">Decision Taken</span>
+                  <span className="text-sm font-bold text-slate-500">0</span>
+                </div>
+                <div className="mt-1.5 h-2 w-full rounded-full bg-slate-200">
+                  <div className="h-full rounded-full bg-green-500" style={{ width: "0%" }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

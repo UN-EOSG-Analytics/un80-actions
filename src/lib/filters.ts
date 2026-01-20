@@ -4,6 +4,7 @@ import type {
   LeadChartEntry,
   WorkstreamChartEntry,
   WorkPackageChartEntry,
+  UpcomingMilestoneChartEntry,
   StatsData,
   FilterState,
 } from "@/types";
@@ -455,6 +456,142 @@ export function calculateWorkPackageChartData(
   return Array.from(workpackageCounts.entries())
     .map(([workpackage, count]) => ({ workpackage, count }))
     .sort((a, b) => b.count - a.count); // Sort by count descending
+}
+
+/**
+ * Calculate upcoming milestones chart data
+ * Groups actions by their upcoming milestone and counts occurrences
+ * @param actions - Array of actions
+ * @param searchQuery - Search query to filter milestones
+ * @param selectedLead - Selected leads to filter by
+ * @param selectedWorkPackage - Selected work packages to filter by
+ * @param selectedWorkstream - Selected workstreams to filter by
+ * @returns Array of upcoming milestone chart entries sorted by deadline (earliest first), then by count descending
+ */
+export function calculateUpcomingMilestonesChartData(
+  actions: Actions,
+  searchQuery = "",
+  selectedLead: string[] = [],
+  selectedWorkPackage: string[] = [],
+  selectedWorkstream: string[] = [],
+): UpcomingMilestoneChartEntry[] {
+  const milestoneCounts = new Map<string, { 
+    count: number; 
+    deadline: string | null;
+    actionNumber: number | string | null;
+    workPackageNumber: number | string | null;
+    workPackageName: string | null;
+  }>();
+
+  // Filter actions based on other chart selections
+  let filteredActions = actions;
+
+  // Only include actions that have upcoming milestones
+  filteredActions = filteredActions.filter(
+    (action) => action.upcoming_milestone && action.upcoming_milestone.trim() !== ""
+  );
+
+  if (selectedLead.length > 0) {
+    filteredActions = filteredActions.filter(
+      (action) =>
+        Array.isArray(action.work_package_leads) &&
+        action.work_package_leads.some((lead) =>
+          selectedLead.includes(normalizeLeaderName(lead)),
+        ),
+    );
+  }
+
+  if (selectedWorkPackage.length > 0) {
+    const selectedNumbers = selectedWorkPackage.map((wp) => {
+      const wpMatch = wp.match(/^(\d+):/);
+      return wpMatch ? wpMatch[1] : wp;
+    });
+
+    filteredActions = filteredActions.filter((action) => {
+      if (action.work_package_number) {
+        return selectedNumbers.includes(String(action.work_package_number));
+      } else {
+        return selectedNumbers.includes(action.work_package_name);
+      }
+    });
+  }
+
+  if (selectedWorkstream.length > 0) {
+    filteredActions = filteredActions.filter((action) =>
+      selectedWorkstream.includes(action.report),
+    );
+  }
+
+  filteredActions.forEach((action) => {
+    if (!action.upcoming_milestone || action.upcoming_milestone.trim() === "") {
+      return;
+    }
+
+    const milestoneText = action.upcoming_milestone.trim();
+
+    // Filter by chart search query if provided
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      if (!milestoneText.toLowerCase().includes(query)) {
+        return;
+      }
+    }
+
+    const existing = milestoneCounts.get(milestoneText);
+    const deadline = action.upcoming_milestone_deadline;
+
+    if (existing) {
+      // If multiple deadlines exist, keep the earliest one
+      if (deadline && (!existing.deadline || deadline < existing.deadline)) {
+        milestoneCounts.set(milestoneText, {
+          count: existing.count + 1,
+          deadline: deadline,
+          actionNumber: existing.actionNumber,
+          workPackageNumber: existing.workPackageNumber,
+          workPackageName: existing.workPackageName,
+        });
+      } else {
+        milestoneCounts.set(milestoneText, {
+          count: existing.count + 1,
+          deadline: existing.deadline,
+          actionNumber: existing.actionNumber,
+          workPackageNumber: existing.workPackageNumber,
+          workPackageName: existing.workPackageName,
+        });
+      }
+    } else {
+      milestoneCounts.set(milestoneText, {
+        count: 1,
+        deadline: deadline,
+        actionNumber: action.action_number ?? null,
+        workPackageNumber: action.work_package_number ?? null,
+        workPackageName: action.work_package_name ?? null,
+      });
+    }
+  });
+
+  return Array.from(milestoneCounts.entries())
+    .map(([milestone, data]) => ({
+      milestone,
+      count: data.count,
+      deadline: data.deadline,
+      actionNumber: data.actionNumber,
+      workPackageNumber: data.workPackageNumber,
+      workPackageName: data.workPackageName,
+    }))
+    .sort((a, b) => {
+      // Sort by deadline first (earliest first, nulls last)
+      if (a.deadline && b.deadline) {
+        const dateComparison = a.deadline.localeCompare(b.deadline);
+        if (dateComparison !== 0) return dateComparison;
+      } else if (a.deadline && !b.deadline) {
+        return -1;
+      } else if (!a.deadline && b.deadline) {
+        return 1;
+      }
+      // Then by count descending
+      return b.count - a.count;
+    });
 }
 
 /**

@@ -168,25 +168,21 @@ export default function ActionModal({
 
     return (
       <div className="flex items-start justify-between gap-4">
-        <div className="flex flex-1 items-start gap-3">
-          <div className="mt-[3px] flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-un-blue/10">
-            <span className="text-sm font-semibold text-un-blue">
-              {action.action_number}
-            </span>
+        <div className="flex-1">
+          <div className="mb-2 text-sm font-medium tracking-wide text-un-blue uppercase">
+            Action {action.action_number}
           </div>
-          <div className="flex-1">
-            <h2 className="text-lg leading-tight font-semibold text-gray-900 sm:text-xl">
-              {action.indicative_activity}
-              {action.sub_action_details && (
-                <>
-                  {" "}
-                  <span className="font-bold text-gray-600">
-                    – {action.sub_action_details}
-                  </span>
-                </>
-              )}
-            </h2>
-          </div>
+          <h2 className="text-lg leading-tight font-semibold text-gray-900 sm:text-xl">
+            {action.indicative_activity}
+            {action.sub_action_details && (
+              <>
+                {" "}
+                <span className="font-bold text-gray-600">
+                  – {action.sub_action_details}
+                </span>
+              </>
+            )}
+          </h2>
         </div>
         <button
           onClick={handleClose}
@@ -230,13 +226,6 @@ export default function ActionModal({
             </div>
           </Field>
 
-          {action.work_package_goal && (
-            <Field label="Work Package goal">
-              <div className="mt-1 text-base text-gray-900">
-                <div className="text-gray-700">{action.work_package_goal}</div>
-              </div>
-            </Field>
-          )}
         </div>
 
         {/* Work Package Leads */}
@@ -406,6 +395,17 @@ export default function ActionModal({
               </div>
           </div>
         </div>
+
+        {/* Document Text */}
+        {action.doc_text && (
+          <div className="-mt-2 pt-0">
+            <div className="mt-4 ml-0.5 border-l-2 border-slate-400 bg-slate-50 py-2 pr-3 pl-3">
+              <p className="text-sm leading-tight text-slate-600">
+                &ldquo;{action.doc_text}&rdquo;
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* MS Approval */}
         {/* {action.ms_approval && (

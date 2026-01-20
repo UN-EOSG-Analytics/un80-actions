@@ -131,6 +131,7 @@ export interface WorkPackageAction {
   finalMilestoneDeadline: string | null;
   actionEntities: string | null;
   subActionDetails: string | null;
+  decisionStatus: "Further work ongoing" | "decision taken";
 }
 
 /**
@@ -194,6 +195,18 @@ export interface WorkPackageChartEntry {
 }
 
 /**
+ * Upcoming milestone chart entry
+ */
+export interface UpcomingMilestoneChartEntry {
+  milestone: string;
+  count: number;
+  deadline: string | null;
+  actionNumber: number | string | null;
+  workPackageNumber: number | string | null;
+  workPackageName: string | null;
+}
+
+/**
  * Statistics data for display
  */
 export interface StatsData {
@@ -215,6 +228,7 @@ export interface ChartSearchState {
   chartSearchQuery: string;
   workstreamChartSearchQuery: string;
   workpackageChartSearchQuery: string;
+  upcomingMilestonesChartSearchQuery: string;
 }
 
 /**
@@ -224,5 +238,6 @@ export interface CollapsibleState {
   showAllLeads: boolean;
   showAllWorkstreams: boolean;
   showAllWorkpackages: boolean;
+  showAllUpcomingMilestones: boolean;
   isAdvancedFilterOpen: boolean;
 }

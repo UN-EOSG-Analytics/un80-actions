@@ -3,8 +3,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 import { abbreviationMap } from "@/constants/abbreviations";
 import { Users } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface LeadsBadgeProps {
   leads: string[];
@@ -29,47 +31,49 @@ export function LeadsBadge({
     }
   };
 
-  const textColor =
-    customColor || (variant === "muted" ? "text-slate-600" : "text-un-blue");
-  const textSize = variant === "muted" ? "text-sm" : "";
+  const isMuted = variant === "muted";
 
   return (
-    <div className="flex items-center gap-1.5">
-      {showIcon && <Users className={`h-4 w-4 ${textColor} shrink-0`} />}
-      <p
-        className={`${textSize} ${textColor} text-left leading-tight wrap-break-word`}
-      >
-        {leads.map((lead, idx) => {
-          const longForm = abbreviationMap[lead] || lead;
-          return (
-            <span key={idx}>
-              {idx > 0 && "; "}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span
-                    className={
-                      onSelectLead
-                        ? "cursor-pointer hover:underline"
-                        : "cursor-help"
-                    }
-                    onClick={(e) => {
-                      if (onSelectLead) {
-                        e.stopPropagation();
-                        handleLeadClick(lead);
-                      }
-                    }}
-                  >
-                    {lead}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-sm text-gray-600">{longForm}</p>
-                </TooltipContent>
-              </Tooltip>
-            </span>
-          );
-        })}
-      </p>
+    <div className="flex flex-wrap items-center gap-1.5">
+      {showIcon && (
+        <Users
+          className={cn(
+            "h-4 w-4 shrink-0",
+            customColor || (isMuted ? "text-slate-600" : "text-un-blue"),
+          )}
+        />
+      )}
+      {leads.map((lead, idx) => {
+        const longForm = abbreviationMap[lead] || lead;
+        return (
+          <Tooltip key={idx}>
+            <TooltipTrigger asChild>
+              <Badge
+                variant="outline"
+                className={cn(
+                  "cursor-pointer transition-colors",
+                  isMuted
+                    ? "border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100"
+                    : "border-slate-300 bg-white text-un-blue hover:bg-slate-50",
+                  onSelectLead ? "" : "cursor-help",
+                  customColor && `text-[${customColor}]`,
+                )}
+                onClick={(e) => {
+                  if (onSelectLead) {
+                    e.stopPropagation();
+                    handleLeadClick(lead);
+                  }
+                }}
+              >
+                {lead}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-sm text-gray-600">{longForm}</p>
+            </TooltipContent>
+          </Tooltip>
+        );
+      })}
     </div>
   );
 }

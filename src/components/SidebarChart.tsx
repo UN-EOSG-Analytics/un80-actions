@@ -12,6 +12,12 @@ export interface SidebarChartEntry {
   count: number;
   value: string;
   tooltip?: string;
+  deadline?: string | null;
+  isUrgent?: boolean;
+  isUpcoming?: boolean;
+  actionNumber?: number | string | null;
+  workPackageNumber?: number | string | null;
+  workPackageName?: string | null;
 }
 
 interface SidebarChartProps {
@@ -103,53 +109,100 @@ export function SidebarChart({
                 selectedValue.length > 0 &&
                 !selectedValue.includes(entry.value);
 
+              // Enhanced styling for urgent/upcoming milestones
+              const isUrgent = entry.isUrgent === true;
+              const isUpcoming = entry.isUpcoming === true;
+              const hasUrgencyIndicator = isUrgent || isUpcoming;
+
               return (
                 <tr
                   key={entry.value}
                   onClick={() => handleClickBar(entry.value)}
-                  className={`group cursor-pointer transition-colors ${
+                  className={`group cursor-pointer transition-all ${
                     isSelected
-                      ? "bg-un-blue/5 hover:bg-un-blue/10"
+                      ? isUrgent
+                        ? "bg-red-50/50 hover:bg-red-100/50 border-l-2 border-red-400"
+                        : "bg-un-blue/5 hover:bg-un-blue/10"
                       : isFiltered
                         ? "opacity-30 hover:bg-slate-50"
-                        : "hover:bg-slate-50"
-                  } ${index < displayedData.length - 1 ? "border-b border-slate-200" : ""}`}
+                        : isUrgent
+                          ? "bg-red-50/30 hover:bg-red-50/50 border-l-2 border-red-300"
+                          : isUpcoming
+                            ? "bg-amber-50/30 hover:bg-amber-50/50 border-l-2 border-amber-300"
+                            : "hover:bg-slate-50"
+                  } ${index < displayedData.length - 1 ? "border-b border-slate-200" : ""} ${hasUrgencyIndicator ? "pl-1" : ""}`}
                 >
-                  <td className="py-2 pr-0">
+                  <td className="py-2.5 pr-0">
                     <div className="flex items-center justify-between gap-1">
                       <div
-                        style={{ width: `${labelWidth}px`, flexShrink: 0 }}
-                        className="ml-0.5"
+                        style={{ maxWidth: `${labelWidth}px`, flexShrink: 1 }}
+                        className="ml-0.5 min-w-0"
                       >
                         {entry.tooltip ? (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span
-                                className={`block cursor-help text-[14px] font-medium whitespace-nowrap transition-colors ${
-                                  isSelected
-                                    ? "font-semibold text-un-blue"
-                                    : "text-slate-600 group-hover:text-un-blue"
-                                }`}
-                              >
-                                {entry.label}
-                              </span>
+                              <div className="flex items-center gap-1.5">
+                                {isUrgent && (
+                                  <span className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" aria-label="Urgent" />
+                                )}
+                                {!isUrgent && isUpcoming && (
+                                  <span className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-label="Upcoming" />
+                                )}
+                                <span
+                                  className={`block cursor-help text-[14px] font-medium truncate transition-colors ${
+                                    isSelected
+                                      ? "font-semibold text-un-blue"
+                                      : isUrgent
+                                        ? "text-red-700 group-hover:text-red-800"
+                                        : isUpcoming
+                                          ? "text-amber-700 group-hover:text-amber-800"
+                                          : "text-slate-600 group-hover:text-un-blue"
+                                  }`}
+                                  style={{ maxWidth: `${labelWidth}px` }}
+                                >
+                                  {entry.label}
+                                </span>
+                              </div>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p className="text-sm text-gray-600">
-                                {entry.tooltip}
-                              </p>
+                              <div className="text-sm text-gray-600">
+                                <p>{entry.tooltip}</p>
+                                {isUrgent && (
+                                  <p className="mt-1 text-xs font-semibold text-red-600">
+                                    ⚠ Urgent
+                                  </p>
+                                )}
+                                {!isUrgent && isUpcoming && (
+                                  <p className="mt-1 text-xs text-amber-600">
+                                    ⏱ Upcoming
+                                  </p>
+                                )}
+                              </div>
                             </TooltipContent>
                           </Tooltip>
                         ) : (
-                          <span
-                            className={`block text-[14px] font-medium whitespace-nowrap transition-colors ${
-                              isSelected
-                                ? "font-semibold text-un-blue"
-                                : "text-slate-600 group-hover:text-un-blue"
-                            }`}
-                          >
-                            {entry.label}
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            {isUrgent && (
+                              <span className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" aria-label="Urgent" />
+                            )}
+                            {!isUrgent && isUpcoming && (
+                              <span className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-label="Upcoming" />
+                            )}
+                            <span
+                              className={`block text-[14px] font-medium truncate transition-colors ${
+                                isSelected
+                                  ? "font-semibold text-un-blue"
+                                  : isUrgent
+                                    ? "text-red-700 group-hover:text-red-800"
+                                    : isUpcoming
+                                      ? "text-amber-700 group-hover:text-amber-800"
+                                      : "text-slate-600 group-hover:text-un-blue"
+                              }`}
+                              style={{ maxWidth: `${labelWidth}px` }}
+                            >
+                              {entry.label}
+                            </span>
+                          </div>
                         )}
                       </div>
                       <div className="flex shrink-0 items-center gap-1.5">
@@ -157,7 +210,11 @@ export function SidebarChart({
                           className={`text-[14px] font-normal ${countWidth} text-right font-mono tabular-nums ${
                             isSelected
                               ? "font-semibold text-un-blue"
-                              : "text-un-blue"
+                              : isUrgent
+                                ? "text-red-600"
+                                : isUpcoming
+                                  ? "text-amber-600"
+                                  : "text-un-blue"
                           }`}
                         >
                           {entry.count}
@@ -168,7 +225,13 @@ export function SidebarChart({
                         >
                           <div
                             className={`h-full rounded-full transition-all ${
-                              isSelected ? "bg-un-blue" : "bg-un-blue/40"
+                              isSelected
+                                ? "bg-un-blue"
+                                : isUrgent
+                                  ? "bg-red-500"
+                                  : isUpcoming
+                                    ? "bg-amber-500"
+                                    : "bg-un-blue/40"
                             }`}
                             style={{ width: `${percentage}%` }}
                           />

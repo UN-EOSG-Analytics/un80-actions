@@ -106,6 +106,7 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           finalMilestoneDeadline: action.final_milestone_deadline || null,
           actionEntities: action.action_entities || null,
           subActionDetails: action.sub_action_details || null,
+          decisionStatus: "Further work ongoing",
         });
       } else {
         // Merge leads if action already exists (use action_leads)
@@ -124,6 +125,10 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
         // Update doc_text if not already set
         if (action.doc_text && !existingAction.docText) {
           existingAction.docText = action.doc_text;
+        }
+        // Ensure decisionStatus is set (default to "Further work ongoing" if missing)
+        if (!existingAction.decisionStatus) {
+          existingAction.decisionStatus = "Further work ongoing";
         }
         // Update milestone fields if not already set
         if (action.first_milestone && !existingAction.firstMilestone) {

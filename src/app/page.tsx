@@ -62,6 +62,10 @@ function WorkPackagesPageContent() {
     setShowAllWorkstreams,
     showAllWorkpackages,
     setShowAllWorkpackages,
+    showAllUpcomingMilestones,
+    setShowAllUpcomingMilestones,
+    showAllMilestonesPerMonth,
+    setShowAllMilestonesPerMonth,
   } = useCollapsibles();
 
   const {
@@ -71,6 +75,10 @@ function WorkPackagesPageContent() {
     setWorkstreamChartSearchQuery,
     workpackageChartSearchQuery,
     setWorkpackageChartSearchQuery,
+    upcomingMilestonesChartSearchQuery,
+    setUpcomingMilestonesChartSearchQuery,
+    milestonesPerMonthSearchQuery,
+    setMilestonesPerMonthSearchQuery,
   } = useChartSearch();
 
   // Compute work package data using custom hook
@@ -86,6 +94,7 @@ function WorkPackagesPageContent() {
     chartData,
     workstreamChartData,
     workpackageChartData,
+    upcomingMilestonesChartData,
     statsData,
   } = useWorkPackageData(
     actions,
@@ -93,6 +102,7 @@ function WorkPackagesPageContent() {
     chartSearchQuery,
     workstreamChartSearchQuery,
     workpackageChartSearchQuery,
+    upcomingMilestonesChartSearchQuery,
   );
 
   // Sync filters with available options
@@ -249,6 +259,20 @@ function WorkPackagesPageContent() {
                   onToggleShowAllWorkPackages={() =>
                     setShowAllWorkpackages(!showAllWorkpackages)
                   }
+                  upcomingMilestonesData={upcomingMilestonesChartData}
+                  upcomingMilestonesSearchQuery={upcomingMilestonesChartSearchQuery}
+                  onUpcomingMilestonesSearchChange={setUpcomingMilestonesChartSearchQuery}
+                  showAllUpcomingMilestones={showAllUpcomingMilestones}
+                  onToggleShowAllUpcomingMilestones={() =>
+                    setShowAllUpcomingMilestones(!showAllUpcomingMilestones)
+                  }
+                  milestonesPerMonthSearchQuery={milestonesPerMonthSearchQuery}
+                  onMilestonesPerMonthSearchChange={setMilestonesPerMonthSearchQuery}
+                  showAllMilestonesPerMonth={showAllMilestonesPerMonth}
+                  onToggleShowAllMilestonesPerMonth={() =>
+                    setShowAllMilestonesPerMonth(!showAllMilestonesPerMonth)
+                  }
+                  totalActions={statsData.actions}
                 />
               </section>
             </section>

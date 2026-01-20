@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { DocumentBadge } from "@/components/DocumentBadge";
 import { LeadsBadge } from "@/components/LeadsBadge";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Clock, CheckCircle } from "lucide-react";
 import { parseDate } from "@/lib/utils";
 import type { WorkPackageAction } from "@/types";
 
@@ -107,33 +107,61 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
 
       {/* Metadata section - shown when there are leads */}
       {action.leads.length > 0 && (
-        <div className="ml-9 border-t border-slate-100 pt-3">
+        <div className="ml-9 border-t border-slate-100 pt-3 mt-3">
           <div className="flex flex-wrap items-center gap-4">
             {/* Display lead organizations in muted style */}
             <LeadsBadge leads={action.leads} variant="muted" />
-            {/* Display document reference (e.g., "A/80/400 para. 5") */}
-            <DocumentBadge
-              documentParagraphNumber={action.documentParagraph}
-              report={action.report}
-              workPackageNumber={workPackageNumber}
-            />
-          </div>
-          {/* Additional document text/quote - shown below metadata if available */}
-          {action.docText && (
-            <div className="pr- mt-3 ml-0.5 border-l-2 border-slate-400 bg-slate-50 py-2 pl-3">
-              <p className="text-sm leading-tight text-slate-600">
-                &ldquo;{action.docText}&rdquo;
-              </p>
+            {/* Display document reference (e.g., "A/80/400 para. 5") with decision status */}
+            <div className="flex items-center gap-2">
+              <DocumentBadge
+                documentParagraphNumber={action.documentParagraph}
+                report={action.report}
+                workPackageNumber={workPackageNumber}
+              />
+              <div className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 ${
+                action.decisionStatus === "decision taken"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-amber-100 text-amber-700"
+              }`}>
+                {action.decisionStatus === "decision taken" ? (
+                  <CheckCircle className="h-3 w-3" />
+                ) : (
+                  <Clock className="h-3 w-3" />
+                )}
+                <span className="text-xs font-medium">
+                  {action.decisionStatus === "decision taken" ? "Decision Taken" : "Further Work Ongoing"}
+                </span>
+              </div>
             </div>
-          )}
+          </div>
         </div>
       )}
-      {/* Document text - shown when no leads are present */}
-      {action.leads.length === 0 && action.docText && (
-        <div className="ml-9 border-l-2 border-slate-400 bg-slate-50 py-2 pr-3 pl-3">
-          <p className="text-sm leading-tight text-slate-600">
-            &ldquo;{action.docText}&rdquo;
-          </p>
+      {/* Metadata section - shown when there are no leads but document paragraph exists */}
+      {action.leads.length === 0 && action.documentParagraph && (
+        <div className="ml-9 border-t border-slate-100 pt-3 mt-3">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <DocumentBadge
+                documentParagraphNumber={action.documentParagraph}
+                report={action.report}
+                workPackageNumber={workPackageNumber}
+              />
+              <div className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 ${
+                action.decisionStatus === "decision taken"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-amber-100 text-amber-700"
+              }`}>
+                {action.decisionStatus === "decision taken" ? (
+                  <CheckCircle className="h-3 w-3" />
+                ) : (
+                  <Clock className="h-3 w-3" />
+                )}
+                <span className="text-xs font-medium">
+                  {action.decisionStatus === "decision taken" ? "Decision Taken" : "Further Work Ongoing"}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

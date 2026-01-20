@@ -125,7 +125,7 @@ export function WorkPackageItem({
           )}
 
           {/* Report Labels and Work Package Leads */}
-          <div className="mb-2 flex w-full flex-wrap items-start gap-4">
+          <div className="flex w-full flex-wrap items-start gap-4">
             {/* Workstream Labels */}
             <WorkstreamLabels
               report={wp.report}
@@ -135,6 +135,38 @@ export function WorkPackageItem({
             {/* Work Package Leads */}
             <LeadsBadge leads={wp.leads} onSelectLead={onSelectLead} />
           </div>
+
+          {/* Action Count - Bottom Left */}
+          {wp.actions.length > 0 && !isOpen && (
+            <>
+              <div className="w-full border-t border-slate-200 mt-3 mb-3" />
+              <div className="flex items-center gap-2">
+                <div className="flex -space-x-1.5">
+                  {Array.from({ length: Math.min(wp.actions.length, 5) }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-4 h-4 rounded-full border-2 border-slate-100 bg-un-blue"
+                      style={{ 
+                        opacity: 1 - (i * 0.15),
+                        zIndex: 5 - i 
+                      }}
+                    />
+                  ))}
+                  {wp.actions.length > 5 && (
+                    <div 
+                      className="w-4 h-4 rounded-full border-2 border-slate-100 bg-slate-300 flex items-center justify-center text-[8px] font-bold text-slate-600" 
+                      style={{ zIndex: 0 }}
+                    >
+                      +{wp.actions.length - 5}
+                    </div>
+                  )}
+                </div>
+                <span className="text-sm font-semibold text-slate-500">
+                  {wp.actions.length} {wp.actions.length === 1 ? "Action" : "Actions"}
+                </span>
+              </div>
+            </>
+          )}
         </CollapsibleTrigger>
 
         {/* Details Button */}

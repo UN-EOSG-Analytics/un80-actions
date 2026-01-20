@@ -11,6 +11,7 @@ import {
   calculateLeadChartData,
   calculateWorkstreamChartData,
   calculateWorkPackageChartData,
+  calculateUpcomingMilestonesChartData,
   calculateStatsData,
 } from "@/lib/filters";
 import { normalizeTeamMember } from "@/lib/utils";
@@ -69,6 +70,7 @@ export function useWorkPackageData(
   chartSearchQuery: string,
   workstreamChartSearchQuery: string,
   workpackageChartSearchQuery: string,
+  upcomingMilestonesChartSearchQuery: string,
 ) {
   // Group actions by work package (combine across reports)
   const workPackages = useMemo(
@@ -343,6 +345,26 @@ export function useWorkPackageData(
     ],
   );
 
+  // Calculate chart data: upcoming milestones
+  // Filter by selected lead, work package, and workstream from other charts
+  const upcomingMilestonesChartData = useMemo(
+    () =>
+      calculateUpcomingMilestonesChartData(
+        actions,
+        upcomingMilestonesChartSearchQuery,
+        filters.selectedLead,
+        filters.selectedWorkPackage,
+        filters.selectedWorkstream,
+      ),
+    [
+      actions,
+      upcomingMilestonesChartSearchQuery,
+      filters.selectedLead,
+      filters.selectedWorkPackage,
+      filters.selectedWorkstream,
+    ],
+  );
+
   // Filter work packages based on search and filters
   const filteredWorkPackages = useMemo(
     () => filterWorkPackages(workPackages, filters),
@@ -368,6 +390,7 @@ export function useWorkPackageData(
     chartData,
     workstreamChartData,
     workpackageChartData,
+    upcomingMilestonesChartData,
     statsData,
   };
 }
