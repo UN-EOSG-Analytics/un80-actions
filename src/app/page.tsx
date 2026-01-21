@@ -180,20 +180,8 @@ export function WorkPackagesPageContent() {
         {/* Main Container - with padding to account for fixed header */}
         <main className="mx-auto w-full max-w-4xl px-8 pt-8 sm:px-12 sm:pt-24 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
           <div className="space-y-6 pb-16">
-            {/* Header with context info and Progress Toggle */}
-            <div className="flex items-start justify-between gap-4">
-              <ExplainerText />
-              <div className="flex shrink-0 items-center gap-2 pt-0">
-                <Label htmlFor="show-progress" className="text-sm font-medium text-slate-700 cursor-pointer whitespace-nowrap">
-                  Show progress
-                </Label>
-                <Switch
-                  id="show-progress"
-                  checked={showProgress}
-                  onCheckedChange={setShowProgress}
-                />
-              </div>
-            </div>
+            {/* Header with context info */}
+            <ExplainerText />
 
             {/* DataCards Section */}
             <section className="mb-10">
