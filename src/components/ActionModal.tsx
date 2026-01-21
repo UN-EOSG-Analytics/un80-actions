@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { X, Clock, CheckCircle } from "lucide-react";
+import Link from "next/link";
+import { X, Clock, CheckCircle, ChevronRight } from "lucide-react";
 import type { Action } from "@/types";
 import { LeadsBadge } from "@/components/LeadsBadge";
 import { MilestoneTimeline } from "@/components/MilestoneTimeline";
@@ -172,8 +173,27 @@ export default function ActionModal({
     return (
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
-          <div className="mb-2 text-sm font-medium tracking-wide text-un-blue uppercase">
-            Action {action.action_number}
+          {/* Breadcrumb */}
+          <div className="mb-3 flex items-center gap-1.5">
+            <Link
+              href={`/?ws=${action.report}`}
+              onClick={handleClose}
+              className="text-sm leading-5 font-medium tracking-wider text-slate-500 uppercase hover:text-un-blue hover:underline transition-colors"
+            >
+              {action.report}
+            </Link>
+            <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
+            <Link
+              href={`/?wp=${action.work_package_number}`}
+              onClick={handleClose}
+              className="text-sm leading-5 font-medium tracking-wider text-slate-500 uppercase hover:text-un-blue hover:underline transition-colors"
+            >
+              Work Package {action.work_package_number}
+            </Link>
+            <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
+            <span className="text-sm leading-5 font-medium tracking-wider text-un-blue uppercase">
+              Action {action.action_number}
+            </span>
           </div>
           <h2 className="text-lg leading-tight font-semibold text-gray-900 sm:text-xl">
             {action.indicative_activity}

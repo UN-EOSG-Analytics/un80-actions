@@ -127,6 +127,51 @@ export function WorkPackagesPageContent() {
 
   // Track the last selectedAction we processed to avoid infinite loops
   const lastProcessedActionsRef = useRef<string>("");
+  // Track the last selectedWorkPackage we processed to avoid infinite loops
+  const lastProcessedWorkPackagesRef = useRef<string>("");
+
+  // Auto-expand work package collapsibles when work packages are selected via URL
+  useEffect(() => {
+    const selectedWpKey = selectedWorkPackage.sort().join(",");
+    
+    // Skip if we've already processed this selection
+    if (selectedWpKey === lastProcessedWorkPackagesRef.current) {
+      return;
+    }
+
+    if (selectedWorkPackage.length > 0 && filteredWorkPackages.length > 0) {
+      const collapsibleKeysToExpand: string[] = [];
+      
+      filteredWorkPackages.forEach((wp, index) => {
+        // Check if this work package is in the selectedWorkPackage filter
+        const wpNumberStr = String(wp.number);
+        const isSelected = selectedWorkPackage.some((selected) => {
+          // Handle both "1: Name" format and plain number format
+          const match = selected.match(/^(\d+):/);
+          const selectedNumber = match ? match[1] : selected;
+          return wpNumberStr === selectedNumber;
+        });
+        
+        if (isSelected) {
+          const collapsibleKey = `${wp.report.join("-")}-${wp.number || "empty"}-${index}`;
+          // Only add if not already open
+          if (!openCollapsibles.has(collapsibleKey)) {
+            collapsibleKeysToExpand.push(collapsibleKey);
+          }
+        }
+      });
+      
+      if (collapsibleKeysToExpand.length > 0) {
+        expandCollapsibles(collapsibleKeysToExpand);
+      }
+      
+      // Mark this selection as processed
+      lastProcessedWorkPackagesRef.current = selectedWpKey;
+    } else if (selectedWorkPackage.length === 0) {
+      // Reset when no work packages are selected
+      lastProcessedWorkPackagesRef.current = "";
+    }
+  }, [selectedWorkPackage, filteredWorkPackages, openCollapsibles, expandCollapsibles]);
 
   // Auto-expand work package collapsibles when actions are selected
   useEffect(() => {
