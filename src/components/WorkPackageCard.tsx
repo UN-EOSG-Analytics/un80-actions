@@ -32,15 +32,6 @@ function WorkPackageActions({
 
   return (
     <div className="flex flex-col gap-2">
-      {/* Header */}
-      <div className="flex items-center gap-2 pb-1">
-        <h3 className="text-left text-lg font-semibold tracking-wider text-slate-700">
-          Indicative Actions
-        </h3>
-        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-500 text-[10px] font-semibold text-white">
-          {actions.length}
-        </div>
-      </div>
       {/* Display each indicative_activity in its own box */}
       {actions.map((action, idx) => (
         <ActionItem
@@ -74,18 +65,14 @@ export function WorkPackageItem({
   return (
     <Collapsible open={isOpen} onOpenChange={onToggle}>
       <div
-        className={`relative mb-20 rounded-[6px] last:mb-0 ${
-          isOpen
-            ? "bg-slate-100 transition-colors duration-200"
-            : "transition-colors delay-[400ms] duration-200"
-        }`}
+        className="group relative mb-20 rounded-[6px] bg-slate-100 transition-colors hover:bg-[#E0F5FF] last:mb-0"
       >
         {isOpen && (
           <div className="pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-1 rounded-l-[6px] bg-un-blue" />
         )}
         <CollapsibleTrigger
-          className={`flex w-full flex-col items-start rounded-[6px] border-0 px-6 py-4 transition-colors hover:bg-[#E0F5FF] hover:no-underline ${
-            isOpen ? "rounded-b-none bg-slate-100" : "bg-slate-100"
+          className={`flex w-full flex-col items-start rounded-[6px] border-0 px-6 py-4 hover:no-underline ${
+            isOpen ? "rounded-b-none" : ""
           }`}
         >
           {/* Work Package Title */}
@@ -145,19 +132,28 @@ export function WorkPackageItem({
             />
           </div>
 
-          {/* Action Count - Bottom Left */}
-          {wp.actions.length > 0 && !isOpen && (
-            <>
-              <div className="w-full border-t border-slate-200 mt-3 mb-3" />
-              <div className="flex items-center gap-2">
+        </CollapsibleTrigger>
+
+        {/* Divider and Action Count/Header - Always visible when actions exist */}
+        {wp.actions.length > 0 && (
+          <div className="px-6">
+            <div className="w-full border-t border-slate-200" />
+            {/* Cross-fade header section - fixed height container */}
+            <div className="relative h-10 flex items-center">
+              {/* Collapsed state: "X Actions" */}
+              <div 
+                className={`absolute inset-0 flex items-center gap-2 transition-opacity duration-200 ease-out ${
+                  isOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+                }`}
+              >
                 <span className="text-sm font-semibold text-slate-500">
                   {wp.actions.length} {wp.actions.length === 1 ? "Action" : "Actions"}
                 </span>
                 <div className="flex -space-x-1.5">
-                  {Array.from({ length: wp.actions.length }).map((_, i) => (
+                  {Array.from({ length: Math.min(wp.actions.length, 5) }).map((_, i) => (
                     <div
                       key={i}
-                      className="w-4 h-4 rounded-full border-2 border-slate-100 bg-un-blue"
+                      className="w-4 h-4 rounded-full border-2 border-slate-100 group-hover:border-[#E0F5FF] bg-un-blue transition-colors"
                       style={{ 
                         opacity: 1 - (i * 0.15),
                         zIndex: wp.actions.length - i 
@@ -166,9 +162,22 @@ export function WorkPackageItem({
                   ))}
                 </div>
               </div>
-            </>
-          )}
-        </CollapsibleTrigger>
+              {/* Expanded state: "Indicative Actions" header */}
+              <div 
+                className={`absolute inset-0 flex items-center gap-2 transition-opacity duration-200 ease-out ${
+                  isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                }`}
+              >
+                <h3 className="text-left text-lg font-semibold tracking-wider text-slate-700">
+                  Indicative Actions
+                </h3>
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-500 text-[10px] font-semibold text-white">
+                  {wp.actions.length}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Details Button */}
         <button
@@ -185,8 +194,8 @@ export function WorkPackageItem({
         </button>
 
         {/* Collapsible Content */}
-        <CollapsibleContent className="px-6 pt-0 pb-6">
-          <div className="pt-3">
+        <CollapsibleContent className="px-6 pb-6">
+          <div className="pt-2">
             <WorkPackageActions
               actions={wp.actions}
               workPackageNumber={wp.number}
