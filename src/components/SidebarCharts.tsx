@@ -2,6 +2,7 @@ import React from "react";
 import { Users, Layers, Briefcase, Calendar, ChevronDown, ChevronUp, Clock, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
+import { buildCleanQueryString } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
@@ -252,10 +253,13 @@ export function SidebarCharts({
                     sessionStorage.removeItem("previousUrl");
                   }
                   
-                  // Build URL with query param: ?action=14
-                  const params = new URLSearchParams(window.location.search);
-                  params.set("action", String(entry.actionNumber));
-                  const url = `?${params.toString()}`;
+                  // Build URL with query param: ?action=14 (preserving other params with clean encoding)
+                  const params: Record<string, string> = {};
+                  new URLSearchParams(window.location.search).forEach((value, key) => {
+                    params[key] = value;
+                  });
+                  params.action = String(entry.actionNumber);
+                  const url = `?${buildCleanQueryString(params)}`;
                   window.history.pushState({}, "", url);
                   // Trigger a popstate event to notify ModalHandler
                   window.dispatchEvent(new PopStateEvent("popstate"));

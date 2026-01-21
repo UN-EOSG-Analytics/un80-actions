@@ -204,3 +204,60 @@ export const formatGoalText = (text: string): string => {
 
   return result;
 };
+
+/**
+ * URL param encoding/decoding utilities for human-readable URLs
+ * Converts spaces to underscores for cleaner URLs
+ */
+
+/**
+ * Encode a value for use in URL params (replaces spaces with underscores)
+ */
+export function encodeUrlParam(value: string): string {
+  return value.replace(/ /g, "_");
+}
+
+/**
+ * Decode a URL param value (replaces underscores with spaces)
+ */
+export function decodeUrlParam(value: string): string {
+  return value.replace(/_/g, " ");
+}
+
+/**
+ * Encode an array of values for URL params
+ * Uses comma as delimiter (no encoding needed) and underscores for spaces
+ */
+export function encodeUrlParamArray(values: string[]): string {
+  return values.map(encodeUrlParam).join(",");
+}
+
+/**
+ * Decode a URL param string to array of values
+ */
+export function decodeUrlParamArray(param: string | null): string[] {
+  if (!param) return [];
+  return param.split(",").filter(Boolean).map(decodeUrlParam);
+}
+
+/**
+ * Build a clean URL query string without over-encoding
+ * Commas and underscores stay readable
+ */
+export function buildCleanQueryString(params: Record<string, string>): string {
+  const parts: string[] = [];
+  for (const [key, value] of Object.entries(params)) {
+    if (value) {
+      // Only encode characters that truly need encoding (not commas or underscores)
+      const encodedKey = encodeURIComponent(key);
+      // Minimal encoding: only encode &, =, #, and other truly problematic chars
+      const encodedValue = value
+        .replace(/%/g, "%25")
+        .replace(/&/g, "%26")
+        .replace(/=/g, "%3D")
+        .replace(/#/g, "%23");
+      parts.push(`${encodedKey}=${encodedValue}`);
+    }
+  }
+  return parts.join("&");
+}
