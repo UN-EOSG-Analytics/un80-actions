@@ -86,6 +86,7 @@ export function WorkPackagesPageContent() {
 
   // Compute work package data using custom hook
   const {
+    workPackages,
     filteredWorkPackages,
     uniqueWorkPackages,
     uniqueLeads,
@@ -241,11 +242,13 @@ export function WorkPackagesPageContent() {
                 />
                 <DataCard
                   title="Work Packages"
-                  value={statsData.workpackages}
+                  value={workPackages.length}
                   icon={BriefcaseIcon}
                   isLoading={isLoading}
                   showProgress={showProgress}
                   completed={0}
+                  showFiltered={selectedWorkPackage.length > 0}
+                  filteredCount={statsData.workpackages}
                 />
                 <DataCard
                   title="Actions"

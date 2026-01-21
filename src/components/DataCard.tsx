@@ -16,6 +16,8 @@ interface DataCardProps {
   isLoading?: boolean;
   showProgress?: boolean;
   completed?: number;
+  showFiltered?: boolean;
+  filteredCount?: number;
 }
 
 export function DataCard({
@@ -26,6 +28,8 @@ export function DataCard({
   isLoading = false,
   showProgress = false,
   completed = 0,
+  showFiltered = false,
+  filteredCount,
 }: DataCardProps) {
   return (
     <Tooltip>
@@ -45,6 +49,13 @@ export function DataCard({
             </div>
             {isLoading ? (
               <p className="text-left text-[37px] leading-[45px] font-bold text-[#2E3440] tabular-nums sm:text-[43px] sm:leading-[51px] md:text-[49px] md:leading-[57px]"></p>
+            ) : showFiltered && filteredCount !== undefined ? (
+              <p className="text-left text-[37px] leading-[45px] font-bold text-[#2E3440] tabular-nums sm:text-[43px] sm:leading-[51px] md:text-[49px] md:leading-[57px]">
+                {filteredCount}
+                <span className="text-[22px] font-normal text-[#2E3440] sm:text-[26px] md:text-[30px]">
+                  /{value}
+                </span>
+              </p>
             ) : showProgress ? (
               <p
                 className={cn(
@@ -71,9 +82,11 @@ export function DataCard({
           <span className="font-semibold text-un-blue">
             {isLoading
               ? "Loading..."
-              : showProgress
-                ? `${completed}/${value} completed`
-                : value}
+              : showFiltered && filteredCount !== undefined
+                ? `${filteredCount} of ${value}`
+                : showProgress
+                  ? `${completed}/${value} completed`
+                  : value}
           </span>
         </p>
       </TooltipContent>
