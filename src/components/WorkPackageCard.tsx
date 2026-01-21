@@ -150,29 +150,21 @@ export function WorkPackageItem({
             <>
               <div className="w-full border-t border-slate-200 mt-3 mb-3" />
               <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-slate-500">
+                  {wp.actions.length} {wp.actions.length === 1 ? "Action" : "Actions"}
+                </span>
                 <div className="flex -space-x-1.5">
-                  {Array.from({ length: Math.min(wp.actions.length, 5) }).map((_, i) => (
+                  {Array.from({ length: wp.actions.length }).map((_, i) => (
                     <div
                       key={i}
                       className="w-4 h-4 rounded-full border-2 border-slate-100 bg-un-blue"
                       style={{ 
                         opacity: 1 - (i * 0.15),
-                        zIndex: 5 - i 
+                        zIndex: wp.actions.length - i 
                       }}
                     />
                   ))}
-                  {wp.actions.length > 5 && (
-                    <div 
-                      className="w-4 h-4 rounded-full border-2 border-slate-100 bg-slate-300 flex items-center justify-center text-[8px] font-bold text-slate-600" 
-                      style={{ zIndex: 0 }}
-                    >
-                      +{wp.actions.length - 5}
-                    </div>
-                  )}
                 </div>
-                <span className="text-sm font-semibold text-slate-500">
-                  {wp.actions.length} {wp.actions.length === 1 ? "Action" : "Actions"}
-                </span>
               </div>
             </>
           )}
