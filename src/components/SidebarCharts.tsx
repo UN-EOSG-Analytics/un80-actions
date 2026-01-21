@@ -186,11 +186,6 @@ export function SidebarCharts({
       };
     });
 
-  // Determine how many milestones to show
-  const milestonesToShow = showAllUpcomingMilestones 
-    ? upcomingMilestonesChartEntries 
-    : upcomingMilestonesChartEntries.slice(0, 4);
-  const hasMoreMilestones = upcomingMilestonesChartEntries.length > 4;
 
   // Calculate milestones per month
   const monthNames = ["January", "February", "March", "April", "May", "June", 
