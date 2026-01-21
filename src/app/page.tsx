@@ -86,6 +86,7 @@ export function WorkPackagesPageContent() {
 
   // Compute work package data using custom hook
   const {
+    workPackages,
     filteredWorkPackages,
     uniqueWorkPackages,
     uniqueLeads,
@@ -127,6 +128,51 @@ export function WorkPackagesPageContent() {
 
   // Track the last selectedAction we processed to avoid infinite loops
   const lastProcessedActionsRef = useRef<string>("");
+  // Track the last selectedWorkPackage we processed to avoid infinite loops
+  const lastProcessedWorkPackagesRef = useRef<string>("");
+
+  // Auto-expand work package collapsibles when work packages are selected via URL
+  useEffect(() => {
+    const selectedWpKey = selectedWorkPackage.sort().join(",");
+    
+    // Skip if we've already processed this selection
+    if (selectedWpKey === lastProcessedWorkPackagesRef.current) {
+      return;
+    }
+
+    if (selectedWorkPackage.length > 0 && filteredWorkPackages.length > 0) {
+      const collapsibleKeysToExpand: string[] = [];
+      
+      filteredWorkPackages.forEach((wp, index) => {
+        // Check if this work package is in the selectedWorkPackage filter
+        const wpNumberStr = String(wp.number);
+        const isSelected = selectedWorkPackage.some((selected) => {
+          // Handle both "1: Name" format and plain number format
+          const match = selected.match(/^(\d+):/);
+          const selectedNumber = match ? match[1] : selected;
+          return wpNumberStr === selectedNumber;
+        });
+        
+        if (isSelected) {
+          const collapsibleKey = `${wp.report.join("-")}-${wp.number || "empty"}-${index}`;
+          // Only add if not already open
+          if (!openCollapsibles.has(collapsibleKey)) {
+            collapsibleKeysToExpand.push(collapsibleKey);
+          }
+        }
+      });
+      
+      if (collapsibleKeysToExpand.length > 0) {
+        expandCollapsibles(collapsibleKeysToExpand);
+      }
+      
+      // Mark this selection as processed
+      lastProcessedWorkPackagesRef.current = selectedWpKey;
+    } else if (selectedWorkPackage.length === 0) {
+      // Reset when no work packages are selected
+      lastProcessedWorkPackagesRef.current = "";
+    }
+  }, [selectedWorkPackage, filteredWorkPackages, openCollapsibles, expandCollapsibles]);
 
   // Auto-expand work package collapsibles when actions are selected
   useEffect(() => {
@@ -180,20 +226,8 @@ export function WorkPackagesPageContent() {
         {/* Main Container - with padding to account for fixed header */}
         <main className="mx-auto w-full max-w-4xl px-8 pt-8 sm:px-12 sm:pt-24 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
           <div className="space-y-6 pb-16">
-            {/* Header with context info and Progress Toggle */}
-            <div className="flex items-start justify-between gap-4">
+            {/* Header with context info */}
             <ExplainerText />
-              <div className="flex shrink-0 items-center gap-2 pt-0">
-                <Label htmlFor="show-progress" className="text-sm font-medium text-slate-700 cursor-pointer whitespace-nowrap">
-                  Show progress
-                </Label>
-                <Switch
-                  id="show-progress"
-                  checked={showProgress}
-                  onCheckedChange={setShowProgress}
-                />
-              </div>
-            </div>
 
             {/* DataCards Section */}
             <section className="mb-10">
@@ -208,11 +242,13 @@ export function WorkPackagesPageContent() {
                 />
                 <DataCard
                   title="Work Packages"
-                  value={statsData.workpackages}
+                  value={workPackages.length}
                   icon={BriefcaseIcon}
                   isLoading={isLoading}
                   showProgress={showProgress}
                   completed={0}
+                  showFiltered={selectedWorkPackage.length > 0}
+                  filteredCount={statsData.workpackages}
                 />
                 <DataCard
                   title="Actions"

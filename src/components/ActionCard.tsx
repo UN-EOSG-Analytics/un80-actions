@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { LeadsBadge } from "@/components/LeadsBadge";
 import { CheckCircle2, Clock, CheckCircle } from "lucide-react";
-import { parseDate } from "@/lib/utils";
+import { parseDate, buildCleanQueryString } from "@/lib/utils";
 import type { WorkPackageAction } from "@/types";
 
 /**
@@ -33,8 +33,13 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
       sessionStorage.removeItem("previousUrl");
     }
 
-    // Build human-readable URL: /action-14
-    const url = `/action-${action.actionNumber}`;
+    // Build URL with query param: ?action=14 (preserving other params with clean encoding)
+    const params: Record<string, string> = {};
+    new URLSearchParams(window.location.search).forEach((value, key) => {
+      params[key] = value;
+    });
+    params.action = String(action.actionNumber);
+    const url = `?${buildCleanQueryString(params)}`;
 
     // Update URL without navigating (for static export compatibility)
     window.history.pushState({}, "", url);
