@@ -37,33 +37,9 @@ function WorkPackageActions({
         <h3 className="text-left text-lg font-semibold tracking-wider text-slate-700">
           Indicative Actions
         </h3>
-        {actions.length > 0 && (
-          <>
-            <div className="flex -space-x-1.5">
-              {Array.from({ length: Math.min(actions.length, 5) }).map((_, i) => (
-                <div
-                  key={i}
-                  className="w-4 h-4 rounded-full border-2 border-slate-100 bg-un-blue"
-                  style={{ 
-                    opacity: 1 - (i * 0.15),
-                    zIndex: 5 - i 
-                  }}
-                />
-              ))}
-              {actions.length > 5 && (
-                <div 
-                  className="w-4 h-4 rounded-full border-2 border-slate-100 bg-slate-300 flex items-center justify-center text-[8px] font-bold text-slate-600" 
-                  style={{ zIndex: 0 }}
-                >
-                  +{actions.length - 5}
-                </div>
-              )}
-            </div>
-            <span className="text-sm font-semibold text-slate-500">
-              {actions.length} {actions.length === 1 ? "Action" : "Actions"}
-            </span>
-          </>
-        )}
+        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-500 text-[10px] font-semibold text-white">
+          {actions.length}
+        </div>
       </div>
       {/* Display each indicative_activity in its own box */}
       {actions.map((action, idx) => (
