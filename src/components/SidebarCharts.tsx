@@ -224,19 +224,19 @@ export function SidebarCharts({
     <div className="flex w-full min-w-0 shrink-0 flex-col gap-3 lg:w-[320px] lg:max-w-[320px] lg:border-l lg:border-slate-200 lg:pl-6">
       {/* Upcoming Milestones */}
       {upcomingMilestonesChartEntries.length > 0 && (
-        <div className="rounded-xl bg-white pb-4 pl-4.5 sm:pb-5">
-          {/* Header - Same style as other sidebar charts */}
-          <h3 className="mb-2 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
+        <div className="pb-2 pl-4.5">
+          {/* Header */}
+          <h3 className="mb-1 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
             <span className="flex h-5 w-5 items-center justify-center text-un-blue">
               <Calendar className="h-5 w-5" />
             </span>
             Upcoming Milestones
           </h3>
-          <p className="mb-3 text-[15px] text-slate-600">{upcomingMilestonesChartEntries.length} upcoming deadlines</p>
+          <p className="mb-4 text-[15px] text-slate-500">{upcomingMilestonesChartEntries.length} upcoming deadlines</p>
 
-          {/* Milestones List */}
-          <div className="space-y-2">
-            {milestonesToShow.map((entry, index) => {
+          {/* Milestones List - Scrollable */}
+          <div className="divide-y divide-slate-100 max-h-[360px] overflow-y-auto overscroll-contain pr-1 -mr-1">
+            {upcomingMilestonesChartEntries.map((entry, index) => {
               const deadlineDate = entry.deadline ? new Date(entry.deadline) : null;
               const monthShort = deadlineDate 
                 ? deadlineDate.toLocaleDateString("en-US", { month: "short" }).toUpperCase()
@@ -265,26 +265,26 @@ export function SidebarCharts({
                   <TooltipTrigger asChild>
                     <div 
                       onClick={handleMilestoneClick}
-                      className="flex items-start gap-4 py-3 pr-2 cursor-pointer transition-all rounded-lg border bg-slate-50 border-slate-200 hover:bg-slate-100"
+                      className="group flex items-start gap-3 py-3 cursor-pointer transition-colors hover:bg-slate-50/50 -mr-1 pr-1 pl-2"
                     >
-                      {/* Month Badge */}
-                      <div className="flex flex-col items-center justify-center min-w-[50px] h-[50px] rounded-lg border-2 bg-un-blue/10 border-un-blue/20 text-un-blue ml-1">
-                        <span className="text-[9px] font-bold tracking-wide">{monthShort || "—"}</span>
+                      {/* Month Badge - Minimal pill style */}
+                      <div className="flex items-center justify-center min-w-[44px] h-[18px] rounded-full bg-un-blue/8 text-un-blue mt-px">
+                        <span className="text-[10px] font-semibold tracking-wide">{monthShort || "—"}</span>
                       </div>
                       
                       {/* Milestone Content */}
-                      <div className="flex-1 min-w-0 py-0.5">
-                        <p className="text-[14px] font-medium leading-tight line-clamp-2 text-slate-700">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] leading-snug line-clamp-2 text-slate-700 group-hover:text-slate-900 transition-colors">
                           {entry.label}
                         </p>
                         {/* Action & Work Package Info */}
                         {(entry.workPackageNumber || entry.actionNumber) && (
-                          <p className="text-[11px] mt-1.5 text-slate-500">
+                          <p className="text-[11px] mt-1 text-slate-400">
                             {entry.workPackageNumber && (
                               <span className="font-medium">WP{entry.workPackageNumber}</span>
                             )}
                             {entry.workPackageNumber && entry.actionNumber && (
-                              <span> · </span>
+                              <span className="mx-1">·</span>
                             )}
                             {entry.actionNumber && (
                               <span>Action {entry.actionNumber}</span>
@@ -308,26 +308,6 @@ export function SidebarCharts({
               );
             })}
           </div>
-          
-          {/* Show More/Less Button */}
-          {hasMoreMilestones && (
-            <button
-              onClick={onToggleShowAllUpcomingMilestones}
-              className="mt-2 flex w-full items-center justify-start gap-1 text-xs font-medium text-un-blue hover:text-un-blue/80 transition-colors pl-0.5"
-            >
-              {showAllUpcomingMilestones ? (
-                <>
-                  <ChevronUp className="w-3.5 h-3.5" />
-                  Show less
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="w-3.5 h-3.5" />
-                  Show {upcomingMilestonesChartEntries.length - 4} more
-                </>
-              )}
-            </button>
-          )}
         </div>
       )}
 
