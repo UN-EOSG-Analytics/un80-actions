@@ -255,7 +255,8 @@ export default function ActionModal({
                         .map((lead) => lead.trim())
                         .filter((lead) => lead.length > 0)}
                       variant="muted"
-                      showIcon={false}
+                      showIcon={true}
+                      iconTooltip="Action Leads"
                     />
                   </div>
                 </Field>

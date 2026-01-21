@@ -162,7 +162,11 @@ export function WorkPackageItem({
             />
 
             {/* Work Package Leads */}
-            <LeadsBadge leads={wp.leads} onSelectLead={onSelectLead} />
+            <LeadsBadge 
+              leads={wp.leads} 
+              onSelectLead={onSelectLead}
+              iconTooltip="Work Package Leads"
+            />
           </div>
 
           {/* Action Count - Bottom Left */}

@@ -14,6 +14,7 @@ interface LeadsBadgeProps {
   variant?: "default" | "muted";
   showIcon?: boolean;
   color?: string;
+  iconTooltip?: string;
 }
 
 export function LeadsBadge({
@@ -22,6 +23,7 @@ export function LeadsBadge({
   variant = "default",
   showIcon = true,
   color: customColor,
+  iconTooltip,
 }: LeadsBadgeProps) {
   if (leads.length === 0) return null;
 
@@ -36,12 +38,28 @@ export function LeadsBadge({
   return (
     <div className="flex flex-wrap items-center gap-1.5">
       {showIcon && (
-        <Users
-          className={cn(
-            "h-4 w-4 shrink-0",
-            customColor || (isMuted ? "text-slate-500" : "text-un-blue"),
-          )}
-        />
+        iconTooltip ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Users
+                className={cn(
+                  "h-4 w-4 shrink-0 cursor-help",
+                  customColor || (isMuted ? "text-slate-500" : "text-un-blue"),
+                )}
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-sm text-gray-600">{iconTooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          <Users
+            className={cn(
+              "h-4 w-4 shrink-0",
+              customColor || (isMuted ? "text-slate-500" : "text-un-blue"),
+            )}
+          />
+        )
       )}
       {leads.map((lead, idx) => {
         const longForm = abbreviationMap[lead] || lead;
