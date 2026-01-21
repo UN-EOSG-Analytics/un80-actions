@@ -1,5 +1,6 @@
 import React from "react";
 import { Users, Layers, Briefcase, Calendar, ChevronDown, ChevronUp, Clock, CheckCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
 import {
   Tooltip,
@@ -91,6 +92,7 @@ export function SidebarCharts({
   onToggleShowAllMilestonesPerMonth,
   totalActions,
 }: SidebarChartsProps) {
+  const router = useRouter();
   const leadsChartEntries: SidebarChartEntry[] = leadsData.map((entry) => ({
     label: entry.lead,
     count: entry.count,
@@ -233,22 +235,41 @@ export function SidebarCharts({
           <p className="mb-3 text-[15px] text-slate-600">{upcomingMilestonesChartEntries.length} upcoming deadlines</p>
 
           {/* Milestones List */}
-          <div className="space-y-1">
+          <div className="space-y-2">
             {milestonesToShow.map((entry, index) => {
               const deadlineDate = entry.deadline ? new Date(entry.deadline) : null;
               const monthShort = deadlineDate 
                 ? deadlineDate.toLocaleDateString("en-US", { month: "short" }).toUpperCase()
                 : null;
               
+              const handleMilestoneClick = () => {
+                if (entry.actionNumber) {
+                  // Save current URL to sessionStorage before opening modal
+                  const currentUrl = window.location.search;
+                  if (currentUrl) {
+                    sessionStorage.setItem("previousUrl", currentUrl);
+                  } else {
+                    sessionStorage.removeItem("previousUrl");
+                  }
+                  
+                  // Update URL without navigating (for static export compatibility)
+                  const url = `/action-${entry.actionNumber}`;
+                  window.history.pushState({}, "", url);
+                  // Trigger a popstate event to notify ModalHandler
+                  window.dispatchEvent(new PopStateEvent("popstate"));
+                }
+              };
+              
               return (
                 <Tooltip key={index}>
                   <TooltipTrigger asChild>
                     <div 
-                      className="flex items-start gap-3 py-2.5 pr-2 cursor-help transition-colors hover:bg-slate-50 rounded-md"
+                      onClick={handleMilestoneClick}
+                      className="flex items-start gap-4 py-3 pr-2 cursor-pointer transition-all rounded-lg border bg-slate-50 border-slate-200 hover:bg-slate-100"
                     >
                       {/* Month Badge */}
-                      <div className="flex items-center justify-center min-w-[40px] h-[32px] rounded-lg border bg-un-blue/10 border-un-blue/20 text-un-blue">
-                        <span className="text-[10px] font-bold tracking-wide">{monthShort || "—"}</span>
+                      <div className="flex flex-col items-center justify-center min-w-[50px] h-[50px] rounded-lg border-2 bg-un-blue/10 border-un-blue/20 text-un-blue ml-1">
+                        <span className="text-[9px] font-bold tracking-wide">{monthShort || "—"}</span>
                       </div>
                       
                       {/* Milestone Content */}
@@ -258,9 +279,9 @@ export function SidebarCharts({
                         </p>
                         {/* Action & Work Package Info */}
                         {(entry.workPackageNumber || entry.actionNumber) && (
-                          <p className="text-[11px] mt-1 text-slate-400">
+                          <p className="text-[11px] mt-1.5 text-slate-500">
                             {entry.workPackageNumber && (
-                              <span>WP{entry.workPackageNumber}</span>
+                              <span className="font-medium">WP{entry.workPackageNumber}</span>
                             )}
                             {entry.workPackageNumber && entry.actionNumber && (
                               <span> · </span>
@@ -292,7 +313,7 @@ export function SidebarCharts({
           {hasMoreMilestones && (
             <button
               onClick={onToggleShowAllUpcomingMilestones}
-              className="mt-2 flex w-full items-center justify-center gap-1 text-xs font-medium text-un-blue hover:text-un-blue/80 transition-colors"
+              className="mt-2 flex w-full items-center justify-start gap-1 text-xs font-medium text-un-blue hover:text-un-blue/80 transition-colors pl-0.5"
             >
               {showAllUpcomingMilestones ? (
                 <>
@@ -371,31 +392,31 @@ export function SidebarCharts({
           </h3>
           <p className="mb-3 text-[15px] text-slate-600">Progress on action decisions</p>
           
-          <div className="space-y-2 pr-4">
+          <div className="space-y-3 pr-4">
             {/* Further Work Ongoing */}
-            <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5">
-              <div className="flex h-2.5 w-2.5 shrink-0 rounded-full bg-amber-500 animate-pulse" />
+            <div className="flex items-center gap-3">
+              <div className="flex h-2.5 w-2.5 shrink-0 rounded-full bg-un-blue animate-pulse" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-amber-800">Further Work Ongoing</span>
-                  <span className="text-sm font-bold text-amber-700">{totalActions}</span>
+                  <span className="text-sm font-medium text-slate-700">Further Work Ongoing</span>
+                  <span className="text-sm font-bold text-un-blue">{totalActions}</span>
                 </div>
-                <div className="mt-1.5 h-2 w-full rounded-full bg-amber-200">
-                  <div className="h-full rounded-full bg-amber-500" style={{ width: "100%" }} />
+                <div className="mt-1.5 h-2 w-full rounded-full bg-slate-200">
+                  <div className="h-full rounded-full bg-un-blue" style={{ width: "100%" }} />
                 </div>
               </div>
             </div>
 
             {/* Decision Taken */}
-            <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5">
-              <CheckCircle className="h-4 w-4 shrink-0 text-slate-400" />
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-4 w-4 shrink-0 text-un-blue" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-slate-600">Decision Taken</span>
-                  <span className="text-sm font-bold text-slate-500">0</span>
+                  <span className="text-sm font-medium text-slate-700">Decision Taken</span>
+                  <span className="text-sm font-bold text-un-blue">0</span>
                 </div>
                 <div className="mt-1.5 h-2 w-full rounded-full bg-slate-200">
-                  <div className="h-full rounded-full bg-green-500" style={{ width: "0%" }} />
+                  <div className="h-full rounded-full bg-un-blue" style={{ width: "0%" }} />
                 </div>
               </div>
             </div>

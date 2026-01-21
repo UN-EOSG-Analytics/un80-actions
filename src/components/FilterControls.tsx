@@ -518,18 +518,6 @@ export function FilterControls({
       <div className="-mt-1 mb-4 flex w-full items-center justify-between gap-3">
         <SearchBar searchQuery={searchQuery} onSearchChange={onSearchChange} />
         <div className="flex items-center gap-3">
-          {onShowProgressChange && (
-            <div className="flex items-center gap-2">
-              <Label htmlFor="show-progress" className="text-sm text-gray-700 cursor-pointer">
-                Show progress
-              </Label>
-              <Switch
-                id="show-progress"
-                checked={showProgress}
-                onCheckedChange={onShowProgressChange}
-              />
-            </div>
-          )}
           {hasActiveFilters && <ResetButton onClick={onResetFilters} />}
         </div>
       </div>

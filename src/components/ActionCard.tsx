@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { DocumentBadge } from "@/components/DocumentBadge";
 import { LeadsBadge } from "@/components/LeadsBadge";
 import { CheckCircle2, Clock, CheckCircle } from "lucide-react";
 import { parseDate } from "@/lib/utils";
@@ -34,15 +33,17 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
       sessionStorage.removeItem("previousUrl");
     }
 
-    // Build URL with action number and optionally first_milestone for subactions
-    let url = `/?action=${action.actionNumber}`;
+    // Build human-readable URL: /action-14
+    let url = `/action-${action.actionNumber}`;
     if (action.firstMilestone) {
-      // Encode firstMilestone to handle special characters and use it to identify subactions
-      url += `&milestone=${encodeURIComponent(action.firstMilestone)}`;
+      // For subactions, still use query params for milestone
+      url += `?milestone=${encodeURIComponent(action.firstMilestone)}`;
     }
 
-    // Navigate to clean modal URL
-    router.push(url, { scroll: false });
+    // Update URL without navigating (for static export compatibility)
+    window.history.pushState({}, "", url);
+    // Trigger a popstate event to notify ModalHandler
+    window.dispatchEvent(new PopStateEvent("popstate"));
   };
 
   // Calculate progress to determine if action is completed
@@ -75,22 +76,17 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
       onClick={handleClick}
       className="cursor-pointer rounded-[6px] border border-slate-200 bg-white p-5 pr-9 transition-all hover:border-slate-300 hover:shadow-md"
     >
-      {/* Activity Number and Text */}
-      <div className="mb-4 flex items-start gap-3">
-        {/* Numbered circle badge or Completed icon */}
-        {isCompleted ? (
-          <div className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-un-blue/10">
-            <CheckCircle2 className="h-5 w-5 text-un-blue" />
-          </div>
-        ) : (
-          <div className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-un-blue/10">
-            <span className="text-xs font-semibold text-un-blue">
-              {action.actionNumber || ""}
-            </span>
-          </div>
-        )}
+      {/* Action Number and Text */}
+      <div className="mb-4">
+        {/* Action Number */}
+        <div className="mb-2 text-sm font-medium tracking-wide text-un-blue uppercase">
+          Action {action.actionNumber || ""}
+        </div>
         {/* Action description text */}
-        <div className="flex-1">
+        <div className="flex items-start gap-2">
+          {isCompleted && (
+            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-un-blue" />
+          )}
           <p className="leading-normal font-medium text-slate-900">
             {action.text}
             {action.subActionDetails && (
@@ -107,59 +103,45 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
 
       {/* Metadata section - shown when there are leads */}
       {action.leads.length > 0 && (
-        <div className="ml-9 border-t border-slate-100 pt-3 mt-3">
+        <div className="border-t border-slate-100 pt-3 mt-3">
           <div className="flex flex-wrap items-center gap-4">
             {/* Display lead organizations in muted style */}
             <LeadsBadge leads={action.leads} variant="muted" />
-            {/* Display document reference (e.g., "A/80/400 para. 5") with decision status */}
-            <div className="flex items-center gap-2">
-              <DocumentBadge
-                documentParagraphNumber={action.documentParagraph}
-                report={action.report}
-                workPackageNumber={workPackageNumber}
-              />
-              <div className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 ${
-                action.decisionStatus === "decision taken"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-amber-100 text-amber-700"
-              }`}>
-                {action.decisionStatus === "decision taken" ? (
-                  <CheckCircle className="h-3 w-3" />
-                ) : (
-                  <Clock className="h-3 w-3" />
-                )}
-                <span className="text-xs font-medium">
-                  {action.decisionStatus === "decision taken" ? "Decision Taken" : "Further Work Ongoing"}
-                </span>
-              </div>
+            {/* Decision status */}
+            <div className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 ${
+              action.decisionStatus === "decision taken"
+                ? "bg-green-100 text-green-700"
+                : "bg-amber-100 text-amber-700"
+            }`}>
+              {action.decisionStatus === "decision taken" ? (
+                <CheckCircle className="h-3 w-3" />
+              ) : (
+                <Clock className="h-3 w-3" />
+              )}
+              <span className="text-xs font-medium">
+                {action.decisionStatus === "decision taken" ? "Decision Taken" : "Further Work Ongoing"}
+              </span>
             </div>
           </div>
         </div>
       )}
-      {/* Metadata section - shown when there are no leads but document paragraph exists */}
-      {action.leads.length === 0 && action.documentParagraph && (
-        <div className="ml-9 border-t border-slate-100 pt-3 mt-3">
+      {/* Metadata section - shown when there are no leads but decision status exists */}
+      {action.leads.length === 0 && action.decisionStatus && (
+        <div className="border-t border-slate-100 pt-3 mt-3">
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
-              <DocumentBadge
-                documentParagraphNumber={action.documentParagraph}
-                report={action.report}
-                workPackageNumber={workPackageNumber}
-              />
-              <div className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 ${
-                action.decisionStatus === "decision taken"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-amber-100 text-amber-700"
-              }`}>
-                {action.decisionStatus === "decision taken" ? (
-                  <CheckCircle className="h-3 w-3" />
-                ) : (
-                  <Clock className="h-3 w-3" />
-                )}
-                <span className="text-xs font-medium">
-                  {action.decisionStatus === "decision taken" ? "Decision Taken" : "Further Work Ongoing"}
-                </span>
-              </div>
+            <div className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 ${
+              action.decisionStatus === "decision taken"
+                ? "bg-green-100 text-green-700"
+                : "bg-amber-100 text-amber-700"
+            }`}>
+              {action.decisionStatus === "decision taken" ? (
+                <CheckCircle className="h-3 w-3" />
+              ) : (
+                <Clock className="h-3 w-3" />
+              )}
+              <span className="text-xs font-medium">
+                {action.decisionStatus === "decision taken" ? "Decision Taken" : "Further Work Ongoing"}
+              </span>
             </div>
           </div>
         </div>

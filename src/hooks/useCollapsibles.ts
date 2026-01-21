@@ -56,9 +56,18 @@ export function useCollapsibles() {
     });
   }, []);
 
+  const expandCollapsibles = useCallback((keys: string[]) => {
+    setOpenCollapsibles((prev) => {
+      const next = new Set(prev);
+      keys.forEach((key) => next.add(key));
+      return next;
+    });
+  }, []);
+
   return {
     openCollapsibles,
     toggleCollapsible,
+    expandCollapsibles,
     isAdvancedFilterOpen,
     setIsAdvancedFilterOpen,
     openFilterCollapsibles,

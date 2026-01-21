@@ -39,7 +39,7 @@ export function LeadsBadge({
         <Users
           className={cn(
             "h-4 w-4 shrink-0",
-            customColor || (isMuted ? "text-slate-600" : "text-un-blue"),
+            customColor || (isMuted ? "text-slate-500" : "text-un-blue"),
           )}
         />
       )}
@@ -53,8 +53,8 @@ export function LeadsBadge({
                 className={cn(
                   "cursor-pointer transition-colors",
                   isMuted
-                    ? "border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100"
-                    : "border-slate-300 bg-white text-un-blue hover:bg-slate-50",
+                    ? "border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    : "border-un-blue/30 bg-un-blue text-white hover:bg-un-blue/90",
                   onSelectLead ? "" : "cursor-help",
                   customColor && `text-[${customColor}]`,
                 )}

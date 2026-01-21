@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect, useRef } from "react";
 import { DataCard } from "@/components/DataCard";
 import { ExplainerText } from "@/components/ExplainerText";
 import { FilterControls } from "@/components/FilterControls";
@@ -8,6 +8,8 @@ import { Header } from "@/components/HeaderBar";
 import { SidebarCharts } from "@/components/SidebarCharts";
 import { WorkPackageList } from "@/components/ListContainer";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { useActions } from "@/hooks/useActions";
 import { useChartSearch } from "@/hooks/useChartSearch";
 import { useCollapsibles } from "@/hooks/useCollapsibles";
@@ -21,7 +23,7 @@ import {
   User,
 } from "lucide-react";
 
-function WorkPackagesPageContent() {
+export function WorkPackagesPageContent() {
   // Custom hooks for state management
   const { actions, isLoading } = useActions();
   const [showProgress, setShowProgress] = useState(false);
@@ -51,6 +53,7 @@ function WorkPackagesPageContent() {
   const {
     openCollapsibles,
     toggleCollapsible,
+    expandCollapsibles,
     isAdvancedFilterOpen,
     setIsAdvancedFilterOpen,
     openFilterCollapsibles,
@@ -122,6 +125,52 @@ function WorkPackagesPageContent() {
     setSelectedBigTicket,
   );
 
+  // Track the last selectedAction we processed to avoid infinite loops
+  const lastProcessedActionsRef = useRef<string>("");
+
+  // Auto-expand work package collapsibles when actions are selected
+  useEffect(() => {
+    const selectedActionKey = selectedAction.sort().join(",");
+    
+    // Skip if we've already processed this selection
+    if (selectedActionKey === lastProcessedActionsRef.current) {
+      return;
+    }
+
+    if (selectedAction.length > 0 && filteredWorkPackages.length > 0) {
+      const collapsibleKeysToExpand: string[] = [];
+      
+      filteredWorkPackages.forEach((wp, index) => {
+        // Check if this work package contains any of the selected actions
+        const hasSelectedAction = wp.actions.some((action) => {
+          const actionText = action.text ? action.text.trim() : "";
+          return selectedAction.some((selected) => {
+            const selectedTrimmed = selected.trim();
+            return actionText === selectedTrimmed;
+          });
+        });
+        
+        if (hasSelectedAction) {
+          const collapsibleKey = `${wp.report.join("-")}-${wp.number || "empty"}-${index}`;
+          // Only add if not already open
+          if (!openCollapsibles.has(collapsibleKey)) {
+            collapsibleKeysToExpand.push(collapsibleKey);
+          }
+        }
+      });
+      
+      if (collapsibleKeysToExpand.length > 0) {
+        expandCollapsibles(collapsibleKeysToExpand);
+      }
+      
+      // Mark this selection as processed
+      lastProcessedActionsRef.current = selectedActionKey;
+    } else if (selectedAction.length === 0) {
+      // Reset when no actions are selected
+      lastProcessedActionsRef.current = "";
+    }
+  }, [selectedAction]); // Only depend on selectedAction
+
   return (
     <TooltipProvider delayDuration={200}>
       <div className="min-h-screen bg-white">
@@ -131,8 +180,20 @@ function WorkPackagesPageContent() {
         {/* Main Container - with padding to account for fixed header */}
         <main className="mx-auto w-full max-w-4xl px-8 pt-8 sm:px-12 sm:pt-24 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
           <div className="space-y-6 pb-16">
-            {/* Header with context info */}
-            <ExplainerText />
+            {/* Header with context info and Progress Toggle */}
+            <div className="flex items-start justify-between gap-4">
+              <ExplainerText />
+              <div className="flex shrink-0 items-center gap-2 pt-0">
+                <Label htmlFor="show-progress" className="text-sm font-medium text-slate-700 cursor-pointer whitespace-nowrap">
+                  Show progress
+                </Label>
+                <Switch
+                  id="show-progress"
+                  checked={showProgress}
+                  onCheckedChange={setShowProgress}
+                />
+              </div>
+            </div>
 
             {/* DataCards Section */}
             <section className="mb-10">
@@ -215,8 +276,6 @@ function WorkPackagesPageContent() {
                     uniqueTeamMembers={uniqueTeamMembers}
                     availableBigTicketOptions={availableBigTicketOptions}
                     onResetFilters={handleResetFilters}
-                    showProgress={showProgress}
-                    onShowProgressChange={setShowProgress}
                   />
 
                   <WorkPackageList

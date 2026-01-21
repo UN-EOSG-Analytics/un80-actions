@@ -50,9 +50,13 @@ export function WorkPackageList({
         // Filter actions if action filter is selected
         let filteredActions =
           selectedActions.length > 0
-            ? wp.actions.filter((action) =>
-                selectedActions.includes(action.text.trim()),
-              )
+            ? wp.actions.filter((action) => {
+                const actionText = action.text ? action.text.trim() : "";
+                return selectedActions.some((selected) => {
+                  const selectedTrimmed = selected.trim();
+                  return actionText === selectedTrimmed;
+                });
+              })
             : wp.actions;
 
         // Filter actions by team members if team member filter is selected

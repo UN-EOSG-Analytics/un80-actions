@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Circle, Clock } from "lucide-react";
+import { CheckCircle2, Circle } from "lucide-react";
 import { parseDate, formatDateMonthYear } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +41,16 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
                 style={{ height: "calc(100% + 0.5rem)" }}
               />
             )}
+            {/* Continuation line for last item to indicate more to come */}
+            {isLast && !isReached && (
+              <div
+                className="absolute left-[11px] top-8 w-0.5 bg-gray-200"
+                style={{ 
+                  height: "24px",
+                  background: "linear-gradient(to bottom, #e5e7eb, transparent)"
+                }}
+              />
+            )}
 
             {/* Milestone icon */}
             <div className="relative z-10 flex shrink-0 items-center justify-center">
@@ -63,19 +73,14 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
                   isReached && "opacity-60"
                 )}
               >
-                <div className="flex items-center gap-2">
-                  <p
-                    className={cn(
-                      "text-base font-medium text-gray-900",
-                      isReached && "line-through"
-                    )}
-                  >
-                    {milestone.label}
-                  </p>
-                  {!isReached && (
-                    <Clock className="h-4 w-4 text-gray-400" />
+                <p
+                  className={cn(
+                    "text-base font-medium text-gray-900",
+                    isReached && "line-through"
                   )}
-                </div>
+                >
+                  {milestone.label}
+                </p>
                 {deadlineDate && (
                   <p className="text-sm text-gray-600">
                     {formatDateMonthYear(deadlineDate)}

@@ -211,9 +211,13 @@ export function useWorkPackageData(
       filters.selectedAction.length > 0
     ) {
       filtered = filtered.filter((wp) =>
-        wp.actions.some((action) =>
-          filters.selectedAction!.includes(action.text.trim()),
-        ),
+        wp.actions.some((action) => {
+          const actionText = action.text ? action.text.trim() : "";
+          return filters.selectedAction!.some((selected) => {
+            const selectedTrimmed = selected.trim();
+            return actionText === selectedTrimmed;
+          });
+        }),
       );
     }
 

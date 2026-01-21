@@ -1,10 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { X } from "lucide-react";
+import { X, Clock, CheckCircle } from "lucide-react";
 import type { Action } from "@/types";
 import { LeadsBadge } from "@/components/LeadsBadge";
 import { MilestoneTimeline } from "@/components/MilestoneTimeline";
+import { Badge } from "@/components/ui/badge";
+import { FileText } from "lucide-react";
+import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
 import { parseDate, formatDate, formatDateMonthYear, normalizeTeamMemberForDisplay } from "@/lib/utils";
 import { getWorkPackageLeads } from "@/lib/actions";
 import {
@@ -183,6 +186,23 @@ export default function ActionModal({
               </>
             )}
           </h2>
+          {/* Work Package Info */}
+          <div className="mt-2 flex items-center gap-2 text-sm">
+            <span className="text-slate-500">
+              Work Package {action.work_package_number}
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="text-slate-600 font-medium">
+              {action.work_package_name}
+            </span>
+          </div>
+          {/* Decision Status Badge */}
+          <div className="mt-3">
+            <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 bg-amber-100 text-amber-700">
+              <Clock className="h-3.5 w-3.5" />
+              <span className="text-sm font-medium">Further Work Ongoing</span>
+            </div>
+          </div>
         </div>
         <button
           onClick={handleClose}
@@ -217,172 +237,142 @@ export default function ActionModal({
 
     // Action content
     return (
-      <div className="space-y-6 py-4">
-        {/* Work Package Info */}
-        <div className="space-y-4">
-          <Field label="Work Package">
-            <div className="font-medium">
-              #{action.work_package_number}: {action.work_package_name}
-            </div>
-          </Field>
-
-        </div>
-
-        {/* Work Package Leads */}
-        {workPackageLeads.length > 0 && (
-          <div className="">
-            <Field label="Work package leads">
-              <div className="mt-1 text-base text-gray-900">
-                <LeadsBadge
-                  leads={workPackageLeads}
-                  variant="default"
-                  showIcon={false}
-                  color="text-gray-600"
-                />
+      <div className="space-y-4 py-4">
+        {/* Action Details Section */}
+        <div className="rounded-lg border border-slate-200 bg-white p-5">
+          <h3 className="mb-4 text-sm font-semibold tracking-wide text-slate-700 uppercase">
+            Action Details
+          </h3>
+          <div className="space-y-5">
+            {/* Action Leads */}
+            {action.action_leads && action.action_leads.trim() && (
+              <div>
+                <Field label="Action leads">
+                  <div className="mt-1">
+                    <LeadsBadge
+                      leads={action.action_leads
+                        .split(";")
+                        .map((lead) => lead.trim())
+                        .filter((lead) => lead.length > 0)}
+                      variant="muted"
+                      showIcon={false}
+                    />
+                  </div>
+                </Field>
               </div>
-            </Field>
-          </div>
-        )}
+            )}
 
-        {/* Visual separator between Work Package and Action sections */}
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t-2 border-gray-300"></div>
-          </div>
-          <div className="relative flex justify-start">
-            <span className="bg-white pr-3 pl-0 text-sm font-bold tracking-wider text-un-blue uppercase">
-              Action Details
-            </span>
-          </div>
-        </div>
-
-        {/* Action-specific information starts here */}
-        {/* Action Leads */}
-        {action.action_leads && action.action_leads.trim() && (
-          <div className="">
-            <Field label="Action leads">
-              <div className="mt-1 text-base text-gray-900">
-                <LeadsBadge
-                  leads={action.action_leads
-                    .split(";")
-                    .map((lead) => lead.trim())
-                    .filter((lead) => lead.length > 0)}
-                  variant="default"
-                  showIcon={false}
-                  color="text-gray-600"
-                />
-              </div>
-            </Field>
-          </div>
-        )}
-
-        {/* Team Members for Indicative Action */}
-        <div className="-mt-2 pt-0">
-          <div className="space-y-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="cursor-help text-sm font-normal tracking-wide text-gray-600 uppercase">
-                  Team members for indicative action
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-gray-600">
-                  UN system entities that contribute to the implementation of a
-                  specific action, in support of the relevant Work Package Lead.
-                  Work Package Leads report to the UN80 Steering Committee under
-                  the authority of the Secretary-General.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-            <div className="mt-1 text-base text-gray-900">
-              <p className="text-left leading-tight text-gray-700">
+            {/* Team Members */}
+            <div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="cursor-help text-sm font-normal tracking-wide text-gray-600 uppercase">
+                    Team members for indicative action
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-gray-600">
+                    UN system entities that contribute to the implementation of a
+                    specific action, in support of the relevant Work Package Lead.
+                    Work Package Leads report to the UN80 Steering Committee under
+                    the authority of the Secretary-General.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+              <div className="mt-2 flex flex-wrap gap-1.5">
                 {action.action_entities && action.action_entities.trim() ? (
                   action.action_entities
                     .split(";")
                     .map((entity) =>
                       normalizeTeamMemberForDisplay(entity.trim()),
                     )
+                    .filter((entity) => entity && entity.trim().length > 0)
                     .filter((entity, index, array) => {
-                      // Remove duplicates after normalization
                       return array.indexOf(entity) === index;
                     })
-                    .map((entity, index, array) => (
-                      <span key={index}>
+                    .map((entity, index) => (
+                      <Badge
+                        key={index}
+                        variant="outline"
+                        className="border-un-blue/30 bg-un-blue text-white hover:bg-un-blue/90 cursor-default"
+                      >
                         {entity}
-                        {index < array.length - 1 && (
-                          <span className="text-gray-400"> • </span>
-                        )}
-                      </span>
+                      </Badge>
                     ))
                 ) : (
-                  <span>to be updated</span>
+                  <span className="text-sm text-gray-400">to be updated</span>
                 )}
-              </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Milestones Timeline */}
-        {(action.first_milestone || action.final_milestone || action.upcoming_milestone) && (
-          <div className="-mt-2 pt-0">
-            <div className="space-y-1">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="text-sm font-normal tracking-wide text-gray-600 uppercase cursor-help">
-                    Milestones
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-gray-600">
-                    Steps which will be taken towards the delivery of the proposal concerned. Completed milestones are crossed out.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-              <div className="mt-4">
-                <MilestoneTimeline
-                  milestones={[
-                    ...(action.first_milestone
-                      ? [
-                          {
-                            label: action.first_milestone,
-                            deadline: action.first_milestone_deadline,
-                            isReached: false, // Will be calculated based on deadline
-                          },
-                        ]
-                      : []),
-                    ...(action.final_milestone
-                      ? [
-                          {
-                            label: action.final_milestone,
-                            deadline: action.final_milestone_deadline,
-                            isReached: false, // Will be calculated based on deadline
-                          },
-                        ]
-                      : []),
-                    ...(action.upcoming_milestone
-                      ? [
-                          {
-                            label: action.upcoming_milestone,
-                            deadline: action.upcoming_milestone_deadline,
-                            isReached: false,
-                          },
-                        ]
-                      : []),
-                  ]}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Updates */}
-        <div className="-mt-2 pt-0">
-          <div className="space-y-1">
+        {/* Milestones and Updates Section */}
+        {(() => {
+          const hasFirstMilestonePassed = action.first_milestone && action.first_milestone_deadline
+            ? (() => {
+                const deadlineDate = parseDate(action.first_milestone_deadline);
+                const now = new Date();
+                return deadlineDate && deadlineDate < now;
+              })()
+            : false;
+          return hasFirstMilestonePassed || action.upcoming_milestone;
+        })() && (
+          <div className="rounded-lg border border-slate-200 bg-white p-5">
+            {/* Milestones */}
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="cursor-help text-sm font-normal tracking-wide text-gray-600 uppercase">
+                <h3 className="mb-4 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
+                  upcoming Milestone
+                </h3>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-gray-600">
+                  Steps which will be taken towards the delivery of the proposal concerned. Completed milestones are crossed out.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+            <div className="mt-2">
+              <MilestoneTimeline
+                milestones={[
+                  ...(action.first_milestone && action.first_milestone_deadline
+                    ? (() => {
+                        const deadlineDate = parseDate(action.first_milestone_deadline);
+                        const now = new Date();
+                        const hasPassed = deadlineDate && deadlineDate < now;
+                        return hasPassed
+                          ? [
+                              {
+                                label: action.first_milestone,
+                                deadline: action.first_milestone_deadline,
+                                isReached: false,
+                              },
+                            ]
+                          : [];
+                      })()
+                    : []),
+                  ...(action.upcoming_milestone
+                    ? [
+                        {
+                          label: action.upcoming_milestone,
+                          deadline: action.upcoming_milestone_deadline,
+                          isReached: false,
+                        },
+                      ]
+                    : []),
+                ]}
+              />
+            </div>
+
+            {/* Separator */}
+            <div className="my-5 border-t border-slate-200"></div>
+
+            {/* Updates */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <h3 className="mb-4 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
                   Updates
-                </span>
+                </h3>
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-gray-600">
@@ -390,19 +380,54 @@ export default function ActionModal({
                 </p>
               </TooltipContent>
             </Tooltip>
-            <div className="mt-1 text-base text-gray-900">
-              <div className="text-gray-700">To be updated</div>
-              </div>
+            <div className="text-base text-gray-900">
+              <div className="text-gray-500">To be updated</div>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Document Text */}
-        {action.doc_text && (
-          <div className="-mt-2 pt-0">
-            <div className="mt-4 ml-0.5 border-l-2 border-slate-400 bg-slate-50 py-2 pr-3 pl-3">
-              <p className="text-sm leading-tight text-slate-600">
-                &ldquo;{action.doc_text}&rdquo;
-              </p>
+        {/* Document Reference Section */}
+        {(action.doc_text || action.document_paragraph) && (
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-5">
+            <h3 className="mb-4 text-sm font-semibold tracking-wide text-slate-700 uppercase">
+              Document Reference
+            </h3>
+            <div className="space-y-3">
+              {/* Document Paragraph Number */}
+              {action.document_paragraph && (() => {
+                const documentData = getDocumentReference({
+                  workPackageNumber: action.work_package_number,
+                  report: action.report,
+                  documentParagraph: action.document_paragraph,
+                });
+                
+                if (documentData) {
+                  const documentUrl = getDocumentUrl(documentData.documentNumber);
+                  return (
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 shrink-0 text-slate-600" />
+                      <a
+                        href={documentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-mono text-sm leading-tight text-un-blue hover:underline"
+                      >
+                        {documentData.text}
+                      </a>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+              
+              {/* Document Text Quote */}
+              {action.doc_text && (
+                <div className="border-l-2 border-slate-300 bg-white py-3 pl-4 pr-3">
+                  <p className="text-sm leading-relaxed text-slate-700">
+                    &ldquo;{action.doc_text}&rdquo;
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
