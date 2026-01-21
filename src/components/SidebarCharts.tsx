@@ -323,9 +323,6 @@ export function SidebarCharts({
           searchPlaceholder="Search months"
           selectedValue={[]}
           onSelectValue={() => {}}
-          showAll={showAllMilestonesPerMonth}
-          onToggleShowAll={onToggleShowAllMilestonesPerMonth}
-          initialDisplayCount={6}
           barWidth={105}
         />
       )}
@@ -340,9 +337,6 @@ export function SidebarCharts({
         searchPlaceholder="Search principals"
         selectedValue={selectedLead}
         onSelectValue={onSelectLead}
-        showAll={showAllLeads}
-        onToggleShowAll={onToggleShowAllLeads}
-        initialDisplayCount={6}
         barWidth={105}
       />
 
@@ -356,8 +350,6 @@ export function SidebarCharts({
         searchPlaceholder="Search workstreams"
         selectedValue={selectedWorkstream}
         onSelectValue={onSelectWorkstream}
-        showAll={showAllWorkstreams}
-        onToggleShowAll={onToggleShowAllWorkstreams}
         barWidth={105}
       />
 

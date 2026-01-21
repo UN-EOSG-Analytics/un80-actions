@@ -30,9 +30,6 @@ interface SidebarChartProps {
   searchPlaceholder: string;
   selectedValue: string[];
   onSelectValue: (value: string[]) => void;
-  showAll: boolean;
-  onToggleShowAll: () => void;
-  initialDisplayCount?: number;
   barWidth?: number; // Width in pixels
 }
 
@@ -46,12 +43,8 @@ export function SidebarChart({
   searchPlaceholder,
   selectedValue,
   onSelectValue,
-  showAll,
-  onToggleShowAll,
-  initialDisplayCount = 3,
   barWidth = 90,
 }: SidebarChartProps) {
-  const displayedData = showAll ? data : data.slice(0, initialDisplayCount);
   const maxCount =
     data.length > 0 ? Math.max(...data.map((d) => d.count ?? 0)) : 1;
 
@@ -92,11 +85,11 @@ export function SidebarChart({
         />
       </div>
 
-      {/* Chart Data */}
-      <div className="overflow-hidden">
+      {/* Chart Data - Scrollable */}
+      <div className="max-h-[360px] overflow-y-auto overscroll-contain pr-1 -mr-1">
         <table className="w-full table-fixed">
           <tbody>
-            {displayedData.map((entry, index) => {
+            {data.map((entry, index) => {
               const percentage = (entry.count / maxCount) * 100;
               const isSelected = selectedValue.includes(entry.value);
               const isFiltered =
@@ -124,7 +117,7 @@ export function SidebarChart({
                           : isUpcoming
                             ? "bg-amber-50/30 hover:bg-amber-50/50 border-l-2 border-amber-300"
                             : "hover:bg-slate-50"
-                  } ${index < displayedData.length - 1 ? "border-b border-slate-200" : ""} ${hasUrgencyIndicator ? "pl-1" : ""}`}
+                  } ${index < data.length - 1 ? "border-b border-slate-200" : ""} ${hasUrgencyIndicator ? "pl-1" : ""}`}
                 >
                   <td className="py-2.5 pr-0">
                     <div className="flex items-center justify-between gap-2">
@@ -233,18 +226,6 @@ export function SidebarChart({
             })}
           </tbody>
         </table>
-
-        {/* Show More/Less Button */}
-        {data.length > initialDisplayCount && (
-          <button
-            onClick={onToggleShowAll}
-            className="w-full py-2 text-left text-[14px] text-un-blue transition-colors hover:text-un-blue/80"
-          >
-            {showAll
-              ? "Show less"
-              : `Show ${data.length - initialDisplayCount} more`}
-          </button>
-        )}
       </div>
     </div>
   );
