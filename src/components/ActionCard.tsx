@@ -33,8 +33,10 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
       sessionStorage.removeItem("previousUrl");
     }
 
-    // Build human-readable URL: /action-14
-    const url = `/action-${action.actionNumber}`;
+    // Build URL with query param: ?action=14
+    const params = new URLSearchParams(window.location.search);
+    params.set("action", String(action.actionNumber));
+    const url = `?${params.toString()}`;
 
     // Update URL without navigating (for static export compatibility)
     window.history.pushState({}, "", url);

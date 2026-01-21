@@ -252,8 +252,10 @@ export function SidebarCharts({
                     sessionStorage.removeItem("previousUrl");
                   }
                   
-                  // Update URL without navigating (for static export compatibility)
-                  const url = `/action-${entry.actionNumber}`;
+                  // Build URL with query param: ?action=14
+                  const params = new URLSearchParams(window.location.search);
+                  params.set("action", String(entry.actionNumber));
+                  const url = `?${params.toString()}`;
                   window.history.pushState({}, "", url);
                   // Trigger a popstate event to notify ModalHandler
                   window.dispatchEvent(new PopStateEvent("popstate"));
