@@ -34,11 +34,7 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
     }
 
     // Build human-readable URL: /action-14
-    let url = `/action-${action.actionNumber}`;
-    if (action.firstMilestone) {
-      // For subactions, still use query params for milestone
-      url += `?milestone=${encodeURIComponent(action.firstMilestone)}`;
-    }
+    const url = `/action-${action.actionNumber}`;
 
     // Update URL without navigating (for static export compatibility)
     window.history.pushState({}, "", url);
