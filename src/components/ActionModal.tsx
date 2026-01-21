@@ -172,7 +172,7 @@ export default function ActionModal({
     return (
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
-          <div className="mb-2 text-sm font-medium tracking-wide text-un-blue uppercase">
+          <div className="mb-2 text-sm font-medium tracking-wider text-un-blue uppercase">
             Action {action.action_number}
           </div>
           <h2 className="text-lg leading-tight font-semibold text-gray-900 sm:text-xl">
@@ -195,13 +195,6 @@ export default function ActionModal({
             <span className="text-slate-600 font-medium">
               {action.work_package_name}
             </span>
-          </div>
-          {/* Decision Status Badge */}
-          <div className="mt-3">
-            <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 bg-amber-100 text-amber-700">
-              <Clock className="h-3.5 w-3.5" />
-              <span className="text-sm font-medium">Further Work Ongoing</span>
-            </div>
           </div>
         </div>
         <button
@@ -244,6 +237,14 @@ export default function ActionModal({
             Action Details
           </h3>
           <div className="space-y-5">
+            {/* Decision Status Badge */}
+            <div>
+              <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 bg-amber-100 text-amber-700">
+                <Clock className="h-3.5 w-3.5" />
+                <span className="text-sm font-medium">Further Work Ongoing</span>
+              </div>
+            </div>
+
             {/* Action Leads */}
             {action.action_leads && action.action_leads.trim() && (
               <div>

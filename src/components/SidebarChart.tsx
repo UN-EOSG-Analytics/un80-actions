@@ -149,7 +149,7 @@ export function SidebarChart({
                             </TooltipTrigger>
                             <TooltipContent>
                               <div className="text-sm text-gray-600">
-                                <p>{entry.tooltip}</p>
+                                <p>{entry.tooltip || entry.label}</p>
                                 {isUrgent && (
                                   <p className="mt-1 text-xs font-semibold text-red-600">
                                     ⚠ Urgent
@@ -172,7 +172,7 @@ export function SidebarChart({
                               <span className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-label="Upcoming" />
                             )}
                             <span
-                              className={`block text-[14px] font-medium truncate transition-colors ${
+                              className={`block text-[14px] font-medium transition-colors ${
                                 isSelected
                                   ? "font-semibold text-un-blue"
                                   : isUrgent

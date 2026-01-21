@@ -182,7 +182,7 @@ export function WorkPackagesPageContent() {
           <div className="space-y-6 pb-16">
             {/* Header with context info and Progress Toggle */}
             <div className="flex items-start justify-between gap-4">
-              <ExplainerText />
+            <ExplainerText />
               <div className="flex shrink-0 items-center gap-2 pt-0">
                 <Label htmlFor="show-progress" className="text-sm font-medium text-slate-700 cursor-pointer whitespace-nowrap">
                   Show progress

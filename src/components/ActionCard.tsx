@@ -75,7 +75,7 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
       {/* Action Number and Text */}
       <div className="mb-4">
         {/* Action Number */}
-        <div className="mb-2 text-sm font-medium tracking-wide text-un-blue uppercase">
+        <div className="mb-2 text-sm font-medium tracking-wider text-un-blue uppercase">
           Action {action.actionNumber || ""}
         </div>
         {/* Action description text */}
