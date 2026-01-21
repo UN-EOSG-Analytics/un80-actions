@@ -63,12 +63,6 @@ export function SidebarChart({
   const countWidth =
     maxCountDigits === 1 ? "w-5" : maxCountDigits === 2 ? "w-7" : "w-9";
 
-  // Calculate the exact width needed for the longest label
-  // Use 7px per character for more compact spacing
-  const maxLabelLength =
-    data.length > 0 ? Math.max(...data.map((d) => (d.label ?? "").length)) : 0;
-  const labelWidth = maxLabelLength * 7;
-
   const handleClickBar = (value: string) => {
     const newSelected = selectedValue.includes(value)
       ? selectedValue.filter((v) => v !== value)
@@ -133,11 +127,8 @@ export function SidebarChart({
                   } ${index < displayedData.length - 1 ? "border-b border-slate-200" : ""} ${hasUrgencyIndicator ? "pl-1" : ""}`}
                 >
                   <td className="py-2.5 pr-0">
-                    <div className="flex items-center justify-between gap-1">
-                      <div
-                        style={{ maxWidth: `${labelWidth}px`, flexShrink: 1 }}
-                        className="ml-0.5 min-w-0"
-                      >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="ml-0.5 min-w-0 flex-1">
                         {entry.tooltip ? (
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -158,7 +149,6 @@ export function SidebarChart({
                                           ? "text-amber-700 group-hover:text-amber-800"
                                           : "text-slate-600 group-hover:text-un-blue"
                                   }`}
-                                  style={{ maxWidth: `${labelWidth}px` }}
                                 >
                                   {entry.label}
                                 </span>
@@ -198,7 +188,6 @@ export function SidebarChart({
                                       ? "text-amber-700 group-hover:text-amber-800"
                                       : "text-slate-600 group-hover:text-un-blue"
                               }`}
-                              style={{ maxWidth: `${labelWidth}px` }}
                             >
                               {entry.label}
                             </span>
