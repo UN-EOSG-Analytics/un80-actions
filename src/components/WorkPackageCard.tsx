@@ -1,12 +1,11 @@
+import { ActionItem } from "@/components/ActionCard";
+import { WorkstreamLabels, WPLeadsBadge } from "@/components/Badges";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Progress } from "@/components/ui/progress";
-import { ActionItem } from "@/components/ActionCard";
-import { WorkstreamLabels } from "@/components/Badges";
-import { WPLeadsBadge } from "@/components/Badges";
 import { formatGoalText } from "@/lib/utils";
 import type { WorkPackage, WorkPackageAction } from "@/types";
 import { Menu } from "lucide-react";
@@ -117,12 +116,16 @@ export function WorkPackageItem({
           )}
 
           {/* Report Labels and Work Package Leads */}
-          <div className="flex w-full flex-wrap items-start gap-1.5">
+          <div className="flex w-full flex-wrap items-center gap-1.5">
             {/* Workstream Labels */}
             <WorkstreamLabels
               report={wp.report}
               onSelectWorkstream={onSelectWorkstream}
             />
+
+            {/* Separator */}
+            {wp.report.some((r) => ["WS1", "WS2", "WS3"].includes(r)) &&
+              wp.leads.length > 0 && <span className="text-slate-300">•</span>}
 
             {/* Work Package Leads */}
             <WPLeadsBadge leads={wp.leads} onSelect={onSelectLead} />

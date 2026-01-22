@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import { Header } from "@/components/HeaderBar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
@@ -10,6 +11,10 @@ import {
   WorkstreamBadge,
   DecisionStatusBadge,
 } from "@/components/Badges";
+import { WorkPackageItem } from "@/components/WorkPackageCard";
+import { ActionItem } from "@/components/ActionCard";
+import { useActions } from "@/hooks/useActions";
+import { groupActionsByWorkPackage } from "@/lib/workPackages";
 
 function BadgeShowcase({
   title,
@@ -34,9 +39,99 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
 }
 
 export default function StyleGuidePage() {
-  const sampleLeads = ["USG DPPA", "USG DPO", "ASG DOS"];
-  const sampleTeam = ["DPPA", "DPO", "DOS", "DCO", "OCHA"];
-  const sampleWorkstreams = ["WS1", "WS2", "WS3"];
+  const [wpOpen, setWpOpen] = useState(false);
+  const { actions, isLoading } = useActions();
+
+  // Get real work packages from data
+  const workPackages = useMemo(
+    () => groupActionsByWorkPackage(actions),
+    [actions],
+  );
+
+  // Find a work package with multiple actions and workstreams for demo
+  const sampleWorkPackage = useMemo(() => {
+    return (
+      workPackages.find(
+        (wp) =>
+          wp.actions.length >= 2 &&
+          wp.leads.length > 0 &&
+          wp.report.some((r) => ["WS1", "WS2", "WS3"].includes(r)),
+      ) || workPackages[0]
+    );
+  }, [workPackages]);
+
+  // Find actions with different decision statuses
+  const actionOngoing = useMemo(() => {
+    for (const wp of workPackages) {
+      const action = wp.actions.find(
+        (a) =>
+          a.decisionStatus?.toLowerCase() !== "decision taken" &&
+          a.leads.length > 0 &&
+          a.actionEntities,
+      );
+      if (action) return { action, wpNumber: wp.number };
+    }
+    return null;
+  }, [workPackages]);
+
+  const actionTaken = useMemo(() => {
+    for (const wp of workPackages) {
+      const action = wp.actions.find(
+        (a) =>
+          a.decisionStatus?.toLowerCase() === "decision taken" &&
+          a.leads.length > 0,
+      );
+      if (action) return { action, wpNumber: wp.number };
+    }
+    return null;
+  }, [workPackages]);
+
+  // Extract sample data from real actions for badge demos
+  const sampleLeads = useMemo(() => {
+    const leads = new Set<string>();
+    workPackages.forEach((wp) => {
+      wp.leads.forEach((lead) => leads.add(lead));
+    });
+    return Array.from(leads).slice(0, 3);
+  }, [workPackages]);
+
+  const sampleTeam = useMemo(() => {
+    const team = new Set<string>();
+    workPackages.forEach((wp) => {
+      wp.actions.forEach((action) => {
+        if (action.actionEntities) {
+          action.actionEntities.split(";").forEach((entity) => {
+            const trimmed = entity.trim();
+            if (trimmed) team.add(trimmed);
+          });
+        }
+      });
+    });
+    return Array.from(team).slice(0, 5);
+  }, [workPackages]);
+
+  const sampleWorkstreams = useMemo(() => {
+    const ws = new Set<string>();
+    workPackages.forEach((wp) => {
+      wp.report.forEach((r) => {
+        if (["WS1", "WS2", "WS3"].includes(r)) ws.add(r);
+      });
+    });
+    return Array.from(ws).sort();
+  }, [workPackages]);
+
+  if (isLoading) {
+    return (
+      <TooltipProvider delayDuration={200}>
+        <div className="min-h-screen bg-slate-50">
+          <Header />
+          <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+            <div className="text-slate-500">Loading data...</div>
+          </main>
+        </div>
+      </TooltipProvider>
+    );
+  }
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -47,17 +142,17 @@ export default function StyleGuidePage() {
           {/* Page Header */}
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-slate-900">
-              Badge Style Guide
+              Component Style Guide
             </h1>
             <p className="mt-2 text-slate-600">
-              Reference for all badge components. Edit styles in{" "}
+              Live preview using actual data. Edit badge styles in{" "}
               <code className="rounded bg-slate-200 px-1.5 py-0.5 text-sm">
                 src/components/Badges.tsx
               </code>
             </p>
           </div>
 
-          {/* Variants Overview */}
+          {/* Badge Variants */}
           <section className="mb-10">
             <SectionHeader>Badge Variants</SectionHeader>
             <p className="mb-4 text-sm text-slate-600">
@@ -67,40 +162,54 @@ export default function StyleGuidePage() {
             <div className="space-y-4">
               <BadgeShowcase
                 title="primary"
-                description="Solid UN blue, white text. Most prominent."
+                description="Solid UN blue, white text. Used for Work Package Leads."
               >
-                <LabelBadge items={["Example"]} variant="primary" />
+                <LabelBadge
+                  items={sampleLeads.length > 0 ? sampleLeads : ["Example"]}
+                  variant="primary"
+                />
               </BadgeShowcase>
 
               <BadgeShowcase
                 title="secondary"
-                description="UN blue outline with light fill."
+                description="UN blue outline with light fill. Used for Action Leads."
               >
-                <LabelBadge items={["Example"]} variant="secondary" />
+                <LabelBadge
+                  items={sampleLeads.length > 0 ? sampleLeads : ["Example"]}
+                  variant="secondary"
+                />
               </BadgeShowcase>
 
               <BadgeShowcase
                 title="tertiary"
-                description="Dashed outline, minimal fill. Least prominent."
+                description="Subtle UN blue outline and tint. Used for Team Members."
               >
-                <LabelBadge items={["Example"]} variant="tertiary" />
+                <LabelBadge
+                  items={sampleTeam.length > 0 ? sampleTeam : ["Example"]}
+                  variant="tertiary"
+                />
               </BadgeShowcase>
 
               <BadgeShowcase
                 title="muted"
-                description="Solid slate fill. Neutral info."
+                description="Solid slate fill. Used for Workstream labels."
               >
-                <LabelBadge items={["Example"]} variant="muted" />
+                <LabelBadge
+                  items={
+                    sampleWorkstreams.length > 0 ? sampleWorkstreams : ["WS1"]
+                  }
+                  variant="muted"
+                />
               </BadgeShowcase>
             </div>
           </section>
 
-          {/* Side by Side Comparison */}
+          {/* Hierarchy Comparison */}
           <section className="mb-10">
             <SectionHeader>Hierarchy Comparison</SectionHeader>
             <div className="rounded-lg border border-slate-200 bg-white p-6">
               <p className="mb-4 text-sm text-slate-600">
-                All variants side by side:
+                All variants side by side (most to least prominent):
               </p>
               <div className="flex flex-wrap items-center gap-4">
                 <LabelBadge items={["primary"]} variant="primary" />
@@ -111,159 +220,122 @@ export default function StyleGuidePage() {
             </div>
           </section>
 
-          {/* Specialized Wrappers */}
-          <section className="mb-10">
-            <SectionHeader>Specialized Wrappers</SectionHeader>
-            <p className="mb-4 text-sm text-slate-600">
-              Convenience components with preset variants.
-            </p>
-
-            <div className="space-y-4">
-              <BadgeShowcase
-                title="WPLeadsBadge"
-                description="Work Package Leads - uses primary variant"
-              >
-                <WPLeadsBadge leads={sampleLeads} />
-              </BadgeShowcase>
-
-              <BadgeShowcase
-                title="ActionLeadsBadge"
-                description="Action Leads - uses secondary variant"
-              >
-                <ActionLeadsBadge leads={sampleLeads} />
-              </BadgeShowcase>
-
-              <BadgeShowcase
-                title="TeamBadge"
-                description="Team Members - uses tertiary variant"
-              >
-                <TeamBadge leads={sampleTeam} />
-              </BadgeShowcase>
-
-              <BadgeShowcase
-                title="WorkstreamBadge"
-                description="Workstream Labels - uses muted variant"
-              >
-                <WorkstreamBadge workstreams={sampleWorkstreams} />
-              </BadgeShowcase>
-            </div>
-          </section>
-
           {/* Decision Status Badges */}
           <section className="mb-10">
             <SectionHeader>Decision Status Badges</SectionHeader>
             <p className="mb-4 text-sm text-slate-600">
-              Status indicators for action decision states. Green for completed
-              decisions, amber for ongoing work.
+              Status indicators for action decision states.
             </p>
 
             <div className="space-y-4">
-              <BadgeShowcase
-                title="Decision Taken"
-                description="Green with check icon - decision has been finalized"
-              >
-                <DecisionStatusBadge status="decision taken" />
-              </BadgeShowcase>
-
               <BadgeShowcase
                 title="Further Work Ongoing"
                 description="Amber with clock icon - decision still in progress"
               >
                 <DecisionStatusBadge status="further work ongoing" />
               </BadgeShowcase>
-            </div>
-          </section>
 
-          {/* Combined Example */}
-          <section className="mb-10">
-            <SectionHeader>Combined Example (Card Layout)</SectionHeader>
-            <div className="rounded-lg border border-slate-200 bg-slate-100 p-6">
-              <div className="mb-4">
-                <span className="text-sm font-medium tracking-wider text-slate-500 uppercase">
-                  Work Package 1
-                </span>
-                <h3 className="mt-1 text-lg font-semibold text-slate-900">
-                  Peace operations (task delegation; review)
-                </h3>
-              </div>
-
-              <div className="mb-4 flex items-stretch gap-2.5">
-                <div className="w-1 shrink-0 rounded-full bg-un-blue" />
-                <p className="py-0.5 text-sm leading-snug font-medium text-slate-600">
-                  <span className="font-semibold text-un-blue">Goal:</span>{" "}
-                  Joined up and networked for lasting impact
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-1">
-                <WorkstreamBadge workstreams={["WS3"]} />
-                <WPLeadsBadge leads={["USG DPPA", "USG DPO"]} />
-              </div>
-            </div>
-          </section>
-
-          {/* ActionCard Example */}
-          <section className="mb-10">
-            <SectionHeader>ActionCard Example</SectionHeader>
-            <p className="mb-4 text-sm text-slate-600">
-              Example of how badges are combined in an ActionCard with Decision
-              Status.
-            </p>
-            <div className="rounded-lg border border-slate-200 bg-white p-4">
-              {/* Action Number and Decision Status */}
-              <div className="mb-2 flex items-center gap-2">
-                <span className="text-sm font-medium tracking-wider text-un-blue uppercase">
-                  Action 14
-                </span>
-                <DecisionStatusBadge status="further work ongoing" />
-              </div>
-
-              {/* Action description text */}
-              <p className="mb-4 leading-normal font-medium text-slate-900">
-                Review arrangements for timely decision-making on peace
-                operations in relation to changing circumstances
-              </p>
-
-              {/* Metadata section - Action Leads and Team Members */}
-              <div className="border-t border-slate-100 pt-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <ActionLeadsBadge leads={["USG DPPA", "USG DPO"]} />
-                  <span className="text-slate-400">•</span>
-                  <TeamBadge leads={["DPO", "DPPA"]} />
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Decision Taken Example */}
-          <section className="mb-10">
-            <SectionHeader>ActionCard (Decision Taken)</SectionHeader>
-            <p className="mb-4 text-sm text-slate-600">
-              Same layout with a Decision Taken status badge.
-            </p>
-            <div className="rounded-lg border border-slate-200 bg-white p-4">
-              {/* Action Number and Decision Status */}
-              <div className="mb-2 flex items-center gap-2">
-                <span className="text-sm font-medium tracking-wider text-un-blue uppercase">
-                  Action 27
-                </span>
+              <BadgeShowcase
+                title="Decision Taken"
+                description="Green with check icon - decision has been finalized"
+              >
                 <DecisionStatusBadge status="decision taken" />
-              </div>
+              </BadgeShowcase>
+            </div>
+          </section>
 
-              {/* Action description text */}
-              <p className="mb-4 leading-normal font-medium text-slate-900">
-                Ensure that all entities take into consideration relevant human
-                rights guidance
+          {/* WorkPackageItem - Actual Component with Real Data */}
+          {sampleWorkPackage && (
+            <section className="mb-10">
+              <SectionHeader>WorkPackageItem (Live Data)</SectionHeader>
+              <p className="mb-4 text-sm text-slate-600">
+                Actual WorkPackageItem component using real data. Click
+                &quot;Details&quot; to expand and see ActionItems inside.
               </p>
+              <WorkPackageItem
+                workPackage={sampleWorkPackage}
+                isOpen={wpOpen}
+                onToggle={() => setWpOpen(!wpOpen)}
+                collapsibleKey="stylings-wp-live"
+              />
+            </section>
+          )}
 
-              {/* Metadata section */}
-              <div className="border-t border-slate-100 pt-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <ActionLeadsBadge leads={["OHCHR"]} />
-                  <span className="text-slate-400">•</span>
-                  <TeamBadge leads={["DPPA", "DPO", "OCHA"]} />
-                </div>
-              </div>
+          {/* ActionItem - Further Work Ongoing */}
+          {actionOngoing && (
+            <section className="mb-10">
+              <SectionHeader>ActionItem - Further Work Ongoing</SectionHeader>
+              <p className="mb-4 text-sm text-slate-600">
+                Action {actionOngoing.action.actionNumber} from Work Package{" "}
+                {actionOngoing.wpNumber}.
+              </p>
+              <ActionItem
+                action={actionOngoing.action}
+                workPackageNumber={actionOngoing.wpNumber}
+              />
+            </section>
+          )}
+
+          {/* ActionItem - Decision Taken */}
+          {actionTaken && (
+            <section className="mb-10">
+              <SectionHeader>ActionItem - Decision Taken</SectionHeader>
+              <p className="mb-4 text-sm text-slate-600">
+                Action {actionTaken.action.actionNumber} from Work Package{" "}
+                {actionTaken.wpNumber}.
+              </p>
+              <ActionItem
+                action={actionTaken.action}
+                workPackageNumber={actionTaken.wpNumber}
+              />
+            </section>
+          )}
+
+          {/* Specialized Badge Wrappers */}
+          <section className="mb-10">
+            <SectionHeader>Specialized Badge Wrappers</SectionHeader>
+            <p className="mb-4 text-sm text-slate-600">
+              Convenience components with preset variants, using real data.
+            </p>
+
+            <div className="space-y-4">
+              <BadgeShowcase
+                title="WPLeadsBadge"
+                description="Work Package Leads - primary variant"
+              >
+                <WPLeadsBadge
+                  leads={sampleLeads.length > 0 ? sampleLeads : ["USG DPPA"]}
+                />
+              </BadgeShowcase>
+
+              <BadgeShowcase
+                title="ActionLeadsBadge"
+                description="Action Leads - secondary variant"
+              >
+                <ActionLeadsBadge
+                  leads={sampleLeads.length > 0 ? sampleLeads : ["USG DPPA"]}
+                />
+              </BadgeShowcase>
+
+              <BadgeShowcase
+                title="TeamBadge"
+                description="Team Members - tertiary variant"
+              >
+                <TeamBadge
+                  leads={sampleTeam.length > 0 ? sampleTeam : ["DPPA", "DPO"]}
+                />
+              </BadgeShowcase>
+
+              <BadgeShowcase
+                title="WorkstreamBadge"
+                description="Workstream Labels - muted variant"
+              >
+                <WorkstreamBadge
+                  workstreams={
+                    sampleWorkstreams.length > 0 ? sampleWorkstreams : ["WS1"]
+                  }
+                />
+              </BadgeShowcase>
             </div>
           </section>
 
@@ -279,7 +351,7 @@ export default function StyleGuidePage() {
                 description="Cursor changes to pointer when clickable"
               >
                 <LabelBadge
-                  items={sampleLeads}
+                  items={sampleLeads.length > 0 ? sampleLeads : ["Example"]}
                   variant="primary"
                   onSelect={(item) => console.log("Selected:", item)}
                 />
