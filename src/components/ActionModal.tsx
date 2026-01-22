@@ -206,23 +206,42 @@ export default function ActionModal({
               </>
             )}
           </h2>
-          {/* Team Members - underneath action name */}
-          {action.action_entities && action.action_entities.trim() && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {action.action_entities
-                .split(";")
-                .map((entity) => normalizeTeamMemberForDisplay(entity.trim()))
-                .filter((entity) => entity && entity.trim().length > 0)
-                .filter((entity, index, array) => array.indexOf(entity) === index)
-                .map((entity, index) => (
-                  <Badge
-                    key={index}
-                    variant="outline"
-                    className="border-un-blue/20 bg-un-blue text-white cursor-default text-xs shadow-sm shadow-un-blue/25 ring-1 ring-inset ring-white/10"
-                  >
-                    {entity}
-                  </Badge>
-                ))}
+          {/* Action Leads and Team Members - underneath action name */}
+          {(action.action_leads || action.action_entities) && (
+            <div className="mt-3 flex flex-wrap items-center gap-1.5">
+              {/* Action Leads */}
+              {action.action_leads && action.action_leads.trim() && (
+                <LeadsBadge
+                  leads={action.action_leads
+                    .split(";")
+                    .map((lead) => lead.trim())
+                    .filter((lead) => lead.length > 0)}
+                  variant="muted"
+                  showIcon={false}
+                />
+              )}
+              {/* Team Members */}
+              {action.action_entities && action.action_entities.trim() && (
+                <>
+                  {action.action_leads && action.action_leads.trim() && (
+                    <span className="text-slate-300">•</span>
+                  )}
+                  {action.action_entities
+                    .split(";")
+                    .map((entity) => normalizeTeamMemberForDisplay(entity.trim()))
+                    .filter((entity) => entity && entity.trim().length > 0)
+                    .filter((entity, index, array) => array.indexOf(entity) === index)
+                    .map((entity, index) => (
+                      <Badge
+                        key={index}
+                        variant="outline"
+                        className="border-un-blue/20 bg-un-blue text-white cursor-default text-xs shadow-sm shadow-un-blue/25 ring-1 ring-inset ring-white/10"
+                      >
+                        {entity}
+                      </Badge>
+                    ))}
+                </>
+              )}
             </div>
           )}
         </div>
@@ -277,25 +296,6 @@ export default function ActionModal({
                 </div>
               </div>
             </div>
-
-            {/* Action Leads */}
-            {action.action_leads && action.action_leads.trim() && (
-              <div>
-                <Field label="Action leads">
-                  <div className="mt-1">
-                    <LeadsBadge
-                      leads={action.action_leads
-                        .split(";")
-                        .map((lead) => lead.trim())
-                        .filter((lead) => lead.length > 0)}
-                      variant="muted"
-                      showIcon={true}
-                      iconTooltip="Action Leads"
-                    />
-                  </div>
-                </Field>
-              </div>
-            )}
           </div>
 
           {/* Milestones Section */}
