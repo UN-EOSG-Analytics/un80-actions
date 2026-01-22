@@ -69,12 +69,12 @@ export function WorkPackageItem({
           <div className="pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-1 rounded-l-[6px] bg-un-blue" />
         )}
         <CollapsibleTrigger
-          className={`flex w-full flex-col items-start rounded-[6px] border-0 px-6 py-4 hover:no-underline ${
+          className={`flex w-full flex-col items-start rounded-[6px] border-0 px-4 py-3 hover:no-underline sm:px-6 sm:py-4 ${
             isOpen ? "rounded-b-none" : ""
           }`}
         >
           {/* Work Package Title */}
-          <div className="mb-2 min-w-0 pr-20 text-left sm:pr-8">
+          <div className="mb-2 min-w-0 pr-20 text-left sm:pr-24 md:pr-8">
             {wp.number ? (
               <>
                 <div className="flex flex-wrap items-center gap-3">
@@ -94,12 +94,12 @@ export function WorkPackageItem({
                     </div>
                   )}
                 </div>
-                <h2 className="mt-1 text-xl leading-7 font-semibold text-slate-900">
+                <h2 className="mt-1 text-base leading-6 font-semibold text-slate-900 sm:text-xl sm:leading-7">
                   {wp.name}
                 </h2>
               </>
             ) : (
-              <h2 className="text-xl leading-7 font-semibold text-slate-900">
+              <h2 className="text-base leading-6 font-semibold text-slate-900 sm:text-xl sm:leading-7">
                 {wp.name}
               </h2>
             )}
@@ -107,8 +107,8 @@ export function WorkPackageItem({
 
           {/* Goal from work package data */}
           {wp.goal && (
-            <div className="mb-4 pr-8 text-left">
-              <p className="leading-snug font-medium text-slate-600">
+            <div className="mb-3 pr-4 text-left sm:mb-4 sm:pr-8">
+              <p className="text-sm leading-snug font-medium text-slate-600 sm:text-base">
                 <span className="font-semibold text-un-blue">Goal:</span>{" "}
                 {formatGoalText(wp.goal)}
               </p>
@@ -134,7 +134,7 @@ export function WorkPackageItem({
 
         {/* Divider and Action Count/Header - Always visible when actions exist */}
         {wp.actions.length > 0 && (
-          <div className="px-6">
+          <div className="px-4 sm:px-6">
             <div className="w-full border-t border-slate-200" />
             {/* Cross-fade header section - fixed height container */}
             <div className="relative flex h-10 items-center">
@@ -191,7 +191,7 @@ export function WorkPackageItem({
         {/* Details Button */}
         <button
           type="button"
-          className="absolute top-4 right-2 flex items-center gap-1.5 rounded-[6px] bg-slate-500 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-slate-600 hover:text-white sm:right-4"
+          className="absolute top-3 right-2 flex items-center gap-1 rounded-[6px] bg-slate-500 px-2 py-1.5 text-xs font-medium text-white transition-colors hover:bg-slate-600 hover:text-white sm:top-4 sm:right-4 sm:gap-1.5 sm:px-3 sm:text-sm"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -199,11 +199,11 @@ export function WorkPackageItem({
           }}
         >
           <Menu className="h-3.5 w-3.5" />
-          <span>Details</span>
+          <span className="hidden sm:inline">Details</span>
         </button>
 
         {/* Collapsible Content */}
-        <CollapsibleContent className="px-6 pb-6">
+        <CollapsibleContent className="px-4 pb-4 sm:px-6 sm:pb-6">
           <div className="pt-2">
             <WorkPackageActions
               actions={wp.actions}

@@ -228,14 +228,14 @@ export function WorkPackagesPageContent() {
         <Header onReset={handleResetAll} showLogin={false} />
 
         {/* Main Container */}
-        <main className="mx-auto w-full max-w-4xl px-8 pt-8 sm:px-12 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
+        <main className="mx-auto w-full max-w-4xl px-4 pt-6 sm:px-8 sm:pt-8 md:px-12 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
           <div className="space-y-6 pb-16">
             {/* Header with context info */}
             <ExplainerText />
 
             {/* DataCards Section */}
-            <section className="mb-10">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            <section className="mb-6 sm:mb-10">
+              <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
                 <DataCard
                   title="Workstreams"
                   value={statsData.workstreams}

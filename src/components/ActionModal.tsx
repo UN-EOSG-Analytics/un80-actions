@@ -136,28 +136,28 @@ export default function ActionModal({
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           {/* Breadcrumb */}
-          <div className="mb-3 flex items-center gap-1.5">
+          <div className="mb-2 flex flex-wrap items-center gap-x-1 gap-y-0.5 sm:mb-3 sm:gap-x-1.5">
             <Link
               href={`/?ws=${action.report}`}
               onClick={handleClose}
-              className="text-sm leading-5 font-medium tracking-wider text-slate-500 uppercase transition-colors hover:text-un-blue hover:underline"
+              className="text-[10px] leading-4 font-medium tracking-wide text-slate-500 uppercase transition-colors hover:text-un-blue hover:underline sm:text-xs sm:leading-5 md:text-sm md:tracking-wider"
             >
               {action.report}
             </Link>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
+            <ChevronRight className="h-2.5 w-2.5 shrink-0 text-slate-400 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5" />
             <Link
               href={`/?wp=${action.work_package_number}`}
               onClick={handleClose}
-              className="text-sm leading-5 font-medium tracking-wider text-slate-500 uppercase transition-colors hover:text-un-blue hover:underline"
+              className="text-[10px] leading-4 font-medium tracking-wide text-slate-500 uppercase transition-colors hover:text-un-blue hover:underline sm:text-xs sm:leading-5 md:text-sm md:tracking-wider"
             >
-              Work Package {action.work_package_number}
+              WP {action.work_package_number}
             </Link>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
-            <span className="text-sm leading-5 font-medium tracking-wider text-un-blue uppercase">
+            <ChevronRight className="h-2.5 w-2.5 shrink-0 text-slate-400 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5" />
+            <span className="text-[10px] leading-4 font-medium tracking-wide text-un-blue uppercase sm:text-xs sm:leading-5 md:text-sm md:tracking-wider">
               Action {action.action_number}
             </span>
           </div>
-          <h2 className="text-lg leading-tight font-semibold text-gray-900 sm:text-xl">
+          <h2 className="text-base leading-tight font-semibold text-gray-900 sm:text-lg md:text-xl">
             {action.indicative_activity}
             {action.sub_action_details && (
               <>
@@ -201,7 +201,7 @@ export default function ActionModal({
                       <Badge
                         key={index}
                         variant="outline"
-                        className="cursor-default border-slate-300 bg-slate-100 text-xs text-slate-700 shadow-sm ring-1 ring-slate-200/50 transition-all duration-150 ring-inset hover:bg-slate-200"
+                        className="cursor-default border-0 bg-slate-200 text-xs text-slate-700 transition-all duration-150 hover:bg-slate-300"
                       >
                         {entity}
                       </Badge>
@@ -246,9 +246,15 @@ export default function ActionModal({
     return (
       <div className="space-y-4 py-4">
         {/* Combined Action Details, Milestones, and Updates Section */}
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          {/* Action Details */}
-          <div className="space-y-5">
+        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+          {/* Action Details Header */}
+          <div className="border-b border-slate-200 bg-slate-50 px-5 py-3">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
+              Action Details
+            </h3>
+          </div>
+          {/* Action Details Content */}
+          <div className="p-5">
             {/* Decision Status */}
             <div>
               <FieldLabel>Decision Status</FieldLabel>
@@ -261,100 +267,104 @@ export default function ActionModal({
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Milestones Section */}
-          {(() => {
-            const hasFirstMilestonePassed =
-              action.first_milestone && action.first_milestone_deadline
-                ? (() => {
-                    const deadlineDate = parseDate(
-                      action.first_milestone_deadline,
-                    );
-                    const now = new Date();
-                    return deadlineDate && deadlineDate < now;
-                  })()
-                : false;
-            return hasFirstMilestonePassed || action.upcoming_milestone;
-          })() && (
-            <>
-              <div className="my-5 border-t border-slate-200"></div>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <h3 className="mb-4 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
-                    Upcoming Milestone
-                  </h3>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-gray-600">
-                    Steps which will be taken towards the delivery of the
-                    proposal concerned. Completed milestones are crossed out.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-              <div className="mt-2">
-                <MilestoneTimeline
-                  milestones={[
-                    ...(action.first_milestone &&
-                    action.first_milestone_deadline
-                      ? (() => {
-                          const deadlineDate = parseDate(
-                            action.first_milestone_deadline,
-                          );
-                          const now = new Date();
-                          const hasPassed = deadlineDate && deadlineDate < now;
-                          return hasPassed
-                            ? [
-                                {
-                                  label: action.first_milestone,
-                                  deadline: action.first_milestone_deadline,
-                                  isReached: false,
-                                },
-                              ]
-                            : [];
-                        })()
-                      : []),
-                    ...(action.upcoming_milestone
-                      ? [
-                          {
-                            label: action.upcoming_milestone,
-                            deadline: action.upcoming_milestone_deadline,
-                            isReached: false,
-                          },
-                        ]
-                      : []),
-                  ]}
-                />
-              </div>
-            </>
-          )}
+            {/* Milestones Section */}
+            {(() => {
+              const hasFirstMilestonePassed =
+                action.first_milestone && action.first_milestone_deadline
+                  ? (() => {
+                      const deadlineDate = parseDate(
+                        action.first_milestone_deadline,
+                      );
+                      const now = new Date();
+                      return deadlineDate && deadlineDate < now;
+                    })()
+                  : false;
+              return hasFirstMilestonePassed || action.upcoming_milestone;
+            })() && (
+              <>
+                <div className="my-5 border-t border-slate-200"></div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <h3 className="mb-4 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
+                      Upcoming Milestone
+                    </h3>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-gray-600">
+                      Steps which will be taken towards the delivery of the
+                      proposal concerned. Completed milestones are crossed out.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+                <div className="mt-2">
+                  <MilestoneTimeline
+                    milestones={[
+                      ...(action.first_milestone &&
+                      action.first_milestone_deadline
+                        ? (() => {
+                            const deadlineDate = parseDate(
+                              action.first_milestone_deadline,
+                            );
+                            const now = new Date();
+                            const hasPassed = deadlineDate && deadlineDate < now;
+                            return hasPassed
+                              ? [
+                                  {
+                                    label: action.first_milestone,
+                                    deadline: action.first_milestone_deadline,
+                                    isReached: false,
+                                  },
+                                ]
+                              : [];
+                          })()
+                        : []),
+                      ...(action.upcoming_milestone
+                        ? [
+                            {
+                              label: action.upcoming_milestone,
+                              deadline: action.upcoming_milestone_deadline,
+                              isReached: false,
+                            },
+                          ]
+                        : []),
+                    ]}
+                  />
+                </div>
+              </>
+            )}
 
-          {/* Updates Section */}
-          <div className="my-5 border-t border-slate-200"></div>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <h3 className="mb-4 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
-                Updates
-              </h3>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="text-gray-600">
-                A summary of recent progress on the action.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-          <div className="text-base text-gray-900">
-            <div className="text-gray-500">Updates forthcoming</div>
+            {/* Updates Section */}
+            <div className="my-2 border-t border-slate-200"></div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <h3 className="mb-4 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
+                  Updates
+                </h3>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-gray-600">
+                  A summary of recent progress on the action.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+            <div className="text-base text-gray-900">
+              <div className="text-gray-500">Updates forthcoming</div>
+            </div>
           </div>
         </div>
 
         {/* Document Reference Section */}
         {(action.doc_text || action.document_paragraph) && (
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-5">
-            <h3 className="mb-4 text-sm font-semibold tracking-wide text-slate-700 uppercase">
-              Document Reference
-            </h3>
-            <div className="space-y-3">
+          <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+            {/* Document Reference Header */}
+            <div className="border-b border-slate-200 bg-slate-50 px-5 py-3">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
+                Document Reference
+              </h3>
+            </div>
+            {/* Document Reference Content */}
+            <div className="p-5 space-y-3">
               {/* Document Paragraph Number */}
               {action.document_paragraph &&
                 (() => {
@@ -398,16 +408,32 @@ export default function ActionModal({
         )}
 
         {/* Work Package Reference Section */}
-        <div className="rounded-lg border border-slate-200 bg-white p-5">
-          <h3 className="mb-4 text-sm font-semibold tracking-wide text-slate-700 uppercase">
-            Work Package Reference
-          </h3>
-          <div className="text-base text-gray-900">
-            <span className="font-medium">
-              Work Package {action.work_package_number}
-            </span>
-            <span className="mx-2 text-slate-400">•</span>
-            <span className="text-slate-600">{action.work_package_name}</span>
+        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+          {/* Work Package Reference Header */}
+          <div className="border-b border-slate-200 bg-slate-50 px-5 py-3">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
+              Work Package Reference
+            </h3>
+          </div>
+          {/* Work Package Reference Content */}
+          <div className="p-5">
+            <div className="text-base text-gray-900">
+              <span className="font-medium">
+                Work Package {action.work_package_number}
+              </span>
+              <span className="mx-2 text-slate-400">•</span>
+              <span className="text-slate-600">{action.work_package_name}</span>
+            </div>
+            {/* Work Package Leads */}
+            {action.work_package_leads && action.work_package_leads.length > 0 && (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                <LeadsBadge
+                  leads={action.work_package_leads}
+                  variant="default"
+                  showIcon={false}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -467,7 +493,7 @@ export default function ActionModal({
     >
       <div
         ref={modalRef}
-        className={`h-full w-full overflow-y-auto bg-white shadow-2xl transition-transform duration-300 ease-out sm:w-3/4 md:w-1/2 lg:w-1/2 ${
+        className={`h-full w-full overflow-y-auto bg-white shadow-2xl transition-transform duration-300 ease-out sm:w-4/5 md:w-3/4 lg:w-1/2 ${
           isVisible && !isClosing ? "translate-x-0" : "translate-x-full"
         }`}
         onClick={(e) => e.stopPropagation()}
@@ -477,12 +503,12 @@ export default function ActionModal({
       >
         <div className="flex min-h-full flex-col">
           {/* Header */}
-          <div className="border-b border-gray-200 bg-white px-6 py-5 sm:px-8 sm:py-6">
+          <div className="border-b border-gray-200 bg-white px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6">
             {renderHeader()}
           </div>
 
           {/* Body */}
-          <div className="flex-1 px-6 pb-8 sm:px-8">{renderBody()}</div>
+          <div className="flex-1 px-4 pb-6 sm:px-6 sm:pb-8 md:px-8">{renderBody()}</div>
         </div>
       </div>
     </div>

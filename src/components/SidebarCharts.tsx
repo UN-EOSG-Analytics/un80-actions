@@ -1,5 +1,5 @@
 import React from "react";
-import { Users, Calendar, Clock, CheckCircle } from "lucide-react";
+import { Users, Calendar, Clock, CheckCircle, Layers } from "lucide-react";
 import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
 import { buildCleanQueryString } from "@/lib/utils";
 import {
@@ -65,6 +65,11 @@ export function SidebarCharts({
   onLeadsSearchChange,
   selectedLead,
   onSelectLead,
+  workstreamsData,
+  workstreamsSearchQuery,
+  onWorkstreamsSearchChange,
+  selectedWorkstream,
+  onSelectWorkstream,
   upcomingMilestonesData,
   milestonesPerMonthSearchQuery,
   onMilestonesPerMonthSearchChange,
@@ -75,6 +80,14 @@ export function SidebarCharts({
     count: entry.count,
     value: entry.lead,
   }));
+
+  const workstreamsChartEntries: SidebarChartEntry[] = workstreamsData.map(
+    (entry) => ({
+      label: entry.workstream,
+      count: entry.count,
+      value: entry.workstream,
+    }),
+  );
 
   // Format upcoming milestones with dates and urgency, filter for January only
   const now = new Date();
@@ -378,6 +391,19 @@ export function SidebarCharts({
         onSelectValue={onSelectLead}
         barWidth={105}
         maxHeight={135}
+      />
+
+      {/* Actions per Workstream */}
+      <SidebarChart
+        title="Actions per Workstream"
+        icon={<Layers />}
+        data={workstreamsChartEntries}
+        searchQuery={workstreamsSearchQuery}
+        onSearchChange={onWorkstreamsSearchChange}
+        searchPlaceholder="Search workstreams"
+        selectedValue={selectedWorkstream}
+        onSelectValue={onSelectWorkstream}
+        barWidth={105}
       />
     </div>
   );

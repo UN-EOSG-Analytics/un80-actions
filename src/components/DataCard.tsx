@@ -35,24 +35,24 @@ export function DataCard({
     <Tooltip>
       <TooltipTrigger asChild>
         <div
-          className={cn("relative h-[110px] w-full sm:h-[140px]", className)}
+          className={cn("relative h-[90px] w-full sm:h-[110px] md:h-[140px]", className)}
         >
           <div className="absolute inset-0 rounded-lg bg-white"></div>
-          <Card className="relative flex h-full w-full cursor-pointer flex-col items-start justify-start gap-0 rounded-lg border-0 bg-un-blue/10 px-4 py-4 pl-[26px] shadow-none transition-all hover:scale-[1.02] sm:py-6">
-            <div className="mb-2 flex w-full items-center justify-between gap-2 sm:mb-3">
-              <p className="min-w-0 flex-1 truncate text-left text-[15px] leading-[19px] font-normal text-un-blue sm:text-[18px] sm:leading-[23px] md:text-[19px] md:leading-[25px]">
+          <Card className="relative flex h-full w-full cursor-pointer flex-col items-start justify-start gap-0 rounded-lg border-0 bg-un-blue/10 px-3 py-3 pl-4 shadow-none transition-all hover:scale-[1.02] sm:px-4 sm:py-4 sm:pl-[26px] md:py-6">
+            <div className="mb-1.5 flex w-full items-center justify-between gap-1.5 sm:mb-2 sm:gap-2 md:mb-3">
+              <p className="min-w-0 flex-1 truncate text-left text-[12px] leading-[16px] font-normal text-un-blue sm:text-[15px] sm:leading-[19px] md:text-[18px] md:leading-[23px] lg:text-[19px] lg:leading-[25px]">
                 {title}
               </p>
-              <div className="mr-2.5 shrink-0">
-                <Icon className="h-5 w-5 text-un-blue" />
+              <div className="mr-1 shrink-0 sm:mr-2.5">
+                <Icon className="h-4 w-4 text-un-blue sm:h-5 sm:w-5" />
               </div>
             </div>
             {isLoading ? (
-              <p className="text-left text-[37px] leading-[45px] font-bold text-[#2E3440] tabular-nums sm:text-[43px] sm:leading-[51px] md:text-[49px] md:leading-[57px]"></p>
+              <p className="text-left text-[24px] leading-[30px] font-bold text-[#2E3440] tabular-nums sm:text-[37px] sm:leading-[45px] md:text-[43px] md:leading-[51px] lg:text-[49px] lg:leading-[57px]"></p>
             ) : showFiltered && filteredCount !== undefined ? (
-              <p className="text-left text-[37px] leading-[45px] font-bold text-[#2E3440] tabular-nums sm:text-[43px] sm:leading-[51px] md:text-[49px] md:leading-[57px]">
+              <p className="text-left text-[24px] leading-[30px] font-bold text-[#2E3440] tabular-nums sm:text-[37px] sm:leading-[45px] md:text-[43px] md:leading-[51px] lg:text-[49px] lg:leading-[57px]">
                 {filteredCount}
-                <span className="text-[22px] font-normal text-[#2E3440] sm:text-[26px] md:text-[30px]">
+                <span className="text-[16px] font-normal text-[#2E3440] sm:text-[22px] md:text-[26px] lg:text-[30px]">
                   /{value}
                 </span>
               </p>
@@ -60,16 +60,16 @@ export function DataCard({
               <p
                 className={cn(
                   "text-left font-bold text-[#2E3440] tabular-nums",
-                  "text-[24px] leading-[30px] sm:text-[28px] sm:leading-[34px] md:text-[32px] md:leading-[38px]",
+                  "text-[18px] leading-[24px] sm:text-[24px] sm:leading-[30px] md:text-[28px] md:leading-[34px] lg:text-[32px] lg:leading-[38px]",
                 )}
               >
                 {completed}/{value}{" "}
-                <span className="text-[12px] font-normal text-un-blue sm:text-[14px] md:text-[16px]">
+                <span className="text-[10px] font-normal text-un-blue sm:text-[12px] md:text-[14px] lg:text-[16px]">
                   completed
                 </span>
               </p>
             ) : (
-              <p className="text-left text-[37px] leading-[45px] font-bold text-[#2E3440] tabular-nums sm:text-[43px] sm:leading-[51px] md:text-[49px] md:leading-[57px]">
+              <p className="text-left text-[24px] leading-[30px] font-bold text-[#2E3440] tabular-nums sm:text-[37px] sm:leading-[45px] md:text-[43px] md:leading-[51px] lg:text-[49px] lg:leading-[57px]">
                 {value}
               </p>
             )}

@@ -94,7 +94,7 @@ export function ActionItem({ action }: ActionItemProps) {
   return (
     <div
       onClick={handleClick}
-      className="cursor-pointer rounded-[6px] border border-slate-200 bg-white p-5 pr-9 transition-all hover:border-slate-300 hover:shadow-md"
+      className="cursor-pointer rounded-[6px] border border-slate-200 bg-white p-3 pr-6 transition-all hover:border-slate-300 hover:shadow-md sm:p-5 sm:pr-9"
     >
       {/* Action Number and Text */}
       <div className="mb-4">
@@ -151,7 +151,7 @@ export function ActionItem({ action }: ActionItemProps) {
               <Badge
                 key={index}
                 variant="outline"
-                className="cursor-default border-slate-300 bg-slate-100 text-xs text-slate-700 shadow-sm ring-1 ring-slate-200/50 transition-all duration-150 ring-inset hover:bg-slate-200"
+                className="cursor-default border-0 bg-slate-200 text-xs text-slate-700 transition-all duration-150 hover:bg-slate-300"
               >
                 {member}
               </Badge>

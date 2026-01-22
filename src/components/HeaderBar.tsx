@@ -24,7 +24,7 @@ export function Header({ onReset, showLogin = true }: HeaderProps) {
   return (
     <>
       <header className="w-full border-b bg-background">
-        <div className="mx-auto w-full max-w-4xl px-8 py-2 sm:px-12 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
+        <div className="mx-auto w-full max-w-4xl px-4 py-2 sm:px-8 md:px-12 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
           <div className="flex items-center justify-between gap-3">
             {/* Title Section */}
             <Link href="/" onClick={handleClick} className="group">

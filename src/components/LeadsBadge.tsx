@@ -70,8 +70,8 @@ export function LeadsBadge({
                 className={cn(
                   "transition-all duration-150",
                   isMuted
-                    ? "hover:bg-slate-150 border-slate-200 bg-slate-100 text-slate-700 shadow-sm ring-1 shadow-slate-200/50 ring-slate-200/50 ring-inset hover:shadow-md"
-                    : "border-un-blue/20 bg-un-blue text-white shadow-sm ring-1 shadow-un-blue/25 ring-white/10 ring-inset hover:shadow-md hover:shadow-un-blue/30",
+                    ? "hover:bg-slate-300 border-0 bg-slate-200 text-slate-700"
+                    : "border-0 bg-un-blue text-white",
                   onSelectLead ? "cursor-pointer" : "cursor-help",
                   customColor && `text-[${customColor}]`,
                 )}

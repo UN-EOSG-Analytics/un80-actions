@@ -2,7 +2,7 @@ import { ExternalLink } from "./ExternalLink";
 
 export function ExplainerText() {
   return (
-    <div className="mb-4 w-full text-left text-gray-600 sm:text-justify">
+    <div className="mb-4 w-full text-left text-sm text-gray-600 sm:text-base sm:text-justify">
       <p className="mb-0 leading-relaxed">
         This Dashboard complements the{" "}
         <ExternalLink href="https://www.un.org/un80-initiative/sites/default/files/2025-11/UN80_Initiative_Action_Plan.pdf">

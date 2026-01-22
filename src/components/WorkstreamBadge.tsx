@@ -38,7 +38,7 @@ export function WorkstreamLabels({
           <TooltipTrigger asChild>
             <Badge
               variant="outline"
-              className={`border-slate-200 bg-slate-100 text-slate-700 shadow-sm ring-1 shadow-slate-200/50 ring-slate-200/50 transition-all duration-150 ring-inset hover:shadow-md ${
+              className={`border-0 bg-slate-200 text-slate-700 transition-all duration-150 ${
                 onSelectWorkstream ? "cursor-pointer" : "cursor-help"
               }`}
               onClick={(e) => {
