@@ -218,7 +218,7 @@ export default function ActionModal({
                   <Badge
                     key={index}
                     variant="outline"
-                    className="border-un-blue/30 bg-un-blue text-white hover:bg-un-blue/90 cursor-default text-xs"
+                    className="border-un-blue/20 bg-un-blue text-white cursor-default text-xs shadow-sm shadow-un-blue/25 ring-1 ring-inset ring-white/10"
                   >
                     {entity}
                   </Badge>
@@ -372,7 +372,7 @@ export default function ActionModal({
             </TooltipContent>
           </Tooltip>
           <div className="text-base text-gray-900">
-            <div className="text-gray-500">Updates for coming</div>
+            <div className="text-gray-500">Updates forthcoming</div>
           </div>
         </div>
 
@@ -421,6 +421,18 @@ export default function ActionModal({
             </div>
           </div>
         )}
+
+        {/* Work Package Reference Section */}
+        <div className="rounded-lg border border-slate-200 bg-white p-5">
+          <h3 className="mb-4 text-sm font-semibold tracking-wide text-slate-700 uppercase">
+            Work Package Reference
+          </h3>
+          <div className="text-base text-gray-900">
+            <span className="font-medium">Work Package {action.work_package_number}</span>
+            <span className="text-slate-400 mx-2">•</span>
+            <span className="text-slate-600">{action.work_package_name}</span>
+          </div>
+        </div>
 
         {/* MS Approval */}
         {/* {action.ms_approval && (

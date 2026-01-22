@@ -69,11 +69,11 @@ export function LeadsBadge({
               <Badge
                 variant="outline"
                 className={cn(
-                  "cursor-pointer transition-colors",
+                  "transition-all duration-150",
                   isMuted
-                    ? "border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200"
-                    : "border-un-blue/30 bg-un-blue text-white hover:bg-un-blue/90",
-                  onSelectLead ? "" : "cursor-help",
+                    ? "border-slate-200 bg-slate-100 text-slate-700 shadow-sm shadow-slate-200/50 ring-1 ring-inset ring-slate-200/50 hover:bg-slate-150 hover:shadow-md"
+                    : "border-un-blue/20 bg-un-blue text-white shadow-sm shadow-un-blue/25 ring-1 ring-inset ring-white/10 hover:shadow-md hover:shadow-un-blue/30",
+                  onSelectLead ? "cursor-pointer" : "cursor-help",
                   customColor && `text-[${customColor}]`,
                 )}
                 onClick={(e) => {

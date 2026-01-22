@@ -353,10 +353,10 @@ export function SidebarCharts({
         </div>
       )}
 
-      {/* Milestones per Month */}
+      {/* Milestones by Month */}
       {milestonesPerMonthEntries.length > 0 && (
         <SidebarChart
-          title="Milestones per Month"
+          title="Milestones by Month"
           description="Number of milestones by month"
           icon={<Calendar />}
           data={milestonesPerMonthEntries}

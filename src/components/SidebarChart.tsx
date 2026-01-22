@@ -120,7 +120,7 @@ export function SidebarChart({
                           ? "bg-red-50/30 hover:bg-red-50/50 border-l-2 border-red-300"
                           : isUpcoming
                             ? "bg-amber-50/30 hover:bg-amber-50/50 border-l-2 border-amber-300"
-                            : "hover:bg-slate-50"
+                        : "hover:bg-slate-50"
                   } ${index < data.length - 1 ? "border-b border-slate-200" : ""} ${hasUrgencyIndicator ? "pl-1" : ""}`}
                 >
                   <td className="py-2.5 pr-0">
@@ -136,19 +136,19 @@ export function SidebarChart({
                                 {!isUrgent && isUpcoming && (
                                   <span className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-label="Upcoming" />
                                 )}
-                                <span
+                              <span
                                   className={`block cursor-help text-[14px] font-medium truncate transition-colors ${
-                                    isSelected
-                                      ? "font-semibold text-un-blue"
+                                  isSelected
+                                    ? "font-semibold text-un-blue"
                                       : isUrgent
                                         ? "text-red-700 group-hover:text-red-800"
                                         : isUpcoming
                                           ? "text-amber-700 group-hover:text-amber-800"
-                                          : "text-slate-600 group-hover:text-un-blue"
-                                  }`}
-                                >
-                                  {entry.label}
-                                </span>
+                                    : "text-slate-600 group-hover:text-un-blue"
+                                }`}
+                              >
+                                {entry.label}
+                              </span>
                               </div>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -175,19 +175,19 @@ export function SidebarChart({
                             {!isUrgent && isUpcoming && (
                               <span className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-label="Upcoming" />
                             )}
-                            <span
+                          <span
                               className={`block text-[14px] font-medium transition-colors ${
-                                isSelected
-                                  ? "font-semibold text-un-blue"
+                              isSelected
+                                ? "font-semibold text-un-blue"
                                   : isUrgent
                                     ? "text-red-700 group-hover:text-red-800"
                                     : isUpcoming
                                       ? "text-amber-700 group-hover:text-amber-800"
-                                      : "text-slate-600 group-hover:text-un-blue"
-                              }`}
-                            >
-                              {entry.label}
-                            </span>
+                                : "text-slate-600 group-hover:text-un-blue"
+                            }`}
+                          >
+                            {entry.label}
+                          </span>
                           </div>
                         )}
                       </div>
@@ -200,7 +200,7 @@ export function SidebarChart({
                                 ? "text-red-600"
                                 : isUpcoming
                                   ? "text-amber-600"
-                                  : "text-un-blue"
+                              : "text-un-blue"
                           }`}
                         >
                           {entry.count}

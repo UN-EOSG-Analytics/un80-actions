@@ -150,12 +150,12 @@ export function WorkPackageItem({
                   {wp.actions.length} {wp.actions.length === 1 ? "Action" : "Actions"}
                 </span>
                 <div className="flex -space-x-1.5">
-                  {Array.from({ length: Math.min(wp.actions.length, 5) }).map((_, i) => (
+                  {Array.from({ length: wp.actions.length }).map((_, i) => (
                     <div
                       key={i}
                       className="w-4 h-4 rounded-full border-2 border-slate-100 group-hover:border-[#E0F5FF] bg-un-blue transition-colors"
                       style={{ 
-                        opacity: 1 - (i * 0.15),
+                        opacity: Math.max(0.3, 1 - (i * 0.08)),
                         zIndex: wp.actions.length - i 
                       }}
                     />
@@ -172,12 +172,12 @@ export function WorkPackageItem({
                   {wp.actions.length} Indicative {wp.actions.length === 1 ? "Action" : "Actions"}
                 </h3>
                 <div className="flex -space-x-1.5">
-                  {Array.from({ length: Math.min(wp.actions.length, 5) }).map((_, i) => (
+                  {Array.from({ length: wp.actions.length }).map((_, i) => (
                     <div
                       key={i}
                       className="w-4 h-4 rounded-full border-2 border-slate-100 group-hover:border-[#E0F5FF] bg-un-blue transition-colors"
                       style={{ 
-                        opacity: 1 - (i * 0.15),
+                        opacity: Math.max(0.3, 1 - (i * 0.08)),
                         zIndex: wp.actions.length - i 
                       }}
                     />

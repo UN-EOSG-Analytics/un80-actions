@@ -73,14 +73,14 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
                   isReached && "opacity-60"
                 )}
               >
-                <p
-                  className={cn(
-                    "text-base font-medium text-gray-900",
-                    isReached && "line-through"
-                  )}
-                >
-                  {milestone.label}
-                </p>
+                  <p
+                    className={cn(
+                      "text-base font-medium text-gray-900",
+                      isReached && "line-through"
+                    )}
+                  >
+                    {milestone.label}
+                  </p>
                 {deadlineDate && (
                   <p className="text-sm text-gray-600">
                     {formatDateMonthYear(deadlineDate)}

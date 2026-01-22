@@ -106,14 +106,14 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
             }`}>
               {action.decisionStatus === "decision taken" ? (
                 <CheckCircle className="h-3 w-3" />
-              ) : (
+        ) : (
                 <Clock className="h-3 w-3" />
               )}
               <span className="text-xs font-medium">
                 {action.decisionStatus === "decision taken" ? "Decision Taken" : "Further Work Ongoing"}
-              </span>
-            </div>
-          )}
+            </span>
+          </div>
+        )}
         </div>
         {/* Action description text */}
         <div className="flex items-start gap-2">
@@ -142,7 +142,7 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
               <Badge
                 key={index}
                 variant="outline"
-                className="border-un-blue/30 bg-un-blue text-white cursor-default text-xs"
+                className="border-un-blue/20 bg-un-blue text-white cursor-default text-xs shadow-sm shadow-un-blue/25 ring-1 ring-inset ring-white/10"
               >
                 {member}
               </Badge>
