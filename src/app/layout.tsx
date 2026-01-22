@@ -29,11 +29,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${roboto.className} antialiased`}>
-      <body>
+      <body className="flex min-h-screen flex-col">
         <Providers>
-          <AnimatedCornerLogo />
-          {children}
-          <Footer />
+          <div className="flex min-h-screen flex-col">
+            <AnimatedCornerLogo />
+            <div className="flex-1">{children}</div>
+            <Footer />
+          </div>
         </Providers>
         <Suspense fallback={null}>
           <ModalHandler />
