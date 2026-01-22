@@ -13,6 +13,7 @@ import { useChartSearch } from "@/hooks/useChartSearch";
 import { useCollapsibles } from "@/hooks/useCollapsibles";
 import { useFilters, useFilterSync } from "@/hooks/useFilters";
 import { useWorkPackageData } from "@/hooks/useWorkPackageData";
+import { normalizeTeamMemberForDisplay } from "@/lib/utils";
 import {
   Briefcase as BriefcaseIcon,
   Layers,
@@ -236,48 +237,95 @@ export function WorkPackagesPageContent() {
             {/* DataCards Section */}
             <section className="mb-6 sm:mb-10">
               <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
-                <DataCard
-                  title="Workstreams"
-                  value={statsData.workstreams}
-                  icon={Layers}
-                  isLoading={isLoading}
-                  showProgress={showProgress}
-                  completed={0}
-                />
-                <DataCard
-                  title="Work Packages"
-                  value={workPackages.length}
-                  icon={BriefcaseIcon}
-                  isLoading={isLoading}
-                  showProgress={showProgress}
-                  completed={0}
-                  showFiltered={selectedWorkPackage.length > 0}
-                  filteredCount={statsData.workpackages}
-                />
-                <DataCard
-                  title="Actions"
-                  value={statsData.actions}
-                  icon={ListTodo}
-                  isLoading={isLoading}
-                  showProgress={showProgress}
-                  completed={0}
-                />
-                <DataCard
-                  title="UN System Leaders"
-                  value={statsData.leads}
-                  icon={Users}
-                  isLoading={isLoading}
-                  showProgress={showProgress}
-                  completed={0}
-                />
-                <DataCard
-                  title="UN System Entities"
-                  value={statsData.teamMembers}
-                  icon={User}
-                  isLoading={isLoading}
-                  showProgress={showProgress}
-                  completed={0}
-                />
+                {/* Check if any advanced filter is active */}
+                {(() => {
+                  const hasActiveFilters =
+                    selectedLead.length > 0 ||
+                    selectedWorkstream.length > 0 ||
+                    selectedWorkPackage.length > 0 ||
+                    selectedBigTicket.length > 0 ||
+                    selectedAction.length > 0 ||
+                    selectedTeamMember.length > 0 ||
+                    searchQuery.trim().length > 0;
+
+                  // Calculate total counts (unfiltered) - use all workPackages and actions
+                  const totalWorkstreams = new Set(
+                    workPackages.flatMap((wp) => wp.report)
+                  ).size;
+                  const totalActions = actions.filter(
+                    (a) => !a.sub_action_details
+                  ).length;
+                  const totalLeads = new Set(
+                    workPackages.flatMap((wp) => wp.leads)
+                  ).size;
+                  // Get unique team members from all actions (normalized)
+                  const allTeamMembers = new Set<string>();
+                  actions.forEach((action) => {
+                    if (action.action_entities) {
+                      action.action_entities
+                        .split(";")
+                        .map((e) => normalizeTeamMemberForDisplay(e.trim()))
+                        .filter((e) => e && e.trim().length > 0)
+                        .forEach((member) => allTeamMembers.add(member));
+                    }
+                  });
+                  const totalTeamMembers = allTeamMembers.size;
+
+                  return (
+                    <>
+                      <DataCard
+                        title="Workstreams"
+                        value={totalWorkstreams}
+                        icon={Layers}
+                        isLoading={isLoading}
+                        showProgress={showProgress}
+                        completed={0}
+                        showFiltered={hasActiveFilters}
+                        filteredCount={statsData.workstreams}
+                      />
+                      <DataCard
+                        title="Work Packages"
+                        value={workPackages.length}
+                        icon={BriefcaseIcon}
+                        isLoading={isLoading}
+                        showProgress={showProgress}
+                        completed={0}
+                        showFiltered={hasActiveFilters}
+                        filteredCount={statsData.workpackages}
+                      />
+                      <DataCard
+                        title="Actions"
+                        value={totalActions}
+                        icon={ListTodo}
+                        isLoading={isLoading}
+                        showProgress={showProgress}
+                        completed={0}
+                        showFiltered={hasActiveFilters}
+                        filteredCount={statsData.actions}
+                      />
+                      <DataCard
+                        title="UN System Leaders"
+                        value={totalLeads}
+                        icon={Users}
+                        isLoading={isLoading}
+                        showProgress={showProgress}
+                        completed={0}
+                        showFiltered={hasActiveFilters}
+                        filteredCount={statsData.leads}
+                      />
+                      <DataCard
+                        title="UN System Entities"
+                        value={totalTeamMembers}
+                        icon={User}
+                        isLoading={isLoading}
+                        showProgress={showProgress}
+                        completed={0}
+                        showFiltered={hasActiveFilters}
+                        filteredCount={statsData.teamMembers}
+                      />
+                    </>
+                  );
+                })()}
               </div>
             </section>
 
