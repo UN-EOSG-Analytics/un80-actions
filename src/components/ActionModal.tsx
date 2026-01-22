@@ -206,16 +206,25 @@ export default function ActionModal({
               </>
             )}
           </h2>
-          {/* Work Package Info */}
-          <div className="mt-2 flex items-center gap-2 text-sm">
-            <span className="text-slate-500">
-              Work Package {action.work_package_number}
-            </span>
-            <span className="text-slate-300">•</span>
-            <span className="text-slate-600 font-medium">
-              {action.work_package_name}
-            </span>
-          </div>
+          {/* Team Members - underneath action name */}
+          {action.action_entities && action.action_entities.trim() && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {action.action_entities
+                .split(";")
+                .map((entity) => normalizeTeamMemberForDisplay(entity.trim()))
+                .filter((entity) => entity && entity.trim().length > 0)
+                .filter((entity, index, array) => array.indexOf(entity) === index)
+                .map((entity, index) => (
+                  <Badge
+                    key={index}
+                    variant="outline"
+                    className="border-un-blue/30 bg-un-blue text-white hover:bg-un-blue/90 cursor-default text-xs"
+                  >
+                    {entity}
+                  </Badge>
+                ))}
+            </div>
+          )}
         </div>
         <button
           onClick={handleClose}
@@ -251,17 +260,21 @@ export default function ActionModal({
     // Action content
     return (
       <div className="space-y-4 py-4">
-        {/* Action Details Section */}
+        {/* Combined Action Details, Milestones, and Updates Section */}
         <div className="rounded-lg border border-slate-200 bg-white p-5">
+          {/* Action Details */}
           <h3 className="mb-4 text-sm font-semibold tracking-wide text-slate-700 uppercase">
             Action Details
           </h3>
           <div className="space-y-5">
-            {/* Decision Status Badge */}
+            {/* Decision Status */}
             <div>
-              <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 bg-amber-100 text-amber-700">
-                <Clock className="h-3.5 w-3.5" />
-                <span className="text-sm font-medium">Further Work Ongoing</span>
+              <FieldLabel>Decision Status</FieldLabel>
+              <div className="mt-1">
+                <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 bg-amber-100 text-amber-700">
+                  <Clock className="h-3.5 w-3.5" />
+                  <span className="text-sm font-medium">Further Work Ongoing</span>
+                </div>
               </div>
             </div>
 
@@ -283,130 +296,85 @@ export default function ActionModal({
                 </Field>
               </div>
             )}
+          </div>
 
-            {/* Team Members */}
-            <div>
+          {/* Milestones Section */}
+          {(() => {
+            const hasFirstMilestonePassed = action.first_milestone && action.first_milestone_deadline
+              ? (() => {
+                  const deadlineDate = parseDate(action.first_milestone_deadline);
+                  const now = new Date();
+                  return deadlineDate && deadlineDate < now;
+                })()
+              : false;
+            return hasFirstMilestonePassed || action.upcoming_milestone;
+          })() && (
+            <>
+              <div className="my-5 border-t border-slate-200"></div>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="cursor-help text-sm font-normal tracking-wide text-gray-600 uppercase">
-                    Team members for indicative action
-                  </span>
+                  <h3 className="mb-4 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
+                    Upcoming Milestone
+                  </h3>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-gray-600">
-                    UN system entities that contribute to the implementation of a
-                    specific action, in support of the relevant Work Package Lead.
-                    Work Package Leads report to the UN80 Steering Committee under
-                    the authority of the Secretary-General.
+                    Steps which will be taken towards the delivery of the proposal concerned. Completed milestones are crossed out.
                   </p>
                 </TooltipContent>
               </Tooltip>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {action.action_entities && action.action_entities.trim() ? (
-                  action.action_entities
-                    .split(";")
-                    .map((entity) =>
-                      normalizeTeamMemberForDisplay(entity.trim()),
-                    )
-                    .filter((entity) => entity && entity.trim().length > 0)
-                    .filter((entity, index, array) => {
-                      return array.indexOf(entity) === index;
-                    })
-                    .map((entity, index) => (
-                      <Badge
-                        key={index}
-                        variant="outline"
-                        className="border-un-blue/30 bg-un-blue text-white hover:bg-un-blue/90 cursor-default"
-                      >
-                        {entity}
-                      </Badge>
-                    ))
-                ) : (
-                  <span className="text-sm text-gray-400">to be updated</span>
-                )}
+              <div className="mt-2">
+                <MilestoneTimeline
+                  milestones={[
+                    ...(action.first_milestone && action.first_milestone_deadline
+                      ? (() => {
+                          const deadlineDate = parseDate(action.first_milestone_deadline);
+                          const now = new Date();
+                          const hasPassed = deadlineDate && deadlineDate < now;
+                          return hasPassed
+                            ? [
+                                {
+                                  label: action.first_milestone,
+                                  deadline: action.first_milestone_deadline,
+                                  isReached: false,
+                                },
+                              ]
+                            : [];
+                        })()
+                      : []),
+                    ...(action.upcoming_milestone
+                      ? [
+                          {
+                            label: action.upcoming_milestone,
+                            deadline: action.upcoming_milestone_deadline,
+                            isReached: false,
+                          },
+                        ]
+                      : []),
+                  ]}
+                />
               </div>
-            </div>
+            </>
+          )}
+
+          {/* Updates Section */}
+          <div className="my-5 border-t border-slate-200"></div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <h3 className="mb-4 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
+                Updates
+              </h3>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-gray-600">
+                A summary of recent progress on the action.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+          <div className="text-base text-gray-900">
+            <div className="text-gray-500">Updates for coming</div>
           </div>
         </div>
-
-        {/* Milestones and Updates Section */}
-        {(() => {
-          const hasFirstMilestonePassed = action.first_milestone && action.first_milestone_deadline
-            ? (() => {
-                const deadlineDate = parseDate(action.first_milestone_deadline);
-                const now = new Date();
-                return deadlineDate && deadlineDate < now;
-              })()
-            : false;
-          return hasFirstMilestonePassed || action.upcoming_milestone;
-        })() && (
-          <div className="rounded-lg border border-slate-200 bg-white p-5">
-            {/* Milestones */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <h3 className="mb-4 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
-                  upcoming Milestone
-                </h3>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-gray-600">
-                  Steps which will be taken towards the delivery of the proposal concerned. Completed milestones are crossed out.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-            <div className="mt-2">
-              <MilestoneTimeline
-                milestones={[
-                  ...(action.first_milestone && action.first_milestone_deadline
-                    ? (() => {
-                        const deadlineDate = parseDate(action.first_milestone_deadline);
-                        const now = new Date();
-                        const hasPassed = deadlineDate && deadlineDate < now;
-                        return hasPassed
-                          ? [
-                              {
-                                label: action.first_milestone,
-                                deadline: action.first_milestone_deadline,
-                                isReached: false,
-                              },
-                            ]
-                          : [];
-                      })()
-                    : []),
-                  ...(action.upcoming_milestone
-                    ? [
-                        {
-                          label: action.upcoming_milestone,
-                          deadline: action.upcoming_milestone_deadline,
-                          isReached: false,
-                        },
-                      ]
-                    : []),
-                ]}
-              />
-            </div>
-
-            {/* Separator */}
-            <div className="my-5 border-t border-slate-200"></div>
-
-            {/* Updates */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <h3 className="mb-4 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
-                  Updates
-                </h3>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-gray-600">
-                  A summary of recent progress on the action.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-            <div className="text-base text-gray-900">
-              <div className="text-gray-500">To be updated</div>
-            </div>
-          </div>
-        )}
 
         {/* Document Reference Section */}
         {(action.doc_text || action.document_paragraph) && (

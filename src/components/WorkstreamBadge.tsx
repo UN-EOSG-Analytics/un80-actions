@@ -3,7 +3,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Layers } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface WorkstreamLabelsProps {
   report: string[];
@@ -32,37 +32,30 @@ export function WorkstreamLabels({
   };
 
   return (
-    <div className="flex items-start gap-1 sm:gap-2">
-      <Layers className="mt-0.5 h-4 w-4 shrink-0 text-un-blue" />
-      <p className="text-left text-base leading-5 wrap-break-word text-un-blue">
-        {activeWorkstreams.map((ws, idx) => (
-          <span key={ws}>
-            {idx > 0 && "; "}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span
-                  className={
-                    onSelectWorkstream
-                      ? "cursor-pointer hover:underline"
-                      : "cursor-help"
-                  }
-                  onClick={(e) => {
-                    if (onSelectWorkstream) {
-                      e.stopPropagation();
-                      handleWorkstreamClick(ws);
-                    }
-                  }}
-                >
-                  {ws}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-sm text-gray-600">{workstreamNames[ws]}</p>
-              </TooltipContent>
-            </Tooltip>
-          </span>
-        ))}
-      </p>
+    <div className="flex flex-wrap items-center gap-1.5">
+      {activeWorkstreams.map((ws) => (
+        <Tooltip key={ws}>
+          <TooltipTrigger asChild>
+            <Badge
+              variant="outline"
+              className={`border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors ${
+                onSelectWorkstream ? "cursor-pointer" : "cursor-help"
+              }`}
+              onClick={(e) => {
+                if (onSelectWorkstream) {
+                  e.stopPropagation();
+                  handleWorkstreamClick(ws);
+                }
+              }}
+            >
+              {ws}
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="text-sm text-gray-600">{workstreamNames[ws]}</p>
+          </TooltipContent>
+        </Tooltip>
+      ))}
     </div>
   );
 }

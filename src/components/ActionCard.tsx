@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { LeadsBadge } from "@/components/LeadsBadge";
-import { CheckCircle2, Clock, CheckCircle } from "lucide-react";
-import { parseDate, buildCleanQueryString } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, Clock, CheckCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { parseDate, buildCleanQueryString, normalizeTeamMemberForDisplay } from "@/lib/utils";
 import type { WorkPackageAction } from "@/types";
 
 /**
@@ -23,6 +24,19 @@ interface ActionItemProps {
 export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [showAllTeamMembers, setShowAllTeamMembers] = useState(false);
+
+  // Parse team members from actionEntities
+  const teamMembers = action.actionEntities
+    ? action.actionEntities
+        .split(";")
+        .map((entity) => normalizeTeamMemberForDisplay(entity.trim()))
+        .filter((entity) => entity && entity.trim().length > 0)
+        .filter((entity, index, array) => array.indexOf(entity) === index)
+    : [];
+  
+  const hasMoreThanFour = teamMembers.length > 4;
+  const displayedTeamMembers = showAllTeamMembers ? teamMembers : teamMembers.slice(0, 4);
 
   const handleClick = () => {
     // Save current URL to sessionStorage before opening modal
@@ -79,9 +93,27 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
     >
       {/* Action Number and Text */}
       <div className="mb-4">
-        {/* Action Number */}
-        <div className="mb-2 text-sm font-medium tracking-wider text-un-blue uppercase">
-          Action {action.actionNumber || ""}
+        {/* Action Number and Decision Status */}
+        <div className="mb-2 flex items-center gap-2">
+          <span className="text-sm font-medium tracking-wider text-un-blue uppercase">
+            Action {action.actionNumber || ""}
+          </span>
+          {action.decisionStatus && (
+            <div className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 ${
+              action.decisionStatus === "decision taken"
+                ? "bg-green-100 text-green-700"
+                : "bg-amber-100 text-amber-700"
+            }`}>
+              {action.decisionStatus === "decision taken" ? (
+                <CheckCircle className="h-3 w-3" />
+              ) : (
+                <Clock className="h-3 w-3" />
+              )}
+              <span className="text-xs font-medium">
+                {action.decisionStatus === "decision taken" ? "Decision Taken" : "Further Work Ongoing"}
+              </span>
+            </div>
+          )}
         </div>
         {/* Action description text */}
         <div className="flex items-start gap-2">
@@ -102,48 +134,41 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
         </div>
       </div>
 
-      {/* Metadata section - shown when there are leads */}
-      {action.leads.length > 0 && (
+      {/* Metadata section - team members */}
+      {teamMembers.length > 0 && (
         <div className="border-t border-slate-100 pt-3 mt-3">
-          <div className="flex flex-wrap items-center gap-4">
-            {/* Display lead organizations in muted style */}
-            <LeadsBadge leads={action.leads} variant="muted" />
-            {/* Decision status */}
-            <div className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 ${
-              action.decisionStatus === "decision taken"
-                ? "bg-green-100 text-green-700"
-                : "bg-amber-100 text-amber-700"
-            }`}>
-              {action.decisionStatus === "decision taken" ? (
-                <CheckCircle className="h-3 w-3" />
-              ) : (
-                <Clock className="h-3 w-3" />
-              )}
-              <span className="text-xs font-medium">
-                {action.decisionStatus === "decision taken" ? "Decision Taken" : "Further Work Ongoing"}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* Metadata section - shown when there are no leads but decision status exists */}
-      {action.leads.length === 0 && action.decisionStatus && (
-        <div className="border-t border-slate-100 pt-3 mt-3">
-          <div className="flex flex-wrap items-center gap-4">
-            <div className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 ${
-              action.decisionStatus === "decision taken"
-                ? "bg-green-100 text-green-700"
-                : "bg-amber-100 text-amber-700"
-            }`}>
-              {action.decisionStatus === "decision taken" ? (
-                <CheckCircle className="h-3 w-3" />
-              ) : (
-                <Clock className="h-3 w-3" />
-              )}
-              <span className="text-xs font-medium">
-                {action.decisionStatus === "decision taken" ? "Decision Taken" : "Further Work Ongoing"}
-              </span>
-            </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {displayedTeamMembers.map((member, index) => (
+              <Badge
+                key={index}
+                variant="outline"
+                className="border-un-blue/30 bg-un-blue text-white cursor-default text-xs"
+              >
+                {member}
+              </Badge>
+            ))}
+            {/* Show all/less button */}
+            {hasMoreThanFour && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowAllTeamMembers(!showAllTeamMembers);
+                }}
+                className="flex items-center gap-0.5 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
+              >
+                {showAllTeamMembers ? (
+                  <>
+                    <ChevronUp className="h-3 w-3" />
+                    Show less
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-3 w-3" />
+                    +{teamMembers.length - 4} more
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       )}

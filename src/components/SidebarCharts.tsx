@@ -1,5 +1,5 @@
 import React from "react";
-import { Users, Layers, Briefcase, Calendar, ChevronDown, ChevronUp, Clock, CheckCircle } from "lucide-react";
+import { Users, Briefcase, Calendar, ChevronDown, ChevronUp, Clock, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
 import { buildCleanQueryString } from "@/lib/utils";
@@ -218,17 +218,58 @@ export function SidebarCharts({
 
   return (
     <div className="flex w-full min-w-0 shrink-0 flex-col gap-3 lg:w-[320px] lg:max-w-[320px] lg:border-l lg:border-slate-200 lg:pl-6">
+      {/* Decision Status Chart */}
+      {totalActions > 0 && (
+        <div className="rounded-xl bg-white pb-4 pl-4.5 sm:pb-5">
+          <h3 className="mb-3 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
+            <span className="flex h-5 w-5 items-center justify-center text-un-blue">
+              <Clock className="h-5 w-5" />
+            </span>
+            Decision Status
+          </h3>
+          
+          <div className="space-y-3 pr-4">
+            {/* Further Work Ongoing */}
+            <div className="flex items-center gap-3">
+              <div className="flex h-2.5 w-2.5 shrink-0 rounded-full bg-un-blue animate-pulse" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-slate-700">Further Work Ongoing</span>
+                  <span className="text-sm font-bold text-un-blue">{totalActions}</span>
+                </div>
+                <div className="mt-1.5 h-2 w-full rounded-full bg-slate-200">
+                  <div className="h-full rounded-full bg-un-blue" style={{ width: "100%" }} />
+                </div>
+              </div>
+            </div>
+
+            {/* Decision Taken */}
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-4 w-4 shrink-0 text-un-blue" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-slate-700">Decision Taken</span>
+                  <span className="text-sm font-bold text-un-blue">0</span>
+                </div>
+                <div className="mt-1.5 h-2 w-full rounded-full bg-slate-200">
+                  <div className="h-full rounded-full bg-un-blue" style={{ width: "0%" }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Upcoming Milestones */}
       {upcomingMilestonesChartEntries.length > 0 && (
         <div className="pb-2 pl-4.5">
           {/* Header */}
-          <h3 className="mb-1 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
+          <h3 className="mb-3 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
             <span className="flex h-5 w-5 items-center justify-center text-un-blue">
               <Calendar className="h-5 w-5" />
             </span>
             Upcoming Milestones
           </h3>
-          <p className="mb-4 text-[15px] text-slate-500">{upcomingMilestonesChartEntries.length} upcoming deadlines</p>
 
           {/* Milestones List - Scrollable */}
           <div className="divide-y divide-slate-100 max-h-[360px] overflow-y-auto overscroll-contain pr-1 -mr-1">
@@ -339,63 +380,8 @@ export function SidebarCharts({
         selectedValue={selectedLead}
         onSelectValue={onSelectLead}
         barWidth={105}
+        maxHeight={135}
       />
-
-      <SidebarChart
-        title="Actions per Workstream"
-        description="Number of actions per workstream"
-        icon={<Layers />}
-        data={workstreamsChartEntries}
-        searchQuery={workstreamsSearchQuery}
-        onSearchChange={onWorkstreamsSearchChange}
-        searchPlaceholder="Search workstreams"
-        selectedValue={selectedWorkstream}
-        onSelectValue={onSelectWorkstream}
-        barWidth={105}
-      />
-
-      {/* Decision Status Chart */}
-      {totalActions > 0 && (
-        <div className="rounded-xl bg-white pb-4 pl-4.5 sm:pb-5">
-          <h3 className="mb-2 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
-            <span className="flex h-5 w-5 items-center justify-center text-un-blue">
-              <Clock className="h-5 w-5" />
-            </span>
-            Decision Status
-          </h3>
-          <p className="mb-3 text-[15px] text-slate-600">Progress on action decisions</p>
-          
-          <div className="space-y-3 pr-4">
-            {/* Further Work Ongoing */}
-            <div className="flex items-center gap-3">
-              <div className="flex h-2.5 w-2.5 shrink-0 rounded-full bg-un-blue animate-pulse" />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-slate-700">Further Work Ongoing</span>
-                  <span className="text-sm font-bold text-un-blue">{totalActions}</span>
-                </div>
-                <div className="mt-1.5 h-2 w-full rounded-full bg-slate-200">
-                  <div className="h-full rounded-full bg-un-blue" style={{ width: "100%" }} />
-                </div>
-              </div>
-            </div>
-
-            {/* Decision Taken */}
-            <div className="flex items-center gap-3">
-              <CheckCircle className="h-4 w-4 shrink-0 text-un-blue" />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-slate-700">Decision Taken</span>
-                  <span className="text-sm font-bold text-un-blue">0</span>
-                </div>
-                <div className="mt-1.5 h-2 w-full rounded-full bg-slate-200">
-                  <div className="h-full rounded-full bg-un-blue" style={{ width: "0%" }} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );

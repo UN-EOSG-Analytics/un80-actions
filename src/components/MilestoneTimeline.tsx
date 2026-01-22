@@ -41,13 +41,13 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
                 style={{ height: "calc(100% + 0.5rem)" }}
               />
             )}
-            {/* Continuation line for last item to indicate more to come */}
-            {isLast && !isReached && (
+            {/* Continuation line for last item - dashed to indicate path continues */}
+            {isLast && (
               <div
-                className="absolute left-[11px] top-8 w-0.5 bg-gray-200"
+                className="absolute left-[10px] top-8 w-1"
                 style={{ 
-                  height: "24px",
-                  background: "linear-gradient(to bottom, #e5e7eb, transparent)"
+                  height: "20px",
+                  backgroundImage: "repeating-linear-gradient(to bottom, #cbd5e1 0px, #cbd5e1 3px, transparent 3px, transparent 6px)"
                 }}
               />
             )}
@@ -59,8 +59,8 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
                   <CheckCircle2 className="h-4 w-4 text-white" />
                 </div>
               ) : (
-                <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-gray-300 bg-white">
-                  <Circle className="h-3 w-3 fill-gray-300 text-gray-300" />
+                <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-un-blue bg-white">
+                  <div className="h-2 w-2 rounded-full bg-un-blue" />
                 </div>
               )}
             </div>

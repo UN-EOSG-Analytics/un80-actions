@@ -31,6 +31,7 @@ interface SidebarChartProps {
   selectedValue: string[];
   onSelectValue: (value: string[]) => void;
   barWidth?: number; // Width in pixels
+  maxHeight?: number; // Max height in pixels for scrollable area
 }
 
 export function SidebarChart({
@@ -44,6 +45,7 @@ export function SidebarChart({
   selectedValue,
   onSelectValue,
   barWidth = 90,
+  maxHeight = 360,
 }: SidebarChartProps) {
   const maxCount =
     data.length > 0 ? Math.max(...data.map((d) => d.count ?? 0)) : 1;
@@ -71,7 +73,6 @@ export function SidebarChart({
         </span>
         {title}
       </h3>
-      <p className="mb-1.5 text-[15px] text-slate-600">{description}</p>
 
       {/* Search Bar */}
       <div className="relative mb-1 w-full">
@@ -86,7 +87,10 @@ export function SidebarChart({
       </div>
 
       {/* Chart Data - Scrollable */}
-      <div className="max-h-[360px] overflow-y-auto overscroll-contain pr-1 -mr-1">
+      <div 
+        className="overflow-y-auto overscroll-contain pr-1 -mr-1"
+        style={{ maxHeight: `${maxHeight}px` }}
+      >
         <table className="w-full table-fixed">
           <tbody>
             {data.map((entry, index) => {

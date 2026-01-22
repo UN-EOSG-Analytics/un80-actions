@@ -109,9 +109,9 @@ export function WorkPackageItem({
 
           {/* Goal from work package data */}
           {wp.goal && (
-            <div className="mb-4 ml-0.5 border-l-2 border-un-blue pr-8 pl-3 text-left">
+            <div className="mb-4 pr-8 text-left">
               <p className="leading-snug font-medium text-slate-600">
-                {formatGoalText(wp.goal)}
+                <span className="font-semibold text-un-blue">Goal:</span> {formatGoalText(wp.goal)}
               </p>
             </div>
           )}
@@ -128,7 +128,7 @@ export function WorkPackageItem({
             <LeadsBadge 
               leads={wp.leads} 
               onSelectLead={onSelectLead}
-              iconTooltip="Work Package Leads"
+              showIcon={false}
             />
           </div>
 
@@ -162,17 +162,26 @@ export function WorkPackageItem({
                   ))}
                 </div>
               </div>
-              {/* Expanded state: "Indicative Actions" header */}
+              {/* Expanded state: "Indicative Actions" header with count and dots */}
               <div 
                 className={`absolute inset-0 flex items-center gap-2 transition-opacity duration-200 ease-out ${
                   isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
                 }`}
               >
                 <h3 className="text-left text-lg font-semibold tracking-wider text-slate-700">
-                  Indicative Actions
+                  {wp.actions.length} Indicative {wp.actions.length === 1 ? "Action" : "Actions"}
                 </h3>
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-500 text-[10px] font-semibold text-white">
-                  {wp.actions.length}
+                <div className="flex -space-x-1.5">
+                  {Array.from({ length: Math.min(wp.actions.length, 5) }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-4 h-4 rounded-full border-2 border-slate-100 group-hover:border-[#E0F5FF] bg-un-blue transition-colors"
+                      style={{ 
+                        opacity: 1 - (i * 0.15),
+                        zIndex: wp.actions.length - i 
+                      }}
+                    />
+                  ))}
                 </div>
               </div>
             </div>
