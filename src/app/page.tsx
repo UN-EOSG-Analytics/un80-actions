@@ -227,8 +227,8 @@ export function WorkPackagesPageContent() {
         {/* Fixed Header */}
         <Header onReset={handleResetAll} showLogin={false} />
 
-        {/* Main Container - with padding to account for fixed header */}
-        <main className="mx-auto w-full max-w-4xl px-8 pt-8 sm:px-12 sm:pt-24 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
+        {/* Main Container */}
+        <main className="mx-auto w-full max-w-4xl px-8 pt-8 sm:px-12 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
           <div className="space-y-6 pb-16">
             {/* Header with context info */}
             <ExplainerText />
