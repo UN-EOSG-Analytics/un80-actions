@@ -117,7 +117,7 @@ export function WorkPackageItem({
           )}
 
           {/* Report Labels and Work Package Leads */}
-          <div className="flex w-full flex-wrap items-start gap-4">
+          <div className="flex w-full flex-wrap items-start gap-1.5">
             {/* Workstream Labels */}
             <WorkstreamLabels
               report={wp.report}
