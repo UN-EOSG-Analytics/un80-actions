@@ -218,14 +218,14 @@ export function SidebarCharts({
 
   return (
     <div className="flex w-full min-w-0 shrink-0 flex-col gap-3 lg:w-[320px] lg:max-w-[320px] lg:border-l lg:border-slate-200 lg:pl-6">
-      {/* Decision Status Chart */}
+      {/* Action Status Chart */}
       {totalActions > 0 && (
         <div className="rounded-xl bg-white pb-4 pl-4.5 sm:pb-5">
           <h3 className="mb-3 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
             <span className="flex h-5 w-5 items-center justify-center text-un-blue">
               <Clock className="h-5 w-5" />
             </span>
-            Decision Status
+            Action Status
           </h3>
           
           <div className="space-y-3 pr-4">

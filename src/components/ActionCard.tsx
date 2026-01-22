@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Clock, CheckCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { CheckCircle2, Clock, CheckCircle } from "lucide-react";
 import { parseDate, buildCleanQueryString, normalizeTeamMemberForDisplay } from "@/lib/utils";
 import type { WorkPackageAction } from "@/types";
 
@@ -148,27 +148,21 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
               </Badge>
             ))}
             {/* Show all/less button */}
-            {hasMoreThanFour && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowAllTeamMembers(!showAllTeamMembers);
-                }}
-                className="flex items-center gap-0.5 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
-              >
-                {showAllTeamMembers ? (
-                  <>
-                    <ChevronUp className="h-3 w-3" />
-                    Show less
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="h-3 w-3" />
-                    +{teamMembers.length - 4} more
-                  </>
-                )}
-              </button>
-            )}
+              {hasMoreThanFour && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowAllTeamMembers(!showAllTeamMembers);
+                  }}
+                  className="text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
+                >
+                  {showAllTeamMembers ? (
+                    "show less"
+                  ) : (
+                    `show ${teamMembers.length - 4} more`
+                  )}
+                </button>
+              )}
           </div>
         </div>
       )}
