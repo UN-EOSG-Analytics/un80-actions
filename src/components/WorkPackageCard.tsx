@@ -128,6 +128,7 @@ export function WorkPackageItem({
               leads={wp.leads}
               onSelectLead={onSelectLead}
               showIcon={false}
+              chipType="Work Package Lead"
             />
           </div>
         </CollapsibleTrigger>

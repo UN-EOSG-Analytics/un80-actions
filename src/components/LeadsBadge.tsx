@@ -15,6 +15,7 @@ interface LeadsBadgeProps {
   showIcon?: boolean;
   color?: string;
   iconTooltip?: string;
+  chipType?: "Work Package Lead" | "Action Lead";
 }
 
 export function LeadsBadge({
@@ -24,6 +25,7 @@ export function LeadsBadge({
   showIcon = true,
   color: customColor,
   iconTooltip,
+  chipType,
 }: LeadsBadgeProps) {
   if (leads.length === 0) return null;
 
@@ -86,7 +88,12 @@ export function LeadsBadge({
               </Badge>
             </TooltipTrigger>
             <TooltipContent>
-              <p className="text-sm text-gray-600">{longForm}</p>
+              <div className="space-y-1">
+                {chipType && (
+                  <p className="text-xs font-semibold text-gray-700">{chipType}</p>
+                )}
+                <p className="text-sm text-gray-600">{longForm}</p>
+              </div>
             </TooltipContent>
           </Tooltip>
         );

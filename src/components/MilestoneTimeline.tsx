@@ -69,7 +69,7 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
             </div>
 
             {/* Milestone content */}
-            <div className="flex-1 pb-6">
+            <div className="flex-1 pb-2">
               <div
                 className={cn("flex flex-col gap-1", isReached && "opacity-60")}
               >

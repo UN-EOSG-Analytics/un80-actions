@@ -9,6 +9,12 @@ import {
   buildCleanQueryString,
   normalizeTeamMemberForDisplay,
 } from "@/lib/utils";
+import { abbreviationMap } from "@/constants/abbreviations";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { WorkPackageAction } from "@/types";
 
 /**
@@ -147,15 +153,27 @@ export function ActionItem({ action }: ActionItemProps) {
       {teamMembers.length > 0 && (
         <div className="mt-3 border-t border-slate-100 pt-3">
           <div className="flex flex-wrap items-center gap-1.5">
-            {displayedTeamMembers.map((member, index) => (
-              <Badge
-                key={index}
-                variant="outline"
-                className="cursor-default border-0 bg-slate-200 text-xs text-slate-700 transition-all duration-150 hover:bg-slate-300"
-              >
-                {member}
-              </Badge>
-            ))}
+            {displayedTeamMembers.map((member, index) => {
+              const fullName = abbreviationMap[member] || member;
+              return (
+                <Tooltip key={index}>
+                  <TooltipTrigger asChild>
+                    <Badge
+                      variant="outline"
+                      className="cursor-default border-0 bg-slate-200 text-xs text-slate-700 transition-all duration-150 hover:bg-slate-300"
+                    >
+                      {member}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <div className="space-y-1">
+                      <p className="text-xs font-semibold text-gray-700">Team Member</p>
+                      <p className="text-sm text-gray-600">{fullName}</p>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })}
             {/* Show all/less button */}
             {hasMoreThanFour && (
               <button

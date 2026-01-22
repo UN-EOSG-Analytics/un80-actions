@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { FileText } from "lucide-react";
 import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
 import { parseDate, normalizeTeamMemberForDisplay } from "@/lib/utils";
+import { abbreviationMap } from "@/constants/abbreviations";
 import {
   Tooltip,
   TooltipContent,
@@ -180,6 +181,7 @@ export default function ActionModal({
                     .filter((lead) => lead.length > 0)}
                   variant="default"
                   showIcon={false}
+                  chipType="Action Lead"
                 />
               )}
               {/* Team Members - Slate */}
@@ -197,15 +199,27 @@ export default function ActionModal({
                     .filter(
                       (entity, index, array) => array.indexOf(entity) === index,
                     )
-                    .map((entity, index) => (
-                      <Badge
-                        key={index}
-                        variant="outline"
-                        className="cursor-default border-0 bg-slate-200 text-xs text-slate-700 transition-all duration-150 hover:bg-slate-300"
-                      >
-                        {entity}
-                      </Badge>
-                    ))}
+                    .map((entity, index) => {
+                      const fullName = abbreviationMap[entity] || entity;
+                      return (
+                        <Tooltip key={index}>
+                          <TooltipTrigger asChild>
+                            <Badge
+                              variant="outline"
+                              className="cursor-default border-0 bg-slate-200 text-xs text-slate-700 transition-all duration-150 hover:bg-slate-300"
+                            >
+                              {entity}
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="space-y-1">
+                              <p className="text-xs font-semibold text-gray-700">Team Member</p>
+                              <p className="text-sm text-gray-600">{fullName}</p>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })}
                 </>
               )}
             </div>
@@ -283,10 +297,10 @@ export default function ActionModal({
               return hasFirstMilestonePassed || action.upcoming_milestone;
             })() && (
               <>
-                <div className="my-5 border-t border-slate-200"></div>
+                <div className="my-3 border-t border-slate-200"></div>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <h3 className="mb-4 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
+                    <h3 className="mb-3 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
                       Upcoming Milestone
                     </h3>
                   </TooltipTrigger>
@@ -335,7 +349,7 @@ export default function ActionModal({
             )}
 
             {/* Updates Section */}
-            <div className="my-5 border-t border-slate-200"></div>
+            <div className="my-3 border-t border-slate-200"></div>
             <Tooltip>
               <TooltipTrigger asChild>
                 <h3 className="mb-4 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
@@ -431,6 +445,7 @@ export default function ActionModal({
                   leads={action.work_package_leads}
                   variant="default"
                   showIcon={false}
+                  chipType="Work Package Lead"
                 />
               </div>
             )}
