@@ -61,9 +61,15 @@ export function WorkPackageItem({
   onSelectWorkstream,
   showProgress = false,
 }: WorkPackageItemProps) {
+  // Calculate animation duration: base 150ms + 30ms per action, capped at 400ms
+  const collapsibleDuration = Math.min(150 + wp.actions.length * 30, 400);
+
   return (
     <Collapsible open={isOpen} onOpenChange={onToggle}>
-      <div className="group relative mb-20 rounded-[6px] bg-slate-100 transition-colors last:mb-0 hover:bg-[#E0F5FF]">
+      <div
+        className="group relative mb-20 rounded-[6px] bg-slate-100 transition-colors last:mb-0 hover:bg-[#E0F5FF]"
+        style={{ "--collapsible-duration": `${collapsibleDuration}ms` } as React.CSSProperties}
+      >
         {isOpen && (
           <div className="pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-1 rounded-l-[6px] bg-un-blue" />
         )}

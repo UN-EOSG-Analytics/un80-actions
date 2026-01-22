@@ -2,11 +2,8 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import {
-  ActionLeadsBadge,
-  TeamBadge,
-  DecisionStatusBadge,
-} from "@/components/Badges";
+import { ActionLeadsBadge, DecisionStatusBadge } from "@/components/Badges";
+import { Badge } from "@/components/ui/badge";
 import { CheckCircle2 } from "lucide-react";
 import {
   parseDate,
@@ -144,9 +141,26 @@ export function ActionItem({ action }: ActionItemProps) {
             {action.leads.length > 0 && teamMembers.length > 0 && (
               <span className="text-slate-300">•</span>
             )}
-            {/* Team Members */}
-            <TeamBadge leads={displayedTeamMembers} />
-            {/* Show all/less button */}
+            {/* Team Members - rendered individually for proper flex flow */}
+            {displayedTeamMembers.map((member, idx) => {
+              const tooltip = abbreviationMap[member] || member;
+              return (
+                <Tooltip key={idx}>
+                  <TooltipTrigger asChild>
+                    <Badge
+                      variant="outline"
+                      className="cursor-help border border-un-blue/20 bg-un-blue/5 text-un-blue/70 transition-all duration-150 hover:border-un-blue/30 hover:bg-un-blue/10"
+                    >
+                      {member}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-sm text-gray-600">{tooltip}</p>
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })}
+            {/* Show all/less button - inline with badges */}
             {hasMoreThanFour && (
               <button
                 onClick={(e) => {
@@ -157,7 +171,7 @@ export function ActionItem({ action }: ActionItemProps) {
               >
                 {showAllTeamMembers
                   ? "show less"
-                  : `show ${teamMembers.length - 4} more`}
+                  : `+${teamMembers.length - 4} more`}
               </button>
             )}
           </div>
