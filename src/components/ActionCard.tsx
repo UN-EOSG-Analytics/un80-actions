@@ -142,7 +142,7 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
               <Badge
                 key={index}
                 variant="outline"
-                className="border-un-blue/20 bg-un-blue text-white cursor-default text-xs shadow-sm shadow-un-blue/25 ring-1 ring-inset ring-white/10"
+                className="border-slate-300 bg-slate-100 text-slate-700 cursor-default text-xs shadow-sm ring-1 ring-inset ring-slate-200/50 hover:bg-slate-200 transition-all duration-150"
               >
                 {member}
               </Badge>

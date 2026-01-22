@@ -209,18 +209,18 @@ export default function ActionModal({
           {/* Action Leads and Team Members - underneath action name */}
           {(action.action_leads || action.action_entities) && (
             <div className="mt-3 flex flex-wrap items-center gap-1.5">
-              {/* Action Leads */}
+              {/* Action Leads - Blue */}
               {action.action_leads && action.action_leads.trim() && (
                 <LeadsBadge
                   leads={action.action_leads
                     .split(";")
                     .map((lead) => lead.trim())
                     .filter((lead) => lead.length > 0)}
-                  variant="muted"
+                  variant="default"
                   showIcon={false}
                 />
               )}
-              {/* Team Members */}
+              {/* Team Members - Slate */}
               {action.action_entities && action.action_entities.trim() && (
                 <>
                   {action.action_leads && action.action_leads.trim() && (
@@ -235,7 +235,7 @@ export default function ActionModal({
                       <Badge
                         key={index}
                         variant="outline"
-                        className="border-un-blue/20 bg-un-blue text-white cursor-default text-xs shadow-sm shadow-un-blue/25 ring-1 ring-inset ring-white/10"
+                        className="border-slate-300 bg-slate-100 text-slate-700 cursor-default text-xs shadow-sm ring-1 ring-inset ring-slate-200/50 hover:bg-slate-200 transition-all duration-150"
                       >
                         {entity}
                       </Badge>
@@ -282,9 +282,6 @@ export default function ActionModal({
         {/* Combined Action Details, Milestones, and Updates Section */}
         <div className="rounded-lg border border-slate-200 bg-white p-5">
           {/* Action Details */}
-          <h3 className="mb-4 text-sm font-semibold tracking-wide text-slate-700 uppercase">
-            Action Details
-          </h3>
           <div className="space-y-5">
             {/* Decision Status */}
             <div>
