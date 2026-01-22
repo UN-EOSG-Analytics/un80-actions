@@ -335,7 +335,7 @@ export default function ActionModal({
             )}
 
             {/* Updates Section */}
-            <div className="my-2 border-t border-slate-200"></div>
+            <div className="my-5 border-t border-slate-200"></div>
             <Tooltip>
               <TooltipTrigger asChild>
                 <h3 className="mb-4 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
