@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { DataCard } from "@/components/DataCard";
 import { ExplainerText } from "@/components/ExplainerText";
 import { FilterControls } from "@/components/FilterControls";
@@ -8,8 +8,6 @@ import { Header } from "@/components/HeaderBar";
 import { SidebarCharts } from "@/components/SidebarCharts";
 import { WorkPackageList } from "@/components/ListContainer";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { useActions } from "@/hooks/useActions";
 import { useChartSearch } from "@/hooks/useChartSearch";
 import { useCollapsibles } from "@/hooks/useCollapsibles";
@@ -26,7 +24,7 @@ import {
 export function WorkPackagesPageContent() {
   // Custom hooks for state management
   const { actions, isLoading } = useActions();
-  const [showProgress, setShowProgress] = useState(false);
+  const showProgress = false;
 
   const {
     filters,
@@ -220,7 +218,8 @@ export function WorkPackagesPageContent() {
       // Reset when no actions are selected
       lastProcessedActionsRef.current = "";
     }
-  }, [selectedAction]); // Only depend on selectedAction
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAction]); // Only depend on selectedAction to avoid infinite loops
 
   return (
     <TooltipProvider delayDuration={200}>

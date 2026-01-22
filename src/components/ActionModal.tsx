@@ -2,20 +2,14 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import { X, Clock, CheckCircle, ChevronRight } from "lucide-react";
+import { X, Clock, ChevronRight } from "lucide-react";
 import type { Action } from "@/types";
 import { LeadsBadge } from "@/components/LeadsBadge";
 import { MilestoneTimeline } from "@/components/MilestoneTimeline";
 import { Badge } from "@/components/ui/badge";
 import { FileText } from "lucide-react";
 import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
-import {
-  parseDate,
-  formatDate,
-  formatDateMonthYear,
-  normalizeTeamMemberForDisplay,
-} from "@/lib/utils";
-import { getWorkPackageLeads } from "@/lib/actions";
+import { parseDate, normalizeTeamMemberForDisplay } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
@@ -38,7 +32,6 @@ export default function ActionModal({
   const modalRef = useRef<HTMLDivElement>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  const [workPackageLeads, setWorkPackageLeads] = useState<string[]>([]);
 
   // Animation state management
   useEffect(() => {
@@ -90,23 +83,6 @@ export default function ActionModal({
     }
   };
 
-  // Fetch aggregated work package leads when action changes
-  useEffect(() => {
-    if (action && action.work_package_number) {
-      getWorkPackageLeads(action.work_package_number)
-        .then((leads) => {
-          setWorkPackageLeads(leads);
-        })
-        .catch((err) => {
-          console.error("Error fetching work package leads:", err);
-          // Fallback to action's own leads if aggregation fails
-          setWorkPackageLeads(action.work_package_leads || []);
-        });
-    } else {
-      setWorkPackageLeads([]);
-    }
-  }, [action]);
-
   // Prevent body scroll when modal is open while maintaining scrollbar space
   useEffect(() => {
     // Store original values
@@ -133,25 +109,6 @@ export default function ActionModal({
     <span className="text-sm font-normal tracking-wide text-gray-600 uppercase">
       {children}
     </span>
-  );
-
-  // Reusable field value wrapper component
-  const FieldValue = ({ children }: { children: React.ReactNode }) => (
-    <div className="mt-1 text-base text-gray-900">{children}</div>
-  );
-
-  // Complete field component combining label and value
-  const Field = ({
-    label,
-    children,
-  }: {
-    label: string;
-    children: React.ReactNode;
-  }) => (
-    <div className="space-y-1">
-      <FieldLabel>{label}</FieldLabel>
-      <FieldValue>{children}</FieldValue>
-    </div>
   );
 
   // Render header content based on state

@@ -22,34 +22,38 @@ export default function ModalHandler() {
       ? decodeUrlParam(milestoneParam)
       : null;
 
-    // If there's no action, clear state
+    // If there's no action, skip loading
     if (!actionNumber || isNaN(actionNumber)) {
-      setAction(null);
-      setError(null);
-      setLoading(false);
       return;
     }
 
-    setLoading(true);
-    setError(null);
+    // Load action data in async function
+    const loadAction = async () => {
+      setLoading(true);
+      setError(null);
 
-    // Load action data
-    getActionByNumber(actionNumber, firstMilestone)
-      .then((foundAction) => {
+      try {
+        const foundAction = await getActionByNumber(
+          actionNumber,
+          firstMilestone,
+        );
         if (!foundAction) {
           console.warn(`Action ${actionNumber} not found`);
           setError("Action not found");
+          setAction(null);
         } else {
           setAction(foundAction);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Error loading action:", err);
         setError("Failed to load action");
-      })
-      .finally(() => {
+        setAction(null);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    loadAction();
   }, [actionParam, milestoneParam]);
 
   const handleClose = () => {

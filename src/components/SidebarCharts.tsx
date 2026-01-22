@@ -1,14 +1,5 @@
 import React from "react";
-import {
-  Users,
-  Briefcase,
-  Calendar,
-  ChevronDown,
-  ChevronUp,
-  Clock,
-  CheckCircle,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Users, Calendar, Clock, CheckCircle } from "lucide-react";
 import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
 import { buildCleanQueryString } from "@/lib/utils";
 import {
@@ -74,68 +65,16 @@ export function SidebarCharts({
   onLeadsSearchChange,
   selectedLead,
   onSelectLead,
-  showAllLeads,
-  onToggleShowAllLeads,
-  workstreamsData,
-  workstreamsSearchQuery,
-  onWorkstreamsSearchChange,
-  selectedWorkstream,
-  onSelectWorkstream,
-  showAllWorkstreams,
-  onToggleShowAllWorkstreams,
-  workPackagesData,
-  workPackagesSearchQuery,
-  onWorkPackagesSearchChange,
-  selectedWorkPackage,
-  onSelectWorkPackage,
-  showAllWorkPackages,
-  onToggleShowAllWorkPackages,
   upcomingMilestonesData,
-  upcomingMilestonesSearchQuery,
-  onUpcomingMilestonesSearchChange,
-  showAllUpcomingMilestones,
-  onToggleShowAllUpcomingMilestones,
   milestonesPerMonthSearchQuery,
   onMilestonesPerMonthSearchChange,
-  showAllMilestonesPerMonth,
-  onToggleShowAllMilestonesPerMonth,
   totalActions,
 }: SidebarChartsProps) {
-  const router = useRouter();
   const leadsChartEntries: SidebarChartEntry[] = leadsData.map((entry) => ({
     label: entry.lead,
     count: entry.count,
     value: entry.lead,
   }));
-
-  const workstreamsChartEntries: SidebarChartEntry[] = workstreamsData.map(
-    (entry) => ({
-      label: entry.workstream,
-      count: entry.count,
-      value: entry.workstream,
-    }),
-  );
-
-  const workPackagesChartEntries: SidebarChartEntry[] = workPackagesData.map(
-    (entry) => {
-      const rawWorkpackage =
-        typeof entry.workpackage === "string" ? entry.workpackage : "";
-
-      const wpMatch = rawWorkpackage.match(/^(\d+):/);
-      const wpNumber = wpMatch ? wpMatch[1] : null;
-      const wpName = wpMatch
-        ? rawWorkpackage.replace(/^\d+:\s*/, "")
-        : rawWorkpackage;
-      const wpOption = wpNumber ? `${wpNumber}: ${wpName}` : wpName;
-
-      return {
-        label: wpNumber ? `WP${wpNumber}` : "Work package",
-        count: entry.count,
-        value: wpOption,
-        tooltip: wpNumber && wpName ? wpName : undefined,
-      };
-    },
-  );
 
   // Format upcoming milestones with dates and urgency, filter for January only
   const now = new Date();

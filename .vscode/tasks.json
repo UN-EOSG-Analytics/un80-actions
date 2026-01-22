@@ -33,6 +33,13 @@
     },
     {
       "type": "npm",
+      "script": "typecheck",
+      "label": "npm run typecheck",
+      "detail": "tsc --noEmit",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "type": "npm",
       "script": "format",
       "label": "npm run format",
       "detail": "prettier --write",

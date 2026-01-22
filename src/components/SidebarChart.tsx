@@ -36,7 +36,6 @@ interface SidebarChartProps {
 
 export function SidebarChart({
   title,
-  description,
   icon,
   data,
   searchQuery,

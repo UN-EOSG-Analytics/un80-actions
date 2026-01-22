@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Clock, CheckCircle } from "lucide-react";
 import {
@@ -25,8 +25,7 @@ interface ActionItemProps {
  * Displays a single action item within a work package.
  * Shows the action text, leads, document references, and optional doc text.
  */
-export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
-  const router = useRouter();
+export function ActionItem({ action }: ActionItemProps) {
   const searchParams = useSearchParams();
   const [showAllTeamMembers, setShowAllTeamMembers] = useState(false);
 

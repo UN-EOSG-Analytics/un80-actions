@@ -7,8 +7,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import {
   ArrowUpDown,
   Briefcase,
@@ -100,8 +98,6 @@ export function FilterControls({
   uniqueTeamMembers,
   availableBigTicketOptions,
   onResetFilters,
-  showProgress = false,
-  onShowProgressChange,
 }: FilterControlsProps) {
   const [isMobile, setIsMobile] = useState(false);
 

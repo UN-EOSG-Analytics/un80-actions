@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Circle } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { parseDate, formatDateMonthYear } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
