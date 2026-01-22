@@ -76,78 +76,78 @@ interface ProgressCardProps {
 }
 
 function ProgressCard({
-    label,
-    value,
-    total,
-    percentage,
-    icon: Icon,
-    separator = "of",
+  label,
+  value,
+  total,
+  percentage,
+  icon: Icon,
+  separator = "of",
 }: ProgressCardProps) {
-    // Calculate circumference for circular progress (radius = 40, so circumference = 2 * π * 40 ≈ 251)
-    const radius = 40;
-    const circumference = 2 * Math.PI * radius;
-    const offset = circumference - (percentage / 100) * circumference;
+  // Calculate circumference for circular progress (radius = 40, so circumference = 2 * π * 40 ≈ 251)
+  const radius = 40;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (percentage / 100) * circumference;
 
-    return (
-      <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-4 transition-all hover:border-un-blue/30">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="mb-3 flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-un-blue/10 transition-colors group-hover:bg-un-blue/20">
-                <Icon className="h-4 w-4 text-un-blue" />
-              </div>
-              <div className="flex-1">
-                <h4 className="text-sm font-medium text-gray-600">{label}</h4>
-                <div className="mt-0.5 flex items-baseline gap-2">
-                  <span className="text-2xl font-bold text-gray-900">
-                    {value}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    {separator === "/"
-                      ? `${separator}${total}`
-                      : `${separator} ${total}`}
-                  </span>
-                </div>
-              </div>
+  return (
+    <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-4 transition-all hover:border-un-blue/30">
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <div className="mb-3 flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-un-blue/10 transition-colors group-hover:bg-un-blue/20">
+              <Icon className="h-4 w-4 text-un-blue" />
             </div>
-
-            {/* Circular Progress Indicator */}
-            <div className="relative inline-flex items-center justify-center">
-              <svg
-                className="h-20 w-20 -rotate-90 transform"
-                viewBox="0 0 100 100"
-              >
-                {/* Background circle */}
-                <circle
-                  cx="50"
-                  cy="50"
-                  r={radius}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="7"
-                  className="text-gray-100"
-                />
-                {/* Progress circle */}
-                <circle
-                  cx="50"
-                  cy="50"
-                  r={radius}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="7"
-                  strokeLinecap="round"
-                  strokeDasharray={circumference}
-                  strokeDashoffset={offset}
-                  className="text-un-blue transition-all duration-1000 ease-out"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xl font-bold text-gray-900">
-                  {percentage}%
+            <div className="flex-1">
+              <h4 className="text-sm font-medium text-gray-600">{label}</h4>
+              <div className="mt-0.5 flex items-baseline gap-2">
+                <span className="text-2xl font-bold text-gray-900">
+                  {value}
+                </span>
+                <span className="text-sm text-gray-500">
+                  {separator === "/"
+                    ? `${separator}${total}`
+                    : `${separator} ${total}`}
                 </span>
               </div>
             </div>
           </div>
+
+          {/* Circular Progress Indicator */}
+          <div className="relative inline-flex items-center justify-center">
+            <svg
+              className="h-20 w-20 -rotate-90 transform"
+              viewBox="0 0 100 100"
+            >
+              {/* Background circle */}
+              <circle
+                cx="50"
+                cy="50"
+                r={radius}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="7"
+                className="text-gray-100"
+              />
+              {/* Progress circle */}
+              <circle
+                cx="50"
+                cy="50"
+                r={radius}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="7"
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={offset}
+                className="text-un-blue transition-all duration-1000 ease-out"
+              />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-xl font-bold text-gray-900">
+                {percentage}%
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

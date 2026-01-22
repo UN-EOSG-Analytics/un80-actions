@@ -87,8 +87,8 @@ export function SidebarChart({
       </div>
 
       {/* Chart Data - Scrollable */}
-      <div 
-        className="overflow-y-auto overscroll-contain pr-1 -mr-1"
+      <div
+        className="-mr-1 overflow-y-auto overscroll-contain pr-1"
         style={{ maxHeight: `${maxHeight}px` }}
       >
         <table className="w-full table-fixed">
@@ -112,15 +112,15 @@ export function SidebarChart({
                   className={`group cursor-pointer transition-all ${
                     isSelected
                       ? isUrgent
-                        ? "bg-red-50/50 hover:bg-red-100/50 border-l-2 border-red-400"
+                        ? "border-l-2 border-red-400 bg-red-50/50 hover:bg-red-100/50"
                         : "bg-un-blue/5 hover:bg-un-blue/10"
                       : isFiltered
                         ? "opacity-30 hover:bg-slate-50"
                         : isUrgent
-                          ? "bg-red-50/30 hover:bg-red-50/50 border-l-2 border-red-300"
+                          ? "border-l-2 border-red-300 bg-red-50/30 hover:bg-red-50/50"
                           : isUpcoming
-                            ? "bg-amber-50/30 hover:bg-amber-50/50 border-l-2 border-amber-300"
-                        : "hover:bg-slate-50"
+                            ? "border-l-2 border-amber-300 bg-amber-50/30 hover:bg-amber-50/50"
+                            : "hover:bg-slate-50"
                   } ${index < data.length - 1 ? "border-b border-slate-200" : ""} ${hasUrgencyIndicator ? "pl-1" : ""}`}
                 >
                   <td className="py-2.5 pr-0">
@@ -131,24 +131,30 @@ export function SidebarChart({
                             <TooltipTrigger asChild>
                               <div className="flex items-center gap-1.5">
                                 {isUrgent && (
-                                  <span className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" aria-label="Urgent" />
+                                  <span
+                                    className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-red-500"
+                                    aria-label="Urgent"
+                                  />
                                 )}
                                 {!isUrgent && isUpcoming && (
-                                  <span className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-label="Upcoming" />
+                                  <span
+                                    className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500"
+                                    aria-label="Upcoming"
+                                  />
                                 )}
-                              <span
-                                  className={`block cursor-help text-[14px] font-medium truncate transition-colors ${
-                                  isSelected
-                                    ? "font-semibold text-un-blue"
+                                <span
+                                  className={`block cursor-help truncate text-[14px] font-medium transition-colors ${
+                                    isSelected
+                                      ? "font-semibold text-un-blue"
                                       : isUrgent
                                         ? "text-red-700 group-hover:text-red-800"
                                         : isUpcoming
                                           ? "text-amber-700 group-hover:text-amber-800"
-                                    : "text-slate-600 group-hover:text-un-blue"
-                                }`}
-                              >
-                                {entry.label}
-                              </span>
+                                          : "text-slate-600 group-hover:text-un-blue"
+                                  }`}
+                                >
+                                  {entry.label}
+                                </span>
                               </div>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -170,24 +176,30 @@ export function SidebarChart({
                         ) : (
                           <div className="flex items-center gap-1.5">
                             {isUrgent && (
-                              <span className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" aria-label="Urgent" />
+                              <span
+                                className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-red-500"
+                                aria-label="Urgent"
+                              />
                             )}
                             {!isUrgent && isUpcoming && (
-                              <span className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-label="Upcoming" />
+                              <span
+                                className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500"
+                                aria-label="Upcoming"
+                              />
                             )}
-                          <span
+                            <span
                               className={`block text-[14px] font-medium transition-colors ${
-                              isSelected
-                                ? "font-semibold text-un-blue"
+                                isSelected
+                                  ? "font-semibold text-un-blue"
                                   : isUrgent
                                     ? "text-red-700 group-hover:text-red-800"
                                     : isUpcoming
                                       ? "text-amber-700 group-hover:text-amber-800"
-                                : "text-slate-600 group-hover:text-un-blue"
-                            }`}
-                          >
-                            {entry.label}
-                          </span>
+                                      : "text-slate-600 group-hover:text-un-blue"
+                              }`}
+                            >
+                              {entry.label}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -200,7 +212,7 @@ export function SidebarChart({
                                 ? "text-red-600"
                                 : isUpcoming
                                   ? "text-amber-600"
-                              : "text-un-blue"
+                                  : "text-un-blue"
                           }`}
                         >
                           {entry.count}

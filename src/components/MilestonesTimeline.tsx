@@ -60,7 +60,9 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
           const milestone = milestoneMap.get(dateKey)!;
           milestone.count++;
           // Use deterministic hash-based distribution instead of Math.random()
-          const actionHash = hash(`${action.action_number}-${action.first_milestone}`);
+          const actionHash = hash(
+            `${action.action_number}-${action.first_milestone}`,
+          );
           if ((actionHash % 100) / 100 < 0.3) {
             milestone.completed++;
           }

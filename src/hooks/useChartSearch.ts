@@ -11,8 +11,10 @@ export function useChartSearch() {
     useState<string>("");
   const [workpackageChartSearchQuery, setWorkpackageChartSearchQuery] =
     useState<string>("");
-  const [upcomingMilestonesChartSearchQuery, setUpcomingMilestonesChartSearchQuery] =
-    useState<string>("");
+  const [
+    upcomingMilestonesChartSearchQuery,
+    setUpcomingMilestonesChartSearchQuery,
+  ] = useState<string>("");
   const [milestonesPerMonthSearchQuery, setMilestonesPerMonthSearchQuery] =
     useState<string>("");
   const [leaderChecklistSearchQuery, setLeaderChecklistSearchQuery] =

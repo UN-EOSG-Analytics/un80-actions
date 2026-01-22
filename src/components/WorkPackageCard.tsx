@@ -22,7 +22,7 @@ function WorkPackageActions({
 }: WorkPackageActionsProps) {
   if (actions.length === 0) {
     return (
-      <div className="rounded-[6px] border border-slate-200 bg-white p-[17px]">
+      <div className="rounded-[6px] border border-slate-200 bg-white p-4.25">
         <p className="text-sm leading-tight font-normal text-slate-900">
           No actions available
         </p>
@@ -64,9 +64,7 @@ export function WorkPackageItem({
 }: WorkPackageItemProps) {
   return (
     <Collapsible open={isOpen} onOpenChange={onToggle}>
-      <div
-        className="group relative mb-20 rounded-[6px] bg-slate-100 transition-colors hover:bg-[#E0F5FF] last:mb-0"
-      >
+      <div className="group relative mb-20 rounded-[6px] bg-slate-100 transition-colors last:mb-0 hover:bg-[#E0F5FF]">
         {isOpen && (
           <div className="pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-1 rounded-l-[6px] bg-un-blue" />
         )}
@@ -85,8 +83,8 @@ export function WorkPackageItem({
                   </span>
                   {/* Progress Bar */}
                   {showProgress && (
-                    <div className="flex min-w-[120px] flex-1 items-center gap-2">
-                      <div className="relative max-w-[200px] flex-1">
+                    <div className="flex min-w-30 flex-1 items-center gap-2">
+                      <div className="relative max-w-50 flex-1">
                         <Progress value={0} className="h-1.5" />
                         <div className="absolute top-0 left-0 h-1.5 w-0.5 rounded-l-full bg-un-blue" />
                       </div>
@@ -111,7 +109,8 @@ export function WorkPackageItem({
           {wp.goal && (
             <div className="mb-4 pr-8 text-left">
               <p className="leading-snug font-medium text-slate-600">
-                <span className="font-semibold text-un-blue">Goal:</span> {formatGoalText(wp.goal)}
+                <span className="font-semibold text-un-blue">Goal:</span>{" "}
+                {formatGoalText(wp.goal)}
               </p>
             </div>
           )}
@@ -125,13 +124,12 @@ export function WorkPackageItem({
             />
 
             {/* Work Package Leads */}
-            <LeadsBadge 
-              leads={wp.leads} 
+            <LeadsBadge
+              leads={wp.leads}
               onSelectLead={onSelectLead}
               showIcon={false}
             />
           </div>
-
         </CollapsibleTrigger>
 
         {/* Divider and Action Count/Header - Always visible when actions exist */}
@@ -139,46 +137,48 @@ export function WorkPackageItem({
           <div className="px-6">
             <div className="w-full border-t border-slate-200" />
             {/* Cross-fade header section - fixed height container */}
-            <div className="relative h-10 flex items-center">
+            <div className="relative flex h-10 items-center">
               {/* Collapsed state: "X Actions" */}
-              <div 
+              <div
                 className={`absolute inset-0 flex items-center gap-2 transition-opacity duration-200 ease-out ${
-                  isOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+                  isOpen ? "pointer-events-none opacity-0" : "opacity-100"
                 }`}
               >
                 <span className="text-sm font-semibold text-slate-500">
-                  {wp.actions.length} {wp.actions.length === 1 ? "Action" : "Actions"}
+                  {wp.actions.length}{" "}
+                  {wp.actions.length === 1 ? "Action" : "Actions"}
                 </span>
                 <div className="flex -space-x-1.5">
                   {Array.from({ length: wp.actions.length }).map((_, i) => (
                     <div
                       key={i}
-                      className="w-4 h-4 rounded-full border-2 border-slate-100 group-hover:border-[#E0F5FF] bg-un-blue transition-colors"
-                      style={{ 
-                        opacity: Math.max(0.3, 1 - (i * 0.08)),
-                        zIndex: wp.actions.length - i 
+                      className="h-4 w-4 rounded-full border-2 border-slate-100 bg-un-blue transition-colors group-hover:border-[#E0F5FF]"
+                      style={{
+                        opacity: Math.max(0.3, 1 - i * 0.08),
+                        zIndex: wp.actions.length - i,
                       }}
                     />
                   ))}
                 </div>
               </div>
               {/* Expanded state: "Indicative Actions" header with count and dots */}
-              <div 
+              <div
                 className={`absolute inset-0 flex items-center gap-2 transition-opacity duration-200 ease-out ${
-                  isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                  isOpen ? "opacity-100" : "pointer-events-none opacity-0"
                 }`}
               >
                 <h3 className="text-left text-lg font-semibold tracking-wider text-slate-700">
-                  {wp.actions.length} Indicative {wp.actions.length === 1 ? "Action" : "Actions"}
+                  {wp.actions.length} Indicative{" "}
+                  {wp.actions.length === 1 ? "Action" : "Actions"}
                 </h3>
                 <div className="flex -space-x-1.5">
                   {Array.from({ length: wp.actions.length }).map((_, i) => (
                     <div
                       key={i}
-                      className="w-4 h-4 rounded-full border-2 border-slate-100 group-hover:border-[#E0F5FF] bg-un-blue transition-colors"
-                      style={{ 
-                        opacity: Math.max(0.3, 1 - (i * 0.08)),
-                        zIndex: wp.actions.length - i 
+                      className="h-4 w-4 rounded-full border-2 border-slate-100 bg-un-blue transition-colors group-hover:border-[#E0F5FF]"
+                      style={{
+                        opacity: Math.max(0.3, 1 - i * 0.08),
+                        zIndex: wp.actions.length - i,
                       }}
                     />
                   ))}

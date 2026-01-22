@@ -9,7 +9,12 @@ import { MilestoneTimeline } from "@/components/MilestoneTimeline";
 import { Badge } from "@/components/ui/badge";
 import { FileText } from "lucide-react";
 import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
-import { parseDate, formatDate, formatDateMonthYear, normalizeTeamMemberForDisplay } from "@/lib/utils";
+import {
+  parseDate,
+  formatDate,
+  formatDateMonthYear,
+  normalizeTeamMemberForDisplay,
+} from "@/lib/utils";
 import { getWorkPackageLeads } from "@/lib/actions";
 import {
   Tooltip,
@@ -178,7 +183,7 @@ export default function ActionModal({
             <Link
               href={`/?ws=${action.report}`}
               onClick={handleClose}
-              className="text-sm leading-5 font-medium tracking-wider text-slate-500 uppercase hover:text-un-blue hover:underline transition-colors"
+              className="text-sm leading-5 font-medium tracking-wider text-slate-500 uppercase transition-colors hover:text-un-blue hover:underline"
             >
               {action.report}
             </Link>
@@ -186,7 +191,7 @@ export default function ActionModal({
             <Link
               href={`/?wp=${action.work_package_number}`}
               onClick={handleClose}
-              className="text-sm leading-5 font-medium tracking-wider text-slate-500 uppercase hover:text-un-blue hover:underline transition-colors"
+              className="text-sm leading-5 font-medium tracking-wider text-slate-500 uppercase transition-colors hover:text-un-blue hover:underline"
             >
               Work Package {action.work_package_number}
             </Link>
@@ -228,14 +233,18 @@ export default function ActionModal({
                   )}
                   {action.action_entities
                     .split(";")
-                    .map((entity) => normalizeTeamMemberForDisplay(entity.trim()))
+                    .map((entity) =>
+                      normalizeTeamMemberForDisplay(entity.trim()),
+                    )
                     .filter((entity) => entity && entity.trim().length > 0)
-                    .filter((entity, index, array) => array.indexOf(entity) === index)
+                    .filter(
+                      (entity, index, array) => array.indexOf(entity) === index,
+                    )
                     .map((entity, index) => (
                       <Badge
                         key={index}
                         variant="outline"
-                        className="border-slate-300 bg-slate-100 text-slate-700 cursor-default text-xs shadow-sm ring-1 ring-inset ring-slate-200/50 hover:bg-slate-200 transition-all duration-150"
+                        className="cursor-default border-slate-300 bg-slate-100 text-xs text-slate-700 shadow-sm ring-1 ring-slate-200/50 transition-all duration-150 ring-inset hover:bg-slate-200"
                       >
                         {entity}
                       </Badge>
@@ -287,9 +296,11 @@ export default function ActionModal({
             <div>
               <FieldLabel>Decision Status</FieldLabel>
               <div className="mt-1">
-                <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 bg-amber-100 text-amber-700">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-amber-700">
                   <Clock className="h-3.5 w-3.5" />
-                  <span className="text-sm font-medium">Further Work Ongoing</span>
+                  <span className="text-sm font-medium">
+                    Further Work Ongoing
+                  </span>
                 </div>
               </div>
             </div>
@@ -297,13 +308,16 @@ export default function ActionModal({
 
           {/* Milestones Section */}
           {(() => {
-            const hasFirstMilestonePassed = action.first_milestone && action.first_milestone_deadline
-              ? (() => {
-                  const deadlineDate = parseDate(action.first_milestone_deadline);
-                  const now = new Date();
-                  return deadlineDate && deadlineDate < now;
-                })()
-              : false;
+            const hasFirstMilestonePassed =
+              action.first_milestone && action.first_milestone_deadline
+                ? (() => {
+                    const deadlineDate = parseDate(
+                      action.first_milestone_deadline,
+                    );
+                    const now = new Date();
+                    return deadlineDate && deadlineDate < now;
+                  })()
+                : false;
             return hasFirstMilestonePassed || action.upcoming_milestone;
           })() && (
             <>
@@ -316,16 +330,20 @@ export default function ActionModal({
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-gray-600">
-                    Steps which will be taken towards the delivery of the proposal concerned. Completed milestones are crossed out.
+                    Steps which will be taken towards the delivery of the
+                    proposal concerned. Completed milestones are crossed out.
                   </p>
                 </TooltipContent>
               </Tooltip>
               <div className="mt-2">
                 <MilestoneTimeline
                   milestones={[
-                    ...(action.first_milestone && action.first_milestone_deadline
+                    ...(action.first_milestone &&
+                    action.first_milestone_deadline
                       ? (() => {
-                          const deadlineDate = parseDate(action.first_milestone_deadline);
+                          const deadlineDate = parseDate(
+                            action.first_milestone_deadline,
+                          );
                           const now = new Date();
                           const hasPassed = deadlineDate && deadlineDate < now;
                           return hasPassed
@@ -381,35 +399,38 @@ export default function ActionModal({
             </h3>
             <div className="space-y-3">
               {/* Document Paragraph Number */}
-              {action.document_paragraph && (() => {
-                const documentData = getDocumentReference({
-                  workPackageNumber: action.work_package_number,
-                  report: action.report,
-                  documentParagraph: action.document_paragraph,
-                });
-                
-                if (documentData) {
-                  const documentUrl = getDocumentUrl(documentData.documentNumber);
-                  return (
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 shrink-0 text-slate-600" />
-                      <a
-                        href={documentUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-mono text-sm leading-tight text-un-blue hover:underline"
-                      >
-                        {documentData.text}
-                      </a>
-                    </div>
-                  );
-                }
-                return null;
-              })()}
-              
+              {action.document_paragraph &&
+                (() => {
+                  const documentData = getDocumentReference({
+                    workPackageNumber: action.work_package_number,
+                    report: action.report,
+                    documentParagraph: action.document_paragraph,
+                  });
+
+                  if (documentData) {
+                    const documentUrl = getDocumentUrl(
+                      documentData.documentNumber,
+                    );
+                    return (
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 shrink-0 text-slate-600" />
+                        <a
+                          href={documentUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-mono text-sm leading-tight text-un-blue hover:underline"
+                        >
+                          {documentData.text}
+                        </a>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+
               {/* Document Text Quote */}
               {action.doc_text && (
-                <div className="border-l-2 border-slate-300 bg-white py-3 pl-4 pr-3">
+                <div className="border-l-2 border-slate-300 bg-white py-3 pr-3 pl-4">
                   <p className="text-sm leading-relaxed text-slate-700">
                     &ldquo;{action.doc_text}&rdquo;
                   </p>
@@ -425,8 +446,10 @@ export default function ActionModal({
             Work Package Reference
           </h3>
           <div className="text-base text-gray-900">
-            <span className="font-medium">Work Package {action.work_package_number}</span>
-            <span className="text-slate-400 mx-2">•</span>
+            <span className="font-medium">
+              Work Package {action.work_package_number}
+            </span>
+            <span className="mx-2 text-slate-400">•</span>
             <span className="text-slate-600">{action.work_package_name}</span>
           </div>
         </div>

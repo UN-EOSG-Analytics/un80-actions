@@ -133,16 +133,16 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
       <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
         <p className="mb-2 font-semibold text-gray-900">{data.workstream}</p>
         {payload.map((entry, index: number) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: {entry.value} (
-              {((entry.value / total) * 100).toFixed(1)}%)
-            </p>
-          ))}
-          <p className="mt-2 border-t border-gray-200 pt-2 text-sm font-medium text-gray-900">
-            Total: {total} actions
+          <p key={index} className="text-sm" style={{ color: entry.color }}>
+            {entry.name}: {entry.value} (
+            {((entry.value / total) * 100).toFixed(1)}%)
           </p>
-        </div>
-      );
-    }
-    return null;
+        ))}
+        <p className="mt-2 border-t border-gray-200 pt-2 text-sm font-medium text-gray-900">
+          Total: {total} actions
+        </p>
+      </div>
+    );
+  }
+  return null;
 }

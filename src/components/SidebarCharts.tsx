@@ -1,5 +1,13 @@
 import React from "react";
-import { Users, Briefcase, Calendar, ChevronDown, ChevronUp, Clock, CheckCircle } from "lucide-react";
+import {
+  Users,
+  Briefcase,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  CheckCircle,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
 import { buildCleanQueryString } from "@/lib/utils";
@@ -134,81 +142,108 @@ export function SidebarCharts({
   const currentYear = now.getFullYear();
   const januaryStart = new Date(currentYear, 0, 1); // January 1st of current year
   const januaryEnd = new Date(currentYear, 0, 31, 23, 59, 59); // January 31st of current year
-  
-  const upcomingMilestonesChartEntries: SidebarChartEntry[] = upcomingMilestonesData
-    .filter((entry) => {
-      // Only show milestones with deadlines in January
-      if (!entry.deadline) return false;
-      const deadlineDate = new Date(entry.deadline);
-      return deadlineDate >= januaryStart && deadlineDate <= januaryEnd;
-    })
-    .map((entry) => {
-      const deadlineDate = entry.deadline ? new Date(entry.deadline) : null;
-      const daysUntilDeadline = deadlineDate
-        ? Math.ceil((deadlineDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-        : null;
-      
-      const isUpcoming = daysUntilDeadline !== null && daysUntilDeadline >= 0 && daysUntilDeadline <= 90;
-      const isUrgent = daysUntilDeadline !== null && daysUntilDeadline >= 0 && daysUntilDeadline <= 30;
-      
-      let deadlineText = "";
-      if (deadlineDate) {
-        const formattedDate = deadlineDate.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        });
-        if (daysUntilDeadline === null || daysUntilDeadline < 0) {
-          deadlineText = `Past: ${formattedDate}`;
-        } else if (daysUntilDeadline === 0) {
-          deadlineText = `Due today: ${formattedDate}`;
-        } else if (daysUntilDeadline === 1) {
-          deadlineText = `Due tomorrow: ${formattedDate}`;
-        } else if (daysUntilDeadline <= 7) {
-          deadlineText = `Due in ${daysUntilDeadline} days: ${formattedDate}`;
-        } else if (daysUntilDeadline <= 30) {
-          deadlineText = `Due in ${Math.ceil(daysUntilDeadline / 7)} weeks: ${formattedDate}`;
-        } else {
-          deadlineText = `Due ${formattedDate}`;
+
+  const upcomingMilestonesChartEntries: SidebarChartEntry[] =
+    upcomingMilestonesData
+      .filter((entry) => {
+        // Only show milestones with deadlines in January
+        if (!entry.deadline) return false;
+        const deadlineDate = new Date(entry.deadline);
+        return deadlineDate >= januaryStart && deadlineDate <= januaryEnd;
+      })
+      .map((entry) => {
+        const deadlineDate = entry.deadline ? new Date(entry.deadline) : null;
+        const daysUntilDeadline = deadlineDate
+          ? Math.ceil(
+              (deadlineDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+            )
+          : null;
+
+        const isUpcoming =
+          daysUntilDeadline !== null &&
+          daysUntilDeadline >= 0 &&
+          daysUntilDeadline <= 90;
+        const isUrgent =
+          daysUntilDeadline !== null &&
+          daysUntilDeadline >= 0 &&
+          daysUntilDeadline <= 30;
+
+        let deadlineText = "";
+        if (deadlineDate) {
+          const formattedDate = deadlineDate.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          });
+          if (daysUntilDeadline === null || daysUntilDeadline < 0) {
+            deadlineText = `Past: ${formattedDate}`;
+          } else if (daysUntilDeadline === 0) {
+            deadlineText = `Due today: ${formattedDate}`;
+          } else if (daysUntilDeadline === 1) {
+            deadlineText = `Due tomorrow: ${formattedDate}`;
+          } else if (daysUntilDeadline <= 7) {
+            deadlineText = `Due in ${daysUntilDeadline} days: ${formattedDate}`;
+          } else if (daysUntilDeadline <= 30) {
+            deadlineText = `Due in ${Math.ceil(daysUntilDeadline / 7)} weeks: ${formattedDate}`;
+          } else {
+            deadlineText = `Due ${formattedDate}`;
+          }
         }
-      }
 
-      return {
-        label: entry.milestone,
-        count: entry.count,
-        value: entry.milestone,
-        tooltip: deadlineText || undefined,
-        deadline: entry.deadline,
-        isUrgent: isUrgent || false,
-        isUpcoming: isUpcoming || false,
-        actionNumber: entry.actionNumber,
-        workPackageNumber: entry.workPackageNumber,
-        workPackageName: entry.workPackageName,
-      };
-    });
-
+        return {
+          label: entry.milestone,
+          count: entry.count,
+          value: entry.milestone,
+          tooltip: deadlineText || undefined,
+          deadline: entry.deadline,
+          isUrgent: isUrgent || false,
+          isUpcoming: isUpcoming || false,
+          actionNumber: entry.actionNumber,
+          workPackageNumber: entry.workPackageNumber,
+          workPackageName: entry.workPackageName,
+        };
+      });
 
   // Calculate milestones per month
-  const monthNames = ["January", "February", "March", "April", "May", "June", 
-                      "July", "August", "September", "October", "November", "December"];
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
   const milestonesPerMonthMap = new Map<number, number>();
-  
+
   upcomingMilestonesData.forEach((entry) => {
     if (entry.deadline) {
       const deadlineDate = new Date(entry.deadline);
       const month = deadlineDate.getMonth();
-      milestonesPerMonthMap.set(month, (milestonesPerMonthMap.get(month) || 0) + entry.count);
+      milestonesPerMonthMap.set(
+        month,
+        (milestonesPerMonthMap.get(month) || 0) + entry.count,
+      );
     }
   });
 
-  const milestonesPerMonthEntries: SidebarChartEntry[] = Array.from(milestonesPerMonthMap.entries())
+  const milestonesPerMonthEntries: SidebarChartEntry[] = Array.from(
+    milestonesPerMonthMap.entries(),
+  )
     .sort((a, b) => a[0] - b[0]) // Sort by month number
     .filter(([, count]) => count > 0) // Only include months with milestones
     .filter(([monthIndex]) => {
       // Filter by search query if provided
       if (!milestonesPerMonthSearchQuery) return true;
       const monthName = monthNames[monthIndex];
-      return monthName?.toLowerCase().includes(milestonesPerMonthSearchQuery.toLowerCase());
+      return monthName
+        ?.toLowerCase()
+        .includes(milestonesPerMonthSearchQuery.toLowerCase());
     })
     .map(([monthIndex, count]) => ({
       label: monthNames[monthIndex],
@@ -227,18 +262,25 @@ export function SidebarCharts({
             </span>
             Action Status
           </h3>
-          
+
           <div className="space-y-3 pr-4">
             {/* Further Work Ongoing */}
             <div className="flex items-center gap-3">
-              <div className="flex h-2.5 w-2.5 shrink-0 rounded-full bg-un-blue animate-pulse" />
-              <div className="flex-1 min-w-0">
+              <div className="flex h-2.5 w-2.5 shrink-0 animate-pulse rounded-full bg-un-blue" />
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-slate-700">Further Work Ongoing</span>
-                  <span className="text-sm font-bold text-un-blue">{totalActions}</span>
+                  <span className="text-sm font-medium text-slate-700">
+                    Further Work Ongoing
+                  </span>
+                  <span className="text-sm font-bold text-un-blue">
+                    {totalActions}
+                  </span>
                 </div>
                 <div className="mt-1.5 h-2 w-full rounded-full bg-slate-200">
-                  <div className="h-full rounded-full bg-un-blue" style={{ width: "100%" }} />
+                  <div
+                    className="h-full rounded-full bg-un-blue"
+                    style={{ width: "100%" }}
+                  />
                 </div>
               </div>
             </div>
@@ -246,13 +288,18 @@ export function SidebarCharts({
             {/* Decision Taken */}
             <div className="flex items-center gap-3">
               <CheckCircle className="h-4 w-4 shrink-0 text-un-blue" />
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-slate-700">Decision Taken</span>
+                  <span className="text-sm font-medium text-slate-700">
+                    Decision Taken
+                  </span>
                   <span className="text-sm font-bold text-un-blue">0</span>
                 </div>
                 <div className="mt-1.5 h-2 w-full rounded-full bg-slate-200">
-                  <div className="h-full rounded-full bg-un-blue" style={{ width: "0%" }} />
+                  <div
+                    className="h-full rounded-full bg-un-blue"
+                    style={{ width: "0%" }}
+                  />
                 </div>
               </div>
             </div>
@@ -272,13 +319,17 @@ export function SidebarCharts({
           </h3>
 
           {/* Milestones List - Scrollable */}
-          <div className="divide-y divide-slate-100 max-h-[360px] overflow-y-auto overscroll-contain pr-1 -mr-1">
+          <div className="-mr-1 max-h-[360px] divide-y divide-slate-100 overflow-y-auto overscroll-contain pr-1">
             {upcomingMilestonesChartEntries.map((entry, index) => {
-              const deadlineDate = entry.deadline ? new Date(entry.deadline) : null;
-              const monthShort = deadlineDate 
-                ? deadlineDate.toLocaleDateString("en-US", { month: "short" }).toUpperCase()
+              const deadlineDate = entry.deadline
+                ? new Date(entry.deadline)
                 : null;
-              
+              const monthShort = deadlineDate
+                ? deadlineDate
+                    .toLocaleDateString("en-US", { month: "short" })
+                    .toUpperCase()
+                : null;
+
               const handleMilestoneClick = () => {
                 if (entry.actionNumber) {
                   // Save current URL to sessionStorage before opening modal
@@ -288,12 +339,14 @@ export function SidebarCharts({
                   } else {
                     sessionStorage.removeItem("previousUrl");
                   }
-                  
+
                   // Build URL with query param: ?action=14 (preserving other params with clean encoding)
                   const params: Record<string, string> = {};
-                  new URLSearchParams(window.location.search).forEach((value, key) => {
-                    params[key] = value;
-                  });
+                  new URLSearchParams(window.location.search).forEach(
+                    (value, key) => {
+                      params[key] = value;
+                    },
+                  );
                   params.action = String(entry.actionNumber);
                   const url = `?${buildCleanQueryString(params)}`;
                   window.history.pushState({}, "", url);
@@ -301,29 +354,33 @@ export function SidebarCharts({
                   window.dispatchEvent(new PopStateEvent("popstate"));
                 }
               };
-              
+
               return (
                 <Tooltip key={index}>
                   <TooltipTrigger asChild>
-                    <div 
+                    <div
                       onClick={handleMilestoneClick}
-                      className="group flex items-start gap-3 py-3 cursor-pointer transition-colors hover:bg-slate-50/50 -mr-1 pr-1 pl-2"
+                      className="group -mr-1 flex cursor-pointer items-start gap-3 py-3 pr-1 pl-2 transition-colors hover:bg-slate-50/50"
                     >
                       {/* Month Badge - Minimal pill style */}
-                      <div className="flex items-center justify-center min-w-[44px] h-[18px] rounded-full bg-un-blue/8 text-un-blue mt-px">
-                        <span className="text-[10px] font-semibold tracking-wide">{monthShort || "—"}</span>
+                      <div className="mt-px flex h-[18px] min-w-[44px] items-center justify-center rounded-full bg-un-blue/8 text-un-blue">
+                        <span className="text-[10px] font-semibold tracking-wide">
+                          {monthShort || "—"}
+                        </span>
                       </div>
-                      
+
                       {/* Milestone Content */}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[13px] leading-snug line-clamp-2 text-slate-700 group-hover:text-slate-900 transition-colors">
+                      <div className="min-w-0 flex-1">
+                        <p className="line-clamp-2 text-[13px] leading-snug text-slate-700 transition-colors group-hover:text-slate-900">
                           {entry.label}
                         </p>
                         {/* Action & Work Package Info */}
                         {(entry.workPackageNumber || entry.actionNumber) && (
-                          <p className="text-[11px] mt-1 text-slate-400">
+                          <p className="mt-1 text-[11px] text-slate-400">
                             {entry.workPackageNumber && (
-                              <span className="font-medium">WP{entry.workPackageNumber}</span>
+                              <span className="font-medium">
+                                WP{entry.workPackageNumber}
+                              </span>
                             )}
                             {entry.workPackageNumber && entry.actionNumber && (
                               <span className="mx-1">·</span>
@@ -339,8 +396,9 @@ export function SidebarCharts({
                   <TooltipContent side="left" className="max-w-[280px]">
                     <p className="text-sm font-medium">{entry.label}</p>
                     {(entry.workPackageNumber || entry.actionNumber) && (
-                      <p className="text-xs text-slate-400 mt-1">
-                        {entry.workPackageNumber && `WP${entry.workPackageNumber}`}
+                      <p className="mt-1 text-xs text-slate-400">
+                        {entry.workPackageNumber &&
+                          `WP${entry.workPackageNumber}`}
                         {entry.workPackageNumber && entry.actionNumber && " · "}
                         {entry.actionNumber && `Action ${entry.actionNumber}`}
                       </p>
@@ -382,7 +440,6 @@ export function SidebarCharts({
         barWidth={105}
         maxHeight={135}
       />
-
     </div>
   );
 }

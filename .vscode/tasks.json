@@ -13,7 +13,7 @@
       "type": "npm",
       "script": "build",
       "label": "npm run build",
-      "detail": "next build && node scripts/encrypt-site.js",
+      "detail": "next build",
       "problemMatcher": []
     },
     {

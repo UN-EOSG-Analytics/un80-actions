@@ -25,7 +25,9 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
     <div className="relative space-y-0">
       {milestones.map((milestone, index) => {
         const isLast = index === milestones.length - 1;
-        const deadlineDate = milestone.deadline ? parseDate(milestone.deadline) : null;
+        const deadlineDate = milestone.deadline
+          ? parseDate(milestone.deadline)
+          : null;
         const isPast = deadlineDate ? deadlineDate < now : false;
         const isReached = milestone.isReached || isPast;
 
@@ -35,8 +37,8 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
             {!isLast && (
               <div
                 className={cn(
-                  "absolute left-[11px] top-8 w-0.5",
-                  isReached ? "bg-un-blue" : "bg-gray-300"
+                  "absolute top-8 left-[11px] w-0.5",
+                  isReached ? "bg-un-blue" : "bg-gray-300",
                 )}
                 style={{ height: "calc(100% + 0.5rem)" }}
               />
@@ -44,10 +46,11 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
             {/* Continuation line for last item - dashed to indicate path continues */}
             {isLast && (
               <div
-                className="absolute left-[10px] top-8 w-1"
-                style={{ 
+                className="absolute top-8 left-[10px] w-1"
+                style={{
                   height: "20px",
-                  backgroundImage: "repeating-linear-gradient(to bottom, #cbd5e1 0px, #cbd5e1 3px, transparent 3px, transparent 6px)"
+                  backgroundImage:
+                    "repeating-linear-gradient(to bottom, #cbd5e1 0px, #cbd5e1 3px, transparent 3px, transparent 6px)",
                 }}
               />
             )}
@@ -68,19 +71,16 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
             {/* Milestone content */}
             <div className="flex-1 pb-6">
               <div
-                className={cn(
-                  "flex flex-col gap-1",
-                  isReached && "opacity-60"
-                )}
+                className={cn("flex flex-col gap-1", isReached && "opacity-60")}
               >
-                  <p
-                    className={cn(
-                      "text-base font-medium text-gray-900",
-                      isReached && "line-through"
-                    )}
-                  >
-                    {milestone.label}
-                  </p>
+                <p
+                  className={cn(
+                    "text-base font-medium text-gray-900",
+                    isReached && "line-through",
+                  )}
+                >
+                  {milestone.label}
+                </p>
                 {deadlineDate && (
                   <p className="text-sm text-gray-600">
                     {formatDateMonthYear(deadlineDate)}
@@ -94,4 +94,3 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
     </div>
   );
 }
-

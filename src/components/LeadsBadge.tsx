@@ -37,8 +37,8 @@ export function LeadsBadge({
 
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      {showIcon && (
-        iconTooltip ? (
+      {showIcon &&
+        (iconTooltip ? (
           <Tooltip>
             <TooltipTrigger asChild>
               <Users
@@ -59,8 +59,7 @@ export function LeadsBadge({
               customColor || (isMuted ? "text-slate-500" : "text-un-blue"),
             )}
           />
-        )
-      )}
+        ))}
       {leads.map((lead, idx) => {
         const longForm = abbreviationMap[lead] || lead;
         return (
@@ -71,8 +70,8 @@ export function LeadsBadge({
                 className={cn(
                   "transition-all duration-150",
                   isMuted
-                    ? "border-slate-200 bg-slate-100 text-slate-700 shadow-sm shadow-slate-200/50 ring-1 ring-inset ring-slate-200/50 hover:bg-slate-150 hover:shadow-md"
-                    : "border-un-blue/20 bg-un-blue text-white shadow-sm shadow-un-blue/25 ring-1 ring-inset ring-white/10 hover:shadow-md hover:shadow-un-blue/30",
+                    ? "hover:bg-slate-150 border-slate-200 bg-slate-100 text-slate-700 shadow-sm ring-1 shadow-slate-200/50 ring-slate-200/50 ring-inset hover:shadow-md"
+                    : "border-un-blue/20 bg-un-blue text-white shadow-sm ring-1 shadow-un-blue/25 ring-white/10 ring-inset hover:shadow-md hover:shadow-un-blue/30",
                   onSelectLead ? "cursor-pointer" : "cursor-help",
                   customColor && `text-[${customColor}]`,
                 )}

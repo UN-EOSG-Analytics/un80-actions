@@ -479,20 +479,24 @@ export function calculateUpcomingMilestonesChartData(
   selectedWorkPackage: string[] = [],
   selectedWorkstream: string[] = [],
 ): UpcomingMilestoneChartEntry[] {
-  const milestoneCounts = new Map<string, { 
-    count: number; 
-    deadline: string | null;
-    actionNumber: number | string | null;
-    workPackageNumber: number | string | null;
-    workPackageName: string | null;
-  }>();
+  const milestoneCounts = new Map<
+    string,
+    {
+      count: number;
+      deadline: string | null;
+      actionNumber: number | string | null;
+      workPackageNumber: number | string | null;
+      workPackageName: string | null;
+    }
+  >();
 
   // Filter actions based on other chart selections
   let filteredActions = actions;
 
   // Only include actions that have upcoming milestones
   filteredActions = filteredActions.filter(
-    (action) => action.upcoming_milestone && action.upcoming_milestone.trim() !== ""
+    (action) =>
+      action.upcoming_milestone && action.upcoming_milestone.trim() !== "",
   );
 
   if (selectedLead.length > 0) {

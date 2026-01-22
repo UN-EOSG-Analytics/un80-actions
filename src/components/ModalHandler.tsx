@@ -18,7 +18,9 @@ export default function ModalHandler() {
   useEffect(() => {
     // Parse action number from query param
     const actionNumber = actionParam ? parseInt(actionParam, 10) : null;
-    const firstMilestone = milestoneParam ? decodeUrlParam(milestoneParam) : null;
+    const firstMilestone = milestoneParam
+      ? decodeUrlParam(milestoneParam)
+      : null;
 
     // If there's no action, clear state
     if (!actionNumber || isNaN(actionNumber)) {
@@ -58,7 +60,7 @@ export default function ModalHandler() {
         params[key] = value;
       }
     });
-    
+
     const queryString = buildCleanQueryString(params);
     const newUrl = queryString ? `?${queryString}` : "/";
     window.history.pushState({}, "", newUrl);

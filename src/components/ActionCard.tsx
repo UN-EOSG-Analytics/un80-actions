@@ -4,7 +4,11 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Clock, CheckCircle } from "lucide-react";
-import { parseDate, buildCleanQueryString, normalizeTeamMemberForDisplay } from "@/lib/utils";
+import {
+  parseDate,
+  buildCleanQueryString,
+  normalizeTeamMemberForDisplay,
+} from "@/lib/utils";
 import type { WorkPackageAction } from "@/types";
 
 /**
@@ -34,9 +38,11 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
         .filter((entity) => entity && entity.trim().length > 0)
         .filter((entity, index, array) => array.indexOf(entity) === index)
     : [];
-  
+
   const hasMoreThanFour = teamMembers.length > 4;
-  const displayedTeamMembers = showAllTeamMembers ? teamMembers : teamMembers.slice(0, 4);
+  const displayedTeamMembers = showAllTeamMembers
+    ? teamMembers
+    : teamMembers.slice(0, 4);
 
   const handleClick = () => {
     // Save current URL to sessionStorage before opening modal
@@ -99,21 +105,25 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
             Action {action.actionNumber || ""}
           </span>
           {action.decisionStatus && (
-            <div className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 ${
-              action.decisionStatus === "decision taken"
-                ? "bg-green-100 text-green-700"
-                : "bg-amber-100 text-amber-700"
-            }`}>
+            <div
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 ${
+                action.decisionStatus === "decision taken"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-amber-100 text-amber-700"
+              }`}
+            >
               {action.decisionStatus === "decision taken" ? (
                 <CheckCircle className="h-3 w-3" />
-        ) : (
+              ) : (
                 <Clock className="h-3 w-3" />
               )}
               <span className="text-xs font-medium">
-                {action.decisionStatus === "decision taken" ? "Decision Taken" : "Further Work Ongoing"}
-            </span>
-          </div>
-        )}
+                {action.decisionStatus === "decision taken"
+                  ? "Decision Taken"
+                  : "Further Work Ongoing"}
+              </span>
+            </div>
+          )}
         </div>
         {/* Action description text */}
         <div className="flex items-start gap-2">
@@ -136,33 +146,31 @@ export function ActionItem({ action, workPackageNumber }: ActionItemProps) {
 
       {/* Metadata section - team members */}
       {teamMembers.length > 0 && (
-        <div className="border-t border-slate-100 pt-3 mt-3">
+        <div className="mt-3 border-t border-slate-100 pt-3">
           <div className="flex flex-wrap items-center gap-1.5">
             {displayedTeamMembers.map((member, index) => (
               <Badge
                 key={index}
                 variant="outline"
-                className="border-slate-300 bg-slate-100 text-slate-700 cursor-default text-xs shadow-sm ring-1 ring-inset ring-slate-200/50 hover:bg-slate-200 transition-all duration-150"
+                className="cursor-default border-slate-300 bg-slate-100 text-xs text-slate-700 shadow-sm ring-1 ring-slate-200/50 transition-all duration-150 ring-inset hover:bg-slate-200"
               >
                 {member}
               </Badge>
             ))}
             {/* Show all/less button */}
-              {hasMoreThanFour && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowAllTeamMembers(!showAllTeamMembers);
-                  }}
-                  className="text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
-                >
-                  {showAllTeamMembers ? (
-                    "show less"
-                  ) : (
-                    `show ${teamMembers.length - 4} more`
-                  )}
-                </button>
-              )}
+            {hasMoreThanFour && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowAllTeamMembers(!showAllTeamMembers);
+                }}
+                className="text-xs font-medium text-slate-500 transition-colors hover:text-slate-700"
+              >
+                {showAllTeamMembers
+                  ? "show less"
+                  : `show ${teamMembers.length - 4} more`}
+              </button>
+            )}
           </div>
         </div>
       )}

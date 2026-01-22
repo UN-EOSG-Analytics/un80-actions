@@ -139,13 +139,13 @@ export async function getWorkPackageLeads(
   workPackageNumber: number | string,
 ): Promise<string[]> {
   const actions = await fetchActions();
-  
+
   const wpActions = actions.filter(
     (action) => action.work_package_number === workPackageNumber,
   );
 
   const allLeads = new Set<string>();
-  
+
   wpActions.forEach((action) => {
     if (action.work_package_leads && Array.isArray(action.work_package_leads)) {
       action.work_package_leads.forEach((lead) => {

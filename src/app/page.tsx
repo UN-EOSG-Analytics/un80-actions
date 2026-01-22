@@ -134,7 +134,7 @@ export function WorkPackagesPageContent() {
   // Auto-expand work package collapsibles when work packages are selected via URL
   useEffect(() => {
     const selectedWpKey = selectedWorkPackage.sort().join(",");
-    
+
     // Skip if we've already processed this selection
     if (selectedWpKey === lastProcessedWorkPackagesRef.current) {
       return;
@@ -142,7 +142,7 @@ export function WorkPackagesPageContent() {
 
     if (selectedWorkPackage.length > 0 && filteredWorkPackages.length > 0) {
       const collapsibleKeysToExpand: string[] = [];
-      
+
       filteredWorkPackages.forEach((wp, index) => {
         // Check if this work package is in the selectedWorkPackage filter
         const wpNumberStr = String(wp.number);
@@ -152,7 +152,7 @@ export function WorkPackagesPageContent() {
           const selectedNumber = match ? match[1] : selected;
           return wpNumberStr === selectedNumber;
         });
-        
+
         if (isSelected) {
           const collapsibleKey = `${wp.report.join("-")}-${wp.number || "empty"}-${index}`;
           // Only add if not already open
@@ -161,23 +161,28 @@ export function WorkPackagesPageContent() {
           }
         }
       });
-      
+
       if (collapsibleKeysToExpand.length > 0) {
         expandCollapsibles(collapsibleKeysToExpand);
       }
-      
+
       // Mark this selection as processed
       lastProcessedWorkPackagesRef.current = selectedWpKey;
     } else if (selectedWorkPackage.length === 0) {
       // Reset when no work packages are selected
       lastProcessedWorkPackagesRef.current = "";
     }
-  }, [selectedWorkPackage, filteredWorkPackages, openCollapsibles, expandCollapsibles]);
+  }, [
+    selectedWorkPackage,
+    filteredWorkPackages,
+    openCollapsibles,
+    expandCollapsibles,
+  ]);
 
   // Auto-expand work package collapsibles when actions are selected
   useEffect(() => {
     const selectedActionKey = selectedAction.sort().join(",");
-    
+
     // Skip if we've already processed this selection
     if (selectedActionKey === lastProcessedActionsRef.current) {
       return;
@@ -185,7 +190,7 @@ export function WorkPackagesPageContent() {
 
     if (selectedAction.length > 0 && filteredWorkPackages.length > 0) {
       const collapsibleKeysToExpand: string[] = [];
-      
+
       filteredWorkPackages.forEach((wp, index) => {
         // Check if this work package contains any of the selected actions
         const hasSelectedAction = wp.actions.some((action) => {
@@ -195,7 +200,7 @@ export function WorkPackagesPageContent() {
             return actionText === selectedTrimmed;
           });
         });
-        
+
         if (hasSelectedAction) {
           const collapsibleKey = `${wp.report.join("-")}-${wp.number || "empty"}-${index}`;
           // Only add if not already open
@@ -204,11 +209,11 @@ export function WorkPackagesPageContent() {
           }
         }
       });
-      
+
       if (collapsibleKeysToExpand.length > 0) {
         expandCollapsibles(collapsibleKeysToExpand);
       }
-      
+
       // Mark this selection as processed
       lastProcessedActionsRef.current = selectedActionKey;
     } else if (selectedAction.length === 0) {
@@ -355,14 +360,20 @@ export function WorkPackagesPageContent() {
                     setShowAllWorkpackages(!showAllWorkpackages)
                   }
                   upcomingMilestonesData={upcomingMilestonesChartData}
-                  upcomingMilestonesSearchQuery={upcomingMilestonesChartSearchQuery}
-                  onUpcomingMilestonesSearchChange={setUpcomingMilestonesChartSearchQuery}
+                  upcomingMilestonesSearchQuery={
+                    upcomingMilestonesChartSearchQuery
+                  }
+                  onUpcomingMilestonesSearchChange={
+                    setUpcomingMilestonesChartSearchQuery
+                  }
                   showAllUpcomingMilestones={showAllUpcomingMilestones}
                   onToggleShowAllUpcomingMilestones={() =>
                     setShowAllUpcomingMilestones(!showAllUpcomingMilestones)
                   }
                   milestonesPerMonthSearchQuery={milestonesPerMonthSearchQuery}
-                  onMilestonesPerMonthSearchChange={setMilestonesPerMonthSearchQuery}
+                  onMilestonesPerMonthSearchChange={
+                    setMilestonesPerMonthSearchQuery
+                  }
                   showAllMilestonesPerMonth={showAllMilestonesPerMonth}
                   onToggleShowAllMilestonesPerMonth={() =>
                     setShowAllMilestonesPerMonth(!showAllMilestonesPerMonth)

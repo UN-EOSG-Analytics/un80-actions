@@ -109,17 +109,17 @@ interface CustomTooltipProps {
 }
 
 function CustomTooltip({ active, payload }: CustomTooltipProps) {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
-          <p className="mb-2 font-semibold text-gray-900">{data.leader}</p>
-          <p className="text-sm text-gray-600">Total Actions: {data.total}</p>
-          <p className="text-sm text-gray-600">
-            Completed: {data.completed} ({data.progress.toFixed(1)}%)
-          </p>
-        </div>
-      );
-    }
-    return null;
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
+        <p className="mb-2 font-semibold text-gray-900">{data.leader}</p>
+        <p className="text-sm text-gray-600">Total Actions: {data.total}</p>
+        <p className="text-sm text-gray-600">
+          Completed: {data.completed} ({data.progress.toFixed(1)}%)
+        </p>
+      </div>
+    );
+  }
+  return null;
 }
