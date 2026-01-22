@@ -2,8 +2,12 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Clock, CheckCircle } from "lucide-react";
+import {
+  ActionLeadsBadge,
+  TeamBadge,
+  DecisionStatusBadge,
+} from "@/components/Badges";
+import { CheckCircle2 } from "lucide-react";
 import {
   parseDate,
   buildCleanQueryString,
@@ -109,26 +113,7 @@ export function ActionItem({ action }: ActionItemProps) {
           <span className="text-sm font-medium tracking-wider text-un-blue uppercase">
             Action {action.actionNumber || ""}
           </span>
-          {action.decisionStatus && (
-            <div
-              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 ${
-                action.decisionStatus === "decision taken"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-amber-100 text-amber-700"
-              }`}
-            >
-              {action.decisionStatus === "decision taken" ? (
-                <CheckCircle className="h-3 w-3" />
-              ) : (
-                <Clock className="h-3 w-3" />
-              )}
-              <span className="text-xs font-medium">
-                {action.decisionStatus === "decision taken"
-                  ? "Decision Taken"
-                  : "Further Work Ongoing"}
-              </span>
-            </div>
-          )}
+          <DecisionStatusBadge status={action.decisionStatus} />
         </div>
         {/* Action description text */}
         <div className="flex items-start gap-2">
@@ -149,31 +134,18 @@ export function ActionItem({ action }: ActionItemProps) {
         </div>
       </div>
 
-      {/* Metadata section - team members */}
-      {teamMembers.length > 0 && (
+      {/* Metadata section - Action Leads and Team Members */}
+      {(action.leads.length > 0 || teamMembers.length > 0) && (
         <div className="mt-3 border-t border-slate-100 pt-3">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {displayedTeamMembers.map((member, index) => {
-              const fullName = abbreviationMap[member] || member;
-              return (
-                <Tooltip key={index}>
-                  <TooltipTrigger asChild>
-                    <Badge
-                      variant="outline"
-                      className="cursor-default border-0 bg-slate-200 text-xs text-slate-700 transition-all duration-150 hover:bg-slate-300"
-                    >
-                      {member}
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <div className="space-y-1">
-                      <p className="text-xs font-semibold text-gray-700">Team Member</p>
-                      <p className="text-sm text-gray-600">{fullName}</p>
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              );
-            })}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Action Leads */}
+            <ActionLeadsBadge leads={action.leads} />
+            {/* Separator */}
+            {action.leads.length > 0 && teamMembers.length > 0 && (
+              <span className="text-slate-300">•</span>
+            )}
+            {/* Team Members */}
+            <TeamBadge leads={displayedTeamMembers} />
             {/* Show all/less button */}
             {hasMoreThanFour && (
               <button

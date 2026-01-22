@@ -5,8 +5,8 @@ import {
 } from "@/components/ui/collapsible";
 import { Progress } from "@/components/ui/progress";
 import { ActionItem } from "@/components/ActionCard";
-import { WorkstreamLabels } from "@/components/WorkstreamBadge";
-import { LeadsBadge } from "@/components/LeadsBadge";
+import { WorkstreamLabels } from "@/components/Badges";
+import { WPLeadsBadge } from "@/components/Badges";
 import { formatGoalText } from "@/lib/utils";
 import type { WorkPackage, WorkPackageAction } from "@/types";
 import { Menu } from "lucide-react";
@@ -107,8 +107,9 @@ export function WorkPackageItem({
 
           {/* Goal from work package data */}
           {wp.goal && (
-            <div className="mb-3 pr-4 text-left sm:mb-4 sm:pr-8">
-              <p className="text-sm leading-snug font-medium text-slate-600 sm:text-base">
+            <div className="mb-3 flex items-stretch gap-2.5 text-left sm:mb-4">
+              <div className="w-1 shrink-0 rounded-full bg-un-blue" />
+              <p className="py-0.5 text-sm leading-snug font-medium text-slate-600 sm:text-base">
                 <span className="font-semibold text-un-blue">Goal:</span>{" "}
                 {formatGoalText(wp.goal)}
               </p>
@@ -124,12 +125,7 @@ export function WorkPackageItem({
             />
 
             {/* Work Package Leads */}
-            <LeadsBadge
-              leads={wp.leads}
-              onSelectLead={onSelectLead}
-              showIcon={false}
-              chipType="Work Package Lead"
-            />
+            <WPLeadsBadge leads={wp.leads} onSelect={onSelectLead} />
           </div>
         </CollapsibleTrigger>
 
@@ -139,14 +135,14 @@ export function WorkPackageItem({
             <div className="w-full border-t border-slate-200" />
             {/* Cross-fade header section - fixed height container */}
             <div className="relative flex h-10 items-center">
-              {/* Collapsed state: "X Actions" */}
+              {/* Collapsed state: "X Indicative Actions" */}
               <div
                 className={`absolute inset-0 flex items-center gap-2 transition-opacity duration-200 ease-out ${
                   isOpen ? "pointer-events-none opacity-0" : "opacity-100"
                 }`}
               >
                 <span className="text-sm font-semibold text-slate-500">
-                  {wp.actions.length}{" "}
+                  {wp.actions.length} Indicative{" "}
                   {wp.actions.length === 1 ? "Action" : "Actions"}
                 </span>
                 <div className="flex -space-x-1.5">

@@ -4,9 +4,13 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { X, Clock, ChevronRight } from "lucide-react";
 import type { Action } from "@/types";
-import { LeadsBadge } from "@/components/LeadsBadge";
+import {
+  WPLeadsBadge,
+  ActionLeadsBadge,
+  TeamBadge,
+  parseLeadsString,
+} from "@/components/Badges";
 import { MilestoneTimeline } from "@/components/MilestoneTimeline";
-import { Badge } from "@/components/ui/badge";
 import { FileText } from "lucide-react";
 import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
 import { parseDate, normalizeTeamMemberForDisplay } from "@/lib/utils";
@@ -171,57 +175,29 @@ export default function ActionModal({
           </h2>
           {/* Action Leads and Team Members - underneath action name */}
           {(action.action_leads || action.action_entities) && (
-            <div className="mt-3 flex flex-wrap items-center gap-1.5">
-              {/* Action Leads - Blue */}
-              {action.action_leads && action.action_leads.trim() && (
-                <LeadsBadge
-                  leads={action.action_leads
-                    .split(";")
-                    .map((lead) => lead.trim())
-                    .filter((lead) => lead.length > 0)}
-                  variant="default"
-                  showIcon={false}
-                  chipType="Action Lead"
-                />
-              )}
-              {/* Team Members - Slate */}
-              {action.action_entities && action.action_entities.trim() && (
-                <>
-                  {action.action_leads && action.action_leads.trim() && (
-                    <span className="text-slate-300">•</span>
-                  )}
-                  {action.action_entities
-                    .split(";")
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {/* Action Leads */}
+              <ActionLeadsBadge leads={parseLeadsString(action.action_leads)} />
+              {/* Team Members */}
+              {action.action_leads &&
+                action.action_leads.trim() &&
+                action.action_entities &&
+                action.action_entities.trim() && (
+                  <span className="text-slate-300">•</span>
+                )}
+              <TeamBadge
+                leads={
+                  action.action_entities
+                    ?.split(";")
                     .map((entity) =>
                       normalizeTeamMemberForDisplay(entity.trim()),
                     )
                     .filter((entity) => entity && entity.trim().length > 0)
                     .filter(
                       (entity, index, array) => array.indexOf(entity) === index,
-                    )
-                    .map((entity, index) => {
-                      const fullName = abbreviationMap[entity] || entity;
-                      return (
-                        <Tooltip key={index}>
-                          <TooltipTrigger asChild>
-                            <Badge
-                              variant="outline"
-                              className="cursor-default border-0 bg-slate-200 text-xs text-slate-700 transition-all duration-150 hover:bg-slate-300"
-                            >
-                              {entity}
-                            </Badge>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <div className="space-y-1">
-                              <p className="text-xs font-semibold text-gray-700">Team Member</p>
-                              <p className="text-sm text-gray-600">{fullName}</p>
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      );
-                    })}
-                </>
-              )}
+                    ) || []
+                }
+              />
             </div>
           )}
         </div>
@@ -440,13 +416,8 @@ export default function ActionModal({
             </div>
             {/* Work Package Leads */}
             {action.work_package_leads && action.work_package_leads.length > 0 && (
-              <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                <LeadsBadge
-                  leads={action.work_package_leads}
-                  variant="default"
-                  showIcon={false}
-                  chipType="Work Package Lead"
-                />
+              <div className="mt-3">
+                <WPLeadsBadge leads={action.work_package_leads} />
               </div>
             )}
           </div>
