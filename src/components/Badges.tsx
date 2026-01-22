@@ -21,9 +21,9 @@ const variantStyles: Record<BadgeVariant, string> = {
   primary:
     "border border-transparent bg-un-blue text-white hover:bg-un-blue/90",
   secondary:
-    "border border-un-blue/30 bg-un-blue/10 text-un-blue hover:bg-un-blue/20",
+    "border border-un-blue/50 bg-un-blue/15 text-un-blue hover:bg-un-blue/25",
   tertiary:
-    "border border-dashed border-slate-300 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:border-slate-400",
+    "border border-un-blue/20 bg-un-blue/5 text-un-blue/70 hover:bg-un-blue/10 hover:border-un-blue/30",
   muted:
     "border border-transparent bg-slate-200 text-slate-700 hover:bg-slate-300",
 };

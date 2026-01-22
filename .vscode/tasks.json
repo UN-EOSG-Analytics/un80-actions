@@ -18,6 +18,14 @@
     },
     {
       "type": "npm",
+      "script": "install",
+      "label": "npm install",
+      "detail": "npm install",
+      "problemMatcher": [],
+      "isBackground": true
+    },
+    {
+      "type": "npm",
       "script": "start",
       "label": "npm run start",
       "detail": "next start",
