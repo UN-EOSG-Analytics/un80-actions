@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { LogIn } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 interface HeaderProps {
@@ -34,7 +35,17 @@ export function Header({ onReset, showLogin = true }: HeaderProps) {
           <div className="flex items-start justify-between gap-4">
             {/* Title Section */}
             <Link href="/" onClick={handleClick} className="group">
-              <div className="flex flex-col lg:flex-row lg:items-baseline lg:gap-x-2">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:gap-x-3">
+                <div className="mb-3 lg:mb-0">
+                  <Image
+                    src="/images/un-logo-stacked-colour-english.svg"
+                    alt="UN Logo"
+                    width={90}
+                    height={90}
+                    priority
+                    className="h-auto w-20 lg:w-[90px]"
+                  />
+                </div>
                 <h1 className="cursor-pointer text-4xl leading-tight tracking-tight text-foreground group-hover:text-un-blue">
                   <span className="leading-none font-bold">
                     UN80 Initiative
