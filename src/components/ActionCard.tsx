@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { ActionLeadsBadge, DecisionStatusBadge } from "@/components/Badges";
+import { DecisionStatusBadge } from "@/components/Badges";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2 } from "lucide-react";
 import {
@@ -101,47 +101,62 @@ export function ActionItem({ action }: ActionItemProps) {
   return (
     <div
       onClick={handleClick}
-      className="cursor-pointer rounded-[6px] border border-slate-200 bg-white p-3 pr-6 transition-all hover:border-slate-300 hover:shadow-md sm:p-5 sm:pr-9"
+      className="group cursor-pointer rounded-lg border border-slate-200 bg-white p-4 transition-all hover:border-un-blue/30 hover:shadow-lg sm:p-5"
     >
-      {/* Action Number and Text */}
-      <div className="mb-4">
-        {/* Action Number and Decision Status */}
-        <div className="mb-2 flex items-center gap-2">
-          <span className="text-sm font-medium tracking-wider text-un-blue uppercase">
-            Action {action.actionNumber || ""}
-          </span>
-          <DecisionStatusBadge status={action.decisionStatus} />
-        </div>
-        {/* Action description text */}
-        <div className="flex items-start gap-2">
-          {isCompleted && (
-            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-un-blue" />
+      {/* Header row: Action Number + Decision Status */}
+      <div className="mb-2.5 flex items-center gap-2.5">
+        <span className="rounded bg-un-blue/8 px-2 py-0.5 text-xs font-semibold tracking-wide text-un-blue uppercase">
+          Action {action.actionNumber || ""}
+        </span>
+        <DecisionStatusBadge status={action.decisionStatus} />
+      </div>
+
+      {/* Action description text - primary focus */}
+      <div className="flex items-start gap-2">
+        {isCompleted && (
+          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-un-blue" />
+        )}
+        <p className="text-[15px] leading-snug font-medium text-slate-900">
+          {action.text}
+          {action.subActionDetails && (
+            <>
+              {" "}
+              <span className="font-semibold text-slate-600">
+                – {action.subActionDetails}
+              </span>
+            </>
           )}
-          <p className="leading-normal font-medium text-slate-900">
-            {action.text}
-            {action.subActionDetails && (
-              <>
-                {" "}
-                <span className="font-bold text-slate-600">
-                  – {action.subActionDetails}
-                </span>
-              </>
-            )}
-          </p>
-        </div>
+        </p>
       </div>
 
       {/* Metadata section - Action Leads and Team Members */}
       {(action.leads.length > 0 || teamMembers.length > 0) && (
         <div className="mt-3 border-t border-slate-100 pt-3">
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Action Leads */}
-            <ActionLeadsBadge leads={action.leads} />
+          <div className="flex flex-wrap items-center gap-1">
+            {/* Action Leads - compact */}
+            {action.leads.map((lead, idx) => {
+              const tooltip = abbreviationMap[lead] || lead;
+              return (
+                <Tooltip key={idx}>
+                  <TooltipTrigger asChild>
+                    <Badge
+                      variant="outline"
+                      className="inline-flex h-5 cursor-help items-center border border-un-blue/40 bg-un-blue/10 px-1.5 text-[11px] font-medium leading-none text-un-blue transition-all duration-150 hover:bg-un-blue/20"
+                    >
+                      {lead}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-sm text-gray-600">{tooltip}</p>
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })}
             {/* Separator */}
             {action.leads.length > 0 && teamMembers.length > 0 && (
               <span className="text-slate-300">•</span>
             )}
-            {/* Team Members - rendered individually for proper flex flow */}
+            {/* Team Members - even more subtle */}
             {displayedTeamMembers.map((member, idx) => {
               const tooltip = abbreviationMap[member] || member;
               return (
@@ -149,7 +164,7 @@ export function ActionItem({ action }: ActionItemProps) {
                   <TooltipTrigger asChild>
                     <Badge
                       variant="outline"
-                      className="cursor-help border border-un-blue/20 bg-un-blue/5 text-un-blue/70 transition-all duration-150 hover:border-un-blue/30 hover:bg-un-blue/10"
+                      className="inline-flex h-5 cursor-help items-center border border-slate-200 bg-slate-50 px-1.5 text-[11px] font-medium leading-none text-slate-500 transition-all duration-150 hover:border-slate-300 hover:bg-slate-100"
                     >
                       {member}
                     </Badge>
@@ -167,7 +182,7 @@ export function ActionItem({ action }: ActionItemProps) {
                   e.stopPropagation();
                   setShowAllTeamMembers(!showAllTeamMembers);
                 }}
-                className="text-xs font-medium text-slate-500 transition-colors hover:text-slate-700"
+                className="inline-flex h-5 items-center justify-center rounded-full border border-dashed border-slate-300 bg-white px-2 text-[11px] font-medium leading-none text-slate-500 transition-all duration-150 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
               >
                 {showAllTeamMembers
                   ? "show less"

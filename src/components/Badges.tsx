@@ -171,7 +171,7 @@ interface DecisionStatusBadgeProps {
 }
 
 /**
- * Decision Status Badge - shows blue styling for both states with different icons
+ * Decision Status Badge - shows amber for "Further Work Ongoing" or green for "Decision Taken"
  */
 export function DecisionStatusBadge({ status }: DecisionStatusBadgeProps) {
   if (!status) return null;
@@ -182,7 +182,9 @@ export function DecisionStatusBadge({ status }: DecisionStatusBadgeProps) {
     <div
       className={cn(
         "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
-        "bg-un-blue/10 text-un-blue",
+        isDecisionTaken
+          ? "bg-green-100 text-green-700"
+          : "bg-amber-100 text-amber-700",
       )}
     >
       {isDecisionTaken ? (
