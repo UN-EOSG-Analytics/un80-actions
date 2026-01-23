@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import "./globals.css";
 import { AnimatedCornerLogo } from "@/components/AnimatedCornerLogo";
 import Footer from "@/components/Footer";
-import { Providers } from "@/components/providers";
+import { Providers } from "@/components/Providers";
 import ModalHandler from "@/components/ModalHandler";
 
 // https://fonts.google.com/specimen/Roboto
