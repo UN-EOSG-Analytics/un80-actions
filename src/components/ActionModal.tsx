@@ -16,7 +16,7 @@ import {
 import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
 import { normalizeTeamMemberForDisplay, parseDate } from "@/lib/utils";
 import type { Action } from "@/types";
-import { ChevronRight, FileText, X } from "lucide-react";
+import { ChevronRight, FileText, HelpCircle, X } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -252,8 +252,8 @@ export default function ActionModal({
         {/* Combined Action Details, Milestones, and Updates Section */}
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           {/* Action Details Header */}
-          <div className="border-b border-slate-200 bg-slate-50 px-5 py-3">
-            <h3 className="text-sm font-semibold tracking-wide text-slate-700 uppercase">
+          <div className="border-b-2 border-l-4 border-slate-300 border-l-slate-500 bg-slate-200 px-5 py-4">
+            <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-800">
               Action Details
             </h3>
           </div>
@@ -261,7 +261,7 @@ export default function ActionModal({
           <div className="p-5">
             {/* Decision Status */}
             <div>
-              <h3 className="mb-1.5 text-sm font-semibold tracking-wide text-slate-700 uppercase">
+              <h3 className="mb-1.5 text-sm font-semibold tracking-wide text-slate-700">
                 Status
               </h3>
               <DecisionStatusBadge status="further work ongoing" />
@@ -283,19 +283,26 @@ export default function ActionModal({
             })() && (
               <>
                 <div className="my-3 border-t border-slate-200"></div>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <h3 className="mb-3 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
-                      Upcoming Milestone
-                    </h3>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-gray-600">
-                      Steps which will be taken towards the delivery of the
-                      proposal concerned. Completed milestones are crossed out.
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
+                <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold tracking-wide text-slate-700">
+                  Upcoming Milestone
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label="What is Upcoming Milestone?"
+                        className="inline-flex size-6 shrink-0 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-700 sm:size-5 sm:text-slate-400 sm:hover:bg-slate-100 sm:hover:text-slate-600"
+                      >
+                        <HelpCircle className="size-4 sm:size-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" align="center">
+                      <p className="text-gray-600">
+                        Steps which will be taken towards the delivery of the
+                        proposal concerned. Completed milestones are crossed out.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </h3>
                 <div className="mt-2">
                   <MilestoneTimeline
                     milestones={[
@@ -336,18 +343,25 @@ export default function ActionModal({
 
             {/* Updates Section */}
             <div className="my-3 border-t border-slate-200"></div>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <h3 className="mb-4 cursor-help text-sm font-semibold tracking-wide text-slate-700 uppercase">
-                  Updates
-                </h3>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-gray-600">
-                  A summary of recent progress on the action.
-                </p>
-              </TooltipContent>
-            </Tooltip>
+            <h3 className="mb-4 flex items-center gap-1.5 text-sm font-semibold tracking-wide text-slate-700">
+              Updates
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="What are Updates?"
+                    className="inline-flex size-6 shrink-0 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-700 sm:size-5 sm:text-slate-400 sm:hover:bg-slate-100 sm:hover:text-slate-600"
+                  >
+                    <HelpCircle className="size-4 sm:size-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top" align="center">
+                  <p className="text-gray-600">
+                    A summary of recent progress on the action.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </h3>
             <div className="text-sm leading-relaxed text-slate-600">
               Updates forthcoming
             </div>
@@ -358,8 +372,8 @@ export default function ActionModal({
         {(action.doc_text || action.document_paragraph) && (
           <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
             {/* Document Reference Header */}
-            <div className="border-b border-slate-200 bg-slate-50 px-5 py-3">
-              <h3 className="text-sm font-semibold tracking-wide text-slate-700 uppercase">
+            <div className="border-b-2 border-l-4 border-slate-300 border-l-slate-500 bg-slate-200 px-5 py-4">
+              <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-800">
                 Document Reference
               </h3>
             </div>
@@ -410,8 +424,8 @@ export default function ActionModal({
         {/* Work Package Reference Section */}
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           {/* Work Package Reference Header */}
-          <div className="border-b border-slate-200 bg-slate-50 px-5 py-3">
-            <h3 className="text-sm font-semibold tracking-wide text-slate-700 uppercase">
+          <div className="border-b-2 border-l-4 border-slate-300 border-l-slate-500 bg-slate-200 px-5 py-4">
+            <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-800">
               Work Package Reference
             </h3>
           </div>

@@ -104,6 +104,13 @@ export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionIt
     window.dispatchEvent(new PopStateEvent("popstate"));
   };
 
+  // On mobile: prevent chip clicks from opening the modal (so tooltips can be used)
+  const stopPropagationOnMobile = (e: React.MouseEvent) => {
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 640px)").matches) {
+      e.stopPropagation();
+    }
+  };
+
   // Calculate progress to determine if action is completed
   // Icon only appears when progress reaches 100% based on elapsed time calculation
   const isCompleted = (() => {
@@ -139,7 +146,9 @@ export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionIt
         <span className="rounded bg-un-blue/8 px-2 py-0.5 text-xs font-semibold tracking-wide text-un-blue uppercase">
           Action {action.actionNumber || ""}
         </span>
-        <DecisionStatusBadge status={action.decisionStatus} size="sm" />
+        <span onClick={stopPropagationOnMobile} className="inline-flex">
+          <DecisionStatusBadge status={action.decisionStatus} size="sm" />
+        </span>
       </div>
 
       {/* Action description text - primary focus */}
@@ -163,7 +172,7 @@ export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionIt
       {/* Metadata section - Action Leads and Team Members */}
       {(action.leads.length > 0 || teamMembers.length > 0) && (
         <div className="mt-3 border-t border-slate-100 pt-3">
-          <div className="flex flex-wrap items-center gap-1">
+          <div className="flex flex-wrap items-center gap-1" onClick={stopPropagationOnMobile}>
             {/* Action Leads - uses centralized sorting */}
             <ActionLeadsBadge leads={action.leads} inline />
             {/* Separator */}
