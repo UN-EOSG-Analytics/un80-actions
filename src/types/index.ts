@@ -53,18 +53,6 @@ export interface Action {
   /** Whether this is a subaction (not displayed on dashboard) */
   is_subaction?: boolean;
 
-  /** Whether Member State approval is required */
-  ms_approval: boolean;
-
-  /** Member State body abbreviation (e.g., "GA", "SC", "ECOSOC") or null */
-  ms_body: string[];
-
-  /** Legal considerations and requirements or null */
-  legal_consideration: string | null;
-
-  /** Array of UN budget information */
-  un_budget: string[];
-
   /** Work package goal description or null */
   work_package_goal: string | null;
 
@@ -229,15 +217,7 @@ export interface ChartSearchState {
   workstreamChartSearchQuery: string;
   workpackageChartSearchQuery: string;
   upcomingMilestonesChartSearchQuery: string;
+  milestonesPerMonthSearchQuery: string;
+  leaderChecklistSearchQuery: string;
 }
 
-/**
- * Collapsible visibility state
- */
-export interface CollapsibleState {
-  showAllLeads: boolean;
-  showAllWorkstreams: boolean;
-  showAllWorkpackages: boolean;
-  showAllUpcomingMilestones: boolean;
-  isAdvancedFilterOpen: boolean;
-}

@@ -25,6 +25,8 @@ export function useChartSearch() {
     workstreamChartSearchQuery,
     workpackageChartSearchQuery,
     upcomingMilestonesChartSearchQuery,
+    milestonesPerMonthSearchQuery,
+    leaderChecklistSearchQuery,
   };
 
   return {

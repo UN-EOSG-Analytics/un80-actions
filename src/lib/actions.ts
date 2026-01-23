@@ -81,26 +81,6 @@ export function countByBigTicket(actions: Actions): {
 }
 
 /**
- * Count actions by MS approval requirement
- * @param actions - Array of actions
- * @returns Object with counts
- */
-export function countByMSApproval(actions: Actions): {
-  requiresApproval: number;
-  noApproval: number;
-  total: number;
-} {
-  const requiresApproval = actions.filter((a) => a.ms_approval === true).length;
-  const noApproval = actions.filter((a) => a.ms_approval === false).length;
-
-  return {
-    requiresApproval,
-    noApproval,
-    total: actions.length,
-  };
-}
-
-/**
  * Get action by action number
  * @param actionNumber - The unique action number to search for
  * @param firstMilestone - Optional first milestone to distinguish subactions with the same action number
