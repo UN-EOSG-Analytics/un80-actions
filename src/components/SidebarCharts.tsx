@@ -1,5 +1,5 @@
 import React from "react";
-import { Users, Calendar, Clock, CheckCircle, Layers } from "lucide-react";
+import { Users, Calendar, Clock, CircleCheck, Layers, Activity } from "lucide-react";
 import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
 import { buildCleanQueryString } from "@/lib/utils";
 import {
@@ -210,7 +210,7 @@ export function SidebarCharts({
         <div className="rounded-xl bg-white pb-4 pl-4.5 sm:pb-5">
           <h3 className="mb-3 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
             <span className="flex h-5 w-5 items-center justify-center text-un-blue">
-              <Clock className="h-5 w-5" />
+              <Activity className="h-5 w-5" />
             </span>
             Action Status
           </h3>
@@ -218,7 +218,7 @@ export function SidebarCharts({
           <div className="space-y-3 pr-4">
             {/* Further Work Ongoing */}
             <div className="flex items-center gap-3">
-              <div className="flex h-2.5 w-2.5 shrink-0 animate-pulse rounded-full bg-un-blue" />
+              <Clock className="h-4 w-4 shrink-0 text-un-blue" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-slate-700">
@@ -239,7 +239,7 @@ export function SidebarCharts({
 
             {/* Decision Taken */}
             <div className="flex items-center gap-3">
-              <CheckCircle className="h-4 w-4 shrink-0 text-un-blue" />
+              <CircleCheck className="h-4 w-4 shrink-0 text-un-blue" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-slate-700">

@@ -6,7 +6,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { abbreviationMap } from "@/constants/abbreviations";
 import { cn } from "@/lib/utils";
-import { CheckCircle, Clock } from "lucide-react";
+import { CircleCheck, Clock } from "lucide-react";
 
 /**
  * Badge variants (visual hierarchy):
@@ -171,7 +171,7 @@ interface DecisionStatusBadgeProps {
 }
 
 /**
- * Decision Status Badge - shows amber for "Further Work Ongoing" or green for "Decision Taken"
+ * Decision Status Badge - shows blue styling for both states with different icons
  */
 export function DecisionStatusBadge({ status }: DecisionStatusBadgeProps) {
   if (!status) return null;
@@ -182,13 +182,11 @@ export function DecisionStatusBadge({ status }: DecisionStatusBadgeProps) {
     <div
       className={cn(
         "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
-        isDecisionTaken
-          ? "bg-green-100 text-green-700"
-          : "bg-amber-100 text-amber-700",
+        "bg-un-blue/10 text-un-blue",
       )}
     >
       {isDecisionTaken ? (
-        <CheckCircle className="h-3 w-3" />
+        <CircleCheck className="h-3 w-3" />
       ) : (
         <Clock className="h-3 w-3" />
       )}
