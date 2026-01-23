@@ -1,5 +1,12 @@
 import React from "react";
-import { Users, Calendar, Clock, SquareCheckBig, Layers, Activity } from "lucide-react";
+import {
+  Users,
+  Calendar,
+  Clock,
+  SquareCheckBig,
+  Layers,
+  Activity,
+} from "lucide-react";
 import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
 import { buildCleanQueryString } from "@/lib/utils";
 import {
@@ -76,12 +83,10 @@ export function SidebarCharts({
   // Calculate status counts based on action_status field
   // For now this is 100% "Further Work Ongoing" as dummy data
   const decisionTakenCount = actions.filter(
-    (action) => action.action_status === "Decision Taken"
+    (action) => action.action_status === "Decision Taken",
   ).length;
-  const furtherWorkCount = actions.filter(
-    (action) => action.action_status === "Further Work Ongoing"
-  ).length;
-  const totalActions = actions.length;
+  const furtherWorkCount = 86; // Hardcoded for now
+  const totalActions = 86; // Hardcoded for now
 
   const leadsChartEntries: SidebarChartEntry[] = leadsData.map((entry) => ({
     label: entry.lead,
@@ -238,14 +243,19 @@ export function SidebarCharts({
                     Further Work Ongoing
                   </span>
                 </div>
-                <span className="shrink-0 text-[14px] font-semibold tabular-nums text-un-blue">
+                <span className="shrink-0 text-[14px] font-semibold text-un-blue tabular-nums">
                   {furtherWorkCount}
                 </span>
               </div>
               <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
                 <div
                   className="h-full rounded-full bg-un-blue/50 transition-all"
-                  style={{ width: totalActions > 0 ? `${(furtherWorkCount / totalActions) * 100}%` : "0%" }}
+                  style={{
+                    width:
+                      totalActions > 0
+                        ? `${(furtherWorkCount / totalActions) * 100}%`
+                        : "0%",
+                  }}
                 />
               </div>
             </div>
@@ -259,14 +269,19 @@ export function SidebarCharts({
                     Decision Taken
                   </span>
                 </div>
-                <span className="shrink-0 text-[14px] font-semibold tabular-nums text-un-blue">
+                <span className="shrink-0 text-[14px] font-semibold text-un-blue tabular-nums">
                   {decisionTakenCount}
                 </span>
               </div>
               <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
                 <div
                   className="h-full rounded-full bg-un-blue/50 transition-all"
-                  style={{ width: totalActions > 0 ? `${(decisionTakenCount / totalActions) * 100}%` : "0%" }}
+                  style={{
+                    width:
+                      totalActions > 0
+                        ? `${(decisionTakenCount / totalActions) * 100}%`
+                        : "0%",
+                  }}
                 />
               </div>
             </div>
