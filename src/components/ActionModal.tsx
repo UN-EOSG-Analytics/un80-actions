@@ -1,25 +1,23 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import Link from "next/link";
-import { X, Clock, ChevronRight } from "lucide-react";
-import type { Action } from "@/types";
 import {
-  WPLeadsBadge,
-  ActionLeadsBadge,
-  TeamBadge,
-  parseLeadsString,
+    ActionLeadsBadge,
+    TeamBadge,
+    WPLeadsBadge,
+    parseLeadsString,
 } from "@/components/Badges";
 import { MilestoneTimeline } from "@/components/MilestoneTimeline";
-import { FileText } from "lucide-react";
-import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
-import { parseDate, normalizeTeamMemberForDisplay } from "@/lib/utils";
-import { abbreviationMap } from "@/constants/abbreviations";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
+import { normalizeTeamMemberForDisplay, parseDate } from "@/lib/utils";
+import type { Action } from "@/types";
+import { ChevronRight, Clock, FileText, X } from "lucide-react";
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface ActionModalProps {
   action: Action | null;
@@ -34,6 +32,7 @@ export default function ActionModal({
 }: ActionModalProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [copied, setCopied] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
@@ -155,12 +154,28 @@ export default function ActionModal({
               onClick={handleClose}
               className="text-[10px] leading-4 font-medium tracking-wide text-slate-500 uppercase transition-colors hover:text-un-blue hover:underline sm:text-xs sm:leading-5 md:text-sm md:tracking-wider"
             >
-              WP {action.work_package_number}
+              WORK PACKAGE {action.work_package_number}
             </Link>
             <ChevronRight className="h-2.5 w-2.5 shrink-0 text-slate-400 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5" />
-            <span className="text-[10px] leading-4 font-medium tracking-wide text-un-blue uppercase sm:text-xs sm:leading-5 md:text-sm md:tracking-wider">
-              Action {action.action_number}
-            </span>
+            <Tooltip open={copied ? true : undefined}>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const url = `${window.location.origin}${window.location.pathname}?action=${action.action_number}`;
+                    navigator.clipboard.writeText(url);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="cursor-pointer text-[10px] leading-4 font-medium tracking-wide text-un-blue uppercase transition-all hover:underline sm:text-xs sm:leading-5 md:text-sm md:tracking-wider"
+                >
+                  Action {action.action_number}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-sm text-gray-600">{copied ? "Copied!" : "Click to copy link"}</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
           <h2 className="text-base leading-tight font-semibold text-gray-900 sm:text-lg md:text-xl">
             {action.indicative_activity}
@@ -175,17 +190,22 @@ export default function ActionModal({
           </h2>
           {/* Action Leads and Team Members - underneath action name */}
           {(action.action_leads || action.action_entities) && (
-            <div className="mt-3 flex flex-wrap items-center gap-2">
+            <div className="mt-3 flex flex-wrap items-center gap-1">
               {/* Action Leads */}
-              <ActionLeadsBadge leads={parseLeadsString(action.action_leads)} />
-              {/* Team Members */}
+              <ActionLeadsBadge
+                leads={parseLeadsString(action.action_leads)}
+                inline
+              />
+              {/* Separator */}
               {action.action_leads &&
                 action.action_leads.trim() &&
                 action.action_entities &&
                 action.action_entities.trim() && (
                   <span className="text-slate-300">•</span>
                 )}
+              {/* Team Members */}
               <TeamBadge
+                inline
                 leads={
                   action.action_entities
                     ?.split(";")
@@ -239,7 +259,7 @@ export default function ActionModal({
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           {/* Action Details Header */}
           <div className="border-b border-slate-200 bg-slate-50 px-5 py-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
+            <h3 className="text-sm font-semibold tracking-wide text-slate-700 uppercase">
               Action Details
             </h3>
           </div>
@@ -247,7 +267,7 @@ export default function ActionModal({
           <div className="p-5">
             {/* Decision Status */}
             <div>
-              <FieldLabel>Decision Status</FieldLabel>
+              <FieldLabel>Action Status</FieldLabel>
               <div className="mt-1">
                 <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-amber-700">
                   <Clock className="h-3.5 w-3.5" />
@@ -297,7 +317,8 @@ export default function ActionModal({
                               action.first_milestone_deadline,
                             );
                             const now = new Date();
-                            const hasPassed = deadlineDate && deadlineDate < now;
+                            const hasPassed =
+                              deadlineDate && deadlineDate < now;
                             return hasPassed
                               ? [
                                   {
@@ -349,12 +370,12 @@ export default function ActionModal({
           <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
             {/* Document Reference Header */}
             <div className="border-b border-slate-200 bg-slate-50 px-5 py-3">
-              <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
+              <h3 className="text-sm font-semibold tracking-wide text-slate-700 uppercase">
                 Document Reference
               </h3>
             </div>
             {/* Document Reference Content */}
-            <div className="p-5 space-y-3">
+            <div className="space-y-3 p-5">
               {/* Document Paragraph Number */}
               {action.document_paragraph &&
                 (() => {
@@ -401,7 +422,7 @@ export default function ActionModal({
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           {/* Work Package Reference Header */}
           <div className="border-b border-slate-200 bg-slate-50 px-5 py-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
+            <h3 className="text-sm font-semibold tracking-wide text-slate-700 uppercase">
               Work Package Reference
             </h3>
           </div>
@@ -415,11 +436,12 @@ export default function ActionModal({
               <span className="text-slate-600">{action.work_package_name}</span>
             </div>
             {/* Work Package Leads */}
-            {action.work_package_leads && action.work_package_leads.length > 0 && (
-              <div className="mt-3">
-                <WPLeadsBadge leads={action.work_package_leads} />
-              </div>
-            )}
+            {action.work_package_leads &&
+              action.work_package_leads.length > 0 && (
+                <div className="mt-3">
+                  <WPLeadsBadge leads={action.work_package_leads} />
+                </div>
+              )}
           </div>
         </div>
 
@@ -494,7 +516,9 @@ export default function ActionModal({
           </div>
 
           {/* Body */}
-          <div className="flex-1 px-4 pb-6 sm:px-6 sm:pb-8 md:px-8">{renderBody()}</div>
+          <div className="flex-1 px-4 pb-6 sm:px-6 sm:pb-8 md:px-8">
+            {renderBody()}
+          </div>
         </div>
       </div>
     </div>

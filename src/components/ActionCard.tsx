@@ -2,21 +2,17 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { DecisionStatusBadge } from "@/components/Badges";
-import { Badge } from "@/components/ui/badge";
+import {
+  ActionLeadsBadge,
+  DecisionStatusBadge,
+  TeamBadge,
+} from "@/components/Badges";
 import { CheckCircle2 } from "lucide-react";
 import {
   parseDate,
   buildCleanQueryString,
   normalizeTeamMemberForDisplay,
-  naturalSort,
 } from "@/lib/utils";
-import { abbreviationMap } from "@/constants/abbreviations";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import type { WorkPackageAction } from "@/types";
 
 /**
@@ -37,19 +33,14 @@ export function ActionItem({ action }: ActionItemProps) {
   const searchParams = useSearchParams();
   const [showAllTeamMembers, setShowAllTeamMembers] = useState(false);
 
-  // Parse team members from actionEntities and sort alphabetically
-  const teamMembers = naturalSort(
-    action.actionEntities
-      ? action.actionEntities
-          .split(";")
-          .map((entity) => normalizeTeamMemberForDisplay(entity.trim()))
-          .filter((entity) => entity && entity.trim().length > 0)
-          .filter((entity, index, array) => array.indexOf(entity) === index)
-      : [],
-  );
-
-  // Sort action leads alphabetically
-  const sortedLeads = naturalSort(action.leads);
+  // Parse team members from actionEntities (sorting handled by TeamBadge)
+  const teamMembers = action.actionEntities
+    ? action.actionEntities
+        .split(";")
+        .map((entity) => normalizeTeamMemberForDisplay(entity.trim()))
+        .filter((entity) => entity && entity.trim().length > 0)
+        .filter((entity, index, array) => array.indexOf(entity) === index)
+    : [];
 
   const hasMoreThanFour = teamMembers.length > 4;
   const displayedTeamMembers = showAllTeamMembers
@@ -136,51 +127,17 @@ export function ActionItem({ action }: ActionItemProps) {
       </div>
 
       {/* Metadata section - Action Leads and Team Members */}
-      {(sortedLeads.length > 0 || teamMembers.length > 0) && (
+      {(action.leads.length > 0 || teamMembers.length > 0) && (
         <div className="mt-3 border-t border-slate-100 pt-3">
           <div className="flex flex-wrap items-center gap-1">
-            {/* Action Leads - compact */}
-            {sortedLeads.map((lead, idx) => {
-              const tooltip = abbreviationMap[lead] || lead;
-              return (
-                <Tooltip key={idx}>
-                  <TooltipTrigger asChild>
-                    <Badge
-                      variant="outline"
-                      className="inline-flex h-5 cursor-help items-center border border-un-blue/40 bg-un-blue/10 px-1.5 text-[11px] font-medium leading-none text-un-blue transition-all duration-150 hover:bg-un-blue/20"
-                    >
-                      {lead}
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-sm text-gray-600">{tooltip}</p>
-                  </TooltipContent>
-                </Tooltip>
-              );
-            })}
+            {/* Action Leads - uses centralized sorting */}
+            <ActionLeadsBadge leads={action.leads} inline />
             {/* Separator */}
-            {sortedLeads.length > 0 && teamMembers.length > 0 && (
+            {action.leads.length > 0 && teamMembers.length > 0 && (
               <span className="text-slate-300">•</span>
             )}
-            {/* Team Members - even more subtle */}
-            {displayedTeamMembers.map((member, idx) => {
-              const tooltip = abbreviationMap[member] || member;
-              return (
-                <Tooltip key={idx}>
-                  <TooltipTrigger asChild>
-                    <Badge
-                      variant="outline"
-                      className="inline-flex h-5 cursor-help items-center border border-slate-200 bg-slate-50 px-1.5 text-[11px] font-medium leading-none text-slate-500 transition-all duration-150 hover:border-slate-300 hover:bg-slate-100"
-                    >
-                      {member}
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-sm text-gray-600">{tooltip}</p>
-                  </TooltipContent>
-                </Tooltip>
-              );
-            })}
+            {/* Team Members - uses centralized sorting */}
+            <TeamBadge leads={displayedTeamMembers} inline />
             {/* Show all/less button - inline with badges */}
             {hasMoreThanFour && (
               <button

@@ -38,6 +38,8 @@ interface LabelBadgeProps {
   onSelect?: (item: string[]) => void;
   tooltips?: Record<string, string>;
   className?: string;
+  /** When true, returns badges without a wrapper div (for inline flow) */
+  inline?: boolean;
 }
 
 export function LabelBadge({
@@ -46,41 +48,49 @@ export function LabelBadge({
   onSelect,
   tooltips,
   className,
+  inline = false,
 }: LabelBadgeProps) {
   if (items.length === 0) return null;
 
   const sortedItems = naturalSort(items);
 
+  const badges = sortedItems.map((item, idx) => {
+    const tooltip = tooltips?.[item] || abbreviationMap[item] || item;
+    return (
+      <Tooltip key={idx}>
+        <TooltipTrigger asChild>
+          <Badge
+            variant="outline"
+            className={cn(
+              "transition-all duration-150",
+              variantStyles[variant],
+              onSelect ? "cursor-pointer" : "cursor-help",
+            )}
+            onClick={(e) => {
+              if (onSelect) {
+                e.stopPropagation();
+                onSelect([item]);
+              }
+            }}
+          >
+            {item}
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p className="text-sm text-gray-600">{tooltip}</p>
+        </TooltipContent>
+      </Tooltip>
+    );
+  });
+
+  // Return badges without wrapper for inline flow
+  if (inline) {
+    return <>{badges}</>;
+  }
+
   return (
     <div className={cn("flex flex-wrap items-center gap-1", className)}>
-      {sortedItems.map((item, idx) => {
-        const tooltip = tooltips?.[item] || abbreviationMap[item] || item;
-        return (
-          <Tooltip key={idx}>
-            <TooltipTrigger asChild>
-              <Badge
-                variant="outline"
-                className={cn(
-                  "transition-all duration-150",
-                  variantStyles[variant],
-                  onSelect ? "cursor-pointer" : "cursor-help",
-                )}
-                onClick={(e) => {
-                  if (onSelect) {
-                    e.stopPropagation();
-                    onSelect([item]);
-                  }
-                }}
-              >
-                {item}
-              </Badge>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="text-sm text-gray-600">{tooltip}</p>
-            </TooltipContent>
-          </Tooltip>
-        );
-      })}
+      {badges}
     </div>
   );
 }
@@ -92,21 +102,23 @@ export function LabelBadge({
 interface LeadBadgeProps {
   leads: string[];
   onSelect?: (lead: string[]) => void;
+  /** When true, returns badges without a wrapper div (for inline flow) */
+  inline?: boolean;
 }
 
 /** Work Package Leads - primary (solid blue) */
-export function WPLeadsBadge({ leads, onSelect }: LeadBadgeProps) {
-  return <LabelBadge items={leads} variant="primary" onSelect={onSelect} />;
+export function WPLeadsBadge({ leads, onSelect, inline }: LeadBadgeProps) {
+  return <LabelBadge items={leads} variant="primary" onSelect={onSelect} inline={inline} />;
 }
 
 /** Action Leads - secondary (outlined blue) */
-export function ActionLeadsBadge({ leads, onSelect }: LeadBadgeProps) {
-  return <LabelBadge items={leads} variant="secondary" onSelect={onSelect} />;
+export function ActionLeadsBadge({ leads, onSelect, inline }: LeadBadgeProps) {
+  return <LabelBadge items={leads} variant="secondary" onSelect={onSelect} inline={inline} />;
 }
 
 /** Team Members - tertiary (dashed, subtle) */
-export function TeamBadge({ leads, onSelect }: LeadBadgeProps) {
-  return <LabelBadge items={leads} variant="tertiary" onSelect={onSelect} />;
+export function TeamBadge({ leads, onSelect, inline }: LeadBadgeProps) {
+  return <LabelBadge items={leads} variant="tertiary" onSelect={onSelect} inline={inline} />;
 }
 
 /** Workstream Labels - muted (slate fill) */
