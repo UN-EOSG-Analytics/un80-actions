@@ -204,10 +204,10 @@ export function SidebarCharts({
     }));
 
   return (
-    <div className="flex w-full min-w-0 shrink-0 flex-col gap-3 lg:w-[320px] lg:max-w-[320px] lg:border-l lg:border-slate-200 lg:pl-6">
+    <div className="flex w-full min-w-0 shrink-0 flex-col divide-y divide-slate-200 lg:w-[320px] lg:max-w-[320px] lg:border-l lg:pl-6">
       {/* Action Status Chart */}
       {totalActions > 0 && (
-        <div className="rounded-xl bg-white pb-4 pl-4.5 sm:pb-5">
+        <div className="py-5 pl-4.5 first:pt-0">
           <h3 className="mb-3 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
             <span className="flex h-5 w-5 items-center justify-center text-un-blue">
               <Activity className="h-5 w-5" />
@@ -261,7 +261,7 @@ export function SidebarCharts({
 
       {/* Upcoming Milestones */}
       {upcomingMilestonesChartEntries.length > 0 && (
-        <div className="pb-2 pl-4.5">
+        <div className="py-5 pl-4.5">
           {/* Header */}
           <h3 className="mb-3 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
             <span className="flex h-5 w-5 items-center justify-center text-un-blue">
@@ -331,7 +331,7 @@ export function SidebarCharts({
                           <p className="mt-1 text-[11px] text-slate-400">
                             {entry.workPackageNumber && (
                               <span className="font-medium">
-                                WP{entry.workPackageNumber}
+                                Work Package {entry.workPackageNumber}
                               </span>
                             )}
                             {entry.workPackageNumber && entry.actionNumber && (
@@ -350,7 +350,7 @@ export function SidebarCharts({
                     {(entry.workPackageNumber || entry.actionNumber) && (
                       <p className="mt-1 text-xs text-slate-400">
                         {entry.workPackageNumber &&
-                          `WP${entry.workPackageNumber}`}
+                          `Work Package ${entry.workPackageNumber}`}
                         {entry.workPackageNumber && entry.actionNumber && " · "}
                         {entry.actionNumber && `Action ${entry.actionNumber}`}
                       </p>
@@ -365,41 +365,47 @@ export function SidebarCharts({
 
       {/* Milestones by Month */}
       {milestonesPerMonthEntries.length > 0 && (
-        <SidebarChart
-          title="Milestones by Month"
-          description="Number of milestones by month"
-          icon={<Calendar />}
-          data={milestonesPerMonthEntries}
-          selectedValue={[]}
-          onSelectValue={() => {}}
-          barWidth={105}
-        />
+        <div className="py-5">
+          <SidebarChart
+            title="Milestones by Month"
+            description="Number of milestones by month"
+            icon={<Calendar />}
+            data={milestonesPerMonthEntries}
+            selectedValue={[]}
+            onSelectValue={() => {}}
+            barWidth={105}
+          />
+        </div>
       )}
 
-      <SidebarChart
-        title="Work Packages per Leader"
-        description="Number of packages by leader"
-        icon={<Users />}
-        data={leadsChartEntries}
-        searchQuery={leadsSearchQuery}
-        onSearchChange={onLeadsSearchChange}
-        searchPlaceholder="Search principals"
-        selectedValue={selectedLead}
-        onSelectValue={onSelectLead}
-        barWidth={105}
-        maxHeight={145}
-      />
+      <div className="py-5">
+        <SidebarChart
+          title="Work Packages per Leader"
+          description="Number of packages by leader"
+          icon={<Users />}
+          data={leadsChartEntries}
+          searchQuery={leadsSearchQuery}
+          onSearchChange={onLeadsSearchChange}
+          searchPlaceholder="Search principals"
+          selectedValue={selectedLead}
+          onSelectValue={onSelectLead}
+          barWidth={105}
+          maxHeight={145}
+        />
+      </div>
 
       {/* Actions per Workstream */}
-      <SidebarChart
-        title="Actions per Workstream"
-        description="Number of actions by workstream"
-        icon={<Layers />}
-        data={workstreamsChartEntries}
-        selectedValue={selectedWorkstream}
-        onSelectValue={onSelectWorkstream}
-        barWidth={105}
-      />
+      <div className="py-5 last:pb-0">
+        <SidebarChart
+          title="Actions per Workstream"
+          description="Number of actions by workstream"
+          icon={<Layers />}
+          data={workstreamsChartEntries}
+          selectedValue={selectedWorkstream}
+          onSelectValue={onSelectWorkstream}
+          barWidth={105}
+        />
+      </div>
     </div>
   );
 }
