@@ -38,6 +38,7 @@ export default function ActionModal({
   const modalRef = useRef<HTMLDivElement>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [showAllChips, setShowAllChips] = useState(false);
 
   const setModalRef = useCallback((el: HTMLDivElement | null) => {
     (modalRef as { current: HTMLDivElement | null }).current = el;
@@ -108,6 +109,11 @@ export default function ActionModal({
     };
   }, []);
 
+  // Reset chips expand when switching to another action
+  useEffect(() => {
+    setShowAllChips(false);
+  }, [action?.action_number]);
+
   // Handle click outside to close
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -135,6 +141,28 @@ export default function ActionModal({
         </div>
       );
     }
+
+    // Merge leads + team, dedupe; then take first N for one line, rest in "+x more"
+    const teamMembers =
+      action.action_entities
+        ?.split(";")
+        .map((e) => normalizeTeamMemberForDisplay(e.trim()))
+        .filter((e) => e && e.trim().length > 0) || [];
+    const seen = new Set<string>();
+    const allChips: { name: string; type: "lead" | "team" }[] = [];
+    for (const n of action.action_leads || []) {
+      if (!n?.trim() || seen.has(n)) continue;
+      seen.add(n);
+      allChips.push({ name: n, type: "lead" });
+    }
+    for (const n of teamMembers) {
+      if (seen.has(n)) continue;
+      seen.add(n);
+      allChips.push({ name: n, type: "team" });
+    }
+    const CHIPS_PER_LINE = 5;
+    const displayedChips = showAllChips ? allChips : allChips.slice(0, CHIPS_PER_LINE);
+    const hasMore = allChips.length > CHIPS_PER_LINE;
 
     return (
       <div className="flex items-start justify-between gap-4">
@@ -188,35 +216,28 @@ export default function ActionModal({
               </>
             )}
           </h2>
-          {/* Action Leads and Team Members - underneath action name */}
-          {(action.action_leads.length > 0 || action.action_entities) && (
+          {/* Action Leads and Team Members - one line, rest in "+x more" */}
+          {allChips.length > 0 && (
             <div className="mt-3 flex flex-wrap items-center gap-1">
-              {/* Action Leads */}
-              <ActionLeadsBadge
-                leads={action.action_leads}
-                inline
-              />
-              {/* Separator */}
-              {action.action_leads.length > 0 &&
-                action.action_entities &&
-                action.action_entities.trim() && (
-                  <span className="text-slate-300">•</span>
-                )}
-              {/* Team Members */}
-              <TeamBadge
-                inline
-                leads={
-                  action.action_entities
-                    ?.split(";")
-                    .map((entity) =>
-                      normalizeTeamMemberForDisplay(entity.trim()),
-                    )
-                    .filter((entity) => entity && entity.trim().length > 0)
-                    .filter(
-                      (entity, index, array) => array.indexOf(entity) === index,
-                    ) || []
-                }
-              />
+              {displayedChips.map((c) =>
+                c.type === "lead" ? (
+                  <ActionLeadsBadge key={c.name} leads={[c.name]} inline />
+                ) : (
+                  <TeamBadge key={c.name} leads={[c.name]} inline />
+                ),
+              )}
+              {hasMore && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowAllChips((s) => !s);
+                  }}
+                  className="inline-flex h-5 items-center justify-center rounded-full border border-dashed border-slate-300 bg-white px-2 text-[11px] font-medium leading-none text-slate-500 transition-all duration-150 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
+                >
+                  {showAllChips ? "show less" : `+${allChips.length - CHIPS_PER_LINE} more`}
+                </button>
+              )}
             </div>
           )}
         </div>
