@@ -59,3 +59,8 @@ npm update
 
 npm audit
 ```
+
+## Deployment
+
+- GitHub Pages
+- Vercel
