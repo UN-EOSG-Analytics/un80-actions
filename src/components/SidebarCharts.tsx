@@ -100,6 +100,11 @@ export function SidebarCharts({
         const deadlineDate = new Date(entry.deadline);
         return deadlineDate >= januaryStart && deadlineDate <= januaryEnd;
       })
+      .sort((a, b) => {
+        const an = a.actionNumber != null ? Number(a.actionNumber) : Infinity;
+        const bn = b.actionNumber != null ? Number(b.actionNumber) : Infinity;
+        return an - bn;
+      })
       .map((entry) => {
         const deadlineDate = entry.deadline ? new Date(entry.deadline) : null;
         const daysUntilDeadline = deadlineDate
@@ -214,42 +219,44 @@ export function SidebarCharts({
 
           <div className="space-y-3 pr-4">
             {/* Further Work Ongoing */}
-            <div className="flex items-center gap-3">
-              <Clock className="h-4 w-4 shrink-0 text-un-blue" />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex min-w-0 items-center gap-2">
+                  <Clock className="h-4 w-4 shrink-0 text-un-blue" />
                   <span className="text-sm font-medium text-slate-700">
                     Further Work Ongoing
                   </span>
-                  <span className="text-[14px] font-semibold tabular-nums text-un-blue">
-                    {totalActions}
-                  </span>
                 </div>
-                <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className="h-full rounded-full bg-un-blue/50 transition-all"
-                    style={{ width: "100%" }}
-                  />
-                </div>
+                <span className="shrink-0 text-[14px] font-semibold tabular-nums text-un-blue">
+                  {totalActions}
+                </span>
+              </div>
+              <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-un-blue/50 transition-all"
+                  style={{ width: "100%" }}
+                />
               </div>
             </div>
 
             {/* Decision Taken */}
-            <div className="flex items-center gap-3">
-              <SquareCheckBig className="h-4 w-4 shrink-0 text-un-blue" />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex min-w-0 items-center gap-2">
+                  <SquareCheckBig className="h-4 w-4 shrink-0 text-un-blue" />
                   <span className="text-sm font-medium text-slate-700">
                     Decision Taken
                   </span>
-                  <span className="text-[14px] font-semibold tabular-nums text-un-blue">0</span>
                 </div>
-                <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className="h-full rounded-full bg-un-blue/50 transition-all"
-                    style={{ width: "0%" }}
-                  />
-                </div>
+                <span className="shrink-0 text-[14px] font-semibold tabular-nums text-un-blue">
+                  0
+                </span>
+              </div>
+              <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-un-blue/50 transition-all"
+                  style={{ width: "0%" }}
+                />
               </div>
             </div>
           </div>
@@ -267,8 +274,8 @@ export function SidebarCharts({
             Upcoming Milestones
           </h3>
 
-          {/* Milestones List - Scrollable */}
-          <div className="-mr-1 max-h-90 divide-y divide-slate-100 overflow-y-auto overscroll-contain pr-1">
+          {/* Milestones List - ~3.5 entries visible, rest scrollable */}
+          <div className="-mr-1 max-h-[15.5rem] divide-y divide-slate-100 overflow-y-auto overscroll-contain pr-1">
             {upcomingMilestonesChartEntries.map((entry, index) => {
               const deadlineDate = entry.deadline
                 ? new Date(entry.deadline)
