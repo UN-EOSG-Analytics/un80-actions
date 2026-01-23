@@ -257,7 +257,7 @@ export default function ActionModal({
         {/* Combined Action Details, Milestones, and Updates Section */}
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           {/* Action Details Header */}
-          <div className="border-b-2 border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
+          <div className="border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
             <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-800">
               Action Details
             </h3>
@@ -377,7 +377,7 @@ export default function ActionModal({
         {(action.doc_text || action.document_paragraph) && (
           <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
             {/* Document Reference Header */}
-            <div className="border-b-2 border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
+            <div className="border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
               <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-800">
                 Document Reference
               </h3>
@@ -429,7 +429,7 @@ export default function ActionModal({
         {/* Work Package Reference Section */}
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           {/* Work Package Reference Header */}
-          <div className="border-b-2 border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
+          <div className="border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
             <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-800">
               Work Package Reference
             </h3>

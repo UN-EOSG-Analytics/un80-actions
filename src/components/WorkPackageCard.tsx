@@ -177,7 +177,7 @@ export function WorkPackageItem({
           {/* Goal from work package data */}
           {wp.goal && (
             <div className="mb-3 flex items-stretch gap-2.5 text-left sm:mb-4">
-              <div className="w-1 shrink-0 rounded-full bg-un-blue" />
+              <div className="w-[3px] shrink-0 rounded-full bg-un-blue" />
               <p className="py-0.5 text-sm leading-snug font-medium text-slate-600 sm:text-base">
                 <span className="font-semibold text-un-blue">Goal:</span>{" "}
                 <HighlightedText text={formatGoalText(wp.goal)} query={searchQuery} />
