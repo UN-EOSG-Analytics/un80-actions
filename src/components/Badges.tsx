@@ -6,7 +6,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { abbreviationMap } from "@/constants/abbreviations";
 import { cn, naturalSort } from "@/lib/utils";
-import { CircleCheck, Clock } from "lucide-react";
+import { SquareCheckBig, Clock } from "lucide-react";
 
 /**
  * Badge variants (visual hierarchy):
@@ -206,7 +206,7 @@ export function DecisionStatusBadge({ status, size = "default" }: DecisionStatus
       )}
     >
       {isDecisionTaken ? (
-        <CircleCheck className={isSmall ? "h-3 w-3" : "h-4 w-4"} />
+        <SquareCheckBig className={isSmall ? "h-3 w-3" : "h-4 w-4"} />
       ) : (
         <Clock className={isSmall ? "h-3 w-3" : "h-4 w-4"} />
       )}

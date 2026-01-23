@@ -206,9 +206,9 @@ export function SidebarChart({
                       </div>
                       <div className="flex shrink-0 items-center gap-1.5">
                         <span
-                          className={`text-[14px] font-normal ${countWidth} text-right font-mono tabular-nums ${
+                          className={`text-[14px] font-semibold ${countWidth} text-right tabular-nums ${
                             isSelected
-                              ? "font-semibold text-un-blue"
+                              ? "text-un-blue"
                               : isUrgent
                                 ? "text-red-600"
                                 : isUpcoming
@@ -230,7 +230,7 @@ export function SidebarChart({
                                   ? "bg-red-500"
                                   : isUpcoming
                                     ? "bg-amber-500"
-                                    : "bg-un-blue/40"
+                                    : "bg-un-blue/50"
                             }`}
                             style={{ width: `${percentage}%` }}
                           />

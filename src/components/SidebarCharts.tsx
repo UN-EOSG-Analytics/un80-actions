@@ -1,5 +1,5 @@
 import React from "react";
-import { Users, Calendar, Clock, CircleCheck, Layers, Activity } from "lucide-react";
+import { Users, Calendar, Clock, SquareCheckBig, Layers, Activity } from "lucide-react";
 import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
 import { buildCleanQueryString } from "@/lib/utils";
 import {
@@ -224,13 +224,13 @@ export function SidebarCharts({
                   <span className="text-sm font-medium text-slate-700">
                     Further Work Ongoing
                   </span>
-                  <span className="text-sm font-bold text-un-blue">
+                  <span className="text-[14px] font-semibold tabular-nums text-un-blue">
                     {totalActions}
                   </span>
                 </div>
-                <div className="mt-1.5 h-2 w-full rounded-full bg-slate-200">
+                <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
                   <div
-                    className="h-full rounded-full bg-un-blue"
+                    className="h-full rounded-full bg-un-blue/50 transition-all"
                     style={{ width: "100%" }}
                   />
                 </div>
@@ -239,17 +239,17 @@ export function SidebarCharts({
 
             {/* Decision Taken */}
             <div className="flex items-center gap-3">
-              <CircleCheck className="h-4 w-4 shrink-0 text-un-blue" />
+              <SquareCheckBig className="h-4 w-4 shrink-0 text-un-blue" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-slate-700">
                     Decision Taken
                   </span>
-                  <span className="text-sm font-bold text-un-blue">0</span>
+                  <span className="text-[14px] font-semibold tabular-nums text-un-blue">0</span>
                 </div>
-                <div className="mt-1.5 h-2 w-full rounded-full bg-slate-200">
+                <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
                   <div
-                    className="h-full rounded-full bg-un-blue"
+                    className="h-full rounded-full bg-un-blue/50 transition-all"
                     style={{ width: "0%" }}
                   />
                 </div>
