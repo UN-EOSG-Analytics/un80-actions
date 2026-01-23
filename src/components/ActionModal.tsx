@@ -262,7 +262,7 @@ export default function ActionModal({
             {/* Decision Status */}
             <div>
               <h3 className="mb-1.5 text-sm font-semibold tracking-wide text-slate-700 uppercase">
-                Action Status
+                Status
               </h3>
               <DecisionStatusBadge status="further work ongoing" />
             </div>

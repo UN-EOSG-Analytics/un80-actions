@@ -25,7 +25,7 @@ const variantStyles: Record<BadgeVariant, string> = {
   tertiary:
     "border border-un-blue/20 bg-un-blue/5 text-un-blue/70 hover:bg-un-blue/10 hover:border-un-blue/30",
   muted:
-    "border border-transparent bg-slate-200 text-slate-700 hover:bg-slate-300",
+    "border border-transparent bg-slate-300 text-slate-800 hover:bg-slate-400",
 };
 
 // ============================================================================
@@ -40,6 +40,8 @@ interface LabelBadgeProps {
   className?: string;
   /** When true, returns badges without a wrapper div (for inline flow) */
   inline?: boolean;
+  /** Label to show in tooltip before the full name (e.g., "Leads", "Action Leads", "Team Members") */
+  tooltipLabel?: string;
 }
 
 export function LabelBadge({
@@ -49,13 +51,14 @@ export function LabelBadge({
   tooltips,
   className,
   inline = false,
+  tooltipLabel,
 }: LabelBadgeProps) {
   if (items.length === 0) return null;
 
   const sortedItems = naturalSort(items);
 
   const badges = sortedItems.map((item, idx) => {
-    const tooltip = tooltips?.[item] || abbreviationMap[item] || item;
+    const fullName = tooltips?.[item] || abbreviationMap[item] || item;
     return (
       <Tooltip key={idx}>
         <TooltipTrigger asChild>
@@ -77,7 +80,12 @@ export function LabelBadge({
           </Badge>
         </TooltipTrigger>
         <TooltipContent>
-          <p className="text-sm text-gray-600">{tooltip}</p>
+          <div className="space-y-1">
+            {tooltipLabel && (
+              <p className="text-xs font-semibold text-gray-700">{tooltipLabel}</p>
+            )}
+            <p className="text-sm text-gray-600">{fullName}</p>
+          </div>
         </TooltipContent>
       </Tooltip>
     );
@@ -108,17 +116,17 @@ interface LeadBadgeProps {
 
 /** Work Package Leads - primary (solid blue) */
 export function WPLeadsBadge({ leads, onSelect, inline }: LeadBadgeProps) {
-  return <LabelBadge items={leads} variant="primary" onSelect={onSelect} inline={inline} />;
+  return <LabelBadge items={leads} variant="primary" onSelect={onSelect} inline={inline} tooltipLabel="Lead" />;
 }
 
 /** Action Leads - secondary (outlined blue) */
 export function ActionLeadsBadge({ leads, onSelect, inline }: LeadBadgeProps) {
-  return <LabelBadge items={leads} variant="secondary" onSelect={onSelect} inline={inline} />;
+  return <LabelBadge items={leads} variant="secondary" onSelect={onSelect} inline={inline} tooltipLabel="Action Lead" />;
 }
 
 /** Team Members - tertiary (dashed, subtle) */
 export function TeamBadge({ leads, onSelect, inline }: LeadBadgeProps) {
-  return <LabelBadge items={leads} variant="tertiary" onSelect={onSelect} inline={inline} />;
+  return <LabelBadge items={leads} variant="tertiary" onSelect={onSelect} inline={inline} tooltipLabel="Team Member" />;
 }
 
 /** Workstream Labels - muted (slate fill) */
