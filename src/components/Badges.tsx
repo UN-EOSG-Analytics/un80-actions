@@ -182,29 +182,33 @@ export type DecisionStatus = "decision taken" | "further work ongoing";
 interface DecisionStatusBadgeProps {
   /** The decision status value */
   status: DecisionStatus | string | null | undefined;
+  /** Size variant: "sm" for compact (cards), "default" for larger (modals) */
+  size?: "sm" | "default";
 }
 
 /**
  * Decision Status Badge - shows amber for "Further Work Ongoing" or green for "Decision Taken"
  */
-export function DecisionStatusBadge({ status }: DecisionStatusBadgeProps) {
+export function DecisionStatusBadge({ status, size = "default" }: DecisionStatusBadgeProps) {
   if (!status) return null;
 
   const isDecisionTaken = status.toLowerCase() === "decision taken";
+  const isSmall = size === "sm";
 
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
+        "inline-flex items-center rounded-full font-medium",
+        isSmall ? "gap-1 px-2 py-0.5 text-xs" : "gap-1.5 px-3 py-1 text-sm",
         isDecisionTaken
           ? "bg-green-100 text-green-700"
           : "bg-amber-100 text-amber-700",
       )}
     >
       {isDecisionTaken ? (
-        <CircleCheck className="h-3 w-3" />
+        <CircleCheck className={isSmall ? "h-3 w-3" : "h-4 w-4"} />
       ) : (
-        <Clock className="h-3 w-3" />
+        <Clock className={isSmall ? "h-3 w-3" : "h-4 w-4"} />
       )}
       <span>{isDecisionTaken ? "Decision Taken" : "Further Work Ongoing"}</span>
     </div>

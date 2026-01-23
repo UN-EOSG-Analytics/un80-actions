@@ -105,7 +105,7 @@ export function ActionItem({ action }: ActionItemProps) {
         <span className="rounded bg-un-blue/8 px-2 py-0.5 text-xs font-semibold tracking-wide text-un-blue uppercase">
           Action {action.actionNumber || ""}
         </span>
-        <DecisionStatusBadge status={action.decisionStatus} />
+        <DecisionStatusBadge status={action.decisionStatus} size="sm" />
       </div>
 
       {/* Action description text - primary focus */}

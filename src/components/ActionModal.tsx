@@ -2,6 +2,7 @@
 
 import {
     ActionLeadsBadge,
+    DecisionStatusBadge,
     TeamBadge,
     WPLeadsBadge,
     parseLeadsString,
@@ -15,7 +16,7 @@ import {
 import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
 import { normalizeTeamMemberForDisplay, parseDate } from "@/lib/utils";
 import type { Action } from "@/types";
-import { ChevronRight, Clock, FileText, X } from "lucide-react";
+import { ChevronRight, FileText, X } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -110,7 +111,7 @@ export default function ActionModal({
 
   // Reusable field label component
   const FieldLabel = ({ children }: { children: React.ReactNode }) => (
-    <span className="text-sm font-normal tracking-wide text-gray-600 uppercase">
+    <span className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
       {children}
     </span>
   );
@@ -119,7 +120,7 @@ export default function ActionModal({
   const renderHeader = () => {
     if (loading) {
       return (
-        <div className="flex items-center gap-3 text-lg text-gray-500">
+        <div className="flex items-center gap-3 text-lg text-slate-500">
           Loading...
         </div>
       );
@@ -128,8 +129,8 @@ export default function ActionModal({
     if (!action) {
       return (
         <div className="flex items-center justify-between gap-4">
-          <p className="text-lg text-gray-500">Action not found</p>
-          <button onClick={handleClose} className="text-gray-400">
+          <p className="text-lg text-slate-500">Action not found</p>
+          <button onClick={handleClose} className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600">
             <X size={24} />
           </button>
         </div>
@@ -177,12 +178,12 @@ export default function ActionModal({
               </TooltipContent>
             </Tooltip>
           </div>
-          <h2 className="text-base leading-tight font-semibold text-gray-900 sm:text-lg md:text-xl">
+          <h2 className="text-base leading-snug font-semibold text-slate-900 sm:text-lg md:text-xl">
             {action.indicative_activity}
             {action.sub_action_details && (
               <>
                 {" "}
-                <span className="font-bold text-gray-600">
+                <span className="font-semibold text-slate-600">
                   – {action.sub_action_details}
                 </span>
               </>
@@ -223,7 +224,7 @@ export default function ActionModal({
         </div>
         <button
           onClick={handleClose}
-          className="shrink-0 text-gray-400 transition-colors hover:text-gray-600"
+          className="shrink-0 rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
           aria-label="Close modal"
         >
           <X size={24} />
@@ -236,16 +237,16 @@ export default function ActionModal({
   const renderBody = () => {
     if (loading) {
       return (
-        <div className="flex items-center justify-center py-8">
-          <div className="text-gray-500">Loading details...</div>
+        <div className="flex items-center justify-center py-12">
+          <div className="text-slate-500">Loading details...</div>
         </div>
       );
     }
 
     if (!action) {
       return (
-        <div className="py-8">
-          <p className="text-gray-500">
+        <div className="py-12">
+          <p className="text-slate-500">
             The requested action could not be found.
           </p>
         </div>
@@ -254,7 +255,7 @@ export default function ActionModal({
 
     // Action content
     return (
-      <div className="space-y-4 py-4">
+      <div className="space-y-4 pt-4">
         {/* Combined Action Details, Milestones, and Updates Section */}
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           {/* Action Details Header */}
@@ -267,15 +268,10 @@ export default function ActionModal({
           <div className="p-5">
             {/* Decision Status */}
             <div>
-              <FieldLabel>Action Status</FieldLabel>
-              <div className="mt-1">
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-amber-700">
-                  <Clock className="h-3.5 w-3.5" />
-                  <span className="text-sm font-medium">
-                    Further Work Ongoing
-                  </span>
-                </div>
-              </div>
+              <h3 className="mb-1.5 text-sm font-semibold tracking-wide text-slate-700 uppercase">
+                Action Status
+              </h3>
+              <DecisionStatusBadge status="further work ongoing" />
             </div>
 
             {/* Milestones Section */}
@@ -359,8 +355,8 @@ export default function ActionModal({
                 </p>
               </TooltipContent>
             </Tooltip>
-            <div className="text-base text-gray-900">
-              <div className="text-gray-500">Updates forthcoming</div>
+            <div className="text-sm leading-relaxed text-slate-600">
+              Updates forthcoming
             </div>
           </div>
         </div>
@@ -428,12 +424,12 @@ export default function ActionModal({
           </div>
           {/* Work Package Reference Content */}
           <div className="p-5">
-            <div className="text-base text-gray-900">
-              <span className="font-medium">
+            <div className="text-[15px] leading-snug text-slate-900">
+              <span className="font-semibold">
                 Work Package {action.work_package_number}
               </span>
-              <span className="mx-2 text-slate-400">•</span>
-              <span className="text-slate-600">{action.work_package_name}</span>
+              <span className="mx-2 text-slate-300">•</span>
+              <span className="font-medium text-slate-600">{action.work_package_name}</span>
             </div>
             {/* Work Package Leads */}
             {action.work_package_leads &&
@@ -511,12 +507,12 @@ export default function ActionModal({
       >
         <div className="flex min-h-full flex-col">
           {/* Header */}
-          <div className="border-b border-gray-200 bg-white px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6">
+          <div className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6">
             {renderHeader()}
           </div>
 
           {/* Body */}
-          <div className="flex-1 px-4 pb-6 sm:px-6 sm:pb-8 md:px-8">
+          <div className="flex-1 bg-slate-50 px-4 pb-6 sm:px-6 sm:pb-8 md:px-8">
             {renderBody()}
           </div>
         </div>
