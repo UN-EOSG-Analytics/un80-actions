@@ -23,9 +23,11 @@ interface WorkPackageActionsProps {
 function actionMatchesSearch(action: WorkPackageAction, query: string): boolean {
   if (!query.trim()) return true;
   const lowerQuery = query.toLowerCase();
+  const queryWords = lowerQuery.split(/\s+/);
   return (
     action.text.toLowerCase().includes(lowerQuery) ||
-    (action.subActionDetails?.toLowerCase().includes(lowerQuery) ?? false)
+    (action.subActionDetails?.toLowerCase().includes(lowerQuery) ?? false) ||
+    queryWords.some((w) => w === String(action.actionNumber))
   );
 }
 

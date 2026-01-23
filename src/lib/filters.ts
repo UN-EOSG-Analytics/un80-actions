@@ -65,12 +65,17 @@ export function filterWorkPackages(
   // Search filter
   if (filters.searchQuery.trim()) {
     const query = filters.searchQuery.toLowerCase();
+    const queryWords = query.split(/\s+/);
     filtered = filtered.filter(
       (wp) =>
         wp.name.toLowerCase().includes(query) ||
         String(wp.number).includes(query) ||
         wp.leads.some((lead) => lead.toLowerCase().includes(query)) ||
-        wp.actions.some((action) => action.text.toLowerCase().includes(query)),
+        wp.actions.some(
+          (action) =>
+            action.text.toLowerCase().includes(query) ||
+            queryWords.some((w) => w === String(action.actionNumber)),
+        ),
     );
   }
 
@@ -623,6 +628,7 @@ export function calculateStatsData(
   // Search filter
   if (filters.searchQuery.trim()) {
     const query = filters.searchQuery.toLowerCase();
+    const queryWords = query.split(/\s+/);
     filteredActions = filteredActions.filter(
       (action) =>
         action.work_package_name.toLowerCase().includes(query) ||
@@ -631,7 +637,8 @@ export function calculateStatsData(
           action.work_package_leads.some((lead) =>
             normalizeLeaderName(lead).toLowerCase().includes(query),
           )) ||
-        action.indicative_activity.toLowerCase().includes(query),
+        action.indicative_activity.toLowerCase().includes(query) ||
+        queryWords.some((w) => w === String(action.action_number)),
     );
   }
 

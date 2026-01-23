@@ -126,13 +126,16 @@ export function useWorkPackageData(
       // Always apply search query
       if (filters.searchQuery.trim()) {
         const query = filters.searchQuery.toLowerCase();
+        const queryWords = query.split(/\s+/);
         filtered = filtered.filter(
           (wp) =>
             wp.name.toLowerCase().includes(query) ||
             String(wp.number).includes(query) ||
             wp.leads.some((lead) => lead.toLowerCase().includes(query)) ||
-            wp.actions.some((action) =>
-              action.text.toLowerCase().includes(query),
+            wp.actions.some(
+              (action) =>
+                action.text.toLowerCase().includes(query) ||
+                queryWords.some((w) => w === String(action.actionNumber)),
             ),
         );
       }
