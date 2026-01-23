@@ -61,6 +61,7 @@ export default function StyleGuidePage() {
   }, [workPackages]);
 
   // Find actions with different decision statuses
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const actionOngoing = useMemo(() => {
     for (const wp of workPackages) {
       const action = wp.actions.find(
@@ -74,6 +75,7 @@ export default function StyleGuidePage() {
     return null;
   }, [workPackages]);
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const actionTaken = useMemo(() => {
     for (const wp of workPackages) {
       const action = wp.actions.find(

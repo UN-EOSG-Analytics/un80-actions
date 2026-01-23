@@ -334,7 +334,7 @@ export function WorkPackagesPageContent() {
               {/* Work Packages and Chart Section */}
               <section className="flex flex-col items-start gap-6 overflow-hidden lg:flex-row">
                 {/* Work Packages Collapsible */}
-                <div className="w-full min-w-0 flex-1 lg:max-w-[818px]">
+                <div className="w-full min-w-0 flex-1 lg:max-w-204.5">
                   <FilterControls
                     isAdvancedFilterOpen={isAdvancedFilterOpen}
                     onAdvancedFilterOpenChange={setIsAdvancedFilterOpen}

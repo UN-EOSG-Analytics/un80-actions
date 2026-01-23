@@ -109,13 +109,6 @@ export default function ActionModal({
     }
   };
 
-  // Reusable field label component
-  const FieldLabel = ({ children }: { children: React.ReactNode }) => (
-    <span className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
-      {children}
-    </span>
-  );
-
   // Render header content based on state
   const renderHeader = () => {
     if (loading) {

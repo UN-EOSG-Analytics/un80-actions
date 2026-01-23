@@ -66,13 +66,10 @@ export function SidebarCharts({
   selectedLead,
   onSelectLead,
   workstreamsData,
-  workstreamsSearchQuery,
-  onWorkstreamsSearchChange,
   selectedWorkstream,
   onSelectWorkstream,
   upcomingMilestonesData,
   milestonesPerMonthSearchQuery,
-  onMilestonesPerMonthSearchChange,
   totalActions,
 }: SidebarChartsProps) {
   const leadsChartEntries: SidebarChartEntry[] = leadsData.map((entry) => ({

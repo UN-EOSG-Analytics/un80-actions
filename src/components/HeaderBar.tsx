@@ -9,7 +9,7 @@ interface HeaderProps {
   showLogin?: boolean;
 }
 
-export function Header({ onReset, showLogin = true }: HeaderProps) {
+export function Header({ onReset }: HeaderProps) {
   const router = useRouter();
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
