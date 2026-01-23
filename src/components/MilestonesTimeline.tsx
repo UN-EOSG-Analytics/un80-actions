@@ -232,10 +232,9 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
                           ) : (
                             milestoneActions.map((action) => {
                               // Convert Action to WorkPackageAction format
-                              // Use action_leads (semicolon-separated string) for individual actions
+                              // Use action_leads array for individual actions
                               const actionLeads = action.action_leads
                                 ? action.action_leads
-                                    .split(";")
                                     .map((lead) => lead.trim())
                                     .filter((lead) => lead.length > 0)
                                 : [];

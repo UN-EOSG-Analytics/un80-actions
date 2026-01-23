@@ -268,13 +268,12 @@ export default function ActionModal({
 
         {/* Action-specific information starts here */}
         {/* Action Leads */}
-        {action.action_leads && action.action_leads.trim() && (
+        {action.action_leads && action.action_leads.length > 0 && (
           <div className="">
             <Field label="Action leads">
               <div className="mt-1 text-base text-gray-900">
                 <LeadsBadge
                   leads={action.action_leads
-                    .split(";")
                     .map((lead) => lead.trim())
                     .filter((lead) => lead.length > 0)}
                   variant="default"

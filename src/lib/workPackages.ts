@@ -86,10 +86,9 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           );
 
       if (!existingAction) {
-        // Use action_leads (semicolon-separated string) for individual actions
+        // Use action_leads array for individual actions
         const actionLeads = action.action_leads
           ? action.action_leads
-              .split(";")
               .map((lead) => lead.trim())
               .filter((lead) => lead.length > 0)
               .map((lead) => normalizeLeaderName(lead))
@@ -111,7 +110,6 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
         // Merge leads if action already exists (use action_leads)
         const actionLeads = action.action_leads
           ? action.action_leads
-              .split(";")
               .map((lead) => lead.trim())
               .filter((lead) => lead.length > 0)
               .map((lead) => normalizeLeaderName(lead))
