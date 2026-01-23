@@ -371,6 +371,7 @@ export function SidebarCharts({
             selectedValue={[]}
             onSelectValue={() => {}}
             barWidth={105}
+            maxHeight={155}
           />
         </div>
       )}
