@@ -114,9 +114,9 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
         if (action.doc_text && !existingAction.docText) {
           existingAction.docText = action.doc_text;
         }
-        // Ensure decisionStatus is set (default to "Further work ongoing" if missing)
-        if (!existingAction.decisionStatus) {
-          existingAction.decisionStatus = "Further work ongoing";
+        // Ensure actionStatus is set (default to "Further Work Ongoing" if missing)
+        if (!existingAction.actionStatus) {
+          existingAction.actionStatus = "Further Work Ongoing";
         }
         // Update milestone fields if not already set
         if (action.first_milestone && !existingAction.firstMilestone) {

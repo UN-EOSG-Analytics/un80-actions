@@ -66,7 +66,7 @@ export default function StyleGuidePage() {
     for (const wp of workPackages) {
       const action = wp.actions.find(
         (a) =>
-          a.decisionStatus?.toLowerCase() !== "decision taken" &&
+          a.actionStatus?.toLowerCase() !== "decision taken" &&
           a.leads.length > 0 &&
           a.actionEntities,
       );
@@ -80,7 +80,7 @@ export default function StyleGuidePage() {
     for (const wp of workPackages) {
       const action = wp.actions.find(
         (a) =>
-          a.decisionStatus?.toLowerCase() === "decision taken" &&
+          a.actionStatus?.toLowerCase() === "decision taken" &&
           a.leads.length > 0,
       );
       if (action) return { action, wpNumber: wp.number };
