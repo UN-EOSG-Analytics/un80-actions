@@ -360,11 +360,11 @@ export function SidebarCharts({
         </div>
       )}
 
-      {/* Milestones by Month */}
+      {/* Upcoming Milestones by Month */}
       {milestonesPerMonthEntries.length > 0 && (
         <div className="py-5">
           <SidebarChart
-            title="Milestones by Month"
+            title="Upcoming Milestones by Month"
             description="Number of milestones by month"
             icon={<Calendar />}
             data={milestonesPerMonthEntries}
