@@ -25,9 +25,9 @@ interface SidebarChartProps {
   description: string;
   icon: React.ReactNode;
   data: SidebarChartEntry[];
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-  searchPlaceholder: string;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  searchPlaceholder?: string;
   selectedValue: string[];
   onSelectValue: (value: string[]) => void;
   barWidth?: number; // Width in pixels
@@ -74,16 +74,18 @@ export function SidebarChart({
       </h3>
 
       {/* Search Bar */}
-      <div className="relative mb-1 w-full">
-        <Search className="pointer-events-none absolute top-1/2 left-0 z-10 h-4 w-4 -translate-y-1/2 transform text-un-blue" />
-        <Input
-          type="text"
-          placeholder={searchPlaceholder}
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="h-9 w-full rounded-none border-0 border-b border-slate-300 bg-white py-2 pr-4 pl-6 text-[15px] text-slate-700 shadow-none transition-all placeholder:text-slate-400 hover:border-b-un-blue/60 focus:border-b-un-blue focus:shadow-none focus:ring-0 focus:ring-offset-0 focus:outline-none"
-        />
-      </div>
+      {onSearchChange && (
+        <div className="relative mb-1 w-full">
+          <Search className="pointer-events-none absolute top-1/2 left-0 z-10 h-4 w-4 -translate-y-1/2 transform text-un-blue" />
+          <Input
+            type="text"
+            placeholder={searchPlaceholder}
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="h-9 w-full rounded-none border-0 border-b border-slate-300 bg-white py-2 pr-4 pl-6 text-[15px] text-slate-700 shadow-none transition-all placeholder:text-slate-400 hover:border-b-un-blue/60 focus:border-b-un-blue focus:shadow-none focus:ring-0 focus:ring-offset-0 focus:outline-none"
+          />
+        </div>
+      )}
 
       {/* Chart Data - Scrollable */}
       <div

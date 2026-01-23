@@ -370,9 +370,6 @@ export function SidebarCharts({
           description="Number of milestones by month"
           icon={<Calendar />}
           data={milestonesPerMonthEntries}
-          searchQuery={milestonesPerMonthSearchQuery}
-          onSearchChange={onMilestonesPerMonthSearchChange}
-          searchPlaceholder="Search months"
           selectedValue={[]}
           onSelectValue={() => {}}
           barWidth={105}
@@ -390,17 +387,15 @@ export function SidebarCharts({
         selectedValue={selectedLead}
         onSelectValue={onSelectLead}
         barWidth={105}
-        maxHeight={135}
+        maxHeight={145}
       />
 
       {/* Actions per Workstream */}
       <SidebarChart
         title="Actions per Workstream"
+        description="Number of actions by workstream"
         icon={<Layers />}
         data={workstreamsChartEntries}
-        searchQuery={workstreamsSearchQuery}
-        onSearchChange={onWorkstreamsSearchChange}
-        searchPlaceholder="Search workstreams"
         selectedValue={selectedWorkstream}
         onSelectValue={onSelectWorkstream}
         barWidth={105}
