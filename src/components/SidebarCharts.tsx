@@ -208,7 +208,7 @@ export function SidebarCharts({
       {/* Action Status Chart */}
       {totalActions > 0 && (
         <div className="py-5 pl-4.5 first:pt-0">
-          <h3 className="mb-3 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
+          <h3 className="mb-3 flex h-6.25 items-center gap-2 text-[17px] font-semibold text-slate-900">
             <span className="flex h-5 w-5 items-center justify-center text-un-blue">
               <Activity className="h-5 w-5" />
             </span>
@@ -263,7 +263,7 @@ export function SidebarCharts({
       {upcomingMilestonesChartEntries.length > 0 && (
         <div className="py-5 pl-4.5">
           {/* Header */}
-          <h3 className="mb-3 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
+          <h3 className="mb-3 flex h-6.25 items-center gap-2 text-[17px] font-semibold text-slate-900">
             <span className="flex h-5 w-5 items-center justify-center text-un-blue">
               <Calendar className="h-5 w-5" />
             </span>
@@ -271,7 +271,7 @@ export function SidebarCharts({
           </h3>
 
           {/* Milestones List - Scrollable */}
-          <div className="-mr-1 max-h-[360px] divide-y divide-slate-100 overflow-y-auto overscroll-contain pr-1">
+          <div className="-mr-1 max-h-90 divide-y divide-slate-100 overflow-y-auto overscroll-contain pr-1">
             {upcomingMilestonesChartEntries.map((entry, index) => {
               const deadlineDate = entry.deadline
                 ? new Date(entry.deadline)
@@ -315,7 +315,7 @@ export function SidebarCharts({
                       className="group -mr-1 flex cursor-pointer items-start gap-3 py-3 pr-1 pl-2 transition-colors hover:bg-slate-50/50"
                     >
                       {/* Month Badge - Minimal pill style */}
-                      <div className="mt-px flex h-[18px] min-w-[44px] items-center justify-center rounded-full bg-un-blue/8 text-un-blue">
+                      <div className="mt-px flex h-4.5 min-w-11 items-center justify-center rounded-full bg-un-blue/8 text-un-blue">
                         <span className="text-[10px] font-semibold tracking-wide">
                           {monthShort || "—"}
                         </span>
@@ -345,7 +345,7 @@ export function SidebarCharts({
                       </div>
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent side="left" className="max-w-[280px]">
+                  <TooltipContent side="left" className="max-w-70">
                     <p className="text-sm font-medium">{entry.label}</p>
                     {(entry.workPackageNumber || entry.actionNumber) && (
                       <p className="mt-1 text-xs text-slate-400">
