@@ -129,6 +129,8 @@ export function WorkPackagesPageContent() {
   const lastProcessedActionsRef = useRef<string>("");
   // Track the last selectedWorkPackage we processed to avoid infinite loops
   const lastProcessedWorkPackagesRef = useRef<string>("");
+  // Track the last search query we processed to avoid infinite loops
+  const lastProcessedSearchRef = useRef<string>("");
 
   // Auto-expand work package collapsibles when work packages are selected via URL
   useEffect(() => {
@@ -221,6 +223,53 @@ export function WorkPackagesPageContent() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAction]); // Only depend on selectedAction to avoid infinite loops
+
+  // Auto-expand work package collapsibles when search query matches action text
+  useEffect(() => {
+    const trimmedQuery = searchQuery.trim().toLowerCase();
+
+    // Skip if we've already processed this search query
+    if (trimmedQuery === lastProcessedSearchRef.current) {
+      return;
+    }
+
+    if (trimmedQuery && filteredWorkPackages.length > 0) {
+      const collapsibleKeysToExpand: string[] = [];
+
+      filteredWorkPackages.forEach((wp, index) => {
+        // Check if this work package has any actions matching the search query
+        const hasMatchingAction = wp.actions.some((action) => {
+          const actionText = action.text ? action.text.toLowerCase() : "";
+          const subActionText = action.subActionDetails
+            ? action.subActionDetails.toLowerCase()
+            : "";
+          return (
+            actionText.includes(trimmedQuery) ||
+            subActionText.includes(trimmedQuery)
+          );
+        });
+
+        if (hasMatchingAction) {
+          const collapsibleKey = `${wp.report.join("-")}-${wp.number || "empty"}-${index}`;
+          // Only add if not already open
+          if (!openCollapsibles.has(collapsibleKey)) {
+            collapsibleKeysToExpand.push(collapsibleKey);
+          }
+        }
+      });
+
+      if (collapsibleKeysToExpand.length > 0) {
+        expandCollapsibles(collapsibleKeysToExpand);
+      }
+
+      // Mark this search query as processed
+      lastProcessedSearchRef.current = trimmedQuery;
+    } else if (!trimmedQuery) {
+      // Reset when search is cleared
+      lastProcessedSearchRef.current = "";
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, filteredWorkPackages]); // Depend on searchQuery and filteredWorkPackages
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -376,6 +425,7 @@ export function WorkPackagesPageContent() {
                     selectedTeamMembers={selectedTeamMember}
                     isLoading={isLoading}
                     showProgress={showProgress}
+                    searchQuery={searchQuery}
                   />
                 </div>
 

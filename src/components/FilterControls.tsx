@@ -141,7 +141,7 @@ export function FilterControls({
     <>
       {/* Header with Advanced Filters Toggle and Sort */}
       <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-        <h2 className="flex shrink-0 items-center gap-2 text-[22px] leading-[25px] font-bold text-black sm:text-[24px] md:text-[26px]">
+        <h2 className="flex shrink-0 items-center gap-2 text-[22px] leading-6.25 font-bold text-black sm:text-[24px] md:text-[26px]">
           <Briefcase className="h-5 w-5 text-un-blue sm:h-6 sm:w-6" />
           Work Packages
         </h2>

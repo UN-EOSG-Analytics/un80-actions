@@ -1,4 +1,5 @@
-import { ActionItem } from "@/components/ActionCard";
+import { useState } from "react";
+import { ActionItem, HighlightedText } from "@/components/ActionCard";
 import { WorkstreamLabels, WPLeadsBadge } from "@/components/Badges";
 import {
     Collapsible,
@@ -8,17 +9,33 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { formatGoalText } from "@/lib/utils";
 import type { WorkPackage, WorkPackageAction } from "@/types";
-import { Menu } from "lucide-react";
+import { ChevronDown, Menu } from "lucide-react";
 
 interface WorkPackageActionsProps {
   actions: WorkPackageAction[];
   workPackageNumber: number | "";
+  searchQuery?: string;
+}
+
+/**
+ * Helper to check if an action matches the search query
+ */
+function actionMatchesSearch(action: WorkPackageAction, query: string): boolean {
+  if (!query.trim()) return true;
+  const lowerQuery = query.toLowerCase();
+  return (
+    action.text.toLowerCase().includes(lowerQuery) ||
+    (action.subActionDetails?.toLowerCase().includes(lowerQuery) ?? false)
+  );
 }
 
 function WorkPackageActions({
   actions,
   workPackageNumber,
+  searchQuery = "",
 }: WorkPackageActionsProps) {
+  const [showUnmatched, setShowUnmatched] = useState(false);
+
   if (actions.length === 0) {
     return (
       <div className="rounded-[6px] border border-slate-200 bg-white p-4.25">
@@ -29,16 +46,59 @@ function WorkPackageActions({
     );
   }
 
+  // Separate matched and unmatched actions
+  const hasActiveSearch = searchQuery.trim().length > 0;
+  const matchedActions = hasActiveSearch
+    ? actions.filter((action) => actionMatchesSearch(action, searchQuery))
+    : actions;
+  const unmatchedActions = hasActiveSearch
+    ? actions.filter((action) => !actionMatchesSearch(action, searchQuery))
+    : [];
+
   return (
     <div className="flex flex-col gap-2">
-      {/* Display each indicative_activity in its own box */}
-      {actions.map((action, idx) => (
+      {/* Display matched actions */}
+      {matchedActions.map((action, idx) => (
         <ActionItem
           key={`${workPackageNumber}-${action.actionNumber}-${action.text}-${idx}`}
           action={action}
           workPackageNumber={workPackageNumber}
+          searchQuery={searchQuery}
+          isSearchMatch={true}
         />
       ))}
+
+      {/* Show unmatched actions toggle button */}
+      {unmatchedActions.length > 0 && (
+        <>
+          <button
+            onClick={() => setShowUnmatched(!showUnmatched)}
+            className="flex w-full items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-500 transition-all hover:border-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          >
+            <ChevronDown
+              className={`h-4 w-4 transition-transform duration-200 ${showUnmatched ? "rotate-180" : ""}`}
+            />
+            {showUnmatched
+              ? "Hide other actions"
+              : `Show ${unmatchedActions.length} other action${unmatchedActions.length === 1 ? "" : "s"}`}
+          </button>
+
+          {/* Unmatched actions - conditionally rendered */}
+          {showUnmatched && (
+            <div className="flex flex-col gap-2 pt-2 opacity-70">
+              {unmatchedActions.map((action, idx) => (
+                <ActionItem
+                  key={`${workPackageNumber}-${action.actionNumber}-${action.text}-unmatched-${idx}`}
+                  action={action}
+                  workPackageNumber={workPackageNumber}
+                  searchQuery={searchQuery}
+                  isSearchMatch={false}
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
@@ -51,6 +111,7 @@ interface WorkPackageItemProps {
   onSelectLead?: (lead: string[]) => void;
   onSelectWorkstream?: (workstream: string[]) => void;
   showProgress?: boolean;
+  searchQuery?: string;
 }
 
 export function WorkPackageItem({
@@ -60,6 +121,7 @@ export function WorkPackageItem({
   onSelectLead,
   onSelectWorkstream,
   showProgress = false,
+  searchQuery = "",
 }: WorkPackageItemProps) {
   // Calculate animation duration: base 150ms + 30ms per action, capped at 400ms
   const collapsibleDuration = Math.min(150 + wp.actions.length * 30, 400);
@@ -100,12 +162,12 @@ export function WorkPackageItem({
                   )}
                 </div>
                 <h2 className="mt-1 text-base leading-6 font-semibold text-slate-900 sm:text-xl sm:leading-7">
-                  {wp.name}
+                  <HighlightedText text={wp.name} query={searchQuery} />
                 </h2>
               </>
             ) : (
               <h2 className="text-base leading-6 font-semibold text-slate-900 sm:text-xl sm:leading-7">
-                {wp.name}
+                <HighlightedText text={wp.name} query={searchQuery} />
               </h2>
             )}
           </div>
@@ -116,7 +178,7 @@ export function WorkPackageItem({
               <div className="w-1 shrink-0 rounded-full bg-un-blue" />
               <p className="py-0.5 text-sm leading-snug font-medium text-slate-600 sm:text-base">
                 <span className="font-semibold text-un-blue">Goal:</span>{" "}
-                {formatGoalText(wp.goal)}
+                <HighlightedText text={formatGoalText(wp.goal)} query={searchQuery} />
               </p>
             </div>
           )}
@@ -143,6 +205,7 @@ export function WorkPackageItem({
           <div className="px-4 sm:px-6">
             <div className="w-full border-t border-slate-200" />
             {/* Cross-fade header section - fixed height container */}
+            {/* Animation timing: title animates first on expand, last on collapse */}
             <div className="relative flex h-10 items-center">
               {/* Collapsed state: "X Indicative Actions" */}
               <div
@@ -214,6 +277,7 @@ export function WorkPackageItem({
             <WorkPackageActions
               actions={wp.actions}
               workPackageNumber={wp.number}
+              searchQuery={searchQuery}
             />
           </div>
         </CollapsibleContent>

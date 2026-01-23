@@ -126,8 +126,8 @@
 
   /* Collapsible animations */
   --collapsible-duration: 150ms;
-  --animate-collapsible-down: collapsible-down var(--collapsible-duration) ease-out forwards;
-  --animate-collapsible-up: collapsible-up var(--collapsible-duration) ease-in forwards;
+  --animate-collapsible-down: collapsible-down var(--collapsible-duration) ease-out;
+  --animate-collapsible-up: collapsible-up var(--collapsible-duration) ease-out forwards;
 }
 
 /* FIXME */
@@ -250,13 +250,9 @@ html {
 
 /* Collapsible animations */
 @keyframes collapsible-down {
-  0% {
+  from {
     height: 0;
     opacity: 0;
-  }
-  100% {
-    height: var(--radix-collapsible-content-height);
-    opacity: 1;
   }
 }
 

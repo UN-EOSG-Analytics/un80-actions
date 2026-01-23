@@ -23,13 +23,47 @@ interface ActionItemProps {
   action: WorkPackageAction;
   /** The work package number (e.g., "31") for document reference formatting */
   workPackageNumber: number | "";
+  /** Search query to highlight in the action text */
+  searchQuery?: string;
+  /** Whether this action matches the search query */
+  isSearchMatch?: boolean;
+}
+
+/**
+ * Highlights matching text in a string with a faint UN blue background
+ */
+export function HighlightedText({ text, query }: { text: string; query: string }) {
+  if (!query.trim()) {
+    return <>{text}</>;
+  }
+
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  const parts = text.split(regex);
+
+  return (
+    <>
+      {parts.map((part, i) => {
+        const isMatch = part.toLowerCase() === query.toLowerCase();
+        return isMatch ? (
+          <mark
+            key={i}
+            className="rounded-sm bg-un-blue/25 px-0.5 text-inherit"
+          >
+            {part}
+          </mark>
+        ) : (
+          <span key={i}>{part}</span>
+        );
+      })}
+    </>
+  );
 }
 
 /**
  * Displays a single action item within a work package.
  * Shows the action text, leads, document references, and optional doc text.
  */
-export function ActionItem({ action }: ActionItemProps) {
+export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionItemProps) {
   const searchParams = useSearchParams();
   const [showAllTeamMembers, setShowAllTeamMembers] = useState(false);
 
@@ -114,12 +148,12 @@ export function ActionItem({ action }: ActionItemProps) {
           <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-un-blue" />
         )}
         <p className="text-[15px] leading-snug font-medium text-slate-900">
-          {action.text}
+          <HighlightedText text={action.text} query={searchQuery} />
           {action.subActionDetails && (
             <>
               {" "}
               <span className="font-semibold text-slate-600">
-                – {action.subActionDetails}
+                – <HighlightedText text={action.subActionDetails} query={searchQuery} />
               </span>
             </>
           )}

@@ -12,6 +12,7 @@ interface WorkPackageListProps {
   selectedTeamMembers?: string[];
   isLoading?: boolean;
   showProgress?: boolean;
+  searchQuery?: string;
 }
 
 export function WorkPackageList({
@@ -24,6 +25,7 @@ export function WorkPackageList({
   selectedTeamMembers = [],
   isLoading = false,
   showProgress = false,
+  searchQuery = "",
 }: WorkPackageListProps) {
   // Don't show "no results" message while loading
   if (workPackages.length === 0 && !isLoading) {
@@ -102,6 +104,7 @@ export function WorkPackageList({
             onSelectLead={onSelectLead}
             onSelectWorkstream={onSelectWorkstream}
             showProgress={showProgress}
+            searchQuery={searchQuery}
           />
         );
       })}
