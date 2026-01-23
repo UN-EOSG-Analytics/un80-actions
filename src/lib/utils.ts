@@ -261,3 +261,23 @@ export function buildCleanQueryString(params: Record<string, string>): string {
   }
   return parts.join("&");
 }
+
+/**
+ * Natural sort comparator for strings
+ * Handles embedded numbers correctly (e.g., "WS1", "WS2", "WS10" sorts as 1, 2, 10)
+ * @param a - First string to compare
+ * @param b - Second string to compare
+ * @returns Comparison result (-1, 0, or 1)
+ */
+export function naturalSortCompare(a: string, b: string): number {
+  return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
+}
+
+/**
+ * Sort an array of strings using natural sort order
+ * @param items - Array of strings to sort
+ * @returns New sorted array (does not mutate original)
+ */
+export function naturalSort(items: string[]): string[] {
+  return [...items].sort(naturalSortCompare);
+}

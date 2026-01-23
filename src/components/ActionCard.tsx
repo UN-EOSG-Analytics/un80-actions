@@ -9,6 +9,7 @@ import {
   parseDate,
   buildCleanQueryString,
   normalizeTeamMemberForDisplay,
+  naturalSort,
 } from "@/lib/utils";
 import { abbreviationMap } from "@/constants/abbreviations";
 import {
@@ -36,14 +37,19 @@ export function ActionItem({ action }: ActionItemProps) {
   const searchParams = useSearchParams();
   const [showAllTeamMembers, setShowAllTeamMembers] = useState(false);
 
-  // Parse team members from actionEntities
-  const teamMembers = action.actionEntities
-    ? action.actionEntities
-        .split(";")
-        .map((entity) => normalizeTeamMemberForDisplay(entity.trim()))
-        .filter((entity) => entity && entity.trim().length > 0)
-        .filter((entity, index, array) => array.indexOf(entity) === index)
-    : [];
+  // Parse team members from actionEntities and sort alphabetically
+  const teamMembers = naturalSort(
+    action.actionEntities
+      ? action.actionEntities
+          .split(";")
+          .map((entity) => normalizeTeamMemberForDisplay(entity.trim()))
+          .filter((entity) => entity && entity.trim().length > 0)
+          .filter((entity, index, array) => array.indexOf(entity) === index)
+      : [],
+  );
+
+  // Sort action leads alphabetically
+  const sortedLeads = naturalSort(action.leads);
 
   const hasMoreThanFour = teamMembers.length > 4;
   const displayedTeamMembers = showAllTeamMembers
@@ -130,11 +136,11 @@ export function ActionItem({ action }: ActionItemProps) {
       </div>
 
       {/* Metadata section - Action Leads and Team Members */}
-      {(action.leads.length > 0 || teamMembers.length > 0) && (
+      {(sortedLeads.length > 0 || teamMembers.length > 0) && (
         <div className="mt-3 border-t border-slate-100 pt-3">
           <div className="flex flex-wrap items-center gap-1">
             {/* Action Leads - compact */}
-            {action.leads.map((lead, idx) => {
+            {sortedLeads.map((lead, idx) => {
               const tooltip = abbreviationMap[lead] || lead;
               return (
                 <Tooltip key={idx}>
@@ -153,7 +159,7 @@ export function ActionItem({ action }: ActionItemProps) {
               );
             })}
             {/* Separator */}
-            {action.leads.length > 0 && teamMembers.length > 0 && (
+            {sortedLeads.length > 0 && teamMembers.length > 0 && (
               <span className="text-slate-300">•</span>
             )}
             {/* Team Members - even more subtle */}

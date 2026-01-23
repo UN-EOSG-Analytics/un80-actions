@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { abbreviationMap } from "@/constants/abbreviations";
-import { cn } from "@/lib/utils";
+import { cn, naturalSort } from "@/lib/utils";
 import { CircleCheck, Clock } from "lucide-react";
 
 /**
@@ -49,9 +49,11 @@ export function LabelBadge({
 }: LabelBadgeProps) {
   if (items.length === 0) return null;
 
+  const sortedItems = naturalSort(items);
+
   return (
     <div className={cn("flex flex-wrap items-center gap-1", className)}>
-      {items.map((item, idx) => {
+      {sortedItems.map((item, idx) => {
         const tooltip = tooltips?.[item] || abbreviationMap[item] || item;
         return (
           <Tooltip key={idx}>
