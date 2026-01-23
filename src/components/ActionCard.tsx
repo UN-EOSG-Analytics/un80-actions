@@ -147,7 +147,7 @@ export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionIt
           Action {action.actionNumber || ""}
         </span>
         <span onClick={stopPropagationOnMobile} className="inline-flex">
-          <DecisionStatusBadge status={action.decisionStatus} size="sm" />
+          <DecisionStatusBadge status={action.actionStatus} size="sm" />
         </span>
       </div>
 

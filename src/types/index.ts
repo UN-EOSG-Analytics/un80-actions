@@ -71,11 +71,20 @@ export interface Action {
   /** Link to updates document or null */
   link_updates: string | null;
 
+  /** Delivery date in ISO format (e.g., "2026-02-28") or null */
+  delivery_date: string | null;
+
+  /** Scenario status */
+  scenario: string | null;
+
+  /** Action status - "Further Work Ongoing" or "Decision Taken" */
+  action_status: "Further Work Ongoing" | "Decision Taken" | null;
+
   /** Sub-action details description or null (for subactions) */
   sub_action_details: string | null;
 
-  /** Action leads (semicolon-separated string) or null */
-  action_leads: string | null;
+  /** Action leads array */
+  action_leads: string[];
 }
 
 /**
@@ -119,7 +128,7 @@ export interface WorkPackageAction {
   finalMilestoneDeadline: string | null;
   actionEntities: string | null;
   subActionDetails: string | null;
-  decisionStatus: "Further work ongoing" | "decision taken";
+  actionStatus: "Further Work Ongoing" | "Decision Taken";
 }
 
 /**

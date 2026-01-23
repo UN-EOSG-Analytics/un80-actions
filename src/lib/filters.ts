@@ -551,7 +551,7 @@ export function calculateUpcomingMilestonesChartData(
     }
 
     const existing = milestoneCounts.get(milestoneText);
-    const deadline = action.upcoming_milestone_deadline;
+    const deadline = action.delivery_date;
 
     if (existing) {
       // If multiple deadlines exist, keep the earliest one

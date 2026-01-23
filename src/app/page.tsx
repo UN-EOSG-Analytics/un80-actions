@@ -477,7 +477,7 @@ export function WorkPackagesPageContent() {
                   onToggleShowAllMilestonesPerMonth={() =>
                     setShowAllMilestonesPerMonth(!showAllMilestonesPerMonth)
                   }
-                  totalActions={statsData.actions}
+                  actions={actions}
                 />
               </section>
             </section>

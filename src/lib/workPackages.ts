@@ -86,14 +86,8 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           );
 
       if (!existingAction) {
-        // Use action_leads (semicolon-separated string) for individual actions
-        const actionLeads = action.action_leads
-          ? action.action_leads
-              .split(";")
-              .map((lead) => lead.trim())
-              .filter((lead) => lead.length > 0)
-              .map((lead) => normalizeLeaderName(lead))
-          : [];
+        // Normalize action leads
+        const actionLeads = action.action_leads.map((lead) => normalizeLeaderName(lead));
 
         wp.actions.push({
           text: action.indicative_activity,
@@ -106,17 +100,11 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           finalMilestoneDeadline: action.final_milestone_deadline || null,
           actionEntities: action.action_entities || null,
           subActionDetails: action.sub_action_details || null,
-          decisionStatus: "Further work ongoing",
+          actionStatus: action.action_status || "Further Work Ongoing",
         });
       } else {
-        // Merge leads if action already exists (use action_leads)
-        const actionLeads = action.action_leads
-          ? action.action_leads
-              .split(";")
-              .map((lead) => lead.trim())
-              .filter((lead) => lead.length > 0)
-              .map((lead) => normalizeLeaderName(lead))
-          : [];
+        // Merge leads if action already exists
+        const actionLeads = action.action_leads.map((lead) => normalizeLeaderName(lead));
         actionLeads.forEach((lead) => {
           if (!existingAction.leads.includes(lead)) {
             existingAction.leads.push(lead);

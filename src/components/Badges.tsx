@@ -185,22 +185,35 @@ export function WorkstreamLabels({
 // Decision Status Badge
 // ============================================================================
 
-export type DecisionStatus = "decision taken" | "further work ongoing";
+export type DecisionStatus = "Decision Taken" | "Further Work Ongoing";
+
+export type ScenarioStatus =
+  | "1. Within SG authority"
+  | "2. Requiring further work"
+  | "3. Included in budget estimate";
 
 interface DecisionStatusBadgeProps {
-  /** The decision status value */
-  status: DecisionStatus | string | null | undefined;
+  /** The decision status value or scenario value */
+  status: DecisionStatus | ScenarioStatus | string | null | undefined;
   /** Size variant: "sm" for compact (cards), "default" for larger (modals) */
   size?: "sm" | "default";
 }
 
 /**
  * Decision Status Badge - shows amber for "Further Work Ongoing" or green for "Decision Taken"
+ * Also maps legacy scenario values:
+ * - "1. Within SG authority" → Decision Taken
+ * - "2. Requiring further work" → Further Work Ongoing
+ * - "3. Included in budget estimate" → Further Work Ongoing
  */
 export function DecisionStatusBadge({ status, size = "default" }: DecisionStatusBadgeProps) {
   if (!status) return null;
 
-  const isDecisionTaken = status.toLowerCase() === "decision taken";
+  // Map scenario values and action_status values to decision status
+  const normalizedStatus = status.toLowerCase();
+  const isDecisionTaken =
+    normalizedStatus === "decision taken" ||
+    status === "1. Within SG authority";
   const isSmall = size === "sm";
 
   return (
@@ -221,17 +234,4 @@ export function DecisionStatusBadge({ status, size = "default" }: DecisionStatus
       <span>{isDecisionTaken ? "Decision Taken" : "Further Work Ongoing"}</span>
     </div>
   );
-}
-
-// ============================================================================
-// Utilities
-// ============================================================================
-
-/** Parse semicolon-separated string into array */
-export function parseLeadsString(str: string | null): string[] {
-  if (!str?.trim()) return [];
-  return str
-    .split(";")
-    .map((s) => s.trim())
-    .filter(Boolean);
 }

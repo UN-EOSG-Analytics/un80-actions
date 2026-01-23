@@ -5,7 +5,6 @@ import {
     DecisionStatusBadge,
     TeamBadge,
     WPLeadsBadge,
-    parseLeadsString,
 } from "@/components/Badges";
 import { MilestoneTimeline } from "@/components/MilestoneTimeline";
 import {
@@ -190,16 +189,15 @@ export default function ActionModal({
             )}
           </h2>
           {/* Action Leads and Team Members - underneath action name */}
-          {(action.action_leads || action.action_entities) && (
+          {(action.action_leads.length > 0 || action.action_entities) && (
             <div className="mt-3 flex flex-wrap items-center gap-1">
               {/* Action Leads */}
               <ActionLeadsBadge
-                leads={parseLeadsString(action.action_leads)}
+                leads={action.action_leads}
                 inline
               />
               {/* Separator */}
-              {action.action_leads &&
-                action.action_leads.trim() &&
+              {action.action_leads.length > 0 &&
                 action.action_entities &&
                 action.action_entities.trim() && (
                   <span className="text-slate-300">•</span>
@@ -271,7 +269,7 @@ export default function ActionModal({
               <h3 className="mb-1.5 text-sm font-semibold tracking-wide text-slate-700">
                 Status
               </h3>
-              <DecisionStatusBadge status="further work ongoing" />
+              <DecisionStatusBadge status={action.action_status || "Further Work Ongoing"} />
             </div>
 
             {/* Milestones Section */}
@@ -337,7 +335,7 @@ export default function ActionModal({
                         ? [
                             {
                               label: action.upcoming_milestone,
-                              deadline: action.upcoming_milestone_deadline,
+                              deadline: action.delivery_date,
                               isReached: false,
                             },
                           ]
