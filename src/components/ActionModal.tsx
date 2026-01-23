@@ -11,6 +11,7 @@ import { MilestoneTimeline } from "@/components/MilestoneTimeline";
 import {
     Tooltip,
     TooltipContent,
+    TooltipCollisionBoundaryProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
@@ -34,9 +35,15 @@ export default function ActionModal({
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [modalEl, setModalEl] = useState<HTMLDivElement | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const setModalRef = useCallback((el: HTMLDivElement | null) => {
+    (modalRef as { current: HTMLDivElement | null }).current = el;
+    setModalEl(el);
+  }, []);
 
   // Animation state management
   useEffect(() => {
@@ -252,7 +259,7 @@ export default function ActionModal({
         {/* Combined Action Details, Milestones, and Updates Section */}
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           {/* Action Details Header */}
-          <div className="border-b-2 border-l-4 border-slate-300 border-l-slate-500 bg-slate-200 px-5 py-4">
+          <div className="border-b-2 border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
             <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-800">
               Action Details
             </h3>
@@ -372,7 +379,7 @@ export default function ActionModal({
         {(action.doc_text || action.document_paragraph) && (
           <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
             {/* Document Reference Header */}
-            <div className="border-b-2 border-l-4 border-slate-300 border-l-slate-500 bg-slate-200 px-5 py-4">
+            <div className="border-b-2 border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
               <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-800">
                 Document Reference
               </h3>
@@ -424,7 +431,7 @@ export default function ActionModal({
         {/* Work Package Reference Section */}
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           {/* Work Package Reference Header */}
-          <div className="border-b-2 border-l-4 border-slate-300 border-l-slate-500 bg-slate-200 px-5 py-4">
+          <div className="border-b-2 border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
             <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-800">
               Work Package Reference
             </h3>
@@ -503,7 +510,7 @@ export default function ActionModal({
       onClick={handleBackdropClick}
     >
       <div
-        ref={modalRef}
+        ref={setModalRef}
         className={`h-full w-full overflow-y-auto bg-white shadow-2xl transition-transform duration-300 ease-out sm:w-4/5 md:w-3/4 lg:w-1/2 ${
           isVisible && !isClosing ? "translate-x-0" : "translate-x-full"
         }`}
@@ -512,6 +519,7 @@ export default function ActionModal({
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
+        <TooltipCollisionBoundaryProvider value={modalEl}>
         <div className="flex min-h-full flex-col">
           {/* Header */}
           <div className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6">
@@ -523,6 +531,7 @@ export default function ActionModal({
             {renderBody()}
           </div>
         </div>
+        </TooltipCollisionBoundaryProvider>
       </div>
     </div>
   );

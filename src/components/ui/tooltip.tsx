@@ -5,6 +5,24 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 import { cn } from "@/lib/utils";
 
+/** When provided (e.g. by Action Modal), tooltips will stay within this element. */
+const TooltipCollisionBoundaryContext =
+  React.createContext<HTMLDivElement | null>(null);
+
+export function TooltipCollisionBoundaryProvider({
+  value,
+  children,
+}: {
+  value: HTMLDivElement | null;
+  children: React.ReactNode;
+}) {
+  return (
+    <TooltipCollisionBoundaryContext.Provider value={value}>
+      {children}
+    </TooltipCollisionBoundaryContext.Provider>
+  );
+}
+
 function useIsTouchDevice() {
   const [isTouch, setIsTouch] = React.useState(false);
   React.useEffect(() => {
@@ -76,17 +94,27 @@ function TooltipContent({
   className,
   sideOffset = 8,
   onPointerDownOutside,
+  collisionBoundary: propsCollisionBoundary,
+  collisionPadding: propsCollisionPadding,
   children,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Content>) {
   const ctx = React.useContext(TooltipContext);
   const isTouch = ctx?.isTouch ?? false;
   const setOpen = ctx?.setOpen;
+  const boundaryEl = React.useContext(TooltipCollisionBoundaryContext);
+  const collisionBoundary = boundaryEl || propsCollisionBoundary;
+  const collisionPadding = boundaryEl
+    ? (propsCollisionPadding ?? 12)
+    : propsCollisionPadding;
+
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content
         data-slot="tooltip-content"
         sideOffset={sideOffset}
+        collisionBoundary={collisionBoundary}
+        collisionPadding={collisionPadding}
         onPointerDownOutside={(e) => {
           if (isTouch && setOpen) setOpen(false);
           onPointerDownOutside?.(e);
