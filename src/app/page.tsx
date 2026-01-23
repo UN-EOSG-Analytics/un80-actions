@@ -301,8 +301,10 @@ export function WorkPackagesPageContent() {
                   const totalWorkstreams = new Set(
                     workPackages.flatMap((wp) => wp.report)
                   ).size;
+                  // Include all actions except subaction entries (is_subaction + sub_action_details);
+                  // main actions with sub_action_details (e.g. "Harmonized in-country logistics") are counted.
                   const totalActions = actions.filter(
-                    (a) => !a.sub_action_details
+                    (a) => !(a.sub_action_details && a.is_subaction)
                   ).length;
                   const totalLeads = new Set(
                     workPackages.flatMap((wp) => wp.leads)

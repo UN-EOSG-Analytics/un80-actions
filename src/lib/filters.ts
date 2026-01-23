@@ -710,9 +710,10 @@ export function calculateStatsData(
     }
   });
 
-  // Count only non-subactions for the actions card (exclude subactions from count)
+  // Count actions: exclude only subaction entries (is_subaction and sub_action_details);
+  // main actions with sub_action_details are counted to match total (86).
   const nonSubactionCount = filteredActions.filter(
-    (action) => !action.is_subaction,
+    (action) => !(action.sub_action_details && action.is_subaction),
   ).length;
 
   return {

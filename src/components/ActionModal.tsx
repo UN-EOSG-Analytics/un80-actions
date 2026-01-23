@@ -393,13 +393,13 @@ export default function ActionModal({
                       documentData.documentNumber,
                     );
                     return (
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-nowrap items-start gap-2">
                         <FileText className="h-4 w-4 shrink-0 text-slate-600" />
                         <a
                           href={documentUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-mono text-sm leading-tight text-un-blue hover:underline"
+                          className="min-w-0 flex-1 font-mono text-sm leading-tight text-un-blue hover:underline"
                         >
                           {documentData.text}
                         </a>
