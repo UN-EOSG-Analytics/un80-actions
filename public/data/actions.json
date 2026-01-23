@@ -300,7 +300,7 @@
       "Administrator UNDP",
       "ED UNOPS"
     ],
-    "first_milestone":"Draft initial assessment analysis of the ‘as is’ with high level merger options, pros, cons, risk analysis for internal consultations completed",
+    "first_milestone":"Draft initial assessment analysis of the ‘as is’ with high level merger proposal, pros, cons, risk analysis for internal consultations completed",
     "first_milestone_deadline":"2026-01-18",
     "final_milestone":"Thorough assessment of selected option(s) provided to Member States and guidance given through a General Assembly decision",
     "final_milestone_deadline":"2026-08-30",
@@ -408,9 +408,9 @@
     "work_package_leads":[
       "DSG"
     ],
-    "first_milestone":"The parameters for the recalibration of the RC system defined and being consulted with Member States (e.g., change in DCO structure, more tailored approach)",
+    "first_milestone":"The parameters for the recalibration of the RC system defined (e.g., change in DCO structure, more tailored approach)",
     "first_milestone_deadline":"2026-01-30",
-    "final_milestone":"All measures to recalibrate the RC system (DCO 2.0) implemented and a decision to enhance the funding model of the RC system successfully tabled in the General Assembly",
+    "final_milestone":"All measures to recalibrate the RC system (DCO 2.0) implemented, under the Secretary-General’s authority, reflecting guidance from the appropriate legislative bodies",
     "final_milestone_deadline":"2026-08-29",
     "doc_text":"We will strengthen and recalibrate the Resident Coordinator system to better leverage system-wide expertise and accountability. Resident Coordinators will serve as the gateway to knowledge hubs and expertise-on-demand to mobilize specialized capacities more easily, particularly from specialized and non-resident entities.",
     "work_package_goal":"Reconfigured country teams with empowered leadership",
