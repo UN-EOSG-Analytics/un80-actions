@@ -63,6 +63,10 @@ interface SidebarChartsProps {
   showAllMilestonesPerMonth: boolean;
   onToggleShowAllMilestonesPerMonth: () => void;
 
+  // Action Status filter
+  selectedActionStatus: string[];
+  onSelectActionStatus: (status: string[]) => void;
+
   // Actions data for status counts
   actions: Action[];
 }
@@ -78,6 +82,8 @@ export function SidebarCharts({
   onSelectWorkstream,
   upcomingMilestonesData,
   milestonesPerMonthSearchQuery,
+  selectedActionStatus,
+  onSelectActionStatus,
   actions,
 }: SidebarChartsProps) {
   // Calculate status counts based on public_action_status field
@@ -236,56 +242,102 @@ export function SidebarCharts({
 
           <div className="space-y-3 pr-4">
             {/* Further Work Ongoing */}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex min-w-0 items-center gap-2">
-                  <Clock className="h-4 w-4 shrink-0 text-un-blue" />
-                  <span className="text-sm font-medium text-slate-700">
-                    Further Work Ongoing
-                  </span>
-                </div>
-                <span className="shrink-0 text-[14px] font-semibold text-un-blue tabular-nums">
-                  {furtherWorkCount}
-                </span>
-              </div>
-              <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+            {(() => {
+              const isSelected = selectedActionStatus.includes("Further work ongoing");
+              return (
                 <div
-                  className="h-full rounded-full bg-un-blue/50 transition-all"
-                  style={{
-                    width:
-                      totalActions > 0
-                        ? `${(furtherWorkCount / totalActions) * 100}%`
-                        : "0%",
+                  className={`group min-w-0 flex-1 cursor-pointer rounded-md px-2 py-1.5 transition-all ${
+                    isSelected
+                      ? "bg-un-blue/10 ring-2 ring-un-blue/30"
+                      : "hover:bg-slate-50"
+                  }`}
+                  onClick={() => {
+                    // Toggle: if selected, clear; if not selected, select only this one
+                    onSelectActionStatus(isSelected ? [] : ["Further work ongoing"]);
                   }}
-                />
-              </div>
-            </div>
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <Clock className={`h-4 w-4 shrink-0 transition-transform group-hover:scale-110 ${
+                        isSelected ? "text-un-blue" : "text-un-blue"
+                      }`} />
+                      <span className={`text-sm font-medium transition-colors ${
+                        isSelected ? "text-un-blue" : "text-slate-700 group-hover:text-slate-900"
+                      }`}>
+                        Further Work Ongoing
+                      </span>
+                    </div>
+                    <span className={`shrink-0 text-[14px] font-semibold tabular-nums ${
+                      isSelected ? "text-un-blue" : "text-un-blue"
+                    }`}>
+                      {furtherWorkCount}
+                    </span>
+                  </div>
+                  <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className={`h-full rounded-full transition-all ${
+                        isSelected ? "bg-un-blue" : "bg-un-blue/50 group-hover:bg-un-blue/60"
+                      }`}
+                      style={{
+                        width:
+                          totalActions > 0
+                            ? `${(furtherWorkCount / totalActions) * 100}%`
+                            : "0%",
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Decision Taken */}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex min-w-0 items-center gap-2">
-                  <SquareCheckBig className="h-4 w-4 shrink-0 text-un-blue" />
-                  <span className="text-sm font-medium text-slate-700">
-                    Decision Taken
-                  </span>
-                </div>
-                <span className="shrink-0 text-[14px] font-semibold text-un-blue tabular-nums">
-                  {decisionTakenCount}
-                </span>
-              </div>
-              <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+            {(() => {
+              const isSelected = selectedActionStatus.includes("Decision taken");
+              return (
                 <div
-                  className="h-full rounded-full bg-un-blue/50 transition-all"
-                  style={{
-                    width:
-                      totalActions > 0
-                        ? `${(decisionTakenCount / totalActions) * 100}%`
-                        : "0%",
+                  className={`group min-w-0 flex-1 cursor-pointer rounded-md px-2 py-1.5 transition-all ${
+                    isSelected
+                      ? "bg-un-blue/10 ring-2 ring-un-blue/30"
+                      : "hover:bg-slate-50"
+                  }`}
+                  onClick={() => {
+                    // Toggle: if selected, clear; if not selected, select only this one
+                    onSelectActionStatus(isSelected ? [] : ["Decision taken"]);
                   }}
-                />
-              </div>
-            </div>
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <SquareCheckBig className={`h-4 w-4 shrink-0 transition-transform group-hover:scale-110 ${
+                        isSelected ? "text-un-blue" : "text-un-blue"
+                      }`} />
+                      <span className={`text-sm font-medium transition-colors ${
+                        isSelected ? "text-un-blue" : "text-slate-700 group-hover:text-slate-900"
+                      }`}>
+                        Decision Taken
+                      </span>
+                    </div>
+                    <span className={`shrink-0 text-[14px] font-semibold tabular-nums ${
+                      isSelected ? "text-un-blue" : "text-un-blue"
+                    }`}>
+                      {decisionTakenCount}
+                    </span>
+                  </div>
+                  <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className={`h-full rounded-full transition-all ${
+                        isSelected ? "bg-un-blue" : "bg-un-blue/50 group-hover:bg-un-blue/60"
+                      }`}
+                      style={{
+                        width:
+                          totalActions > 0
+                            ? `${(decisionTakenCount / totalActions) * 100}%`
+                            : "0%",
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}

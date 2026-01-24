@@ -15,6 +15,7 @@ interface WorkPackageActionsProps {
   actions: WorkPackageAction[];
   workPackageNumber: number | "";
   searchQuery?: string;
+  selectedActionStatus?: string[];
 }
 
 /**
@@ -31,10 +32,22 @@ function actionMatchesSearch(action: WorkPackageAction, query: string): boolean 
   );
 }
 
+/**
+ * Helper to check if an action matches the status filter
+ */
+function actionMatchesStatus(action: WorkPackageAction, selectedStatuses: string[]): boolean {
+  if (selectedStatuses.length === 0) return true;
+  const actionStatusLower = action.actionStatus?.toLowerCase() || "";
+  return selectedStatuses.some(
+    (status) => status.toLowerCase() === actionStatusLower
+  );
+}
+
 function WorkPackageActions({
   actions,
   workPackageNumber,
   searchQuery = "",
+  selectedActionStatus = [],
 }: WorkPackageActionsProps) {
   const [showUnmatched, setShowUnmatched] = useState(false);
 
@@ -48,13 +61,22 @@ function WorkPackageActions({
     );
   }
 
-  // Separate matched and unmatched actions
+  // Separate matched and unmatched actions based on both search and status filters
   const hasActiveSearch = searchQuery.trim().length > 0;
-  const matchedActions = hasActiveSearch
-    ? actions.filter((action) => actionMatchesSearch(action, searchQuery))
+  const hasActiveStatusFilter = selectedActionStatus.length > 0;
+  const hasActiveFilter = hasActiveSearch || hasActiveStatusFilter;
+
+  const matchedActions = hasActiveFilter
+    ? actions.filter((action) => 
+        actionMatchesSearch(action, searchQuery) && 
+        actionMatchesStatus(action, selectedActionStatus)
+      )
     : actions;
-  const unmatchedActions = hasActiveSearch
-    ? actions.filter((action) => !actionMatchesSearch(action, searchQuery))
+  const unmatchedActions = hasActiveFilter
+    ? actions.filter((action) => 
+        !actionMatchesSearch(action, searchQuery) || 
+        !actionMatchesStatus(action, selectedActionStatus)
+      )
     : [];
 
   return (
@@ -114,6 +136,7 @@ interface WorkPackageItemProps {
   onSelectWorkstream?: (workstream: string[]) => void;
   showProgress?: boolean;
   searchQuery?: string;
+  selectedActionStatus?: string[];
 }
 
 export function WorkPackageItem({
@@ -124,6 +147,7 @@ export function WorkPackageItem({
   onSelectWorkstream,
   showProgress = false,
   searchQuery = "",
+  selectedActionStatus = [],
 }: WorkPackageItemProps) {
   // Calculate animation duration: base 150ms + 30ms per action, capped at 400ms
   const collapsibleDuration = Math.min(150 + wp.actions.length * 30, 400);
@@ -280,6 +304,7 @@ export function WorkPackageItem({
               actions={wp.actions}
               workPackageNumber={wp.number}
               searchQuery={searchQuery}
+              selectedActionStatus={selectedActionStatus}
             />
           </div>
         </CollapsibleContent>

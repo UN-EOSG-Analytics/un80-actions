@@ -64,10 +64,15 @@ export function useCollapsibles() {
     });
   }, []);
 
+  const collapseAllWorkPackages = useCallback(() => {
+    setOpenCollapsibles(new Set());
+  }, []);
+
   return {
     openCollapsibles,
     toggleCollapsible,
     expandCollapsibles,
+    collapseAllWorkPackages,
     isAdvancedFilterOpen,
     setIsAdvancedFilterOpen,
     openFilterCollapsibles,

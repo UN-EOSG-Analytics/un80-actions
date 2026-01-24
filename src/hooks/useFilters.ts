@@ -29,6 +29,7 @@ export function useFilters() {
   const selectedBigTicket = decodeUrlParamArray(searchParams.get("type"));
   const selectedAction = decodeUrlParamArray(searchParams.get("actions"));
   const selectedTeamMember = decodeUrlParamArray(searchParams.get("team"));
+  const selectedActionStatus = decodeUrlParamArray(searchParams.get("action_status"));
   const sortOption = searchParams.get("sort") || "number-asc";
 
   // Helper to build a clean, human-readable query string
@@ -171,6 +172,19 @@ export function useFilters() {
     [updateUrl],
   );
 
+  const setSelectedActionStatus = useCallback(
+    (value: string[]) => {
+      updateUrl((params) => {
+        if (value.length > 0) {
+          params.action_status = encodeUrlParamArray(value);
+        } else {
+          delete params.action_status;
+        }
+      });
+    },
+    [updateUrl],
+  );
+
   const setSortOption = useCallback(
     (value: string) => {
       updateUrl((params) => {
@@ -194,6 +208,7 @@ export function useFilters() {
       selectedBigTicket,
       selectedAction,
       selectedTeamMember,
+      selectedActionStatus,
       sortOption,
     }),
     [
@@ -205,6 +220,7 @@ export function useFilters() {
       selectedBigTicket,
       selectedAction,
       selectedTeamMember,
+      selectedActionStatus,
       sortOption,
     ],
   );
@@ -239,6 +255,8 @@ export function useFilters() {
     setSelectedAction,
     selectedTeamMember,
     setSelectedTeamMember,
+    selectedActionStatus,
+    setSelectedActionStatus,
     sortOption,
     setSortOption,
     handleResetFilters,

@@ -18,6 +18,7 @@ import {
   User,
   Package,
   ListTodo,
+  Activity,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -48,6 +49,8 @@ interface FilterControlsProps {
   onSelectAction: (value: string[]) => void;
   selectedTeamMember: string[];
   onSelectTeamMember: (value: string[]) => void;
+  selectedActionStatus: string[];
+  onSelectActionStatus: (value: string[]) => void;
 
   // Search
   searchQuery: string;
@@ -89,6 +92,8 @@ export function FilterControls({
   onSelectAction,
   selectedTeamMember,
   onSelectTeamMember,
+  selectedActionStatus,
+  onSelectActionStatus,
   searchQuery,
   onSearchChange,
   uniqueWorkPackages,
@@ -125,7 +130,8 @@ export function FilterControls({
     selectedWorkstream.length > 0 ||
     selectedBigTicket.length > 0 ||
     selectedAction.length > 0 ||
-    selectedTeamMember.length > 0
+    selectedTeamMember.length > 0 ||
+    selectedActionStatus.length > 0
   );
 
   const hasActiveAdvancedFilters = !!(
@@ -134,7 +140,8 @@ export function FilterControls({
     selectedWorkstream.length > 0 ||
     selectedBigTicket.length > 0 ||
     selectedAction.length > 0 ||
-    selectedTeamMember.length > 0
+    selectedTeamMember.length > 0 ||
+    selectedActionStatus.length > 0
   );
 
   return (
@@ -506,6 +513,36 @@ export function FilterControls({
             ariaLabel="Filter by team member"
             enableSearch={true}
             searchPlaceholder="Search team members..."
+          />
+
+          {/* Action Status Filter */}
+          <FilterDropdown
+            open={openFilterCollapsibles.has("actionStatus")}
+            onOpenChange={(open) =>
+              onToggleFilterCollapsible("actionStatus", open)
+            }
+            icon={<Activity className="h-4 w-4 text-un-blue" />}
+            triggerText={
+              selectedActionStatus.length === 0
+                ? "Select action status"
+                : selectedActionStatus.length === 1
+                  ? selectedActionStatus[0]
+                  : `${selectedActionStatus.length} statuses selected`
+            }
+            isFiltered={selectedActionStatus.length > 0}
+            allActive={false}
+            options={[
+              { key: "Further work ongoing", label: "Further Work Ongoing" },
+              { key: "Decision taken", label: "Decision Taken" },
+            ]}
+            selectedKeys={new Set(selectedActionStatus)}
+            onToggle={(key) => {
+              const newSelected = selectedActionStatus.includes(key)
+                ? selectedActionStatus.filter((status) => status !== key)
+                : [...selectedActionStatus, key];
+              onSelectActionStatus(newSelected);
+            }}
+            ariaLabel="Filter by action status"
           />
         </div>
       )}

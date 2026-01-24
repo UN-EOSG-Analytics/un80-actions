@@ -151,6 +151,20 @@ export function filterWorkPackages(
     );
   }
 
+  // Action Status filter (supports multiple selections)
+  if (filters.selectedActionStatus && filters.selectedActionStatus.length > 0) {
+    filtered = filtered.filter((wp) => {
+      const hasMatchingAction = wp.actions.some((action) => {
+        // Case-insensitive comparison to handle variations
+        const actionStatusLower = action.actionStatus?.toLowerCase() || "";
+        return filters.selectedActionStatus.some(
+          (status) => status.toLowerCase() === actionStatusLower
+        );
+      });
+      return hasMatchingAction;
+    });
+  }
+
   // Note: Team Member filter is applied at the action level in ListContainer,
   // not at the work package level, so we don't filter work packages here
 

@@ -158,6 +158,7 @@ export interface FilterState {
   selectedBigTicket: string[];
   selectedAction: string[];
   selectedTeamMember: string[];
+  selectedActionStatus: string[];
   sortOption: string;
 }
 

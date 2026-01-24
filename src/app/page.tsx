@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useCallback, useEffect, useRef } from "react";
 import { DataCard } from "@/components/DataCard";
 import { ExplainerText } from "@/components/ExplainerText";
 import { FilterControls } from "@/components/FilterControls";
@@ -43,6 +43,8 @@ export function WorkPackagesPageContent() {
     setSelectedAction,
     selectedTeamMember,
     setSelectedTeamMember,
+    selectedActionStatus,
+    setSelectedActionStatus,
     sortOption,
     setSortOption,
     handleResetFilters,
@@ -53,6 +55,7 @@ export function WorkPackagesPageContent() {
     openCollapsibles,
     toggleCollapsible,
     expandCollapsibles,
+    collapseAllWorkPackages,
     isAdvancedFilterOpen,
     setIsAdvancedFilterOpen,
     openFilterCollapsibles,
@@ -123,6 +126,11 @@ export function WorkPackagesPageContent() {
     selectedBigTicket,
     availableBigTicketOptions.map((opt) => opt.key),
     setSelectedBigTicket,
+  );
+  useFilterSync(
+    selectedActionStatus,
+    ["Further work ongoing", "Decision taken"],
+    setSelectedActionStatus,
   );
 
   // Track the last selectedAction we processed to avoid infinite loops
@@ -271,11 +279,104 @@ export function WorkPackagesPageContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, filteredWorkPackages]); // Depend on searchQuery and filteredWorkPackages
 
+  // Track the last selectedActionStatus we processed to avoid infinite loops
+  const lastProcessedActionStatusRef = useRef<string>("");
+  // Track if we've processed the initial data load for action status
+  const hasProcessedInitialActionStatusRef = useRef<boolean>(false);
+
+  // Auto-expand work package collapsibles when action status filter is selected
+  useEffect(() => {
+    const selectedStatusKey = selectedActionStatus.sort().join(",");
+
+    // Build a unique key that includes both the status and whether data is loaded
+    const dataKey = `${selectedStatusKey}:${filteredWorkPackages.length > 0}`;
+
+    // Skip if we've already processed this exact combination
+    // But always process if we have data and haven't processed initial load yet
+    const shouldProcess = 
+      selectedActionStatus.length > 0 && 
+      filteredWorkPackages.length > 0 &&
+      (dataKey !== lastProcessedActionStatusRef.current || !hasProcessedInitialActionStatusRef.current);
+
+    if (shouldProcess) {
+      const collapsibleKeysToExpand: string[] = [];
+
+      filteredWorkPackages.forEach((wp, index) => {
+        // Check if this work package has any actions matching the status filter
+        const hasMatchingAction = wp.actions.some((action) => {
+          const actionStatusLower = action.actionStatus?.toLowerCase() || "";
+          return selectedActionStatus.some(
+            (status) => status.toLowerCase() === actionStatusLower
+          );
+        });
+
+        if (hasMatchingAction) {
+          const collapsibleKey = `${wp.report.join("-")}-${wp.number || "empty"}-${index}`;
+          // Only add if not already open
+          if (!openCollapsibles.has(collapsibleKey)) {
+            collapsibleKeysToExpand.push(collapsibleKey);
+          }
+        }
+      });
+
+      if (collapsibleKeysToExpand.length > 0) {
+        expandCollapsibles(collapsibleKeysToExpand);
+      }
+
+      // Mark this selection as processed
+      lastProcessedActionStatusRef.current = dataKey;
+      hasProcessedInitialActionStatusRef.current = true;
+    } else if (selectedActionStatus.length === 0 && hasProcessedInitialActionStatusRef.current) {
+      // Collapse all work packages when action status filter is cleared
+      collapseAllWorkPackages();
+      // Reset tracking refs
+      lastProcessedActionStatusRef.current = "";
+      hasProcessedInitialActionStatusRef.current = false;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedActionStatus, filteredWorkPackages, collapseAllWorkPackages]); // Depend on selectedActionStatus and filteredWorkPackages
+
+  // Track previous filter state to detect when filters are cleared
+  const prevHadFiltersRef = useRef<boolean>(false);
+
+  // Collapse work packages when all filters are cleared
+  useEffect(() => {
+    const hasActiveFilters = 
+      searchQuery.trim().length > 0 ||
+      selectedAction.length > 0 ||
+      selectedActionStatus.length > 0 ||
+      selectedWorkPackage.length > 0;
+    
+    // If we previously had filters and now we don't, collapse all
+    if (prevHadFiltersRef.current && !hasActiveFilters) {
+      collapseAllWorkPackages();
+      // Reset all tracking refs
+      lastProcessedActionsRef.current = "";
+      lastProcessedWorkPackagesRef.current = "";
+      lastProcessedSearchRef.current = "";
+      lastProcessedActionStatusRef.current = "";
+      hasProcessedInitialActionStatusRef.current = false;
+    }
+    
+    prevHadFiltersRef.current = hasActiveFilters;
+  }, [searchQuery, selectedAction, selectedActionStatus, selectedWorkPackage, collapseAllWorkPackages]);
+
+  // Wrapper for reset that also collapses work packages
+  const handleResetFiltersWithCollapse = useCallback(() => {
+    handleResetFilters();
+    // Collapse will happen via the effect above when URL state updates
+  }, [handleResetFilters]);
+
+  const handleResetAllWithCollapse = useCallback(() => {
+    handleResetAll();
+    // Collapse will happen via the effect above when URL state updates
+  }, [handleResetAll]);
+
   return (
     <TooltipProvider delayDuration={200}>
       <div className="min-h-screen bg-white">
         {/* Fixed Header */}
-        <Header onReset={handleResetAll} showLogin={false} />
+        <Header onReset={handleResetAllWithCollapse} showLogin={false} />
 
         {/* Main Container */}
         <main className="mx-auto w-full max-w-4xl px-4 pt-6 sm:px-8 sm:pt-8 md:px-12 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
@@ -406,6 +507,8 @@ export function WorkPackagesPageContent() {
                     onSelectAction={setSelectedAction}
                     selectedTeamMember={selectedTeamMember}
                     onSelectTeamMember={setSelectedTeamMember}
+                    selectedActionStatus={selectedActionStatus}
+                    onSelectActionStatus={setSelectedActionStatus}
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
                     uniqueWorkPackages={uniqueWorkPackages}
@@ -414,7 +517,7 @@ export function WorkPackagesPageContent() {
                     uniqueActions={uniqueActions}
                     uniqueTeamMembers={uniqueTeamMembers}
                     availableBigTicketOptions={availableBigTicketOptions}
-                    onResetFilters={handleResetFilters}
+                    onResetFilters={handleResetFiltersWithCollapse}
                   />
 
                   <WorkPackageList
@@ -425,6 +528,7 @@ export function WorkPackagesPageContent() {
                     onSelectWorkstream={setSelectedWorkstream}
                     selectedActions={selectedAction}
                     selectedTeamMembers={selectedTeamMember}
+                    selectedActionStatus={selectedActionStatus}
                     isLoading={isLoading}
                     showProgress={showProgress}
                     searchQuery={searchQuery}
@@ -477,6 +581,8 @@ export function WorkPackagesPageContent() {
                   onToggleShowAllMilestonesPerMonth={() =>
                     setShowAllMilestonesPerMonth(!showAllMilestonesPerMonth)
                   }
+                  selectedActionStatus={selectedActionStatus}
+                  onSelectActionStatus={setSelectedActionStatus}
                   actions={actions}
                 />
               </section>

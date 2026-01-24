@@ -37,6 +37,7 @@ function WorkPackagesPageContent() {
       selectedBigTicket: [],
       selectedAction: [],
       selectedTeamMember: [],
+      selectedActionStatus: [],
       sortOption: "number-asc",
     },
     "",
