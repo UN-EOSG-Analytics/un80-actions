@@ -290,7 +290,7 @@ export default function ActionModal({
               <h3 className="mb-1.5 text-sm font-semibold tracking-wide text-slate-700">
                 Status
               </h3>
-              <DecisionStatusBadge status={action.action_status || "Further Work Ongoing"} />
+              <DecisionStatusBadge status={action.public_action_status || "Further Work Ongoing"} />
             </div>
 
             {/* Milestones Section */}

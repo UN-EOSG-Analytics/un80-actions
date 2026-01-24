@@ -248,7 +248,9 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
                                 actionEntities: action.action_entities,
                                 subActionDetails:
                                   action.sub_action_details || null,
-                                actionStatus: "Further Work Ongoing" as const,
+                                actionStatus:
+                                  action.public_action_status ||
+                                  "Further work ongoing",
                               };
                               return (
                                 <div

@@ -23,12 +23,11 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "upcoming_milestone":"Possible delegation of relevant programmatic tasks clarified among entities",
+    "upcoming_milestone":"Draft review of the future of peace operations (requested in GA resolution 79\/1) submitted for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-06-10",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -57,9 +56,8 @@
     "upcoming_milestone":"Draft review of the future of peace operations (requested in GA resolution 79\/1) submitted for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-03-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -86,9 +84,8 @@
     "upcoming_milestone":"Humanitarian Response Plans for 2026 published in shorter and more digital format",
     "updates":null,
     "delivery_date":"2026-03-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -113,11 +110,10 @@
       "USG OCHA"
     ],
     "upcoming_milestone":"Integrated supply chain operational in starter countries",
-    "updates":"- Five starter countries identified",
+    "updates":null,
     "delivery_date":"2026-08-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -144,9 +140,8 @@
     "upcoming_milestone":"Priority common services expanded to cover multiple agencies and contexts",
     "updates":null,
     "delivery_date":"2026-08-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -173,9 +168,8 @@
     "upcoming_milestone":"Collaborative established, scaling joint platforms, financing, capacities and standards",
     "updates":null,
     "delivery_date":"2026-08-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -202,9 +196,8 @@
     "upcoming_milestone":"Initiative functioning system-wide, with joint messaging and strategies for priority crises",
     "updates":null,
     "delivery_date":"2026-08-30",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -231,9 +224,8 @@
     "upcoming_milestone":"Approaches for more coherent work finalized for priority settings",
     "updates":null,
     "delivery_date":"2026-01-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -260,9 +252,8 @@
     "upcoming_milestone":"Benefits of complementarity demonstrated along priority routes",
     "updates":null,
     "delivery_date":"2026-08-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -289,9 +280,8 @@
     "upcoming_milestone":"Benefits of federated, standards-based beneficiary data exchange demonstrated in priority contexts to inform scale-up",
     "updates":null,
     "delivery_date":"2026-08-30",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -318,9 +308,8 @@
     "upcoming_milestone":"Cluster-defined roles for health and nutrition emergencies consolidated into practical guidance material",
     "updates":null,
     "delivery_date":"2026-08-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -348,12 +337,11 @@
       "Administrator UNDP",
       "ED UNOPS"
     ],
-    "upcoming_milestone":"Draft initial assessment (including an analysis of pros, cons, and risks) completed for the Secretary-General's consideration",
+    "upcoming_milestone":"Initial analysis for the assessment completed for the Secretary-General's consideration",
     "updates":null,
-    "delivery_date":"2026-01-18",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "delivery_date":"2026-02-28",
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -381,12 +369,11 @@
       "ED UNFPA",
       "ED UN Women"
     ],
-    "upcoming_milestone":"Strategic merger assessment (including risk and benefit considerations) completed for the Secretary-General's consideration",
+    "upcoming_milestone":"Initial merger assessment completed for the Secretary-General's consideration",
     "updates":null,
-    "delivery_date":"2026-01-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "delivery_date":"2026-02-28",
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -414,12 +401,11 @@
       "ED UNFPA",
       "ED UN Women"
     ],
-    "upcoming_milestone":"As part of strategic merger assessment (action 27), proposal for optimizing the UN system’s work on population statistics and related activities finalized for the Secretary-General's consideration",
+    "upcoming_milestone":"As part of strategic merger assessment (action 27), initial assessment of the UN system’s work on population statistics and related activities finalized for the Secretary-General's consideration",
     "updates":null,
-    "delivery_date":"2026-01-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "delivery_date":"2026-02-28",
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -433,8 +419,8 @@
       "DSG"
     ],
     "first_milestone":"Outline of the draft proposals presented to the Secretary-General for guidance",
-    "first_milestone_deadline":"2026-01-07",
-    "final_milestone":"Member States taken action\/decided on final set of proposals presented by the Secretary-General (report finalized by 31 May 2026 – TBC, depend on UN80 next reporting cycle)",
+    "first_milestone_deadline":"2026-01-31",
+    "final_milestone":"Recommendations on country configuration finalized for Secretary-General’s consideration, and relayed to Member States in the most appropriate format.",
     "final_milestone_deadline":"2026-08-29",
     "doc_text":"To maximize the use of resources and expertise for delivery, we will propose a model to reconfigure country teams that streamlines physical presence to fewer entities, reduces overhead costs, builds more coherent delivery, and aligns with national priorities. To this end, the system-wide working group, chaired by the Deputy Secretary-General, will make recommendations by early 2026.",
     "work_package_goal":"Reconfigured country teams with empowered leadership",
@@ -443,12 +429,11 @@
     "action_leads":[
       "DSG"
     ],
-    "upcoming_milestone":null,
+    "upcoming_milestone":"System-wide working group convened and building blocks for proposals for UN country teams reconfiguration finalized for the Secretary-General's consideration",
     "updates":null,
-    "delivery_date":null,
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "delivery_date":"2026-03-31",
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -472,12 +457,11 @@
     "action_leads":[
       "DSG"
     ],
-    "upcoming_milestone":"Criteria for the recalibration of the RC system formulated by the Secretariat for consultation with Member States consistent with GA resolution 72\/279",
+    "upcoming_milestone":"Initial proposal for strengthening and recalibrating of the RC system prepared for Secretary-General's consideration",
     "updates":null,
-    "delivery_date":"2026-01-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "delivery_date":"2026-03-31",
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -491,8 +475,8 @@
       "DSG"
     ],
     "first_milestone":"System-wide working group convened and draft outline finalized and shared with the Secretary-General for guidance",
-    "first_milestone_deadline":"2026-01-07",
-    "final_milestone":"All aspects of the regional reset under SG prerogative implemented and decisions taken by Member States on aspects requiring new mandates (report May 2026 - TBC, depend on UN80 next reporting cycle)",
+    "first_milestone_deadline":"2026-01-31",
+    "final_milestone":"All aspects of the regional reset under SG prerogative implemented and proposals presented to Member States on aspects requiring new mandates",
     "final_milestone_deadline":"2026-08-29",
     "doc_text":"We will establish a system-wide working group, chaired by the Deputy Secretary-General, to develop proposals on how to advance a reset of regional capacities for sustainable development, with actionable recommendations to the Secretary-General. The group will also propose how to institutionalize Regional Integrated Platforms (see paragraphs 65-66 for more details on these platforms).",
     "work_package_goal":"Integrated regional support for stronger delivery",
@@ -501,12 +485,11 @@
     "action_leads":[
       "DSG"
     ],
-    "upcoming_milestone":null,
+    "upcoming_milestone":"System-wide working group convened and proposal for a regional reset of capacities for sustainable development and institutionalization of Regional Integrated Platforms shared with the Secretary-General for his consideration",
     "updates":null,
-    "delivery_date":null,
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "delivery_date":"2026-03-31",
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -530,12 +513,11 @@
     "action_leads":[
       "DSG"
     ],
-    "upcoming_milestone":"Initial proposal for hosting regional capacities within the regional economic commissions is developed for the Secretary-General's consideration",
+    "upcoming_milestone":"Proposal for hosting regional capacities within the regional economic commissions is developed for the Secretary-General's consideration",
     "updates":null,
-    "delivery_date":"2026-01-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "delivery_date":"2026-03-31",
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -564,9 +546,8 @@
     "upcoming_milestone":"Concept note delivered for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-01-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -592,12 +573,11 @@
       "SG ITU",
       "Administrator UNDP"
     ],
-    "upcoming_milestone":null,
+    "upcoming_milestone":"Expertise-on-demand approaches operational system-wide, including expertise catalogue and protocols",
     "updates":null,
     "delivery_date":"2026-09-17",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -626,9 +606,8 @@
     "upcoming_milestone":"Expertise-on-demand approaches operational system-wide, including expertise catalogue and protocols",
     "updates":null,
     "delivery_date":"2026-09-17",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -655,9 +634,8 @@
     "upcoming_milestone":"Human Rights Group established",
     "updates":null,
     "delivery_date":"2026-03-30",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -681,12 +659,11 @@
     "action_leads":[
       "USG Policy"
     ],
-    "upcoming_milestone":"Proposal for streamlining of fora finalized for the Secretary-General's consideration",
+    "upcoming_milestone":"Initial proposals prepared for the Secretary-General's consideration",
     "updates":null,
-    "delivery_date":"2026-02-27",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "delivery_date":"2026-03-31",
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -710,12 +687,11 @@
     "action_leads":[
       "USG Policy"
     ],
-    "upcoming_milestone":"Proposal for streamlining of fora finalized for the Secretary-General's consideration",
+    "upcoming_milestone":"Initial proposals prepared for the Secretary-General's consideration",
     "updates":null,
-    "delivery_date":"2026-02-27",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "delivery_date":"2026-03-31",
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -742,9 +718,8 @@
     "upcoming_milestone":"Interagency task forces and working groups streamlined around Regional Monthly Review",
     "updates":null,
     "delivery_date":"2026-09-15",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -771,9 +746,8 @@
     "upcoming_milestone":null,
     "updates":null,
     "delivery_date":null,
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Decision taken",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -797,12 +771,11 @@
     "action_leads":[
       "USG Policy"
     ],
-    "upcoming_milestone":"Consideration of any changes in Special Envoy roster finalized by the Secretary-General",
-    "updates":"- Mapping of special envoys, representatives, coordinators and advisers finalized for the Secretary-General's review",
+    "upcoming_milestone":"Consideration of mapping of relevant positions by the Secretary-General",
+    "updates":null,
     "delivery_date":"2026-02-27",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -828,12 +801,11 @@
       "ASG DCO",
       "DSG"
     ],
-    "upcoming_milestone":null,
+    "upcoming_milestone":"Proposal for the establishment of Regional Integrated Platforms developed as part of the overall proposal for a regional reset and shared with the Secretary-General for his consideration",
     "updates":null,
-    "delivery_date":null,
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "delivery_date":"2026-03-31",
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -859,12 +831,11 @@
       "ASG DCO",
       "DSG"
     ],
-    "upcoming_milestone":null,
+    "upcoming_milestone":"Proposal for harmonization of UN system organizational arrangements developed as part of the overall proposal for regional reset and shared with the Secretary-General for his consideration",
     "updates":null,
-    "delivery_date":null,
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "delivery_date":"2026-03-31",
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -890,12 +861,11 @@
       "USG OCHA",
       "DSG"
     ],
-    "upcoming_milestone":"Action plan for the Shared Platform Initiative and first progress report submitted to the Secretary-General",
+    "upcoming_milestone":"First progress report submitted to the Secretary-General covering the four areas: co-location of the offices, common performance management, clear accountabilty towards RC\/HCs and joint strategies for transitions and advocacy, and the Action Plan drafted for Secretary-General’s guidance",
     "updates":null,
-    "delivery_date":"2026-01-30",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "delivery_date":"2026-02-28",
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -923,10 +893,9 @@
     ],
     "upcoming_milestone":"Draft proposal for simplifying country-level planning processes submitted for Secretary-General's consideration",
     "updates":null,
-    "delivery_date":"2026-01-30",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "delivery_date":"2026-02-28",
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -957,9 +926,8 @@
     "upcoming_milestone":"Single Unified Service Roadmap outline submitted for Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-01-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -990,9 +958,8 @@
     "upcoming_milestone":"Proposal for integrated supply chain in starter countries submitted for Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-03-31",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1023,9 +990,8 @@
     "upcoming_milestone":"Assessment framework for unified services finalized for Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-01-31",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1056,9 +1022,8 @@
     "upcoming_milestone":"High-impact contexts for next phase of common country back offices identified for Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-01-31",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1089,9 +1054,8 @@
     "upcoming_milestone":null,
     "updates":null,
     "delivery_date":null,
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1122,9 +1086,8 @@
     "upcoming_milestone":"Proposal for ICT consolidation options presented to UN System Chief Executives Board for Coordination",
     "updates":null,
     "delivery_date":"2026-05-14",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1155,9 +1118,8 @@
     "upcoming_milestone":"Portfolio of 3 high-impact technology acceleration use cases presented to UN80 Steering Committee",
     "updates":null,
     "delivery_date":"2026-02-08",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1188,9 +1150,8 @@
     "upcoming_milestone":"UN System Data Commons site live with public data and statistics from at least 20+ entities",
     "updates":null,
     "delivery_date":"2026-09-14",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1221,9 +1182,8 @@
     "upcoming_milestone":"Commitments made by system-wide leadership for a sustainable joint approach supporting the UN System Data Commons",
     "updates":null,
     "delivery_date":"2026-02-27",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1254,9 +1214,8 @@
     "upcoming_milestone":"Initial data and statistics capacity contributions identified",
     "updates":null,
     "delivery_date":"2026-02-27",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1284,9 +1243,8 @@
     "upcoming_milestone":"Executive heads of UNITAR and UNSSC, together with Action 68 Team agree overall roadmap, stakeholder engagement strategy and key milestones. UNITAR and UNSSC agree detailed workplan for merger of the two institutions incl. needs assessment, scope, methodology and analytical questions",
     "updates":null,
     "delivery_date":"2026-01-31",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1314,9 +1272,8 @@
     "upcoming_milestone":"UNU reviews UNRISD's administrative framework (financial, communications, HR, legal), to gather information regarding integration",
     "updates":null,
     "delivery_date":"2026-03-31",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1345,9 +1302,8 @@
     "upcoming_milestone":"Plan in place setting out the scope and key considerations of the system-wide knowledge mapping exercise, including entities to be engaged",
     "updates":null,
     "delivery_date":"2026-01-31",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1376,9 +1332,8 @@
     "upcoming_milestone":"Review report with recommendations for how to strengthen incentives for pooled funding finalized for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-06-29",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1407,9 +1362,8 @@
     "upcoming_milestone":"Analysis, mapping and categorization of all relevant data finalized for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-01-29",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1438,9 +1392,8 @@
     "upcoming_milestone":"Draft paper on strengthening the case for core funding finalized for discussion with UN80 Steering Committee",
     "updates":null,
     "delivery_date":"2026-01-29",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1469,9 +1422,8 @@
     "upcoming_milestone":"Mapping of review mechanisms and relevant recommendations finalized for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-03-30",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1500,9 +1452,8 @@
     "upcoming_milestone":"Invitation to participate in survey shared with Member State delegates",
     "updates":null,
     "delivery_date":"2026-02-28",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1531,9 +1482,8 @@
     "upcoming_milestone":"Mapping of available support of mandate creation system-wide finalized for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-03-31",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1562,9 +1512,8 @@
     "upcoming_milestone":"Initial concept note finalized for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-03-31",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1591,9 +1540,8 @@
     "upcoming_milestone":"Terms of reference developed and assessment lead confirmed",
     "updates":null,
     "delivery_date":"2026-03-30",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1620,9 +1568,8 @@
     "upcoming_milestone":"Additional review instructions shared with relevant UN entities",
     "updates":null,
     "delivery_date":"2026-01-30",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1648,10 +1595,9 @@
     ],
     "upcoming_milestone":"Additional review instructions shared with relevant UN entities",
     "updates":null,
-    "delivery_date":"2026-01-30",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "delivery_date":"2026-10-31",
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -1678,9 +1624,8 @@
     "upcoming_milestone":"Action plan for a strengthened UN System-Wide Management for Results (MfR) Mechanism finalized for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-05-30",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1709,9 +1654,8 @@
     "upcoming_milestone":null,
     "updates":null,
     "delivery_date":null,
-    "scenario":"3. Included in budget estimate",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Decision taken",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1740,9 +1684,8 @@
     "upcoming_milestone":null,
     "updates":null,
     "delivery_date":null,
-    "scenario":"3. Included in budget estimate",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Decision taken",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1768,12 +1711,11 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "upcoming_milestone":"Proposal on planned joint mechanism linking cross-cutting functions finalized for the Secretary-General's consideration",
+    "upcoming_milestone":"Proposal prepared for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-03-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1802,9 +1744,8 @@
     "upcoming_milestone":null,
     "updates":null,
     "delivery_date":null,
-    "scenario":"3. Included in budget estimate",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Decision taken",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1833,9 +1774,8 @@
     "upcoming_milestone":null,
     "updates":null,
     "delivery_date":null,
-    "scenario":"3. Included in budget estimate",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Decision taken",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1861,12 +1801,11 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "upcoming_milestone":"The Secretariat is awaiting a decision by the Security Council regarding the future mandate of UNMHA",
+    "upcoming_milestone":"Forthcoming",
     "updates":"- The Secretary-General presented the reviewof UNMHA's mandate and suggested three options to the Security Council on 25 November 2025 (see S\/2025\/766)",
     "delivery_date":"2026-01-28",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1895,9 +1834,8 @@
     "upcoming_milestone":null,
     "updates":null,
     "delivery_date":null,
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1926,9 +1864,8 @@
     "upcoming_milestone":"The Office of the Special Adviser for Cyprus is streamlined and aligned with the UN Peacekeping Force in Cyprus (UNFICYP) as per A\/RES\/80\/xx",
     "updates":null,
     "delivery_date":"2026-12-30",
-    "scenario":"3. Included in budget estimate",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Decision taken",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1957,9 +1894,8 @@
     "upcoming_milestone":"Proposal of the Secretary-General to rationalize the Office of the United Nations Representative to the Geneva International Discussions (UNRGID), as approved in GA resolution 80\/xxx, implemented",
     "updates":null,
     "delivery_date":"2026-12-30",
-    "scenario":"3. Included in budget estimate",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Decision taken",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -1985,12 +1921,11 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "upcoming_milestone":"Assessment of prerequisite actions finalized for Secretary-General's consideration",
+    "upcoming_milestone":"Assessment of prerequisite actions prepared for Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-03-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -2016,12 +1951,11 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "upcoming_milestone":"Proposals finalized for the Secretary-General's consideration",
+    "upcoming_milestone":"Proposals prepared for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-03-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -2047,12 +1981,11 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "upcoming_milestone":"Concept note finalized for the Secretary-General's consideration",
+    "upcoming_milestone":"Concept note prepared for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-03-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -2078,12 +2011,11 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "upcoming_milestone":"Recommendations finalized for the Secretary-General's consideration",
+    "upcoming_milestone":"Recommendations prepared for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-03-30",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -2110,9 +2042,8 @@
     "upcoming_milestone":null,
     "updates":null,
     "delivery_date":null,
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -2139,9 +2070,8 @@
     "upcoming_milestone":null,
     "updates":null,
     "delivery_date":null,
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -2169,9 +2099,8 @@
     "upcoming_milestone":"Concept note to integrate the UN Interregional Crime and Justice Research Institute (UNICRI) into the UN Office on Drugs and Crime (UNODC) submitted to the Secretary-General",
     "updates":null,
     "delivery_date":"2026-04-29",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -2199,9 +2128,8 @@
     "upcoming_milestone":"Specific measures to reinforce cooperation on counterterrorism and violent extremism proposed for consideration by the Global Counter-Terrorism Coordination Compact Committee",
     "updates":null,
     "delivery_date":"2026-06-29",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -2230,9 +2158,8 @@
     "upcoming_milestone":"Reporting arrangements for the Director overseeing the UNODC Terrorism Prevention Branch adjusted to include the Under-Secretary-General for Counter-Terrorism",
     "updates":null,
     "delivery_date":"2026-03-30",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -2259,11 +2186,10 @@
       "ED UNAIDS"
     ],
     "upcoming_milestone":"Terms of reference for a Working Group to develop a plan on the further transition and integration of UNAIDS into the UN system and beyond, in coherence with the UN80 Initiative, finalized",
-    "updates":"- UNAIDS Programme Coordinating Board decision issued, containing the process for delivering a final plan for full transformation of UNAIDS that is aligned with UN80 Initiative and adoption of Global AIDS Strategy 2026–2031, by end October 2026",
+    "updates":null,
     "delivery_date":"2026-01-31",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -2290,9 +2216,8 @@
     "upcoming_milestone":null,
     "updates":null,
     "delivery_date":null,
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -2321,9 +2246,8 @@
     "upcoming_milestone":"Assessment of current arrangements and proposals on possible structural changes and programme realignments on environmental issues finalized for the Secretary-General’s consideration",
     "updates":null,
     "delivery_date":"2026-09-17",
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -2354,9 +2278,8 @@
     "upcoming_milestone":null,
     "updates":null,
     "delivery_date":null,
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS3",
@@ -2387,9 +2310,8 @@
     "upcoming_milestone":null,
     "updates":null,
     "delivery_date":null,
-    "scenario":"2. Requiring further work",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -2416,9 +2338,8 @@
     "upcoming_milestone":"mandates.un.org updated with data for the proposed 2027 Programme Budget and proposed 2026\/27 Peacekeeping Budgets",
     "updates":null,
     "delivery_date":"2026-03-15",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -2445,9 +2366,8 @@
     "upcoming_milestone":"First set of digital tools launched and technical briefings for delegates set up",
     "updates":null,
     "delivery_date":"2026-03-15",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -2474,9 +2394,8 @@
     "upcoming_milestone":"Assessment and potential relevant actions finalized for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-02-27",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -2503,9 +2422,8 @@
     "upcoming_milestone":"Assessment and potential actions finalized for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-03-01",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -2532,9 +2450,8 @@
     "upcoming_milestone":"Draft action plan prepared for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-04-30",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS2",
@@ -2561,9 +2478,8 @@
     "upcoming_milestone":"Download count solution implemented",
     "updates":null,
     "delivery_date":"2026-03-31",
-    "scenario":"1. Within SG authority",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS1",
@@ -2592,9 +2508,8 @@
     "upcoming_milestone":"Common administrative platform solution fully operational",
     "updates":"- Proposals on common administrative platform (CAP) was approved in GA resolution 80\/xxx",
     "delivery_date":"2026-07-31",
-    "scenario":"3. Included in budget estimate",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Decision taken",
+    "is_subaction":false
   },
   {
     "report":"WS1",
@@ -2623,9 +2538,8 @@
     "upcoming_milestone":"Global payroll centre fully operational in New York, Nairobi and Entebbe",
     "updates":"- Proposals on payroll consolidation was approved in GA resolution 80\/xxx for implementation throughout 2026",
     "delivery_date":"2026-10-31",
-    "scenario":"3. Included in budget estimate",
-    "is_subaction":true,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Decision taken",
+    "is_subaction":true
   },
   {
     "report":"WS1",
@@ -2651,12 +2565,11 @@
       "USG DMSPC",
       "USG DOS"
     ],
-    "upcoming_milestone":"Additional proposals submitted for the Secretary-General's consideration for inclusion in the Proposed Programme Budget 2027",
-    "updates":"- Phase I of expansion of common administrative platform (CAP) was approved in GA resolution 80\/xxx",
+    "upcoming_milestone":"Proposal prepared for the Secretary-General's consideration",
+    "updates":null,
     "delivery_date":"2026-01-31",
-    "scenario":"3. Included in budget estimate",
-    "is_subaction":false,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":false
   },
   {
     "report":"WS1",
@@ -2685,9 +2598,8 @@
     "upcoming_milestone":null,
     "updates":null,
     "delivery_date":null,
-    "scenario":"3. Included in budget estimate",
-    "is_subaction":true,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":true
   },
   {
     "report":"WS1",
@@ -2716,9 +2628,8 @@
     "upcoming_milestone":"Proposals finalized for management consideration",
     "updates":null,
     "delivery_date":"2026-01-31",
-    "scenario":"3. Included in budget estimate",
-    "is_subaction":true,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":true
   },
   {
     "report":"WS1",
@@ -2747,9 +2658,8 @@
     "upcoming_milestone":"Proposals finalized for management consideration",
     "updates":null,
     "delivery_date":"2026-01-30",
-    "scenario":"3. Included in budget estimate",
-    "is_subaction":true,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":true
   },
   {
     "report":"WS1",
@@ -2778,8 +2688,7 @@
     "upcoming_milestone":"Proposals finalized for management consideration",
     "updates":null,
     "delivery_date":"2026-01-31",
-    "scenario":"3. Included in budget estimate",
-    "is_subaction":true,
-    "action_status":"Further Work Ongoing"
+    "public_action_status":"Further work ongoing",
+    "is_subaction":true
   }
 ]

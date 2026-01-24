@@ -63,7 +63,7 @@ interface SidebarChartsProps {
   showAllMilestonesPerMonth: boolean;
   onToggleShowAllMilestonesPerMonth: () => void;
 
-  // Actions data for scenario-based status
+  // Actions data for status counts
   actions: Action[];
 }
 
@@ -80,13 +80,14 @@ export function SidebarCharts({
   milestonesPerMonthSearchQuery,
   actions,
 }: SidebarChartsProps) {
-  // Calculate status counts based on action_status field
-  // For now this is 100% "Further Work Ongoing" as dummy data
+  // Calculate status counts based on public_action_status field
   const decisionTakenCount = actions.filter(
-    (action) => action.action_status === "Decision Taken",
+    (action) => action.public_action_status?.toLowerCase() === "decision taken",
   ).length;
-  const furtherWorkCount = 86; // Hardcoded for now
-  const totalActions = 86; // Hardcoded for now
+  const furtherWorkCount = actions.filter(
+    (action) => action.public_action_status?.toLowerCase() === "further work ongoing",
+  ).length;
+  const totalActions = actions.length;
 
   const leadsChartEntries: SidebarChartEntry[] = leadsData.map((entry) => ({
     label: entry.lead,

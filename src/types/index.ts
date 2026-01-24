@@ -74,11 +74,9 @@ export interface Action {
   /** Delivery date in ISO format (e.g., "2026-02-28") or null */
   delivery_date: string | null;
 
-  /** Scenario status */
-  scenario: string | null;
 
   /** Action status - "Further Work Ongoing" or "Decision Taken" */
-  action_status: "Further Work Ongoing" | "Decision Taken" | null;
+  public_action_status: "Further work ongoing" | "Decision taken" | null;
 
   /** Sub-action details description or null (for subactions) */
   sub_action_details: string | null;
@@ -128,7 +126,7 @@ export interface WorkPackageAction {
   finalMilestoneDeadline: string | null;
   actionEntities: string | null;
   subActionDetails: string | null;
-  actionStatus: "Further Work Ongoing" | "Decision Taken";
+  actionStatus: "Further work ongoing" | "Decision taken";
 }
 
 /**

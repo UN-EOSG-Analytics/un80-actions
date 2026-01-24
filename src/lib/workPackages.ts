@@ -100,7 +100,7 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           finalMilestoneDeadline: action.final_milestone_deadline || null,
           actionEntities: action.action_entities || null,
           subActionDetails: action.sub_action_details || null,
-          actionStatus: action.action_status || "Further Work Ongoing",
+          actionStatus: action.public_action_status || "Further work ongoing",
         });
       } else {
         // Merge leads if action already exists
@@ -114,9 +114,9 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
         if (action.doc_text && !existingAction.docText) {
           existingAction.docText = action.doc_text;
         }
-        // Ensure actionStatus is set (default to "Further Work Ongoing" if missing)
+        // Ensure actionStatus is set (default to "Further work ongoing" if missing)
         if (!existingAction.actionStatus) {
-          existingAction.actionStatus = "Further Work Ongoing";
+          existingAction.actionStatus = "Further work ongoing";
         }
         // Update milestone fields if not already set
         if (action.first_milestone && !existingAction.firstMilestone) {
