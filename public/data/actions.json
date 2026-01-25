@@ -743,8 +743,8 @@
     "action_leads":[
       "USG Policy"
     ],
-    "upcoming_milestone":null,
-    "updates":null,
+    "upcoming_milestone":"No longer relevant",
+    "updates":"Decision taken",
     "delivery_date":null,
     "public_action_status":"Decision taken",
     "is_subaction":false
@@ -1038,9 +1038,9 @@
       "ED WFP",
       "Co-Chairs BIG"
     ],
-    "first_milestone":"Release of the CBO Tracking Tool and CBO Self Starter Reporting methodology for new CBOs; Promote strengthened reporting practices using tracking tool across UN system",
+    "first_milestone":"Release of the CBO Tracking Tool and CBO Self Starter Reporting methodology for new CBOs; Begin work on improving transparency in expenditure and support cost across all funding streams at country level by expanding the CBO framework to introduce reporting requirements on support costs and programme expense",
     "first_milestone_deadline":"2026-01-31",
-    "final_milestone":"Identify potential service offerings funded by programme budget that can utilize and build on efficiency measures developed for administrative expenditure; For launched CBOs, release the preliminary efficiency gains per scaled common services in new CBO, including common ERPs, common payroll, with UNSDCF-SDG linkages where relevant. The gain calculation to be consistent with the accepted HLCM\/ FBN definition of efficiency.",
+    "final_milestone":"1. Identify potential service offerings funded by programme budget that can utilize and build on efficiency measures developed for administrative expenditure; 2. Four launched CBOs, release the preliminary efficiency gains per scaled common services in new CBO, including common ERPs, common payroll, with UNSDCF-SDG linkages where relevant. The gain calculation to be consistent with the accepted HLCM\/ FBN definition of efficiency",
     "final_milestone_deadline":"2026-11-14",
     "doc_text":"Contingent on progress in scaling shared services, we intend to harmonize most indirect and programme support costs. A progressive transparent rate model will create predictability and provide a strong incentive for collective action.",
     "work_package_goal":"Unified support services",
@@ -1051,7 +1051,7 @@
       "ED WFP",
       "Co-Chairs BIG"
     ],
-    "upcoming_milestone":null,
+    "upcoming_milestone":"Forthcoming",
     "updates":null,
     "delivery_date":null,
     "public_action_status":"Further work ongoing",
@@ -1651,8 +1651,8 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "upcoming_milestone":null,
-    "updates":null,
+    "upcoming_milestone":"No longer relevant",
+    "updates":"Decision taken, as per GA resolution 80\/242",
     "delivery_date":null,
     "public_action_status":"Decision taken",
     "is_subaction":false
@@ -1681,8 +1681,8 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "upcoming_milestone":null,
-    "updates":null,
+    "upcoming_milestone":"No longer relevant",
+    "updates":"Decision taken, as per GA resolution 80\/242",
     "delivery_date":null,
     "public_action_status":"Decision taken",
     "is_subaction":false
@@ -1741,8 +1741,8 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "upcoming_milestone":null,
-    "updates":null,
+    "upcoming_milestone":"No longer relevant",
+    "updates":"Decision taken, as per GA resolution 80\/242",
     "delivery_date":null,
     "public_action_status":"Decision taken",
     "is_subaction":false
@@ -1771,8 +1771,8 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "upcoming_milestone":null,
-    "updates":null,
+    "upcoming_milestone":"No longer relevant",
+    "updates":"Decision taken, as per GA resolution 80\/242",
     "delivery_date":null,
     "public_action_status":"Decision taken",
     "is_subaction":false
@@ -1802,8 +1802,8 @@
       "USG DPO"
     ],
     "upcoming_milestone":"Forthcoming",
-    "updates":"- The Secretary-General presented the reviewof UNMHA's mandate and suggested three options to the Security Council on 25 November 2025 (see S\/2025\/766)",
-    "delivery_date":"2026-01-28",
+    "updates":null,
+    "delivery_date":null,
     "public_action_status":"Further work ongoing",
     "is_subaction":false
   },
@@ -1831,7 +1831,7 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "upcoming_milestone":null,
+    "upcoming_milestone":"Forthcoming",
     "updates":null,
     "delivery_date":null,
     "public_action_status":"Further work ongoing",
@@ -1861,9 +1861,9 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "upcoming_milestone":"The Office of the Special Adviser for Cyprus is streamlined and aligned with the UN Peacekeping Force in Cyprus (UNFICYP) as per A\/RES\/80\/xx",
-    "updates":null,
-    "delivery_date":"2026-12-30",
+    "upcoming_milestone":"No longer relevant",
+    "updates":"Decision taken, as per GA resolution 80\/242",
+    "delivery_date":null,
     "public_action_status":"Decision taken",
     "is_subaction":false
   },
@@ -1891,9 +1891,9 @@
       "USG DPPA",
       "USG DPO"
     ],
-    "upcoming_milestone":"Proposal of the Secretary-General to rationalize the Office of the United Nations Representative to the Geneva International Discussions (UNRGID), as approved in GA resolution 80\/xxx, implemented",
-    "updates":null,
-    "delivery_date":"2026-12-30",
+    "upcoming_milestone":"No longer relevant",
+    "updates":"Decision taken, as per GA resolution 80\/242",
+    "delivery_date":null,
     "public_action_status":"Decision taken",
     "is_subaction":false
   },
@@ -2034,12 +2034,12 @@
     "final_milestone_deadline":null,
     "doc_text":"We plan to integrate the UN Interregional Crime and Justice Research Institute (UNICRI) into the UN Office on Drugs and Crime (UNODC), embedding UNICRI expertise within a global network. The UN Institute for Disarmament Research (UNIDIR) would be integrated into the Office for disarmament Affairs (ODA) so its analysis informs negotiations and field support. In both cases, research independence would be preserved.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":null,
+    "action_entities":"ODA",
     "sub_action_details":null,
     "action_leads":[
       "USG ODA"
     ],
-    "upcoming_milestone":null,
+    "upcoming_milestone":"Forthcoming",
     "updates":null,
     "delivery_date":null,
     "public_action_status":"Further work ongoing",
@@ -2062,12 +2062,12 @@
     "final_milestone_deadline":null,
     "doc_text":"We will begin co-locating special political missions with a regional focus, regional peace and development advisors, with Regional Commissions serving as physical hosts. DPPA and DPO regional divisions will also participate remotely",
     "work_package_goal":"Simplifying access to regional expertise",
-    "action_entities":null,
+    "action_entities":"ODA",
     "sub_action_details":null,
     "action_leads":[
       "USG ODA"
     ],
-    "upcoming_milestone":null,
+    "upcoming_milestone":"Forthcoming",
     "updates":null,
     "delivery_date":null,
     "public_action_status":"Further work ongoing",
@@ -2202,18 +2202,18 @@
     "work_package_leads":[
       "SG"
     ],
-    "first_milestone":null,
+    "first_milestone":"(Pending proposals)",
     "first_milestone_deadline":null,
-    "final_milestone":null,
+    "final_milestone":"(Pending proposals)",
     "final_milestone_deadline":null,
     "doc_text":"The Secretary-General stands ready to provide further analysis to Member States on other potential mergers they may wish to explore.",
     "work_package_goal":"Unified support to people and planet",
-    "action_entities":null,
+    "action_entities":"N\/A",
     "sub_action_details":null,
     "action_leads":[
       "SG"
     ],
-    "upcoming_milestone":null,
+    "upcoming_milestone":"Forthcoming",
     "updates":null,
     "delivery_date":null,
     "public_action_status":"Further work ongoing",
@@ -2275,7 +2275,7 @@
       "ES ECA",
       "SG UNCTAD"
     ],
-    "upcoming_milestone":null,
+    "upcoming_milestone":"Forthcoming",
     "updates":null,
     "delivery_date":null,
     "public_action_status":"Further work ongoing",
@@ -2307,7 +2307,7 @@
       "ES ECA",
       "SG UNCTAD"
     ],
-    "upcoming_milestone":null,
+    "upcoming_milestone":"Forthcoming",
     "updates":null,
     "delivery_date":null,
     "public_action_status":"Further work ongoing",
@@ -2505,9 +2505,9 @@
       "USG DMSPC",
       "USG DOS"
     ],
-    "upcoming_milestone":"Common administrative platform solution fully operational",
-    "updates":"- Proposals on common administrative platform (CAP) was approved in GA resolution 80\/xxx",
-    "delivery_date":"2026-07-31",
+    "upcoming_milestone":"No longer relevant",
+    "updates":"Decision taken, as per GA resolution 80\/242",
+    "delivery_date":null,
     "public_action_status":"Decision taken",
     "is_subaction":false
   },
@@ -2535,9 +2535,9 @@
       "USG DMSPC",
       "USG DOS"
     ],
-    "upcoming_milestone":"Global payroll centre fully operational in New York, Nairobi and Entebbe",
-    "updates":"- Proposals on payroll consolidation was approved in GA resolution 80\/xxx for implementation throughout 2026",
-    "delivery_date":"2026-10-31",
+    "upcoming_milestone":"No longer relevant",
+    "updates":"Decision taken, as per GA resolution 80\/242",
+    "delivery_date":null,
     "public_action_status":"Decision taken",
     "is_subaction":true
   },
@@ -2583,21 +2583,21 @@
       "USG DMSPC",
       "USG DOS"
     ],
-    "first_milestone":null,
-    "first_milestone_deadline":null,
-    "final_milestone":null,
+    "first_milestone":"31 December 2025: Complete analysis of survey on scope of contractual translation services to determine potential management mechanisms and their viability",
+    "first_milestone_deadline":"2025-12-31",
+    "final_milestone":"Determination of the final milestone is subject to the outcome of milestone 1 and analysis of survey",
     "final_milestone_deadline":null,
     "doc_text":null,
     "work_package_goal":null,
-    "action_entities":null,
+    "action_entities":"DGACM; DOS; DMSPC",
     "sub_action_details":"Contractual translation & documentation",
     "action_leads":[
       "USG DMSPC",
       "USG DOS"
     ],
-    "upcoming_milestone":null,
+    "upcoming_milestone":"Proposals finalized for management consideration",
     "updates":null,
-    "delivery_date":null,
+    "delivery_date":"2026-02-01",
     "public_action_status":"Further work ongoing",
     "is_subaction":true
   },
