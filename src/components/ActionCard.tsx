@@ -10,10 +10,10 @@ import {
 } from "@/components/Badges";
 import { CheckCircle2 } from "lucide-react";
 import {
-  parseDate,
   buildCleanQueryString,
   normalizeTeamMemberForDisplay,
 } from "@/lib/utils";
+import { isDecisionTaken } from "@/constants/actionStatus";
 import type { WorkPackageAction } from "@/types";
 
 /**
@@ -125,7 +125,7 @@ export function ActionItem({ action, searchQuery = "" }: ActionItemProps) {
   };
 
   // Completion status is based on action status, not time-based calculation
-  const isCompleted = action.actionStatus === "Decision taken";
+  const isCompleted = isDecisionTaken(action.actionStatus);
 
   return (
     <div

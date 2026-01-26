@@ -8,6 +8,7 @@ import { Header } from "@/components/HeaderBar";
 import { SidebarCharts } from "@/components/SidebarCharts";
 import { WorkPackageList } from "@/components/ListContainer";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ACTION_STATUS } from "@/constants/actionStatus";
 import { useActions } from "@/hooks/useActions";
 import { useChartSearch } from "@/hooks/useChartSearch";
 import { useCollapsibles } from "@/hooks/useCollapsibles";
@@ -135,7 +136,7 @@ export function WorkPackagesPageContent() {
   );
   useFilterSync(
     selectedActionStatus,
-    ["Further work ongoing", "Decision taken"],
+    [ACTION_STATUS.FURTHER_WORK_ONGOING, ACTION_STATUS.DECISION_TAKEN],
     setSelectedActionStatus,
   );
 

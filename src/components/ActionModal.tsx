@@ -15,6 +15,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ACTION_STATUS } from "@/constants/actionStatus";
 import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
 import { normalizeTeamMemberForDisplay } from "@/lib/utils";
 import type { Action } from "@/types";
@@ -323,7 +324,7 @@ export default function ActionModal({
                 Status
               </h3>
               <DecisionStatusBadge
-                status={action.public_action_status || "Further Work Ongoing"}
+                status={action.public_action_status || ACTION_STATUS.FURTHER_WORK_ONGOING}
               />
             </div>
 

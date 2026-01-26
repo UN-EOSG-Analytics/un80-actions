@@ -1,6 +1,7 @@
 import FilterDropdown, { FilterOption } from "@/components/FilterDropdown";
 import ResetButton from "@/components/ResetButton";
 import { SearchBar } from "@/components/SearchBar";
+import { ACTION_STATUS } from "@/constants/actionStatus";
 import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Popover,
@@ -539,8 +540,8 @@ export function FilterControls({
             isFiltered={selectedActionStatus.length > 0}
             allActive={false}
             options={[
-              { key: "Further work ongoing", label: "Further Work Ongoing" },
-              { key: "Decision taken", label: "Decision Taken" },
+              { key: ACTION_STATUS.FURTHER_WORK_ONGOING, label: "Further Work Ongoing" },
+              { key: ACTION_STATUS.DECISION_TAKEN, label: "Decision Taken" },
             ]}
             selectedKeys={new Set(selectedActionStatus)}
             onToggle={(key) => {

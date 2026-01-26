@@ -237,7 +237,9 @@ export function WorkstreamLabels({
 // Decision Status Badge
 // ============================================================================
 
-export type DecisionStatus = "Decision taken" | "Further work ongoing";
+import { getStatusStyles, type ActionStatus } from "@/constants/actionStatus";
+
+export type DecisionStatus = ActionStatus;
 
 interface DecisionStatusBadgeProps {
   /** The public_action_status value */
@@ -256,27 +258,20 @@ export function DecisionStatusBadge({
 }: DecisionStatusBadgeProps) {
   if (!status) return null;
 
-  // Compare case-insensitively to handle variations
-  const normalizedStatus = status.toLowerCase();
-  const isDecisionTaken = normalizedStatus === "decision taken";
+  const styles = getStatusStyles(status);
   const isSmall = size === "sm";
+  const IconComponent = styles.icon.component;
 
   return (
     <div
       className={cn(
         "inline-flex items-center rounded-full font-medium",
         isSmall ? "gap-1 px-2 py-0.5 text-[10px] sm:text-xs" : "gap-1.5 px-3 py-1 text-xs sm:text-sm",
-        isDecisionTaken
-          ? "bg-green-100 text-green-700"
-          : "bg-amber-100 text-amber-700",
+        styles.badge,
       )}
     >
-      {isDecisionTaken ? (
-        <SquareCheckBig className={isSmall ? "h-3 w-3" : "h-4 w-4"} />
-      ) : (
-        <Clock className={isSmall ? "h-3 w-3" : "h-4 w-4"} />
-      )}
-      <span>{isDecisionTaken ? "Decision Taken" : "Further Work Ongoing"}</span>
+      <IconComponent className={cn(isSmall ? "h-3 w-3" : "h-4 w-4", styles.icon.className)} />
+      <span>{styles.label}</span>
     </div>
   );
 }

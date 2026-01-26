@@ -2,11 +2,10 @@ import React from "react";
 import {
   Users,
   Calendar,
-  Clock,
-  SquareCheckBig,
   Layers,
   Activity,
 } from "lucide-react";
+import { ACTION_STATUS, getStatusStyles, isDecisionTaken } from "@/constants/actionStatus";
 import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
 import { buildCleanQueryString } from "@/lib/utils";
 import {
@@ -96,7 +95,7 @@ export function SidebarCharts({
   );
   const totalActions = mainActions.length;
   const decisionTakenCount = mainActions.filter(
-    (a) => a.public_action_status?.toLowerCase() === "decision taken",
+    (a) => isDecisionTaken(a.public_action_status),
   ).length;
   const furtherWorkCount = totalActions - decisionTakenCount;
 
@@ -247,65 +246,56 @@ export function SidebarCharts({
             Action Status
           </h3>
 
-          <div className="space-y-3 pr-4">
+          <div className="divide-y divide-slate-200 pr-4">
             {/* Further Work Ongoing */}
             {(() => {
-              const isSelected = selectedActionStatus.includes(
-                "Further work ongoing",
-              );
+              const statusKey = ACTION_STATUS.FURTHER_WORK_ONGOING;
+              const isSelected = selectedActionStatus.includes(statusKey);
+              const styles = getStatusStyles(statusKey);
+              const IconComponent = styles.icon.component;
+
               return (
                 <div
-                  className={`group min-w-0 flex-1 cursor-pointer rounded-md px-2 py-1.5 transition-all ${
-                    isSelected
-                      ? "bg-un-blue/10 ring-2 ring-un-blue/30"
-                      : "hover:bg-slate-50"
+                  className={`group flex cursor-pointer items-center justify-between gap-2 py-1.5 pl-0.5 transition-all ${
+                    isSelected ? styles.sidebar.selectedBg : styles.sidebar.hoverBg
                   }`}
                   onClick={() => {
-                    // Toggle: if selected, clear; if not selected, select only this one
-                    onSelectActionStatus(
-                      isSelected ? [] : ["Further work ongoing"],
-                    );
+                    onSelectActionStatus(isSelected ? [] : [statusKey]);
                   }}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <Clock
-                        className={`h-4 w-4 shrink-0 transition-transform group-hover:scale-110 ${
-                          isSelected ? "text-un-blue" : "text-un-blue"
-                        }`}
-                      />
-                      <span
-                        className={`text-sm font-medium transition-colors ${
-                          isSelected
-                            ? "text-un-blue"
-                            : "text-slate-700 group-hover:text-slate-900"
-                        }`}
-                      >
-                        Further Work Ongoing
-                      </span>
-                    </div>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <IconComponent className={`h-4 w-4 shrink-0 ${styles.sidebar.icon}`} />
                     <span
-                      className={`shrink-0 text-[14px] font-semibold tabular-nums ${
-                        isSelected ? "text-un-blue" : "text-un-blue"
+                      className={`text-[14px] font-semibold leading-tight transition-colors ${
+                        isSelected
+                          ? styles.sidebar.selectedText
+                          : `${styles.sidebar.count} ${styles.sidebar.hoverText}`
+                      }`}
+                    >
+                      {styles.label}
+                    </span>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <span
+                      className={`w-7 text-right text-[14px] font-semibold tabular-nums ${
+                        isSelected ? styles.sidebar.selectedText : styles.sidebar.count
                       }`}
                     >
                       {furtherWorkCount}
                     </span>
-                  </div>
-                  <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                    <div
-                      className={`h-full rounded-full transition-all ${
-                        isSelected
-                          ? "bg-un-blue"
-                          : "bg-un-blue/50 group-hover:bg-un-blue/60"
-                      }`}
-                      style={{
-                        width:
-                          totalActions > 0
-                            ? `${(furtherWorkCount / totalActions) * 100}%`
-                            : "0%",
-                      }}
-                    />
+                    <div className={`relative mr-2 h-2 w-[85px] overflow-hidden rounded-full ${styles.sidebar.barTrack}`}>
+                      <div
+                        className={`h-full rounded-full transition-all ${
+                          isSelected ? styles.sidebar.selectedBar : styles.sidebar.bar
+                        }`}
+                        style={{
+                          width:
+                            totalActions > 0
+                              ? `${(furtherWorkCount / totalActions) * 100}%`
+                              : "0%",
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               );
@@ -313,59 +303,53 @@ export function SidebarCharts({
 
             {/* Decision Taken */}
             {(() => {
-              const isSelected =
-                selectedActionStatus.includes("Decision taken");
+              const statusKey = ACTION_STATUS.DECISION_TAKEN;
+              const isSelected = selectedActionStatus.includes(statusKey);
+              const styles = getStatusStyles(statusKey);
+              const IconComponent = styles.icon.component;
+
               return (
                 <div
-                  className={`group min-w-0 flex-1 cursor-pointer rounded-md px-2 py-1.5 transition-all ${
-                    isSelected
-                      ? "bg-un-blue/10 ring-2 ring-un-blue/30"
-                      : "hover:bg-slate-50"
+                  className={`group flex cursor-pointer items-center justify-between gap-2 py-1.5 pl-0.5 transition-all ${
+                    isSelected ? styles.sidebar.selectedBg : styles.sidebar.hoverBg
                   }`}
                   onClick={() => {
-                    // Toggle: if selected, clear; if not selected, select only this one
-                    onSelectActionStatus(isSelected ? [] : ["Decision taken"]);
+                    onSelectActionStatus(isSelected ? [] : [statusKey]);
                   }}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <SquareCheckBig
-                        className={`h-4 w-4 shrink-0 transition-transform group-hover:scale-110 ${
-                          isSelected ? "text-un-blue" : "text-un-blue"
-                        }`}
-                      />
-                      <span
-                        className={`text-sm font-medium transition-colors ${
-                          isSelected
-                            ? "text-un-blue"
-                            : "text-slate-700 group-hover:text-slate-900"
-                        }`}
-                      >
-                        Decision Taken
-                      </span>
-                    </div>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <IconComponent className={`h-4 w-4 shrink-0 ${styles.sidebar.icon}`} />
                     <span
-                      className={`shrink-0 text-[14px] font-semibold tabular-nums ${
-                        isSelected ? "text-un-blue" : "text-un-blue"
+                      className={`text-[14px] font-semibold leading-tight transition-colors ${
+                        isSelected
+                          ? styles.sidebar.selectedText
+                          : `${styles.sidebar.count} ${styles.sidebar.hoverText}`
+                      }`}
+                    >
+                      {styles.label}
+                    </span>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <span
+                      className={`w-7 text-right text-[14px] font-semibold tabular-nums ${
+                        isSelected ? styles.sidebar.selectedText : styles.sidebar.count
                       }`}
                     >
                       {decisionTakenCount}
                     </span>
-                  </div>
-                  <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                    <div
-                      className={`h-full rounded-full transition-all ${
-                        isSelected
-                          ? "bg-un-blue"
-                          : "bg-un-blue/50 group-hover:bg-un-blue/60"
-                      }`}
-                      style={{
-                        width:
-                          totalActions > 0
-                            ? `${(decisionTakenCount / totalActions) * 100}%`
-                            : "0%",
-                      }}
-                    />
+                    <div className={`relative mr-2 h-2 w-[85px] overflow-hidden rounded-full ${styles.sidebar.barTrack}`}>
+                      <div
+                        className={`h-full rounded-full transition-all ${
+                          isSelected ? styles.sidebar.selectedBar : styles.sidebar.bar
+                        }`}
+                        style={{
+                          width:
+                            totalActions > 0
+                              ? `${(decisionTakenCount / totalActions) * 100}%`
+                              : "0%",
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               );
