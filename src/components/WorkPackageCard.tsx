@@ -303,7 +303,7 @@ export function WorkPackageItem({
             <div className="relative flex h-10 items-center">
               {/* Collapsed state: "X Indicative Actions" */}
               <div
-                className={`absolute inset-0 flex items-center gap-2 transition-opacity duration-200 ease-out ${
+                className={`absolute left-0 flex items-center gap-2 transition-opacity duration-300 ease-out ${
                   isOpen ? "pointer-events-none opacity-0" : "opacity-100"
                 }`}
               >
@@ -312,30 +312,26 @@ export function WorkPackageItem({
                     ? `${matchedActionsCount}/${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`
                     : `${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`}
                 </span>
-                <div className="flex -space-x-1.5">
-                  {Array.from({ length: totalActionsCount }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="h-4 w-4 rounded-full border-2 border-slate-100 bg-un-blue transition-colors group-hover:border-[#E0F5FF]"
-                      style={{
-                        opacity: Math.max(0.3, 1 - i * 0.08),
-                        zIndex: totalActionsCount - i,
-                      }}
-                    />
-                  ))}
-                </div>
               </div>
               {/* Expanded state: "Indicative Actions" header with count and dots */}
               <div
-                className={`absolute inset-0 flex items-center gap-2 transition-opacity duration-200 ease-out ${
+                className={`absolute left-0 flex items-center gap-2 transition-opacity duration-300 ease-out ${
                   isOpen ? "opacity-100" : "pointer-events-none opacity-0"
                 }`}
               >
-                <h3 className="text-left text-base font-semibold tracking-wider text-slate-700 sm:text-lg">
+                <h3 className="text-left text-sm font-semibold text-slate-900 sm:text-base">
                   {hasActiveFilter
                     ? `${matchedActionsCount}/${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`
                     : `${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`}
                 </h3>
+              </div>
+              {/* Dots - shared between both states */}
+              <div className="absolute left-0 flex items-center gap-2">
+                <div style={{ width: 'max-content' }} className="invisible text-sm font-semibold sm:text-base">
+                  {hasActiveFilter
+                    ? `${matchedActionsCount}/${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`
+                    : `${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`}
+                </div>
                 <div className="flex -space-x-1.5">
                   {Array.from({ length: totalActionsCount }).map((_, i) => (
                     <div
