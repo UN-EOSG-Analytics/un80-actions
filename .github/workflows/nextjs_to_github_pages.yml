@@ -7,11 +7,15 @@ name: Deploy Next.js to GitHub Pages
 run-name: ${{ github.event_name == 'workflow_run' && '🔄 Redeploy after data processing' || github.event_name == 'workflow_dispatch' && '🚀 Manual deployment' || github.event.head_commit.message }}
 
 on:
-  workflow_run:
-    workflows: ["Process raw actions data from Power Automate"]
-    types: [completed]
+   # Runs after the data processing workflow completes successfully
+    workflow_run:
+        workflows: ["Process raw actions data from Power Automate"]
+        types:
+            - completed
+        branches: ["main"]
 
-  workflow_dispatch:
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
