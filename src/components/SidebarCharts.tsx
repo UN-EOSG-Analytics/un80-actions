@@ -86,14 +86,15 @@ export function SidebarCharts({
   onSelectActionStatus,
   actions,
 }: SidebarChartsProps) {
-  // Calculate status counts based on public_action_status field
-  const decisionTakenCount = actions.filter(
-    (action) => action.public_action_status?.toLowerCase() === "decision taken",
+  // Action Status: only main actions (exclude subactions)
+  const mainActions = actions.filter(
+    (a) => !(a.sub_action_details && a.is_subaction),
+  );
+  const totalActions = mainActions.length;
+  const decisionTakenCount = mainActions.filter(
+    (a) => a.public_action_status?.toLowerCase() === "decision taken",
   ).length;
-  const furtherWorkCount = actions.filter(
-    (action) => action.public_action_status?.toLowerCase() === "further work ongoing",
-  ).length;
-  const totalActions = actions.length;
+  const furtherWorkCount = totalActions - decisionTakenCount;
 
   const leadsChartEntries: SidebarChartEntry[] = leadsData.map((entry) => ({
     label: entry.lead,
@@ -167,9 +168,9 @@ export function SidebarCharts({
           }
         }
 
-        return {
+      return {
           label: entry.milestone,
-          count: entry.count,
+        count: entry.count,
           value: entry.milestone,
           tooltip: deadlineText || undefined,
           deadline: entry.deadline,
@@ -463,32 +464,32 @@ export function SidebarCharts({
       )}
 
       <div className="py-5">
-        <SidebarChart
-          title="Work Packages per Leader"
-          description="Number of packages by leader"
-          icon={<Users />}
-          data={leadsChartEntries}
-          searchQuery={leadsSearchQuery}
-          onSearchChange={onLeadsSearchChange}
-          searchPlaceholder="Search principals"
-          selectedValue={selectedLead}
-          onSelectValue={onSelectLead}
-          barWidth={105}
+      <SidebarChart
+        title="Work Packages per Leader"
+        description="Number of packages by leader"
+        icon={<Users />}
+        data={leadsChartEntries}
+        searchQuery={leadsSearchQuery}
+        onSearchChange={onLeadsSearchChange}
+        searchPlaceholder="Search principals"
+        selectedValue={selectedLead}
+        onSelectValue={onSelectLead}
+        barWidth={105}
           maxHeight={145}
-        />
+      />
       </div>
 
       {/* Actions per Workstream */}
       <div className="py-5 last:pb-0">
-        <SidebarChart
-          title="Actions per Workstream"
+      <SidebarChart
+        title="Actions per Workstream"
           description="Number of actions by workstream"
-          icon={<Layers />}
-          data={workstreamsChartEntries}
-          selectedValue={selectedWorkstream}
-          onSelectValue={onSelectWorkstream}
-          barWidth={105}
-        />
+        icon={<Layers />}
+        data={workstreamsChartEntries}
+        selectedValue={selectedWorkstream}
+        onSelectValue={onSelectWorkstream}
+        barWidth={105}
+      />
       </div>
     </div>
   );
