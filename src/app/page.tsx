@@ -24,7 +24,7 @@ import {
 
 export function WorkPackagesPageContent() {
   // Custom hooks for state management
-  const { actions, isLoading } = useActions();
+  const { actions } = useActions();
   const showProgress = false;
 
   const {
@@ -445,7 +445,6 @@ export function WorkPackagesPageContent() {
                         title="Workstreams"
                         value={totalWorkstreams}
                         icon={Layers}
-                        isLoading={isLoading}
                         showProgress={showProgress}
                         completed={0}
                         showFiltered={hasActiveFilters}
@@ -455,7 +454,6 @@ export function WorkPackagesPageContent() {
                         title="Work Packages"
                         value={workPackages.length}
                         icon={BriefcaseIcon}
-                        isLoading={isLoading}
                         showProgress={showProgress}
                         completed={0}
                         showFiltered={hasActiveFilters}
@@ -465,7 +463,6 @@ export function WorkPackagesPageContent() {
                         title="Actions"
                         value={totalActions}
                         icon={ListTodo}
-                        isLoading={isLoading}
                         showProgress={showProgress}
                         completed={0}
                         showFiltered={hasActiveFilters}
@@ -475,7 +472,6 @@ export function WorkPackagesPageContent() {
                         title="UN System Leaders"
                         value={totalLeads}
                         icon={Users}
-                        isLoading={isLoading}
                         showProgress={showProgress}
                         completed={0}
                         showFiltered={hasActiveFilters}
@@ -485,7 +481,6 @@ export function WorkPackagesPageContent() {
                         title="UN System Entities"
                         value={totalTeamMembers}
                         icon={User}
-                        isLoading={isLoading}
                         showProgress={showProgress}
                         completed={0}
                         showFiltered={hasActiveFilters}
@@ -546,7 +541,6 @@ export function WorkPackagesPageContent() {
                     selectedTeamMembers={selectedTeamMember}
                     selectedActionStatus={selectedActionStatus}
                     selectedMilestoneMonth={selectedMilestoneMonth}
-                    isLoading={isLoading}
                     showProgress={showProgress}
                     searchQuery={searchQuery}
                   />

@@ -12,7 +12,6 @@ interface WorkPackageListProps {
   selectedTeamMembers?: string[];
   selectedActionStatus?: string[];
   selectedMilestoneMonth?: string[];
-  isLoading?: boolean;
   showProgress?: boolean;
   searchQuery?: string;
 }
@@ -27,12 +26,10 @@ export function WorkPackageList({
   selectedTeamMembers = [],
   selectedActionStatus = [],
   selectedMilestoneMonth = [],
-  isLoading = false,
   showProgress = false,
   searchQuery = "",
 }: WorkPackageListProps) {
-  // Don't show "no results" message while loading
-  if (workPackages.length === 0 && !isLoading) {
+  if (workPackages.length === 0) {
     return (
       <div className="w-full py-12">
         <p className="text-left text-gray-600">
@@ -40,11 +37,6 @@ export function WorkPackageList({
         </p>
       </div>
     );
-  }
-
-  // Show nothing while loading
-  if (isLoading) {
-    return null;
   }
 
   return (
