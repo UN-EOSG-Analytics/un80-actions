@@ -43,12 +43,12 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
                 style={{ height: "calc(100% + 0.5rem)" }}
               />
             )}
-            {/* Continuation line for last item - dashed to indicate path continues */}
+            {/* Short dashed line for last item */}
             {isLast && (
               <div
                 className="absolute top-8 left-2.5 w-1"
                 style={{
-                  height: "20px",
+                  height: "12px",
                   backgroundImage:
                     "repeating-linear-gradient(to bottom, #cbd5e1 0px, #cbd5e1 3px, transparent 3px, transparent 6px)",
                 }}
@@ -75,8 +75,11 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
               >
                 <p
                   className={cn(
-                    "text-base font-medium text-gray-900",
+                    "text-base font-medium",
                     isReached && "line-through",
+                    milestone.label.toLowerCase() === "no longer relevant"
+                      ? "italic text-slate-500"
+                      : "text-gray-900",
                   )}
                 >
                   {milestone.label}

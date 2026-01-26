@@ -3,23 +3,54 @@
 import {
   ActionLeadsBadge,
   DecisionStatusBadge,
+  ShowMoreBadge,
   TeamBadge,
   WPLeadsBadge,
-  ShowMoreBadge,
 } from "@/components/Badges";
+import { HelpTooltip } from "@/components/HelpTooltip";
 import { MilestoneTimeline } from "@/components/MilestoneTimeline";
 import {
   Tooltip,
-  TooltipContent,
   TooltipCollisionBoundaryProvider,
+  TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
 import { normalizeTeamMemberForDisplay } from "@/lib/utils";
 import type { Action } from "@/types";
-import { ChevronRight, FileText, HelpCircle, X } from "lucide-react";
+import { ChevronRight, FileText, X } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+
+// Modal-specific section card component
+const SectionCard = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) => (
+  <div className="rounded-lg border border-slate-200 bg-white">
+    <div className="-ml-px rounded-tl-[9px] border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
+      <h3 className="text-sm font-extrabold tracking-widest text-slate-800 uppercase">
+        {title}
+      </h3>
+    </div>
+    {children}
+  </div>
+);
+
+const CHIPS_PER_LINE = 5;
+const breadcrumbLinkClass =
+  "text-[10px] leading-4 font-medium tracking-wide text-slate-500 uppercase transition-colors hover:text-un-blue hover:underline sm:text-xs sm:leading-5 md:text-sm md:tracking-wider";
+const chevronClass =
+  "h-2.5 w-2.5 shrink-0 text-slate-400 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5";
 
 interface ActionModalProps {
   action: Action | null;
@@ -105,16 +136,11 @@ export default function ActionModal({
     }
   };
 
-  // Prevent body scroll when modal is open while maintaining scrollbar space
+  // Prevent body scroll when modal is open
   useEffect(() => {
-    // Store original values
     const originalOverflow = document.documentElement.style.overflow;
-
-    // Prevent scrolling on the html element instead of body to preserve scrollbar
     document.documentElement.style.overflow = "hidden";
-
     return () => {
-      // Restore original values
       document.documentElement.style.overflow = originalOverflow;
     };
   }, []);
@@ -168,7 +194,6 @@ export default function ActionModal({
       seen.add(n);
       allChips.push({ name: n, type: "team" });
     }
-    const CHIPS_PER_LINE = 5;
     const displayedChips = showAllChips
       ? allChips
       : allChips.slice(0, CHIPS_PER_LINE);
@@ -182,19 +207,19 @@ export default function ActionModal({
             <Link
               href={`/?ws=${action.report}`}
               onClick={handleClose}
-              className="text-[10px] leading-4 font-medium tracking-wide text-slate-500 uppercase transition-colors hover:text-un-blue hover:underline sm:text-xs sm:leading-5 md:text-sm md:tracking-wider"
+              className={breadcrumbLinkClass}
             >
               {action.report}
             </Link>
-            <ChevronRight className="h-2.5 w-2.5 shrink-0 text-slate-400 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5" />
+            <ChevronRight className={chevronClass} />
             <Link
               href={`/?wp=${action.work_package_number}`}
               onClick={handleClose}
-              className="text-[10px] leading-4 font-medium tracking-wide text-slate-500 uppercase transition-colors hover:text-un-blue hover:underline sm:text-xs sm:leading-5 md:text-sm md:tracking-wider"
+              className={breadcrumbLinkClass}
             >
               WORK PACKAGE {action.work_package_number}
             </Link>
-            <ChevronRight className="h-2.5 w-2.5 shrink-0 text-slate-400 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5" />
+            <ChevronRight className={chevronClass} />
             <Tooltip open={copied ? true : undefined}>
               <TooltipTrigger asChild>
                 <button
@@ -285,15 +310,8 @@ export default function ActionModal({
     // Action content
     return (
       <div className="space-y-4 pt-4">
-        {/* Combined Action Details, Milestones, and Updates Section */}
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-          {/* Action Details Header */}
-          <div className="border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
-            <h3 className="text-sm font-extrabold tracking-widest text-slate-800 uppercase">
-              Action Details
-            </h3>
-          </div>
-          {/* Action Details Content */}
+        {/* Action Details Section */}
+        <SectionCard title="Action Details">
           <div className="p-5">
             {/* Decision Status */}
             <div>
@@ -305,30 +323,13 @@ export default function ActionModal({
               />
             </div>
 
-            {/* Upcoming Milestone – only the single upcoming milestone */}
+            {/* Upcoming Milestone */}
             {action.upcoming_milestone && (
               <>
                 <div className="my-3 border-t border-slate-200"></div>
                 <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold tracking-wide text-slate-700">
                   Upcoming Milestone
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        aria-label="What is Upcoming Milestone?"
-                        className="inline-flex size-6 shrink-0 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-700 sm:size-5 sm:text-slate-400 sm:hover:bg-slate-100 sm:hover:text-slate-600"
-                      >
-                        <HelpCircle className="size-4 sm:size-3.5" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" align="center">
-                      <p className="text-gray-600">
-                        Steps which will be taken towards the delivery of the
-                        proposal concerned. Completed milestones are crossed
-                        out.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
+                  <HelpTooltip content="Steps which will be taken towards the delivery of the proposal concerned. Completed milestones are crossed out." />
                 </h3>
                 <div className="mt-2">
                   <MilestoneTimeline
@@ -345,42 +346,20 @@ export default function ActionModal({
             )}
 
             {/* Updates Section */}
-            <div className="my-3 border-t border-slate-200"></div>
+            <div className="my-6 border-t border-slate-200"></div>
             <h3 className="mb-4 flex items-center gap-1.5 text-sm font-semibold tracking-wide text-slate-700">
               Updates
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label="What are Updates?"
-                    className="inline-flex size-6 shrink-0 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-700 sm:size-5 sm:text-slate-400 sm:hover:bg-slate-100 sm:hover:text-slate-600"
-                  >
-                    <HelpCircle className="size-4 sm:size-3.5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top" align="center">
-                  <p className="text-gray-600">
-                    A summary of recent progress on the action.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
+              <HelpTooltip content="A summary of recent progress on the action." />
             </h3>
             <div className="text-sm leading-relaxed text-slate-600">
               Updates forthcoming
             </div>
           </div>
-        </div>
+        </SectionCard>
 
         {/* Document Reference Section */}
         {(action.doc_text || action.document_paragraph) && (
-          <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-            {/* Document Reference Header */}
-            <div className="border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
-              <h3 className="text-sm font-extrabold tracking-widest text-slate-800 uppercase">
-                Document Reference
-              </h3>
-            </div>
-            {/* Document Reference Content */}
+          <SectionCard title="Document Reference">
             <div className="space-y-3 p-5">
               {/* Document Paragraph Number */}
               {action.document_paragraph &&
@@ -421,18 +400,11 @@ export default function ActionModal({
                 </div>
               )}
             </div>
-          </div>
+          </SectionCard>
         )}
 
         {/* Work Package Reference Section */}
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-          {/* Work Package Reference Header */}
-          <div className="border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
-            <h3 className="text-sm font-extrabold tracking-widest text-slate-800 uppercase">
-              Work Package Reference
-            </h3>
-          </div>
-          {/* Work Package Reference Content */}
+        <SectionCard title="Work Package Reference">
           <div className="p-5">
             <div className="text-[15px] leading-snug text-slate-900">
               <span className="font-semibold">
@@ -443,7 +415,6 @@ export default function ActionModal({
                 {action.work_package_name}
               </span>
             </div>
-            {/* Work Package Leads */}
             {action.work_package_leads &&
               action.work_package_leads.length > 0 && (
                 <div className="mt-3">
@@ -451,50 +422,7 @@ export default function ActionModal({
                 </div>
               )}
           </div>
-        </div>
-
-        {/* MS Approval */}
-        {/* {action.ms_approval && (
-          <div className="border-t border-gray-200 pt-6">
-            <Field label="Member State Approval">
-              <div className="space-y-2">
-                <div className="text-sm font-medium text-gray-900">
-                  Required
-                </div>
-                {action.ms_body.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {action.ms_body.map((body, i) => (
-                      <span
-                        key={i}
-                        className="inline-block rounded-full bg-un-blue/10 px-3 py-1 text-sm font-medium text-un-blue"
-                      >
-                        {body}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </Field>
-          </div>
-        )} */}
-
-        {/* Budget */}
-        {/* {action.un_budget.length > 0 && (
-          <div className="border-t border-gray-200 pt-6">
-            <Field label="UN Budget">
-              <div className="flex flex-wrap gap-2">
-                {action.un_budget.map((budget, i) => (
-                  <span
-                    key={i}
-                    className="inline-block rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800"
-                  >
-                    {budget}
-                  </span>
-                ))}
-              </div>
-            </Field>
-          </div>
-        )} */}
+        </SectionCard>
       </div>
     );
   };
@@ -520,7 +448,7 @@ export default function ActionModal({
         <TooltipCollisionBoundaryProvider value={modalEl}>
           <div className="flex min-h-full flex-col">
             {/* Header */}
-            <div className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6">
+            <div className="bg-white px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6">
               {renderHeader()}
             </div>
 
