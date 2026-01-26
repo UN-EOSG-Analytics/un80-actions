@@ -11,7 +11,7 @@ on:
     push:
         branches: ["main"]
 
-    # Runs after the data processing workflow completes
+    # Runs after the data processing workflow completes successfully
     workflow_run:
         workflows: ["Process raw actions data from Power Automate"]
         types:
@@ -38,12 +38,14 @@ jobs:
     build:
         runs-on: ubuntu-latest
         # Skip if triggered by push with 'automated data update' message (wait for process_actions_data.yml to complete)
-        # Run if triggered by workflow_run and it succeeded, or if manual dispatch, or if push without that message
-        if: |
-            ${{ github.event_name == 'workflow_dispatch' ||
-              (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
-              (github.event_name == 'push' && !contains(github.event.head_commit.message, 'automated data update')) }}
+        # Run if triggered by workflow_run (after data processing completes successfully), manual dispatch, or push without that message
+        if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || (github.event_name == 'push' && !contains(github.event.head_commit.message, 'automated data update')) }}
         steps:
+            - name: Debug workflow trigger
+              run: |
+                  echo "Event name: ${{ github.event_name }}"
+                  echo "Commit message: ${{ github.event.head_commit.message }}"
+                  echo "Workflow run conclusion: ${{ github.event.workflow_run.conclusion }}"
             - name: Checkout
               uses: actions/checkout@v4
             - name: Detect package manager
