@@ -314,7 +314,7 @@ export default function ActionModal({
 
     // Action content
     return (
-      <div className="space-y-4 pt-4">
+      <div className="space-y-6">
         {/* Action Details Section */}
         <SectionCard title="Action Details">
           <div className="p-5">
@@ -457,12 +457,12 @@ export default function ActionModal({
         <TooltipCollisionBoundaryProvider value={modalEl}>
           <div className="flex min-h-full flex-col">
             {/* Header */}
-            <div className="bg-white px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6">
+            <div className="bg-white px-4 pt-4 pb-3 sm:px-6 sm:pt-5 sm:pb-4 md:px-8 md:pt-6 md:pb-5 border-b border-slate-200 shadow-sm">
               {renderHeader()}
             </div>
 
             {/* Body */}
-            <div className="flex-1 bg-slate-50 px-4 pb-6 sm:px-6 sm:pb-8 md:px-8">
+            <div className="flex-1 bg-slate-50 px-4 pt-6 pb-8 sm:px-6 sm:pt-8 sm:pb-12 md:px-8">
               {renderBody()}
             </div>
           </div>
