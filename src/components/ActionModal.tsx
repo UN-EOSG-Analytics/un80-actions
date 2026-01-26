@@ -353,7 +353,11 @@ export default function ActionModal({
               </Tooltip>
             </h3>
             <div className="text-sm leading-relaxed text-slate-600">
-              Updates forthcoming
+              {action.updates && action.updates.trim() ? (
+                action.updates
+              ) : (
+                "Updates forthcoming"
+              )}
             </div>
           </div>
         </div>
