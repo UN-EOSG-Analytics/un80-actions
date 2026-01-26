@@ -534,9 +534,7 @@ export function FilterControls({
             triggerText={
               selectedActionStatus.length === 0
                 ? "Select action status"
-                : selectedActionStatus.length === 1
-                  ? selectedActionStatus[0]
-                  : `${selectedActionStatus.length} statuses selected`
+                : selectedActionStatus[0]
             }
             isFiltered={selectedActionStatus.length > 0}
             allActive={false}
@@ -546,9 +544,10 @@ export function FilterControls({
             ]}
             selectedKeys={new Set(selectedActionStatus)}
             onToggle={(key) => {
+              // Single-select: if clicking the same status, deselect it; otherwise select only this one
               const newSelected = selectedActionStatus.includes(key)
-                ? selectedActionStatus.filter((status) => status !== key)
-                : [...selectedActionStatus, key];
+                ? []
+                : [key];
               onSelectActionStatus(newSelected);
             }}
             ariaLabel="Filter by action status"
