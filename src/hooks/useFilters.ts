@@ -29,7 +29,9 @@ export function useFilters() {
   const selectedBigTicket = decodeUrlParamArray(searchParams.get("type"));
   const selectedAction = decodeUrlParamArray(searchParams.get("actions"));
   const selectedTeamMember = decodeUrlParamArray(searchParams.get("team"));
-  const selectedActionStatus = decodeUrlParamArray(searchParams.get("action_status"));
+  const selectedActionStatus = decodeUrlParamArray(
+    searchParams.get("action_status"),
+  );
   const sortOption = searchParams.get("sort") || "number-asc";
 
   // Helper to build a clean, human-readable query string

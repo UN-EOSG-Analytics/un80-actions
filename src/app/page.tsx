@@ -293,10 +293,11 @@ export function WorkPackagesPageContent() {
 
     // Skip if we've already processed this exact combination
     // But always process if we have data and haven't processed initial load yet
-    const shouldProcess = 
-      selectedActionStatus.length > 0 && 
+    const shouldProcess =
+      selectedActionStatus.length > 0 &&
       filteredWorkPackages.length > 0 &&
-      (dataKey !== lastProcessedActionStatusRef.current || !hasProcessedInitialActionStatusRef.current);
+      (dataKey !== lastProcessedActionStatusRef.current ||
+        !hasProcessedInitialActionStatusRef.current);
 
     if (shouldProcess) {
       const collapsibleKeysToExpand: string[] = [];
@@ -306,7 +307,7 @@ export function WorkPackagesPageContent() {
         const hasMatchingAction = wp.actions.some((action) => {
           const actionStatusLower = action.actionStatus?.toLowerCase() || "";
           return selectedActionStatus.some(
-            (status) => status.toLowerCase() === actionStatusLower
+            (status) => status.toLowerCase() === actionStatusLower,
           );
         });
 
@@ -326,7 +327,10 @@ export function WorkPackagesPageContent() {
       // Mark this selection as processed
       lastProcessedActionStatusRef.current = dataKey;
       hasProcessedInitialActionStatusRef.current = true;
-    } else if (selectedActionStatus.length === 0 && hasProcessedInitialActionStatusRef.current) {
+    } else if (
+      selectedActionStatus.length === 0 &&
+      hasProcessedInitialActionStatusRef.current
+    ) {
       // Collapse all work packages when action status filter is cleared
       collapseAllWorkPackages();
       // Reset tracking refs
@@ -341,12 +345,12 @@ export function WorkPackagesPageContent() {
 
   // Collapse work packages when all filters are cleared
   useEffect(() => {
-    const hasActiveFilters = 
+    const hasActiveFilters =
       searchQuery.trim().length > 0 ||
       selectedAction.length > 0 ||
       selectedActionStatus.length > 0 ||
       selectedWorkPackage.length > 0;
-    
+
     // If we previously had filters and now we don't, collapse all
     if (prevHadFiltersRef.current && !hasActiveFilters) {
       collapseAllWorkPackages();
@@ -357,9 +361,15 @@ export function WorkPackagesPageContent() {
       lastProcessedActionStatusRef.current = "";
       hasProcessedInitialActionStatusRef.current = false;
     }
-    
+
     prevHadFiltersRef.current = hasActiveFilters;
-  }, [searchQuery, selectedAction, selectedActionStatus, selectedWorkPackage, collapseAllWorkPackages]);
+  }, [
+    searchQuery,
+    selectedAction,
+    selectedActionStatus,
+    selectedWorkPackage,
+    collapseAllWorkPackages,
+  ]);
 
   // Wrapper for reset that also collapses work packages
   const handleResetFiltersWithCollapse = useCallback(() => {
@@ -400,15 +410,15 @@ export function WorkPackagesPageContent() {
 
                   // Calculate total counts (unfiltered) - use all workPackages and actions
                   const totalWorkstreams = new Set(
-                    workPackages.flatMap((wp) => wp.report)
+                    workPackages.flatMap((wp) => wp.report),
                   ).size;
                   // Include all actions except subaction entries (is_subaction + sub_action_details);
                   // main actions with sub_action_details (e.g. "Harmonized in-country logistics") are counted.
                   const totalActions = actions.filter(
-                    (a) => !(a.sub_action_details && a.is_subaction)
+                    (a) => !(a.sub_action_details && a.is_subaction),
                   ).length;
                   const totalLeads = new Set(
-                    workPackages.flatMap((wp) => wp.leads)
+                    workPackages.flatMap((wp) => wp.leads),
                   ).size;
                   // Get unique team members from all actions (normalized)
                   const allTeamMembers = new Set<string>();

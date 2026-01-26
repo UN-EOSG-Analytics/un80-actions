@@ -35,7 +35,10 @@ export function DataCard({
     <Tooltip>
       <TooltipTrigger asChild>
         <div
-          className={cn("relative h-[90px] w-full sm:h-[110px] md:h-[140px]", className)}
+          className={cn(
+            "relative h-[90px] w-full sm:h-[110px] md:h-[140px]",
+            className,
+          )}
         >
           <div className="absolute inset-0 rounded-lg bg-white"></div>
           <Card className="relative flex h-full w-full cursor-pointer flex-col items-start justify-start gap-0 rounded-lg border-0 bg-un-blue/10 px-3 py-3 pl-4 shadow-none transition-all hover:scale-[1.02] sm:px-4 sm:py-4 sm:pl-[26px] md:py-6">

@@ -87,7 +87,9 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
 
       if (!existingAction) {
         // Normalize action leads
-        const actionLeads = action.action_leads.map((lead) => normalizeLeaderName(lead));
+        const actionLeads = action.action_leads.map((lead) =>
+          normalizeLeaderName(lead),
+        );
 
         wp.actions.push({
           text: action.indicative_activity,
@@ -104,7 +106,9 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
         });
       } else {
         // Merge leads if action already exists
-        const actionLeads = action.action_leads.map((lead) => normalizeLeaderName(lead));
+        const actionLeads = action.action_leads.map((lead) =>
+          normalizeLeaderName(lead),
+        );
         actionLeads.forEach((lead) => {
           if (!existingAction.leads.includes(lead)) {
             existingAction.leads.push(lead);

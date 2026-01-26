@@ -32,12 +32,21 @@ interface ActionItemProps {
 /**
  * Highlights matching text in a string with a faint UN blue background
  */
-export function HighlightedText({ text, query }: { text: string; query: string }) {
+export function HighlightedText({
+  text,
+  query,
+}: {
+  text: string;
+  query: string;
+}) {
   if (!query.trim()) {
     return <>{text}</>;
   }
 
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  const regex = new RegExp(
+    `(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+    "gi",
+  );
   const parts = text.split(regex);
 
   return (
@@ -63,7 +72,11 @@ export function HighlightedText({ text, query }: { text: string; query: string }
  * Displays a single action item within a work package.
  * Shows the action text, leads, document references, and optional doc text.
  */
-export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionItemProps) {
+export function ActionItem({
+  action,
+  searchQuery = "",
+  isSearchMatch,
+}: ActionItemProps) {
   const searchParams = useSearchParams();
   const [showAllTeamMembers, setShowAllTeamMembers] = useState(false);
 
@@ -106,7 +119,10 @@ export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionIt
 
   // On mobile: prevent chip clicks from opening the modal (so tooltips can be used)
   const stopPropagationOnMobile = (e: React.MouseEvent) => {
-    if (typeof window !== "undefined" && window.matchMedia("(max-width: 640px)").matches) {
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 640px)").matches
+    ) {
       e.stopPropagation();
     }
   };
@@ -162,7 +178,11 @@ export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionIt
             <>
               {" "}
               <span className="font-semibold text-slate-600">
-                – <HighlightedText text={action.subActionDetails} query={searchQuery} />
+                –{" "}
+                <HighlightedText
+                  text={action.subActionDetails}
+                  query={searchQuery}
+                />
               </span>
             </>
           )}
@@ -172,7 +192,10 @@ export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionIt
       {/* Metadata section - Action Leads and Team Members */}
       {(action.leads.length > 0 || teamMembers.length > 0) && (
         <div className="mt-3 border-t border-slate-100 pt-3">
-          <div className="flex flex-wrap items-center gap-1" onClick={stopPropagationOnMobile}>
+          <div
+            className="flex flex-wrap items-center gap-1"
+            onClick={stopPropagationOnMobile}
+          >
             {/* Action Leads - uses centralized sorting */}
             <ActionLeadsBadge leads={action.leads} inline />
             {/* Separator */}
@@ -188,7 +211,7 @@ export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionIt
                   e.stopPropagation();
                   setShowAllTeamMembers(!showAllTeamMembers);
                 }}
-                className="inline-flex h-5 items-center justify-center rounded-full border border-dashed border-slate-300 bg-white px-2 text-[11px] font-medium leading-none text-slate-500 transition-all duration-150 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
+                className="inline-flex h-5 items-center justify-center rounded-full border border-dashed border-slate-300 bg-white px-2 text-[11px] leading-none font-medium text-slate-500 transition-all duration-150 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
               >
                 {showAllTeamMembers
                   ? "show less"

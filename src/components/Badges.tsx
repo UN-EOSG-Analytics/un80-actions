@@ -82,7 +82,9 @@ export function LabelBadge({
         <TooltipContent>
           <div className="space-y-1">
             {tooltipLabel && (
-              <p className="text-xs font-semibold text-gray-700">{tooltipLabel}</p>
+              <p className="text-xs font-semibold text-gray-700">
+                {tooltipLabel}
+              </p>
             )}
             <p className="text-sm text-gray-600">{fullName}</p>
           </div>
@@ -116,17 +118,41 @@ interface LeadBadgeProps {
 
 /** Work Package Leads - primary (solid blue) */
 export function WPLeadsBadge({ leads, onSelect, inline }: LeadBadgeProps) {
-  return <LabelBadge items={leads} variant="primary" onSelect={onSelect} inline={inline} tooltipLabel="Lead" />;
+  return (
+    <LabelBadge
+      items={leads}
+      variant="primary"
+      onSelect={onSelect}
+      inline={inline}
+      tooltipLabel="Lead"
+    />
+  );
 }
 
 /** Action Leads - secondary (outlined blue) */
 export function ActionLeadsBadge({ leads, onSelect, inline }: LeadBadgeProps) {
-  return <LabelBadge items={leads} variant="secondary" onSelect={onSelect} inline={inline} tooltipLabel="Action Lead" />;
+  return (
+    <LabelBadge
+      items={leads}
+      variant="secondary"
+      onSelect={onSelect}
+      inline={inline}
+      tooltipLabel="Action Lead"
+    />
+  );
 }
 
 /** Team Members - tertiary (dashed, subtle) */
 export function TeamBadge({ leads, onSelect, inline }: LeadBadgeProps) {
-  return <LabelBadge items={leads} variant="tertiary" onSelect={onSelect} inline={inline} tooltipLabel="Team Member" />;
+  return (
+    <LabelBadge
+      items={leads}
+      variant="tertiary"
+      onSelect={onSelect}
+      inline={inline}
+      tooltipLabel="Team Member"
+    />
+  );
 }
 
 /** Workstream Labels - muted (slate fill) */
@@ -198,7 +224,10 @@ interface DecisionStatusBadgeProps {
  * Decision Status Badge - shows amber for "Further work ongoing" or green for "Decision taken"
  * Accepts public_action_status values (case-insensitive comparison)
  */
-export function DecisionStatusBadge({ status, size = "default" }: DecisionStatusBadgeProps) {
+export function DecisionStatusBadge({
+  status,
+  size = "default",
+}: DecisionStatusBadgeProps) {
   if (!status) return null;
 
   // Compare case-insensitively to handle variations

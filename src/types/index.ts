@@ -74,7 +74,6 @@ export interface Action {
   /** Delivery date in ISO format (e.g., "2026-02-28") or null */
   delivery_date: string | null;
 
-
   /** Action status - "Further Work Ongoing" or "Decision Taken" */
   public_action_status: "Further work ongoing" | "Decision taken" | null;
 
@@ -228,4 +227,3 @@ export interface ChartSearchState {
   milestonesPerMonthSearchQuery: string;
   leaderChecklistSearchQuery: string;
 }
-

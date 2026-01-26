@@ -1,17 +1,17 @@
 "use client";
 
 import {
-    ActionLeadsBadge,
-    DecisionStatusBadge,
-    TeamBadge,
-    WPLeadsBadge,
+  ActionLeadsBadge,
+  DecisionStatusBadge,
+  TeamBadge,
+  WPLeadsBadge,
 } from "@/components/Badges";
 import { MilestoneTimeline } from "@/components/MilestoneTimeline";
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipCollisionBoundaryProvider,
-    TooltipTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipCollisionBoundaryProvider,
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
 import { normalizeTeamMemberForDisplay, parseDate } from "@/lib/utils";
@@ -135,7 +135,10 @@ export default function ActionModal({
       return (
         <div className="flex items-center justify-between gap-4">
           <p className="text-lg text-slate-500">Action not found</p>
-          <button onClick={handleClose} className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600">
+          <button
+            onClick={handleClose}
+            className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+          >
             <X size={24} />
           </button>
         </div>
@@ -161,7 +164,9 @@ export default function ActionModal({
       allChips.push({ name: n, type: "team" });
     }
     const CHIPS_PER_LINE = 5;
-    const displayedChips = showAllChips ? allChips : allChips.slice(0, CHIPS_PER_LINE);
+    const displayedChips = showAllChips
+      ? allChips
+      : allChips.slice(0, CHIPS_PER_LINE);
     const hasMore = allChips.length > CHIPS_PER_LINE;
 
     return (
@@ -201,7 +206,9 @@ export default function ActionModal({
                 </button>
               </TooltipTrigger>
               <TooltipContent>
-                <p className="text-sm text-gray-600">{copied ? "Copied!" : "Click to copy link"}</p>
+                <p className="text-sm text-gray-600">
+                  {copied ? "Copied!" : "Click to copy link"}
+                </p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -233,9 +240,11 @@ export default function ActionModal({
                     e.stopPropagation();
                     setShowAllChips((s) => !s);
                   }}
-                  className="inline-flex h-5 items-center justify-center rounded-full border border-dashed border-slate-300 bg-white px-2 text-[11px] font-medium leading-none text-slate-500 transition-all duration-150 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
+                  className="inline-flex h-5 items-center justify-center rounded-full border border-dashed border-slate-300 bg-white px-2 text-[11px] leading-none font-medium text-slate-500 transition-all duration-150 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
                 >
-                  {showAllChips ? "show less" : `+${allChips.length - CHIPS_PER_LINE} more`}
+                  {showAllChips
+                    ? "show less"
+                    : `+${allChips.length - CHIPS_PER_LINE} more`}
                 </button>
               )}
             </div>
@@ -279,7 +288,7 @@ export default function ActionModal({
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           {/* Action Details Header */}
           <div className="border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
-            <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-800">
+            <h3 className="text-sm font-extrabold tracking-widest text-slate-800 uppercase">
               Action Details
             </h3>
           </div>
@@ -290,7 +299,9 @@ export default function ActionModal({
               <h3 className="mb-1.5 text-sm font-semibold tracking-wide text-slate-700">
                 Status
               </h3>
-              <DecisionStatusBadge status={action.public_action_status || "Further Work Ongoing"} />
+              <DecisionStatusBadge
+                status={action.public_action_status || "Further Work Ongoing"}
+              />
             </div>
 
             {/* Upcoming Milestone – only the single upcoming milestone */}
@@ -312,7 +323,8 @@ export default function ActionModal({
                     <TooltipContent side="top" align="center">
                       <p className="text-gray-600">
                         Steps which will be taken towards the delivery of the
-                        proposal concerned. Completed milestones are crossed out.
+                        proposal concerned. Completed milestones are crossed
+                        out.
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -322,7 +334,10 @@ export default function ActionModal({
                     milestones={[
                       {
                         label: action.upcoming_milestone,
-                        deadline: action.upcoming_milestone_deadline ?? action.delivery_date ?? null,
+                        deadline:
+                          action.upcoming_milestone_deadline ??
+                          action.delivery_date ??
+                          null,
                         isReached: false,
                       },
                     ]}
@@ -363,7 +378,7 @@ export default function ActionModal({
           <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
             {/* Document Reference Header */}
             <div className="border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
-              <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-800">
+              <h3 className="text-sm font-extrabold tracking-widest text-slate-800 uppercase">
                 Document Reference
               </h3>
             </div>
@@ -415,7 +430,7 @@ export default function ActionModal({
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           {/* Work Package Reference Header */}
           <div className="border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
-            <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-800">
+            <h3 className="text-sm font-extrabold tracking-widest text-slate-800 uppercase">
               Work Package Reference
             </h3>
           </div>
@@ -426,7 +441,9 @@ export default function ActionModal({
                 Work Package {action.work_package_number}
               </span>
               <span className="mx-2 text-slate-300">•</span>
-              <span className="font-medium text-slate-600">{action.work_package_name}</span>
+              <span className="font-medium text-slate-600">
+                {action.work_package_name}
+              </span>
             </div>
             {/* Work Package Leads */}
             {action.work_package_leads &&
@@ -503,17 +520,17 @@ export default function ActionModal({
         onTouchEnd={onTouchEnd}
       >
         <TooltipCollisionBoundaryProvider value={modalEl}>
-        <div className="flex min-h-full flex-col">
-          {/* Header */}
-          <div className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6">
-            {renderHeader()}
-          </div>
+          <div className="flex min-h-full flex-col">
+            {/* Header */}
+            <div className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6">
+              {renderHeader()}
+            </div>
 
-          {/* Body */}
-          <div className="flex-1 bg-slate-50 px-4 pb-6 sm:px-6 sm:pb-8 md:px-8">
-            {renderBody()}
+            {/* Body */}
+            <div className="flex-1 bg-slate-50 px-4 pb-6 sm:px-6 sm:pb-8 md:px-8">
+              {renderBody()}
+            </div>
           </div>
-        </div>
         </TooltipCollisionBoundaryProvider>
       </div>
     </div>

@@ -158,7 +158,7 @@ export function filterWorkPackages(
         // Case-insensitive comparison to handle variations
         const actionStatusLower = action.actionStatus?.toLowerCase() || "";
         return filters.selectedActionStatus.some(
-          (status) => status.toLowerCase() === actionStatusLower
+          (status) => status.toLowerCase() === actionStatusLower,
         );
       });
       return hasMatchingAction;

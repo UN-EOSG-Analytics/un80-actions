@@ -168,9 +168,9 @@ export function SidebarCharts({
           }
         }
 
-      return {
+        return {
           label: entry.milestone,
-        count: entry.count,
+          count: entry.count,
           value: entry.milestone,
           tooltip: deadlineText || undefined,
           deadline: entry.deadline,
@@ -244,7 +244,9 @@ export function SidebarCharts({
           <div className="space-y-3 pr-4">
             {/* Further Work Ongoing */}
             {(() => {
-              const isSelected = selectedActionStatus.includes("Further work ongoing");
+              const isSelected = selectedActionStatus.includes(
+                "Further work ongoing",
+              );
               return (
                 <div
                   className={`group min-w-0 flex-1 cursor-pointer rounded-md px-2 py-1.5 transition-all ${
@@ -254,30 +256,42 @@ export function SidebarCharts({
                   }`}
                   onClick={() => {
                     // Toggle: if selected, clear; if not selected, select only this one
-                    onSelectActionStatus(isSelected ? [] : ["Further work ongoing"]);
+                    onSelectActionStatus(
+                      isSelected ? [] : ["Further work ongoing"],
+                    );
                   }}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex min-w-0 items-center gap-2">
-                      <Clock className={`h-4 w-4 shrink-0 transition-transform group-hover:scale-110 ${
-                        isSelected ? "text-un-blue" : "text-un-blue"
-                      }`} />
-                      <span className={`text-sm font-medium transition-colors ${
-                        isSelected ? "text-un-blue" : "text-slate-700 group-hover:text-slate-900"
-                      }`}>
+                      <Clock
+                        className={`h-4 w-4 shrink-0 transition-transform group-hover:scale-110 ${
+                          isSelected ? "text-un-blue" : "text-un-blue"
+                        }`}
+                      />
+                      <span
+                        className={`text-sm font-medium transition-colors ${
+                          isSelected
+                            ? "text-un-blue"
+                            : "text-slate-700 group-hover:text-slate-900"
+                        }`}
+                      >
                         Further Work Ongoing
                       </span>
                     </div>
-                    <span className={`shrink-0 text-[14px] font-semibold tabular-nums ${
-                      isSelected ? "text-un-blue" : "text-un-blue"
-                    }`}>
+                    <span
+                      className={`shrink-0 text-[14px] font-semibold tabular-nums ${
+                        isSelected ? "text-un-blue" : "text-un-blue"
+                      }`}
+                    >
                       {furtherWorkCount}
                     </span>
                   </div>
                   <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
                     <div
                       className={`h-full rounded-full transition-all ${
-                        isSelected ? "bg-un-blue" : "bg-un-blue/50 group-hover:bg-un-blue/60"
+                        isSelected
+                          ? "bg-un-blue"
+                          : "bg-un-blue/50 group-hover:bg-un-blue/60"
                       }`}
                       style={{
                         width:
@@ -293,7 +307,8 @@ export function SidebarCharts({
 
             {/* Decision Taken */}
             {(() => {
-              const isSelected = selectedActionStatus.includes("Decision taken");
+              const isSelected =
+                selectedActionStatus.includes("Decision taken");
               return (
                 <div
                   className={`group min-w-0 flex-1 cursor-pointer rounded-md px-2 py-1.5 transition-all ${
@@ -308,25 +323,35 @@ export function SidebarCharts({
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex min-w-0 items-center gap-2">
-                      <SquareCheckBig className={`h-4 w-4 shrink-0 transition-transform group-hover:scale-110 ${
-                        isSelected ? "text-un-blue" : "text-un-blue"
-                      }`} />
-                      <span className={`text-sm font-medium transition-colors ${
-                        isSelected ? "text-un-blue" : "text-slate-700 group-hover:text-slate-900"
-                      }`}>
+                      <SquareCheckBig
+                        className={`h-4 w-4 shrink-0 transition-transform group-hover:scale-110 ${
+                          isSelected ? "text-un-blue" : "text-un-blue"
+                        }`}
+                      />
+                      <span
+                        className={`text-sm font-medium transition-colors ${
+                          isSelected
+                            ? "text-un-blue"
+                            : "text-slate-700 group-hover:text-slate-900"
+                        }`}
+                      >
                         Decision Taken
                       </span>
                     </div>
-                    <span className={`shrink-0 text-[14px] font-semibold tabular-nums ${
-                      isSelected ? "text-un-blue" : "text-un-blue"
-                    }`}>
+                    <span
+                      className={`shrink-0 text-[14px] font-semibold tabular-nums ${
+                        isSelected ? "text-un-blue" : "text-un-blue"
+                      }`}
+                    >
                       {decisionTakenCount}
                     </span>
                   </div>
                   <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
                     <div
                       className={`h-full rounded-full transition-all ${
-                        isSelected ? "bg-un-blue" : "bg-un-blue/50 group-hover:bg-un-blue/60"
+                        isSelected
+                          ? "bg-un-blue"
+                          : "bg-un-blue/50 group-hover:bg-un-blue/60"
                       }`}
                       style={{
                         width:
@@ -464,32 +489,32 @@ export function SidebarCharts({
       )}
 
       <div className="py-5">
-      <SidebarChart
-        title="Work Packages per Leader"
-        description="Number of packages by leader"
-        icon={<Users />}
-        data={leadsChartEntries}
-        searchQuery={leadsSearchQuery}
-        onSearchChange={onLeadsSearchChange}
-        searchPlaceholder="Search principals"
-        selectedValue={selectedLead}
-        onSelectValue={onSelectLead}
-        barWidth={105}
+        <SidebarChart
+          title="Work Packages per Leader"
+          description="Number of packages by leader"
+          icon={<Users />}
+          data={leadsChartEntries}
+          searchQuery={leadsSearchQuery}
+          onSearchChange={onLeadsSearchChange}
+          searchPlaceholder="Search principals"
+          selectedValue={selectedLead}
+          onSelectValue={onSelectLead}
+          barWidth={105}
           maxHeight={145}
-      />
+        />
       </div>
 
       {/* Actions per Workstream */}
       <div className="py-5 last:pb-0">
-      <SidebarChart
-        title="Actions per Workstream"
+        <SidebarChart
+          title="Actions per Workstream"
           description="Number of actions by workstream"
-        icon={<Layers />}
-        data={workstreamsChartEntries}
-        selectedValue={selectedWorkstream}
-        onSelectValue={onSelectWorkstream}
-        barWidth={105}
-      />
+          icon={<Layers />}
+          data={workstreamsChartEntries}
+          selectedValue={selectedWorkstream}
+          onSelectValue={onSelectWorkstream}
+          barWidth={105}
+        />
       </div>
     </div>
   );

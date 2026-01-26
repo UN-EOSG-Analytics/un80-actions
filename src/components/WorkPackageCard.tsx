@@ -2,9 +2,9 @@ import { useState } from "react";
 import { ActionItem, HighlightedText } from "@/components/ActionCard";
 import { WorkstreamLabels, WPLeadsBadge } from "@/components/Badges";
 import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Progress } from "@/components/ui/progress";
 import { formatGoalText } from "@/lib/utils";
@@ -21,7 +21,10 @@ interface WorkPackageActionsProps {
 /**
  * Helper to check if an action matches the search query
  */
-function actionMatchesSearch(action: WorkPackageAction, query: string): boolean {
+function actionMatchesSearch(
+  action: WorkPackageAction,
+  query: string,
+): boolean {
   if (!query.trim()) return true;
   const lowerQuery = query.toLowerCase();
   const queryWords = lowerQuery.split(/\s+/);
@@ -35,11 +38,14 @@ function actionMatchesSearch(action: WorkPackageAction, query: string): boolean 
 /**
  * Helper to check if an action matches the status filter
  */
-function actionMatchesStatus(action: WorkPackageAction, selectedStatuses: string[]): boolean {
+function actionMatchesStatus(
+  action: WorkPackageAction,
+  selectedStatuses: string[],
+): boolean {
   if (selectedStatuses.length === 0) return true;
   const actionStatusLower = action.actionStatus?.toLowerCase() || "";
   return selectedStatuses.some(
-    (status) => status.toLowerCase() === actionStatusLower
+    (status) => status.toLowerCase() === actionStatusLower,
   );
 }
 
@@ -67,15 +73,17 @@ function WorkPackageActions({
   const hasActiveFilter = hasActiveSearch || hasActiveStatusFilter;
 
   const matchedActions = hasActiveFilter
-    ? actions.filter((action) => 
-        actionMatchesSearch(action, searchQuery) && 
-        actionMatchesStatus(action, selectedActionStatus)
+    ? actions.filter(
+        (action) =>
+          actionMatchesSearch(action, searchQuery) &&
+          actionMatchesStatus(action, selectedActionStatus),
       )
     : actions;
   const unmatchedActions = hasActiveFilter
-    ? actions.filter((action) => 
-        !actionMatchesSearch(action, searchQuery) || 
-        !actionMatchesStatus(action, selectedActionStatus)
+    ? actions.filter(
+        (action) =>
+          !actionMatchesSearch(action, searchQuery) ||
+          !actionMatchesStatus(action, selectedActionStatus),
       )
     : [];
 
@@ -156,7 +164,11 @@ export function WorkPackageItem({
     <Collapsible open={isOpen} onOpenChange={onToggle}>
       <div
         className="group relative mb-20 rounded-[6px] bg-slate-100 transition-colors last:mb-0 hover:bg-[#E0F5FF]"
-        style={{ "--collapsible-duration": `${collapsibleDuration}ms` } as React.CSSProperties}
+        style={
+          {
+            "--collapsible-duration": `${collapsibleDuration}ms`,
+          } as React.CSSProperties
+        }
       >
         {isOpen && (
           <div className="pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-1 rounded-l-[6px] bg-un-blue" />
@@ -204,7 +216,10 @@ export function WorkPackageItem({
               <div className="w-[3px] shrink-0 rounded-full bg-un-blue" />
               <p className="py-0.5 text-sm leading-snug font-medium text-slate-600 sm:text-base">
                 <span className="font-semibold text-un-blue">Goal:</span>{" "}
-                <HighlightedText text={formatGoalText(wp.goal)} query={searchQuery} />
+                <HighlightedText
+                  text={formatGoalText(wp.goal)}
+                  query={searchQuery}
+                />
               </p>
             </div>
           )}

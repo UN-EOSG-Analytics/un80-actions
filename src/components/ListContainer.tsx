@@ -86,16 +86,21 @@ export function WorkPackageList({
         }
 
         // Check if any actions match the status filter (to determine if work package should show)
-        const hasMatchingStatusAction = selectedActionStatus.length === 0 || 
+        const hasMatchingStatusAction =
+          selectedActionStatus.length === 0 ||
           filteredActions.some((action) => {
             const actionStatusLower = action.actionStatus?.toLowerCase() || "";
             return selectedActionStatus.some(
-              (status) => status.toLowerCase() === actionStatusLower
+              (status) => status.toLowerCase() === actionStatusLower,
             );
           });
 
         // If there are no actions to display, don't render an (empty) collapsible
-        if (!filteredActions || filteredActions.length === 0 || !hasMatchingStatusAction) {
+        if (
+          !filteredActions ||
+          filteredActions.length === 0 ||
+          !hasMatchingStatusAction
+        ) {
           return null;
         }
 
