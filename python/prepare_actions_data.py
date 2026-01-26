@@ -16,6 +16,9 @@ with open(input_path, "r", encoding="utf-8") as f:
 # Convert to DataFrame
 df = pd.DataFrame(data)
 
+print(f"\nLoaded {len(df)} records from {input_path}")
+assert len(df) == 91
+
 # Replace empty strings with None for proper null handling
 df = df.replace("", None)
 
@@ -28,6 +31,8 @@ for col in df.columns:
         raise AssertionError(
             f"Power Automate Issue: Column '{col}' is completely null."
         )
+
+##############################################################################
 
 # Process date columns
 date_columns = [
@@ -50,7 +55,7 @@ for col in date_columns:
         df[col] = df[col].dt.strftime("%Y-%m-%d").fillna("")
 
 # Process list columns (semicolon-separated strings)
-list_columns = ["work_package_leads", "action_leads", "un_budget", "ms_body"]
+list_columns = ["work_package_leads", "action_leads"]
 
 for col in list_columns:
     if col in df.columns:
@@ -61,7 +66,7 @@ for col in list_columns:
         )
 
 # Process boolean columns (Yes/No to true/false)
-boolean_columns = ["big_ticket", "ms_approval"]
+boolean_columns = ["big_ticket"]
 
 for col in boolean_columns:
     if col in df.columns:
@@ -90,6 +95,8 @@ for col in df.columns:
 
 # Replace empty strings with None for proper null handling in JSON
 df = df.replace("", None)
+
+##############################################################################
 
 ## Data Validation ##
 
@@ -212,6 +219,7 @@ if validation_errors:
 
 print("\n✓ All data counts match expected values")
 
+##############################################################################
 
 ## Export ##
 
