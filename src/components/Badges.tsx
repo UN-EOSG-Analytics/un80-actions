@@ -171,13 +171,13 @@ export function ShowMoreBadge({
   onClick,
 }: ShowMoreBadgeProps) {
   return (
-    <button
-      type="button"
+    <Badge
+      variant="outline"
+      className="cursor-pointer border-dashed border-slate-300 bg-white text-slate-500 transition-all duration-150 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
       onClick={onClick}
-      className="inline-flex items-center justify-center rounded-full border border-dashed border-slate-300 bg-white px-2.5 py-1 text-xs font-bold text-slate-500 transition-all duration-150 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
     >
       {showAll ? "show less" : `+${hiddenCount} more`}
-    </button>
+    </Badge>
   );
 }
 

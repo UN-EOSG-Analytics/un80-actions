@@ -356,15 +356,15 @@ export function WorkPackageItem({
         {/* Details Button */}
         <button
           type="button"
-          className="absolute top-3 right-2 flex items-center gap-1 rounded-[6px] bg-slate-500 px-2 py-1.5 text-xs font-medium text-white transition-colors hover:bg-slate-600 hover:text-white sm:top-4 sm:right-4 sm:gap-1.5 sm:px-3 sm:text-sm"
+          className="absolute top-3 right-3 !flex !size-9 !min-h-9 !min-w-9 !max-h-9 !max-w-9 items-center justify-center rounded-md bg-slate-500 !p-0 text-white transition-colors hover:bg-slate-600 sm:!h-auto sm:!w-auto sm:!min-h-0 sm:!min-w-0 sm:!max-h-none sm:!max-w-none sm:gap-1.5 sm:rounded-[6px] sm:!px-3 sm:!py-1.5"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             onToggle();
           }}
         >
-          <Menu className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">Details</span>
+          <Menu className="size-4 shrink-0 sm:size-3.5" />
+          <span className="hidden text-sm font-medium sm:inline">Details</span>
         </button>
 
         {/* Collapsible Content */}
