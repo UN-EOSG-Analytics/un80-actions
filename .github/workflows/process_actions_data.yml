@@ -6,13 +6,13 @@ on:
         branches:
             - main
         paths:
-            - 'data/input/actions_raw.json'
+            - "data/input/actions_raw.json"
 
 permissions:
     contents: write # This grants permission to push changes
 
 jobs:
-    update-data:
+    process-actions-data:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository

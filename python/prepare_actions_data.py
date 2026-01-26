@@ -212,9 +212,6 @@ if validation_errors:
 
 print("\n✓ All data counts match expected values")
 
-## placeholder data ##
-
-df["action_status"] = "Further Work Ongoing"
 
 ## Export ##
 
