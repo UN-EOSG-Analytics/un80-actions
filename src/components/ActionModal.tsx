@@ -5,6 +5,7 @@ import {
   DecisionStatusBadge,
   TeamBadge,
   WPLeadsBadge,
+  ShowMoreBadge,
 } from "@/components/Badges";
 import { MilestoneTimeline } from "@/components/MilestoneTimeline";
 import {
@@ -238,18 +239,14 @@ export default function ActionModal({
                 ),
               )}
               {hasMore && (
-                <button
-                  type="button"
+                <ShowMoreBadge
+                  showAll={showAllChips}
+                  hiddenCount={allChips.length - CHIPS_PER_LINE}
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowAllChips((s) => !s);
                   }}
-                  className="inline-flex h-5 items-center justify-center rounded-full border border-dashed border-slate-300 bg-white px-2 text-[11px] leading-none font-medium text-slate-500 transition-all duration-150 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
-                >
-                  {showAllChips
-                    ? "show less"
-                    : `+${allChips.length - CHIPS_PER_LINE} more`}
-                </button>
+                />
               )}
             </div>
           )}

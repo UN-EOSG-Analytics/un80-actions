@@ -6,6 +6,7 @@ import {
   ActionLeadsBadge,
   DecisionStatusBadge,
   TeamBadge,
+  ShowMoreBadge,
 } from "@/components/Badges";
 import { CheckCircle2 } from "lucide-react";
 import {
@@ -180,17 +181,14 @@ export function ActionItem({ action, searchQuery = "" }: ActionItemProps) {
             <TeamBadge leads={displayedTeamMembers} inline />
             {/* Show all/less button - inline with badges */}
             {hasMoreThanFour && (
-              <button
+              <ShowMoreBadge
+                showAll={showAllTeamMembers}
+                hiddenCount={teamMembers.length - 4}
                 onClick={(e) => {
                   e.stopPropagation();
                   setShowAllTeamMembers(!showAllTeamMembers);
                 }}
-                className="inline-flex h-5 items-center justify-center rounded-full border border-dashed border-slate-300 bg-white px-2 text-[11px] leading-none font-medium text-slate-500 transition-all duration-150 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
-              >
-                {showAllTeamMembers
-                  ? "show less"
-                  : `+${teamMembers.length - 4} more`}
-              </button>
+              />
             )}
           </div>
         </div>

@@ -155,6 +155,32 @@ export function TeamBadge({ leads, onSelect, inline }: LeadBadgeProps) {
   );
 }
 
+/** Show More/Less Badge - for expanding collapsed badge lists */
+interface ShowMoreBadgeProps {
+  /** Whether all items are currently shown */
+  showAll: boolean;
+  /** Number of additional items hidden */
+  hiddenCount: number;
+  /** Click handler to toggle show all state */
+  onClick: (e: React.MouseEvent) => void;
+}
+
+export function ShowMoreBadge({
+  showAll,
+  hiddenCount,
+  onClick,
+}: ShowMoreBadgeProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center justify-center rounded-full border border-dashed border-slate-300 bg-white px-2.5 py-1 text-xs font-bold text-slate-500 transition-all duration-150 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
+    >
+      {showAll ? "show less" : `+${hiddenCount} more`}
+    </button>
+  );
+}
+
 /** Workstream Labels - muted (slate fill) */
 const workstreamTooltips: Record<string, string> = {
   WS1: "Workstream 1",
