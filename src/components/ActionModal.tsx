@@ -14,7 +14,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
-import { normalizeTeamMemberForDisplay, parseDate } from "@/lib/utils";
+import { normalizeTeamMemberForDisplay } from "@/lib/utils";
 import type { Action } from "@/types";
 import { ChevronRight, FileText, HelpCircle, X } from "lucide-react";
 import Link from "next/link";
@@ -39,11 +39,20 @@ export default function ActionModal({
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [showAllChips, setShowAllChips] = useState(false);
+  const prevActionNumberRef = useRef<number | undefined>(undefined);
 
   const setModalRef = useCallback((el: HTMLDivElement | null) => {
     (modalRef as { current: HTMLDivElement | null }).current = el;
     setModalEl(el);
   }, []);
+
+  // Reset chips expand when action changes
+  if (prevActionNumberRef.current !== action?.action_number) {
+    prevActionNumberRef.current = action?.action_number;
+    if (showAllChips) {
+      setShowAllChips(false);
+    }
+  }
 
   // Animation state management
   useEffect(() => {
@@ -108,11 +117,6 @@ export default function ActionModal({
       document.documentElement.style.overflow = originalOverflow;
     };
   }, []);
-
-  // Reset chips expand when switching to another action
-  useEffect(() => {
-    setShowAllChips(false);
-  }, [action?.action_number]);
 
   // Handle click outside to close
   const handleBackdropClick = (e: React.MouseEvent) => {

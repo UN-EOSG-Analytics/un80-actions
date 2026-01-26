@@ -75,7 +75,6 @@ export function HighlightedText({
 export function ActionItem({
   action,
   searchQuery = "",
-  isSearchMatch,
 }: ActionItemProps) {
   const searchParams = useSearchParams();
   const [showAllTeamMembers, setShowAllTeamMembers] = useState(false);
