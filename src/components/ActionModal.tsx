@@ -356,7 +356,11 @@ export default function ActionModal({
               <HelpTooltip content="A summary of recent progress on the action." />
             </h3>
             <div className="text-sm leading-relaxed text-slate-600">
-              Updates forthcoming
+              {action.updates && action.updates.trim() ? (
+                <p className="whitespace-pre-wrap">{action.updates}</p>
+              ) : (
+                <p className="text-slate-400 italic">Updates forthcoming</p>
+              )}
             </div>
           </div>
         </SectionCard>
