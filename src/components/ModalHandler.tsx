@@ -38,14 +38,12 @@ export default function ModalHandler() {
           firstMilestone,
         );
         if (!foundAction) {
-          console.warn(`Action ${actionNumber} not found`);
           setError("Action not found");
           setAction(null);
         } else {
           setAction(foundAction);
         }
       } catch (err) {
-        console.error("Error loading action:", err);
         setError("Failed to load action");
         setAction(null);
       } finally {
