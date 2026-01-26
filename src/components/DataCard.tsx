@@ -33,15 +33,12 @@ export function DataCard({
     <Tooltip>
       <TooltipTrigger asChild>
         <div
-          className={cn(
-            "relative h-[90px] w-full sm:h-[110px] md:h-[140px]",
-            className,
-          )}
+          className={cn("relative h-22.5 w-full sm:h-27.5 md:h-35", className)}
         >
           <div className="absolute inset-0 rounded-lg bg-white"></div>
-          <Card className="relative flex h-full w-full cursor-pointer flex-col items-start justify-start gap-0 rounded-lg border-0 bg-un-blue/10 px-3 py-3 pl-4 shadow-none transition-all hover:scale-[1.02] sm:px-4 sm:py-4 sm:pl-[26px] md:py-6">
+          <Card className="relative flex h-full w-full cursor-pointer flex-col items-start justify-start gap-0 rounded-lg border-0 bg-un-blue/10 px-3 py-3 pl-4 shadow-none transition-all hover:scale-[1.02] sm:px-4 sm:py-4 sm:pl-6.5 md:py-6">
             <div className="mb-1.5 flex w-full items-center justify-between gap-1.5 sm:mb-2 sm:gap-2 md:mb-3">
-              <p className="min-w-0 flex-1 truncate text-left text-[12px] leading-[16px] font-normal text-un-blue sm:text-[15px] sm:leading-[19px] md:text-[18px] md:leading-[23px] lg:text-[19px] lg:leading-[25px]">
+              <p className="min-w-0 flex-1 truncate text-left text-[12px] leading-4 font-normal text-un-blue sm:text-[15px] sm:leading-4.75 md:text-[18px] md:leading-5.75 lg:text-[19px] lg:leading-6.25">
                 {title}
               </p>
               <div className="mr-1 shrink-0 sm:mr-2.5">
@@ -49,7 +46,7 @@ export function DataCard({
               </div>
             </div>
             {showFiltered && filteredCount !== undefined ? (
-              <p className="text-left text-[24px] leading-[30px] font-bold text-[#2E3440] tabular-nums sm:text-[37px] sm:leading-[45px] md:text-[43px] md:leading-[51px] lg:text-[49px] lg:leading-[57px]">
+              <p className="text-left text-[24px] leading-7.5 font-bold text-[#2E3440] tabular-nums sm:text-[37px] sm:leading-11.25 md:text-[43px] md:leading-12.75 lg:text-[49px] lg:leading-14.25">
                 {filteredCount}
                 <span className="text-[16px] font-normal text-[#2E3440] sm:text-[22px] md:text-[26px] lg:text-[30px]">
                   /{value}
@@ -59,7 +56,7 @@ export function DataCard({
               <p
                 className={cn(
                   "text-left font-bold text-[#2E3440] tabular-nums",
-                  "text-[18px] leading-[24px] sm:text-[24px] sm:leading-[30px] md:text-[28px] md:leading-[34px] lg:text-[32px] lg:leading-[38px]",
+                  "text-[18px] leading-6 sm:text-[24px] sm:leading-7.5 md:text-[28px] md:leading-8.5 lg:text-[32px] lg:leading-9.5",
                 )}
               >
                 {completed}/{value}{" "}
@@ -68,7 +65,7 @@ export function DataCard({
                 </span>
               </p>
             ) : (
-              <p className="text-left text-[24px] leading-[30px] font-bold text-[#2E3440] tabular-nums sm:text-[37px] sm:leading-[45px] md:text-[43px] md:leading-[51px] lg:text-[49px] lg:leading-[57px]">
+              <p className="text-left text-[24px] leading-7.5 font-bold text-[#2E3440] tabular-nums sm:text-[37px] sm:leading-11.25 md:text-[43px] md:leading-12.75 lg:text-[49px] lg:leading-14.25">
                 {value}
               </p>
             )}

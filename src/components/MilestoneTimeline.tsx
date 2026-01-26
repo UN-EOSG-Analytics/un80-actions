@@ -78,7 +78,7 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
                     "text-base font-medium",
                     isReached && "line-through",
                     milestone.label.toLowerCase() === "no longer relevant"
-                      ? "italic text-slate-500"
+                      ? "text-slate-500 italic"
                       : "text-gray-900",
                   )}
                 >
