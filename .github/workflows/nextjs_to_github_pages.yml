@@ -1,13 +1,11 @@
 # Sample workflow for building and deploying a Next.js site to GitHub Pages
 #
 # To get started with Next.js see: https://nextjs.org/docs/getting-started
-
-name: Deploy Next.js to GitHub Pages
-
-run-name: ${{ github.event_name == 'workflow_run' && '🔄 Redeploy after data processing' || github.event_name == 'workflow_dispatch' && '🚀 Manual deployment' || github.event.head_commit.message }}
+#
+name: Deploy Next.js site to Pages
 
 on:
-   # Runs after the data processing workflow completes successfully
+    # Runs after the data processing workflow completes successfully
     workflow_run:
         workflows: ["Process raw JSON data"]
         types:
@@ -27,20 +25,12 @@ permissions:
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
     group: "pages"
-    cancel-in-progress: false
+    cancel-in-progress: true
 
 jobs:
     # Build job
     build:
         runs-on: ubuntu-latest
-        # Skip if triggered by push with 'automated data update' message (wait for process_data.yml to complete)
-        # Run if triggered by workflow_run and it succeeded, or if manual dispatch, or if push without that message
-        if: |
-            ${{
-              github.event_name == 'workflow_dispatch' ||
-              (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
-              (github.event_name == 'push' && !contains(github.event.head_commit.message, 'automated data update'))
-            }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -55,7 +45,7 @@ jobs:
                   elif [ -f "${{ github.workspace }}/package.json" ]; then
                     echo "manager=npm" >> $GITHUB_OUTPUT
                     echo "command=ci" >> $GITHUB_OUTPUT
-                    echo "runner=npm" >> $GITHUB_OUTPUT
+                    echo "runner=npx --no-install" >> $GITHUB_OUTPUT
                     exit 0
                   else
                     echo "Unable to determine package manager"
@@ -81,10 +71,7 @@ jobs:
             - name: Install dependencies
               run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
             - name: Build with Next.js
-              run: ${{ steps.detect-package-manager.outputs.runner }} run build
-              env:
-                  NEXT_PUBLIC_BASE_PATH: ""
-                  STATICRYPT_PASSWORD: ${{ secrets.STATICRYPT_PASSWORD }}
+              run: ${{ steps.detect-package-manager.outputs.runner }} next build
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v3
               with:
