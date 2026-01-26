@@ -293,20 +293,8 @@ export default function ActionModal({
               <DecisionStatusBadge status={action.public_action_status || "Further Work Ongoing"} />
             </div>
 
-            {/* Milestones Section */}
-            {(() => {
-              const hasFirstMilestonePassed =
-                action.first_milestone && action.first_milestone_deadline
-                  ? (() => {
-                      const deadlineDate = parseDate(
-                        action.first_milestone_deadline,
-                      );
-                      const now = new Date();
-                      return deadlineDate && deadlineDate < now;
-                    })()
-                  : false;
-              return hasFirstMilestonePassed || action.upcoming_milestone;
-            })() && (
+            {/* Upcoming Milestone – only the single upcoming milestone */}
+            {action.upcoming_milestone && (
               <>
                 <div className="my-3 border-t border-slate-200"></div>
                 <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold tracking-wide text-slate-700">
@@ -332,35 +320,11 @@ export default function ActionModal({
                 <div className="mt-2">
                   <MilestoneTimeline
                     milestones={[
-                      ...(action.first_milestone &&
-                      action.first_milestone_deadline
-                        ? (() => {
-                            const deadlineDate = parseDate(
-                              action.first_milestone_deadline,
-                            );
-                            const now = new Date();
-                            const hasPassed =
-                              deadlineDate && deadlineDate < now;
-                            return hasPassed
-                              ? [
-                                  {
-                                    label: action.first_milestone,
-                                    deadline: action.first_milestone_deadline,
-                                    isReached: false,
-                                  },
-                                ]
-                              : [];
-                          })()
-                        : []),
-                      ...(action.upcoming_milestone
-                        ? [
-                            {
-                              label: action.upcoming_milestone,
-                              deadline: action.delivery_date,
-                              isReached: false,
-                            },
-                          ]
-                        : []),
+                      {
+                        label: action.upcoming_milestone,
+                        deadline: action.upcoming_milestone_deadline ?? action.delivery_date ?? null,
+                        isReached: false,
+                      },
                     ]}
                   />
                 </div>
