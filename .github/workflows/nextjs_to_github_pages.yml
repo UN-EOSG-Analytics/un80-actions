@@ -9,7 +9,7 @@ run-name: ${{ github.event_name == 'workflow_run' && '🔄 Redeploy after data p
 on:
    # Runs after the data processing workflow completes successfully
     workflow_run:
-        workflows: ["Process raw actions data from Power Automate"]
+        workflows: ["Process raw JSON data"]
         types:
             - completed
         branches: ["main"]
@@ -33,29 +33,15 @@ jobs:
     # Build job
     build:
         runs-on: ubuntu-latest
-        # Skip ONLY if triggered by push with 'automated data update' message (wait for process_actions_data.yml to complete)
-        # Run if triggered by workflow_run (after data processing completes), manual dispatch, or push without that message
-        # Note: workflow_run fires on 'completed' (both success and failure), so we check conclusion in a step
+        # Skip if triggered by push with 'automated data update' message (wait for process_data.yml to complete)
+        # Run if triggered by workflow_run and it succeeded, or if manual dispatch, or if push without that message
         if: |
-            github.event_name == 'workflow_dispatch' ||
-            github.event_name == 'workflow_run' ||
-            (github.event_name == 'push' && !contains(github.event.head_commit.message, 'automated data update'))
+            ${{
+              github.event_name == 'workflow_dispatch' ||
+              (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+              (github.event_name == 'push' && !contains(github.event.head_commit.message, 'automated data update'))
+            }}
         steps:
-            - name: Check workflow run success
-              if: github.event_name == 'workflow_run'
-              run: |
-                  echo "Workflow run conclusion: ${{ github.event.workflow_run.conclusion }}"
-                  echo "Workflow run name: ${{ github.event.workflow_run.name }}"
-                  if [ "${{ github.event.workflow_run.conclusion }}" != "success" ]; then
-                    echo "❌ Data processing workflow did not complete successfully. Skipping deployment."
-                    exit 1
-                  fi
-                  echo "✅ Data processing workflow completed successfully. Proceeding with deployment."
-            - name: Debug workflow trigger
-              run: |
-                  echo "Event name: ${{ github.event_name }}"
-                  echo "Commit message: ${{ github.event.head_commit.message }}"
-                  echo "Commit SHA: ${{ github.event.head_commit.id }}"
             - name: Checkout
               uses: actions/checkout@v4
             - name: Detect package manager
