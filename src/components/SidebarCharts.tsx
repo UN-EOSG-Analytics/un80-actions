@@ -1,5 +1,5 @@
 import React from "react";
-import { Users, Calendar, Layers, Activity } from "lucide-react";
+import { Users, Calendar, CalendarDays, Flag, Layers, Activity } from "lucide-react";
 import {
   ACTION_STATUS,
   getStatusStyles,
@@ -239,74 +239,62 @@ export function SidebarCharts({
       {totalActions > 0 && (
         <div className="py-5 pl-4.5 first:pt-0">
           <h3 className="mb-3 flex h-6.25 items-center gap-2 text-[17px] font-semibold text-slate-900">
-            <span className="flex h-5 w-5 items-center justify-center text-un-blue">
+            <span className="flex h-5 w-5 items-center justify-center text-slate-500">
               <Activity className="h-5 w-5" />
             </span>
             Action Status
           </h3>
 
-          <div className="divide-y divide-slate-200 pr-4">
+          <div className="flex flex-col gap-1.5 pr-4">
             {/* Further Work Ongoing */}
             {(() => {
               const statusKey = ACTION_STATUS.FURTHER_WORK_ONGOING;
               const isSelected = selectedActionStatus.includes(statusKey);
               const styles = getStatusStyles(statusKey);
               const IconComponent = styles.icon.component;
+              const percentage =
+                totalActions > 0 ? (furtherWorkCount / totalActions) * 100 : 0;
 
               return (
-                <div
-                  className={`group flex cursor-pointer items-center justify-between gap-2 py-1.5 pl-0.5 transition-all ${
+                <button
+                  type="button"
+                  className={`group flex flex-col gap-1 rounded-md p-1 text-left transition-all duration-150 ${
                     isSelected
                       ? styles.sidebar.selectedBg
-                      : styles.sidebar.hoverBg
+                      : "hover:bg-slate-50"
                   }`}
                   onClick={() => {
                     onSelectActionStatus(isSelected ? [] : [statusKey]);
                   }}
                 >
-                  <div className="flex min-w-0 items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <IconComponent
                       className={`h-4 w-4 shrink-0 ${styles.sidebar.icon}`}
                     />
-                    <span
-                      className={`text-[14px] leading-tight font-semibold transition-colors ${
-                        isSelected
-                          ? styles.sidebar.selectedText
-                          : `${styles.sidebar.count} ${styles.sidebar.hoverText}`
-                      }`}
-                    >
-                      {styles.label}
+                    <span className="text-[13px] font-medium text-slate-900">
+                      Further work ongoing
                     </span>
                   </div>
-                  <div className="flex shrink-0 items-center gap-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <div
+                      className={`relative h-2 min-w-32 flex-1 overflow-hidden rounded-full ${styles.sidebar.barTrack}`}
+                    >
+                      <div
+                        className={`h-full rounded-full transition-all ${styles.sidebar.selectedBar}`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
                     <span
-                      className={`w-7 text-right text-[14px] font-semibold tabular-nums ${
+                      className={`min-w-5 text-right text-[13px] font-semibold tabular-nums ${
                         isSelected
                           ? styles.sidebar.selectedText
-                          : styles.sidebar.count
+                          : "text-slate-900"
                       }`}
                     >
                       {furtherWorkCount}
                     </span>
-                    <div
-                      className={`relative mr-2 h-2 w-[85px] overflow-hidden rounded-full ${styles.sidebar.barTrack}`}
-                    >
-                      <div
-                        className={`h-full rounded-full transition-all ${
-                          isSelected
-                            ? styles.sidebar.selectedBar
-                            : styles.sidebar.bar
-                        }`}
-                        style={{
-                          width:
-                            totalActions > 0
-                              ? `${(furtherWorkCount / totalActions) * 100}%`
-                              : "0%",
-                        }}
-                      />
-                    </div>
                   </div>
-                </div>
+                </button>
               );
             })()}
 
@@ -316,64 +304,70 @@ export function SidebarCharts({
               const isSelected = selectedActionStatus.includes(statusKey);
               const styles = getStatusStyles(statusKey);
               const IconComponent = styles.icon.component;
+              const percentage =
+                totalActions > 0
+                  ? (decisionTakenCount / totalActions) * 100
+                  : 0;
 
               return (
-                <div
-                  className={`group flex cursor-pointer items-center justify-between gap-2 py-1.5 pl-0.5 transition-all ${
+                <button
+                  type="button"
+                  className={`group flex flex-col gap-1 rounded-md p-1 text-left transition-all duration-150 ${
                     isSelected
                       ? styles.sidebar.selectedBg
-                      : styles.sidebar.hoverBg
+                      : "hover:bg-slate-50"
                   }`}
                   onClick={() => {
                     onSelectActionStatus(isSelected ? [] : [statusKey]);
                   }}
                 >
-                  <div className="flex min-w-0 items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <IconComponent
                       className={`h-4 w-4 shrink-0 ${styles.sidebar.icon}`}
                     />
-                    <span
-                      className={`text-[14px] leading-tight font-semibold transition-colors ${
-                        isSelected
-                          ? styles.sidebar.selectedText
-                          : `${styles.sidebar.count} ${styles.sidebar.hoverText}`
-                      }`}
-                    >
-                      {styles.label}
+                    <span className="text-[13px] font-medium text-slate-900">
+                      Decision taken
                     </span>
                   </div>
-                  <div className="flex shrink-0 items-center gap-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <div
+                      className={`relative h-2 min-w-32 flex-1 overflow-hidden rounded-full ${styles.sidebar.barTrack}`}
+                    >
+                      <div
+                        className={`h-full rounded-full transition-all ${styles.sidebar.selectedBar}`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
                     <span
-                      className={`w-7 text-right text-[14px] font-semibold tabular-nums ${
+                      className={`min-w-5 text-right text-[13px] font-semibold tabular-nums ${
                         isSelected
                           ? styles.sidebar.selectedText
-                          : styles.sidebar.count
+                          : "text-slate-900"
                       }`}
                     >
                       {decisionTakenCount}
                     </span>
-                    <div
-                      className={`relative mr-2 h-2 w-[85px] overflow-hidden rounded-full ${styles.sidebar.barTrack}`}
-                    >
-                      <div
-                        className={`h-full rounded-full transition-all ${
-                          isSelected
-                            ? styles.sidebar.selectedBar
-                            : styles.sidebar.bar
-                        }`}
-                        style={{
-                          width:
-                            totalActions > 0
-                              ? `${(decisionTakenCount / totalActions) * 100}%`
-                              : "0%",
-                        }}
-                      />
-                    </div>
                   </div>
-                </div>
+                </button>
               );
             })()}
           </div>
+        </div>
+      )}
+
+      {/* Upcoming Milestones by Month */}
+      {milestonesPerMonthEntries.length > 0 && (
+        <div className="py-5">
+          <SidebarChart
+            title="Upcoming Milestones by Month"
+            description="Number of milestones by month"
+            icon={<CalendarDays />}
+            data={milestonesPerMonthEntries}
+            selectedValue={selectedMilestoneMonth}
+            onSelectValue={onSelectMilestoneMonth}
+            barWidth={105}
+            maxHeight={155}
+          />
         </div>
       )}
 
@@ -382,8 +376,8 @@ export function SidebarCharts({
         <div className="py-5 pl-4.5">
           {/* Header */}
           <h3 className="mb-3 flex h-6.25 items-center gap-2 text-[17px] font-semibold text-slate-900">
-            <span className="flex h-5 w-5 items-center justify-center text-un-blue">
-              <Calendar className="h-5 w-5" />
+            <span className="flex h-5 w-5 items-center justify-center text-slate-500">
+              <Flag className="h-5 w-5" />
             </span>
             Upcoming Milestones
           </h3>
@@ -469,22 +463,6 @@ export function SidebarCharts({
               );
             })}
           </div>
-        </div>
-      )}
-
-      {/* Upcoming Milestones by Month */}
-      {milestonesPerMonthEntries.length > 0 && (
-        <div className="py-5">
-          <SidebarChart
-            title="Upcoming Milestones by Month"
-            description="Number of milestones by month"
-            icon={<Calendar />}
-            data={milestonesPerMonthEntries}
-            selectedValue={selectedMilestoneMonth}
-            onSelectValue={onSelectMilestoneMonth}
-            barWidth={105}
-            maxHeight={155}
-          />
         </div>
       )}
 

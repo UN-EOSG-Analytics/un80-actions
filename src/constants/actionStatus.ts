@@ -43,7 +43,7 @@ const STATUS_COLORS = {
 
     // Bar/progress colors
     bar: "bg-amber-100",
-    barTrack: "bg-slate-100",
+    barTrack: "bg-amber-100",
     // Count/number color
     count: "text-amber-700",
     // Hover/selected states
@@ -61,7 +61,7 @@ const STATUS_COLORS = {
     icon: "text-green-700",
     // Bar/progress colors
     bar: "bg-green-500",
-    barTrack: "bg-slate-100",
+    barTrack: "bg-green-100",
     // Count/number color
     count: "text-green-700",
     // Hover/selected states
