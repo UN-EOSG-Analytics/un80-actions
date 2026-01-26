@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import type { Actions, FilterState } from "@/types";
 import { groupActionsByWorkPackage } from "@/lib/workPackages";
 import {
@@ -11,6 +11,7 @@ import {
   calculateLeadChartData,
   calculateWorkstreamChartData,
   calculateWorkPackageChartData,
+  calculateUpcomingMilestonesChartData,
   calculateStatsData,
 } from "@/lib/filters";
 import { normalizeTeamMember } from "@/lib/utils";
@@ -69,6 +70,7 @@ export function useWorkPackageData(
   chartSearchQuery: string,
   workstreamChartSearchQuery: string,
   workpackageChartSearchQuery: string,
+  upcomingMilestonesChartSearchQuery: string,
 ) {
   // Group actions by work package (combine across reports)
   const workPackages = useMemo(
@@ -77,160 +79,197 @@ export function useWorkPackageData(
   );
 
   // Helper function to filter actions within work packages by team members
-  const filterActionsByTeamMembers = (
-    wp: (typeof workPackages)[0],
-  ): (typeof workPackages)[0] => {
-    if (filters.selectedTeamMember && filters.selectedTeamMember.length > 0) {
-      const filteredActions = wp.actions.filter((action) => {
-        if (!action.actionEntities) return false;
-        const entities = action.actionEntities
-          .split(";")
-          .map((e) => e.trim())
-          .filter(Boolean);
-        // Normalize both the selected team members and the entities for comparison
-        const normalizedSelected = filters
-          .selectedTeamMember!.map(normalizeTeamMember)
-          .filter(Boolean) as string[];
-        return entities.some((entity) => {
-          const normalizedEntity = normalizeTeamMember(entity);
-          return (
-            normalizedEntity && normalizedSelected.includes(normalizedEntity)
-          );
+  const filterActionsByTeamMembers = useCallback(
+    (wp: (typeof workPackages)[0]): (typeof workPackages)[0] => {
+      if (filters.selectedTeamMember && filters.selectedTeamMember.length > 0) {
+        const filteredActions = wp.actions.filter((action) => {
+          if (!action.actionEntities) return false;
+          const entities = action.actionEntities
+            .split(";")
+            .map((e) => e.trim())
+            .filter(Boolean);
+          // Normalize both the selected team members and the entities for comparison
+          const normalizedSelected = filters
+            .selectedTeamMember!.map(normalizeTeamMember)
+            .filter(Boolean) as string[];
+          return entities.some((entity) => {
+            const normalizedEntity = normalizeTeamMember(entity);
+            return (
+              normalizedEntity && normalizedSelected.includes(normalizedEntity)
+            );
+          });
         });
-      });
-      return {
-        ...wp,
-        actions: filteredActions,
-      };
-    }
-    return wp;
-  };
+        return {
+          ...wp,
+          actions: filteredActions,
+        };
+      }
+      return wp;
+    },
+    [filters.selectedTeamMember],
+  );
 
   // Helper function to filter work packages with all filters except one
-  const getFilteredWorkPackagesExcludingFilter = (
-    excludeFilter:
-      | "lead"
-      | "workstream"
-      | "workpackage"
-      | "action"
-      | "bigticket"
-      | "wpfamily"
-      | "teammember",
-  ) => {
-    let filtered = workPackages;
+  const getFilteredWorkPackagesExcludingFilter = useCallback(
+    (
+      excludeFilter:
+        | "lead"
+        | "workstream"
+        | "workpackage"
+        | "action"
+        | "bigticket"
+        | "wpfamily"
+        | "teammember",
+    ) => {
+      let filtered = workPackages;
 
-    // Always apply search query
-    if (filters.searchQuery.trim()) {
-      const query = filters.searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (wp) =>
-          wp.name.toLowerCase().includes(query) ||
-          String(wp.number).includes(query) ||
-          wp.leads.some((lead) => lead.toLowerCase().includes(query)) ||
-          wp.actions.some((action) =>
-            action.text.toLowerCase().includes(query),
-          ),
-      );
-    }
-
-    // Apply team member filter at action level (unless it's the excluded filter)
-    // This filters actions within work packages, not the work packages themselves
-    if (
-      excludeFilter !== "teammember" &&
-      filters.selectedTeamMember &&
-      filters.selectedTeamMember.length > 0
-    ) {
-      filtered = filtered
-        .map(filterActionsByTeamMembers)
-        .filter((wp) => wp.actions.length > 0);
-    }
-
-    // Apply big ticket filter unless it's the excluded filter
-    if (
-      excludeFilter !== "bigticket" &&
-      filters.selectedBigTicket &&
-      filters.selectedBigTicket.length > 0
-    ) {
-      const hasBigTicket = filters.selectedBigTicket.includes("big-ticket");
-      const hasOther = filters.selectedBigTicket.includes("other");
-
-      if (hasBigTicket && hasOther) {
-        // Both selected, show all
-      } else if (hasBigTicket) {
-        filtered = filtered.filter((wp) => wp.bigTicket === true);
-      } else if (hasOther) {
-        filtered = filtered.filter((wp) => wp.bigTicket === false);
+      // Debug: Check if WP 22 exists at start
+      const wp22 = workPackages.find((wp) => wp.number === 22);
+      if (wp22) {
+        console.log("WP 22 exists at start:", {
+          number: wp22.number,
+          name: wp22.name,
+          actionCount: wp22.actions.length,
+          hasAction1: wp22.actions.some((a) => a.actionNumber === 1),
+          action1: wp22.actions.find((a) => a.actionNumber === 1),
+        });
+      } else {
+        console.log("WP 22 NOT found at start");
       }
-    }
 
-    // Apply filters based on what's not excluded
-    if (
-      excludeFilter !== "lead" &&
-      filters.selectedLead &&
-      filters.selectedLead.length > 0
-    ) {
-      filtered = filtered.filter((wp) =>
-        wp.leads.some((lead) => filters.selectedLead!.includes(lead)),
-      );
-    }
+      // Always apply search query
+      if (filters.searchQuery.trim()) {
+        const query = filters.searchQuery.toLowerCase();
+        const queryWords = query.split(/\s+/);
+        filtered = filtered.filter(
+          (wp) =>
+            wp.name.toLowerCase().includes(query) ||
+            String(wp.number).includes(query) ||
+            wp.leads.some((lead) => lead.toLowerCase().includes(query)) ||
+            wp.actions.some(
+              (action) =>
+                action.text.toLowerCase().includes(query) ||
+                queryWords.some((w) => w === String(action.actionNumber)),
+            ),
+        );
+      }
 
-    if (
-      excludeFilter !== "workstream" &&
-      filters.selectedWorkstream &&
-      filters.selectedWorkstream.length > 0
-    ) {
-      filtered = filtered.filter((wp) =>
-        filters.selectedWorkstream!.some((ws) => wp.report.includes(ws)),
-      );
-    }
+      // Apply team member filter at action level (unless it's the excluded filter)
+      // This filters actions within work packages, not the work packages themselves
+      if (
+        excludeFilter !== "teammember" &&
+        filters.selectedTeamMember &&
+        filters.selectedTeamMember.length > 0
+      ) {
+        filtered = filtered
+          .map(filterActionsByTeamMembers)
+          .filter((wp) => wp.actions.length > 0);
+      }
 
-    if (
-      excludeFilter !== "workpackage" &&
-      filters.selectedWorkPackage &&
-      filters.selectedWorkPackage.length > 0
-    ) {
-      const selectedNumbers = filters.selectedWorkPackage.map((wp) => {
-        const wpMatch = wp.match(/^(\d+):/);
-        return wpMatch ? wpMatch[1] : wp;
-      });
+      // Apply big ticket filter unless it's the excluded filter
+      if (
+        excludeFilter !== "bigticket" &&
+        filters.selectedBigTicket &&
+        filters.selectedBigTicket.length > 0
+      ) {
+        const hasBigTicket = filters.selectedBigTicket.includes("big-ticket");
+        const hasOther = filters.selectedBigTicket.includes("other");
 
-      filtered = filtered.filter((wp) => {
-        if (wp.number) {
-          return selectedNumbers.includes(String(wp.number));
-        } else {
-          return selectedNumbers.includes(wp.name);
+        if (hasBigTicket && hasOther) {
+          // Both selected, show all
+        } else if (hasBigTicket) {
+          filtered = filtered.filter((wp) => wp.bigTicket === true);
+        } else if (hasOther) {
+          filtered = filtered.filter((wp) => wp.bigTicket === false);
         }
-      });
-    }
+      }
 
-    if (
-      excludeFilter !== "action" &&
-      filters.selectedAction &&
-      filters.selectedAction.length > 0
-    ) {
-      filtered = filtered.filter((wp) =>
-        wp.actions.some((action) =>
-          filters.selectedAction!.includes(action.text.trim()),
-        ),
-      );
-    }
+      // Apply filters based on what's not excluded
+      if (
+        excludeFilter !== "lead" &&
+        filters.selectedLead &&
+        filters.selectedLead.length > 0
+      ) {
+        filtered = filtered.filter((wp) =>
+          wp.leads.some((lead) => filters.selectedLead!.includes(lead)),
+        );
+      }
 
-    // Apply WP Families filter unless it's the excluded filter
-    if (excludeFilter !== "wpfamily" && filters.selectedWpFamily) {
-      const allowedNumbers = new Set(
-        getWpNumbersForFamilyForHook(filters.selectedWpFamily, workPackages),
-      );
+      if (
+        excludeFilter !== "workstream" &&
+        filters.selectedWorkstream &&
+        filters.selectedWorkstream.length > 0
+      ) {
+        filtered = filtered.filter((wp) =>
+          filters.selectedWorkstream!.some((ws) => wp.report.includes(ws)),
+        );
+      }
 
-      filtered = filtered.filter((wp) => {
-        if (typeof wp.number === "number") {
-          return allowedNumbers.has(String(wp.number));
-        }
-        return false;
-      });
-    }
+      if (
+        excludeFilter !== "workpackage" &&
+        filters.selectedWorkPackage &&
+        filters.selectedWorkPackage.length > 0
+      ) {
+        const selectedNumbers = filters.selectedWorkPackage.map((wp) => {
+          const wpMatch = wp.match(/^(\d+):/);
+          return wpMatch ? wpMatch[1] : wp;
+        });
 
-    return filtered;
-  };
+        filtered = filtered.filter((wp) => {
+          if (wp.number) {
+            return selectedNumbers.includes(String(wp.number));
+          } else {
+            return selectedNumbers.includes(wp.name);
+          }
+        });
+      }
+
+      if (
+        excludeFilter !== "action" &&
+        filters.selectedAction &&
+        filters.selectedAction.length > 0
+      ) {
+        filtered = filtered.filter((wp) =>
+          wp.actions.some((action) => {
+            const actionNumber = String(action.actionNumber || "");
+            const match = filters.selectedAction!.some((selected) => {
+              const selectedTrimmed = selected.trim();
+              const result = actionNumber === selectedTrimmed;
+              if (selected === "1") {
+                console.log("Debug action filter:", {
+                  wpNumber: wp.number,
+                  actionNumber: action.actionNumber,
+                  actionNumberStr: actionNumber,
+                  selected,
+                  selectedTrimmed,
+                  result,
+                });
+              }
+              return result;
+            });
+            return match;
+          }),
+        );
+      }
+
+      // Apply WP Families filter unless it's the excluded filter
+      if (excludeFilter !== "wpfamily" && filters.selectedWpFamily) {
+        const allowedNumbers = new Set(
+          getWpNumbersForFamilyForHook(filters.selectedWpFamily, workPackages),
+        );
+
+        filtered = filtered.filter((wp) => {
+          if (typeof wp.number === "number") {
+            return allowedNumbers.has(String(wp.number));
+          }
+          return false;
+        });
+      }
+
+      return filtered;
+    },
+    [workPackages, filters, filterActionsByTeamMembers],
+  );
 
   // Get unique values for filters (filtered based on other selections)
   const uniqueWorkPackages = useMemo(
@@ -238,12 +277,12 @@ export function useWorkPackageData(
       getUniqueWorkPackages(
         getFilteredWorkPackagesExcludingFilter("workpackage"),
       ),
-    [workPackages, filters],
+    [getFilteredWorkPackagesExcludingFilter],
   );
 
   const uniqueLeads = useMemo(
     () => getUniqueLeads(getFilteredWorkPackagesExcludingFilter("lead")),
-    [workPackages, filters],
+    [getFilteredWorkPackagesExcludingFilter],
   );
 
   const uniqueWorkstreams = useMemo(
@@ -251,12 +290,12 @@ export function useWorkPackageData(
       getUniqueWorkstreams(
         getFilteredWorkPackagesExcludingFilter("workstream"),
       ),
-    [workPackages, filters],
+    [getFilteredWorkPackagesExcludingFilter],
   );
 
   const uniqueActions = useMemo(
     () => getUniqueActions(getFilteredWorkPackagesExcludingFilter("action")),
-    [workPackages, filters],
+    [getFilteredWorkPackagesExcludingFilter],
   );
 
   // Extract just the text for backward compatibility with filter matching
@@ -270,7 +309,7 @@ export function useWorkPackageData(
       getUniqueTeamMembers(
         getFilteredWorkPackagesExcludingFilter("teammember"),
       ),
-    [workPackages, filters],
+    [getFilteredWorkPackagesExcludingFilter],
   );
 
   // Get available big ticket filter options based on current filters
@@ -287,7 +326,7 @@ export function useWorkPackageData(
       options.push({ key: "other", label: "Other Work packages" });
     }
     return options;
-  }, [workPackages, filters]);
+  }, [getFilteredWorkPackagesExcludingFilter]);
 
   // Calculate chart data: count work packages per lead
   // Filter by selected workstream and workpackage from other charts
@@ -343,6 +382,26 @@ export function useWorkPackageData(
     ],
   );
 
+  // Calculate chart data: upcoming milestones
+  // Filter by selected lead, work package, and workstream from other charts
+  const upcomingMilestonesChartData = useMemo(
+    () =>
+      calculateUpcomingMilestonesChartData(
+        actions,
+        upcomingMilestonesChartSearchQuery,
+        filters.selectedLead,
+        filters.selectedWorkPackage,
+        filters.selectedWorkstream,
+      ),
+    [
+      actions,
+      upcomingMilestonesChartSearchQuery,
+      filters.selectedLead,
+      filters.selectedWorkPackage,
+      filters.selectedWorkstream,
+    ],
+  );
+
   // Filter work packages based on search and filters
   const filteredWorkPackages = useMemo(
     () => filterWorkPackages(workPackages, filters),
@@ -368,6 +427,7 @@ export function useWorkPackageData(
     chartData,
     workstreamChartData,
     workpackageChartData,
+    upcomingMilestonesChartData,
     statsData,
   };
 }

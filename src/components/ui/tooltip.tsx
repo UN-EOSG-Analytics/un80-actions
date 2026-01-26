@@ -5,6 +5,42 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 import { cn } from "@/lib/utils";
 
+/** When provided (e.g. by Action Modal), tooltips will stay within this element. */
+const TooltipCollisionBoundaryContext =
+  React.createContext<HTMLDivElement | null>(null);
+
+export function TooltipCollisionBoundaryProvider({
+  value,
+  children,
+}: {
+  value: HTMLDivElement | null;
+  children: React.ReactNode;
+}) {
+  return (
+    <TooltipCollisionBoundaryContext.Provider value={value}>
+      {children}
+    </TooltipCollisionBoundaryContext.Provider>
+  );
+}
+
+function useIsTouchDevice() {
+  const [isTouch, setIsTouch] = React.useState(false);
+  React.useEffect(() => {
+    const m = window.matchMedia("(hover: none)");
+    const update = () => setIsTouch(m.matches);
+    update();
+    m.addEventListener("change", update);
+    return () => m.removeEventListener("change", update);
+  }, []);
+  return isTouch;
+}
+
+const TooltipContext = React.createContext<{
+  isTouch: boolean;
+  open: boolean;
+  setOpen: (v: boolean | ((prev: boolean) => boolean)) => void;
+} | null>(null);
+
 function TooltipProvider({
   delayDuration = 0,
   ...props
@@ -18,33 +54,71 @@ function TooltipProvider({
   );
 }
 
-function Tooltip({
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Root>) {
+function Tooltip(props: React.ComponentProps<typeof TooltipPrimitive.Root>) {
+  const [open, setOpen] = React.useState(false);
+  const isTouch = useIsTouchDevice();
+  const controlledProps = isTouch ? { open, onOpenChange: setOpen } : {};
   return (
-    <TooltipProvider>
-      <TooltipPrimitive.Root data-slot="tooltip" {...props} />
-    </TooltipProvider>
+    <TooltipContext.Provider value={{ isTouch, open, setOpen }}>
+      <TooltipProvider>
+        <TooltipPrimitive.Root
+          data-slot="tooltip"
+          {...controlledProps}
+          {...props}
+        />
+      </TooltipProvider>
+    </TooltipContext.Provider>
   );
 }
 
 function TooltipTrigger({
+  onClick,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
+  const ctx = React.useContext(TooltipContext);
+  const isTouch = ctx?.isTouch ?? false;
+  const setOpen = ctx?.setOpen;
+  return (
+    <TooltipPrimitive.Trigger
+      data-slot="tooltip-trigger"
+      onClick={(e) => {
+        if (isTouch && setOpen) setOpen((o) => !o);
+        onClick?.(e);
+      }}
+      {...props}
+    />
+  );
 }
 
 function TooltipContent({
   className,
   sideOffset = 8,
+  onPointerDownOutside,
+  collisionBoundary: propsCollisionBoundary,
+  collisionPadding: propsCollisionPadding,
   children,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Content>) {
+  const ctx = React.useContext(TooltipContext);
+  const isTouch = ctx?.isTouch ?? false;
+  const setOpen = ctx?.setOpen;
+  const boundaryEl = React.useContext(TooltipCollisionBoundaryContext);
+  const collisionBoundary = boundaryEl || propsCollisionBoundary;
+  const collisionPadding = boundaryEl
+    ? (propsCollisionPadding ?? 12)
+    : propsCollisionPadding;
+
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content
         data-slot="tooltip-content"
         sideOffset={sideOffset}
+        collisionBoundary={collisionBoundary}
+        collisionPadding={collisionPadding}
+        onPointerDownOutside={(e) => {
+          if (isTouch && setOpen) setOpen(false);
+          onPointerDownOutside?.(e);
+        }}
         className={cn(
           "z-50 max-w-xs origin-(--radix-tooltip-content-transform-origin) animate-in rounded-lg border border-un-blue/20 bg-white px-4 py-1.5 text-sm text-balance text-gray-900 shadow-lg shadow-un-blue/10 backdrop-blur-sm fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
           className,

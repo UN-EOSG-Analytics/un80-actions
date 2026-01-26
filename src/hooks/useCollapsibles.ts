@@ -17,6 +17,10 @@ export function useCollapsibles() {
   const [showAllWorkstreams, setShowAllWorkstreams] = useState<boolean>(false);
   const [showAllWorkpackages, setShowAllWorkpackages] =
     useState<boolean>(false);
+  const [showAllUpcomingMilestones, setShowAllUpcomingMilestones] =
+    useState<boolean>(false);
+  const [showAllMilestonesPerMonth, setShowAllMilestonesPerMonth] =
+    useState<boolean>(false);
   const [showAllLeaderChecklist, setShowAllLeaderChecklist] =
     useState<boolean>(false);
 
@@ -52,9 +56,23 @@ export function useCollapsibles() {
     });
   }, []);
 
+  const expandCollapsibles = useCallback((keys: string[]) => {
+    setOpenCollapsibles((prev) => {
+      const next = new Set(prev);
+      keys.forEach((key) => next.add(key));
+      return next;
+    });
+  }, []);
+
+  const collapseAllWorkPackages = useCallback(() => {
+    setOpenCollapsibles(new Set());
+  }, []);
+
   return {
     openCollapsibles,
     toggleCollapsible,
+    expandCollapsibles,
+    collapseAllWorkPackages,
     isAdvancedFilterOpen,
     setIsAdvancedFilterOpen,
     openFilterCollapsibles,
@@ -66,6 +84,10 @@ export function useCollapsibles() {
     setShowAllWorkstreams,
     showAllWorkpackages,
     setShowAllWorkpackages,
+    showAllUpcomingMilestones,
+    setShowAllUpcomingMilestones,
+    showAllMilestonesPerMonth,
+    setShowAllMilestonesPerMonth,
     showAllLeaderChecklist,
     setShowAllLeaderChecklist,
   };

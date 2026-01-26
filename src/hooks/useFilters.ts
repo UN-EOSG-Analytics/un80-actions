@@ -1,10 +1,18 @@
 import { useMemo, useCallback, useEffect, startTransition } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import type { FilterState } from "@/types";
+import {
+  encodeUrlParam,
+  decodeUrlParam,
+  encodeUrlParamArray,
+  decodeUrlParamArray,
+  buildCleanQueryString,
+} from "@/lib/utils";
 
 /**
  * Custom hook to manage filter state with URL as single source of truth
  * Uses router.replace with startTransition for URL updates
+ * URL params use underscores for spaces and commas as delimiters for clean, readable URLs
  */
 export function useFilters() {
   const searchParams = useSearchParams();
@@ -12,35 +20,44 @@ export function useFilters() {
   const pathname = usePathname();
 
   // Derive all state directly from URL - URL is the single source of truth
-  const searchQuery = searchParams.get("search") || "";
-  const selectedWorkPackage =
-    searchParams.get("wp")?.split(",").filter(Boolean) || [];
-  const selectedLead =
-    searchParams.get("lead")?.split(",").filter(Boolean) || [];
-  const selectedWorkstream =
-    searchParams.get("ws")?.split(",").filter(Boolean) || [];
-  const selectedWpFamily = searchParams.get("family") || "";
-  const selectedBigTicket =
-    searchParams.get("type")?.split(",").filter(Boolean) || [];
-  const selectedAction =
-    searchParams.get("actions")?.split(",").filter(Boolean) || [];
-  const selectedTeamMember =
-    searchParams.get("team")?.split(",").filter(Boolean) || [];
+  // Decode underscores back to spaces for display
+  const searchQuery = decodeUrlParam(searchParams.get("search") || "");
+  const selectedWorkPackage = decodeUrlParamArray(searchParams.get("wp"));
+  const selectedLead = decodeUrlParamArray(searchParams.get("lead"));
+  const selectedWorkstream = decodeUrlParamArray(searchParams.get("ws"));
+  const selectedWpFamily = decodeUrlParam(searchParams.get("family") || "");
+  const selectedBigTicket = decodeUrlParamArray(searchParams.get("type"));
+  const selectedAction = decodeUrlParamArray(searchParams.get("actions"));
+  const selectedTeamMember = decodeUrlParamArray(searchParams.get("team"));
+  const selectedActionStatus = decodeUrlParamArray(
+    searchParams.get("action_status"),
+  );
+  const selectedMilestoneMonth = decodeUrlParamArray(
+    searchParams.get("milestone_month"),
+  );
   const sortOption = searchParams.get("sort") || "number-asc";
 
-  // Helper to build query string from params
+  // Helper to build a clean, human-readable query string
   const buildQueryString = useCallback(
-    (updater: (params: URLSearchParams) => void) => {
-      const params = new URLSearchParams(searchParams.toString());
+    (updater: (params: Record<string, string>) => void) => {
+      // Start with current params as a plain object
+      const params: Record<string, string> = {};
+      searchParams.forEach((value, key) => {
+        params[key] = value;
+      });
       updater(params);
-      return params.toString();
+      // Remove empty values
+      Object.keys(params).forEach((key) => {
+        if (!params[key]) delete params[key];
+      });
+      return buildCleanQueryString(params);
     },
     [searchParams],
   );
 
   // Helper to update URL using router.replace in a transition
   const updateUrl = useCallback(
-    (updater: (params: URLSearchParams) => void) => {
+    (updater: (params: Record<string, string>) => void) => {
       const queryString = buildQueryString(updater);
       const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
 
@@ -51,14 +68,14 @@ export function useFilters() {
     [buildQueryString, pathname, router],
   );
 
-  // Setters that update URL
+  // Setters that update URL - encode values for clean, readable URLs
   const setSearchQuery = useCallback(
     (value: string) => {
       updateUrl((params) => {
         if (value) {
-          params.set("search", value);
+          params.search = encodeUrlParam(value);
         } else {
-          params.delete("search");
+          delete params.search;
         }
       });
     },
@@ -73,9 +90,9 @@ export function useFilters() {
             const match = wp.match(/^(\d+):/);
             return match ? match[1] : wp;
           });
-          params.set("wp", wpNumbers.join(","));
+          params.wp = wpNumbers.join(",");
         } else {
-          params.delete("wp");
+          delete params.wp;
         }
       });
     },
@@ -86,9 +103,9 @@ export function useFilters() {
     (value: string[]) => {
       updateUrl((params) => {
         if (value.length > 0) {
-          params.set("lead", value.join(","));
+          params.lead = encodeUrlParamArray(value);
         } else {
-          params.delete("lead");
+          delete params.lead;
         }
       });
     },
@@ -99,9 +116,9 @@ export function useFilters() {
     (value: string[]) => {
       updateUrl((params) => {
         if (value.length > 0) {
-          params.set("ws", value.join(","));
+          params.ws = encodeUrlParamArray(value);
         } else {
-          params.delete("ws");
+          delete params.ws;
         }
       });
     },
@@ -112,9 +129,9 @@ export function useFilters() {
     (value: string) => {
       updateUrl((params) => {
         if (value) {
-          params.set("family", value);
+          params.family = encodeUrlParam(value);
         } else {
-          params.delete("family");
+          delete params.family;
         }
       });
     },
@@ -125,9 +142,9 @@ export function useFilters() {
     (value: string[]) => {
       updateUrl((params) => {
         if (value.length > 0) {
-          params.set("type", value.join(","));
+          params.type = encodeUrlParamArray(value);
         } else {
-          params.delete("type");
+          delete params.type;
         }
       });
     },
@@ -138,9 +155,9 @@ export function useFilters() {
     (value: string[]) => {
       updateUrl((params) => {
         if (value.length > 0) {
-          params.set("actions", value.join(","));
+          params.actions = encodeUrlParamArray(value);
         } else {
-          params.delete("actions");
+          delete params.actions;
         }
       });
     },
@@ -151,9 +168,35 @@ export function useFilters() {
     (value: string[]) => {
       updateUrl((params) => {
         if (value.length > 0) {
-          params.set("team", value.join(","));
+          params.team = encodeUrlParamArray(value);
         } else {
-          params.delete("team");
+          delete params.team;
+        }
+      });
+    },
+    [updateUrl],
+  );
+
+  const setSelectedActionStatus = useCallback(
+    (value: string[]) => {
+      updateUrl((params) => {
+        if (value.length > 0) {
+          params.action_status = encodeUrlParamArray(value);
+        } else {
+          delete params.action_status;
+        }
+      });
+    },
+    [updateUrl],
+  );
+
+  const setSelectedMilestoneMonth = useCallback(
+    (value: string[]) => {
+      updateUrl((params) => {
+        if (value.length > 0) {
+          params.milestone_month = encodeUrlParamArray(value);
+        } else {
+          delete params.milestone_month;
         }
       });
     },
@@ -164,9 +207,9 @@ export function useFilters() {
     (value: string) => {
       updateUrl((params) => {
         if (value !== "number-asc") {
-          params.set("sort", value);
+          params.sort = value;
         } else {
-          params.delete("sort");
+          delete params.sort;
         }
       });
     },
@@ -183,6 +226,8 @@ export function useFilters() {
       selectedBigTicket,
       selectedAction,
       selectedTeamMember,
+      selectedActionStatus,
+      selectedMilestoneMonth,
       sortOption,
     }),
     [
@@ -194,6 +239,8 @@ export function useFilters() {
       selectedBigTicket,
       selectedAction,
       selectedTeamMember,
+      selectedActionStatus,
+      selectedMilestoneMonth,
       sortOption,
     ],
   );
@@ -228,6 +275,10 @@ export function useFilters() {
     setSelectedAction,
     selectedTeamMember,
     setSelectedTeamMember,
+    selectedActionStatus,
+    setSelectedActionStatus,
+    selectedMilestoneMonth,
+    setSelectedMilestoneMonth,
     sortOption,
     setSortOption,
     handleResetFilters,

@@ -1,16 +1,60 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { X } from "lucide-react";
-import type { Action } from "@/types";
-import { LeadsBadge } from "@/components/LeadsBadge";
-import { normalizeTeamMemberForDisplay } from "@/lib/utils";
-import { getWorkPackageLeads } from "@/lib/actions";
+import {
+  ActionLeadsBadge,
+  DecisionStatusBadge,
+  ShowMoreBadge,
+  TeamBadge,
+  WPLeadsBadge,
+} from "@/components/Badges";
+import { HelpTooltip } from "@/components/HelpTooltip";
+import { MilestoneTimeline } from "@/components/MilestoneTimeline";
 import {
   Tooltip,
+  TooltipCollisionBoundaryProvider,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
+import { normalizeTeamMemberForDisplay } from "@/lib/utils";
+import type { Action } from "@/types";
+import { ChevronRight, FileText, X } from "lucide-react";
+import Link from "next/link";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+
+// Modal-specific section card component
+const SectionCard = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) => (
+  <div className="rounded-lg border border-slate-200 bg-white">
+    <div className="-ml-px rounded-tl-[9px] border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
+      <h3 className="text-sm font-extrabold tracking-widest text-slate-800 uppercase">
+        {title}
+      </h3>
+    </div>
+    {children}
+  </div>
+);
+
+const CHIPS_PER_LINE = 5;
+const breadcrumbBaseClass =
+  "inline-flex !min-h-0 items-center text-[10px] leading-4 font-medium tracking-wide uppercase transition-colors sm:text-xs sm:leading-5 md:text-sm md:tracking-wider";
+const breadcrumbLinkClass =
+  `${breadcrumbBaseClass} text-slate-500 hover:text-un-blue hover:underline`;
+const breadcrumbActionClass =
+  `${breadcrumbBaseClass} text-un-blue hover:underline`;
+const chevronClass =
+  "h-2.5 w-2.5 shrink-0 text-slate-400 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5";
 
 interface ActionModalProps {
   action: Action | null;
@@ -25,10 +69,26 @@ export default function ActionModal({
 }: ActionModalProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [modalEl, setModalEl] = useState<HTMLDivElement | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  const [workPackageLeads, setWorkPackageLeads] = useState<string[]>([]);
+  const [showAllChips, setShowAllChips] = useState(false);
+  const prevActionNumberRef = useRef<number | undefined>(undefined);
+
+  const setModalRef = useCallback((el: HTMLDivElement | null) => {
+    (modalRef as { current: HTMLDivElement | null }).current = el;
+    setModalEl(el);
+  }, []);
+
+  // Reset chips expand when action changes
+  if (prevActionNumberRef.current !== action?.action_number) {
+    prevActionNumberRef.current = action?.action_number;
+    if (showAllChips) {
+      setShowAllChips(false);
+    }
+  }
 
   // Animation state management
   useEffect(() => {
@@ -80,33 +140,11 @@ export default function ActionModal({
     }
   };
 
-  // Fetch aggregated work package leads when action changes
+  // Prevent body scroll when modal is open
   useEffect(() => {
-    if (action && action.work_package_number) {
-      getWorkPackageLeads(action.work_package_number)
-        .then((leads) => {
-          setWorkPackageLeads(leads);
-        })
-        .catch((err) => {
-          console.error("Error fetching work package leads:", err);
-          // Fallback to action's own leads if aggregation fails
-          setWorkPackageLeads(action.work_package_leads || []);
-        });
-    } else {
-      setWorkPackageLeads([]);
-    }
-  }, [action]);
-
-  // Prevent body scroll when modal is open while maintaining scrollbar space
-  useEffect(() => {
-    // Store original values
     const originalOverflow = document.documentElement.style.overflow;
-
-    // Prevent scrolling on the html element instead of body to preserve scrollbar
     document.documentElement.style.overflow = "hidden";
-
     return () => {
-      // Restore original values
       document.documentElement.style.overflow = originalOverflow;
     };
   }, []);
@@ -118,37 +156,11 @@ export default function ActionModal({
     }
   };
 
-  // Reusable field label component
-  const FieldLabel = ({ children }: { children: React.ReactNode }) => (
-    <span className="text-sm font-normal tracking-wide text-gray-600 uppercase">
-      {children}
-    </span>
-  );
-
-  // Reusable field value wrapper component
-  const FieldValue = ({ children }: { children: React.ReactNode }) => (
-    <div className="mt-1 text-base text-gray-900">{children}</div>
-  );
-
-  // Complete field component combining label and value
-  const Field = ({
-    label,
-    children,
-  }: {
-    label: string;
-    children: React.ReactNode;
-  }) => (
-    <div className="space-y-1">
-      <FieldLabel>{label}</FieldLabel>
-      <FieldValue>{children}</FieldValue>
-    </div>
-  );
-
   // Render header content based on state
   const renderHeader = () => {
     if (loading) {
       return (
-        <div className="flex items-center gap-3 text-lg text-gray-500">
+        <div className="flex items-center gap-3 text-lg text-slate-500">
           Loading...
         </div>
       );
@@ -157,39 +169,120 @@ export default function ActionModal({
     if (!action) {
       return (
         <div className="flex items-center justify-between gap-4">
-          <p className="text-lg text-gray-500">Action not found</p>
-          <button onClick={handleClose} className="text-gray-400">
+          <p className="text-lg text-slate-500">Action not found</p>
+          <button
+            onClick={handleClose}
+            className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+          >
             <X size={24} />
           </button>
         </div>
       );
     }
 
+    // Merge leads + team, dedupe; then take first N for one line, rest in "+x more"
+    const teamMembers =
+      action.action_entities
+        ?.split(";")
+        .map((e) => normalizeTeamMemberForDisplay(e.trim()))
+        .filter((e) => e && e.trim().length > 0) || [];
+    const seen = new Set<string>();
+    const allChips: { name: string; type: "lead" | "team" }[] = [];
+    for (const n of action.action_leads || []) {
+      if (!n?.trim() || seen.has(n)) continue;
+      seen.add(n);
+      allChips.push({ name: n, type: "lead" });
+    }
+    for (const n of teamMembers) {
+      if (seen.has(n)) continue;
+      seen.add(n);
+      allChips.push({ name: n, type: "team" });
+    }
+    const displayedChips = showAllChips
+      ? allChips
+      : allChips.slice(0, CHIPS_PER_LINE);
+    const hasMore = allChips.length > CHIPS_PER_LINE;
+
     return (
       <div className="flex items-start justify-between gap-4">
-        <div className="flex flex-1 items-start gap-3">
-          <div className="mt-[3px] flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-un-blue/10">
-            <span className="text-sm font-semibold text-un-blue">
-              {action.action_number}
-            </span>
+        <div className="flex-1 min-w-0">
+          {/* Breadcrumb */}
+          <div className="mb-2 flex flex-wrap items-center gap-x-1 gap-y-1 sm:mb-3 sm:gap-x-1.5 sm:gap-y-0.5">
+            <Link
+              href={`/?ws=${action.report}`}
+              onClick={handleClose}
+              className={breadcrumbLinkClass}
+            >
+              {action.report}
+            </Link>
+            <ChevronRight className={chevronClass} />
+            <Link
+              href={`/?wp=${action.work_package_number}`}
+              onClick={handleClose}
+              className={breadcrumbLinkClass}
+            >
+              WORK PACKAGE {action.work_package_number}
+            </Link>
+            <ChevronRight className={chevronClass} />
+            <Tooltip open={copied ? true : undefined}>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const url = `${window.location.origin}${window.location.pathname}?action=${action.action_number}`;
+                    navigator.clipboard.writeText(url);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className={`${breadcrumbActionClass} cursor-pointer`}
+                >
+                  Action {action.action_number}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-sm text-gray-600">
+                  {copied ? "Copied!" : "Click to copy link"}
+                </p>
+              </TooltipContent>
+            </Tooltip>
           </div>
-          <div className="flex-1">
-            <h2 className="text-lg leading-tight font-semibold text-gray-900 sm:text-xl">
-              {action.indicative_activity}
-              {action.sub_action_details && (
-                <>
-                  {" "}
-                  <span className="font-bold text-gray-600">
-                    – {action.sub_action_details}
-                  </span>
-                </>
+          <h2 className="text-base leading-snug font-semibold text-slate-900 sm:text-lg md:text-xl">
+            {action.indicative_activity}
+            {action.sub_action_details && (
+              <>
+                {" "}
+                <span className="font-semibold text-slate-600">
+                  – {action.sub_action_details}
+                </span>
+              </>
+            )}
+          </h2>
+          {/* Action Leads and Team Members - one line, rest in "+x more" */}
+          {allChips.length > 0 && (
+            <div className="mt-3 flex flex-wrap items-center gap-1">
+              {displayedChips.map((c) =>
+                c.type === "lead" ? (
+                  <ActionLeadsBadge key={c.name} leads={[c.name]} inline />
+                ) : (
+                  <TeamBadge key={c.name} leads={[c.name]} inline />
+                ),
               )}
-            </h2>
-          </div>
+              {hasMore && (
+                <ShowMoreBadge
+                  showAll={showAllChips}
+                  hiddenCount={allChips.length - CHIPS_PER_LINE}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowAllChips((s) => !s);
+                  }}
+                />
+              )}
+            </div>
+          )}
         </div>
         <button
           onClick={handleClose}
-          className="shrink-0 text-gray-400 transition-colors hover:text-gray-600"
+          className="shrink-0 rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
           aria-label="Close modal"
         >
           <X size={24} />
@@ -202,16 +295,16 @@ export default function ActionModal({
   const renderBody = () => {
     if (loading) {
       return (
-        <div className="flex items-center justify-center py-8">
-          <div className="text-gray-500">Loading details...</div>
+        <div className="flex items-center justify-center py-12">
+          <div className="text-slate-500">Loading details...</div>
         </div>
       );
     }
 
     if (!action) {
       return (
-        <div className="py-8">
-          <p className="text-gray-500">
+        <div className="py-12">
+          <p className="text-slate-500">
             The requested action could not be found.
           </p>
         </div>
@@ -220,205 +313,120 @@ export default function ActionModal({
 
     // Action content
     return (
-      <div className="space-y-6 py-4">
-        {/* Work Package Info */}
-        <div className="space-y-4">
-          <Field label="Work Package">
-            <div className="font-medium">
-              #{action.work_package_number}: {action.work_package_name}
+      <div className="space-y-4 pt-4">
+        {/* Action Details Section */}
+        <SectionCard title="Action Details">
+          <div className="p-5">
+            {/* Decision Status */}
+            <div>
+              <h3 className="mb-1.5 text-sm font-semibold tracking-wide text-slate-700">
+                Status
+              </h3>
+              <DecisionStatusBadge
+                status={action.public_action_status || "Further Work Ongoing"}
+              />
             </div>
-          </Field>
 
-          {action.work_package_goal && (
-            <Field label="Work Package goal">
-              <div className="mt-1 text-base text-gray-900">
-                <div className="text-gray-700">{action.work_package_goal}</div>
-              </div>
-            </Field>
-          )}
-        </div>
-
-        {/* Work Package Leads */}
-        {workPackageLeads.length > 0 && (
-          <div className="">
-            <Field label="Work package leads">
-              <div className="mt-1 text-base text-gray-900">
-                <LeadsBadge
-                  leads={workPackageLeads}
-                  variant="default"
-                  showIcon={false}
-                  color="text-gray-600"
-                />
-              </div>
-            </Field>
-          </div>
-        )}
-
-        {/* Visual separator between Work Package and Action sections */}
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t-2 border-gray-300"></div>
-          </div>
-          <div className="relative flex justify-start">
-            <span className="bg-white pr-3 pl-0 text-sm font-bold tracking-wider text-un-blue uppercase">
-              Action Details
-            </span>
-          </div>
-        </div>
-
-        {/* Action-specific information starts here */}
-        {/* Action Leads */}
-        {action.action_leads && action.action_leads.length > 0 && (
-          <div className="">
-            <Field label="Action leads">
-              <div className="mt-1 text-base text-gray-900">
-                <LeadsBadge
-                  leads={action.action_leads
-                    .map((lead) => lead.trim())
-                    .filter((lead) => lead.length > 0)}
-                  variant="default"
-                  showIcon={false}
-                  color="text-gray-600"
-                />
-              </div>
-            </Field>
-          </div>
-        )}
-
-        {/* Team Members for Indicative Action */}
-        <div className="-mt-2 pt-0">
-          <div className="space-y-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="cursor-help text-sm font-normal tracking-wide text-gray-600 uppercase">
-                  Team members for indicative action
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-gray-600">
-                  UN system entities that contribute to the implementation of a
-                  specific action, in support of the relevant Work Package Lead.
-                  Work Package Leads report to the UN80 Steering Committee under
-                  the authority of the Secretary-General.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-            <div className="mt-1 text-base text-gray-900">
-              <p className="text-left leading-tight text-gray-700">
-                {action.action_entities && action.action_entities.trim() ? (
-                  action.action_entities
-                    .split(";")
-                    .map((entity) =>
-                      normalizeTeamMemberForDisplay(entity.trim()),
-                    )
-                    .filter((entity, index, array) => {
-                      // Remove duplicates after normalization
-                      return array.indexOf(entity) === index;
-                    })
-                    .map((entity, index, array) => (
-                      <span key={index}>
-                        {entity}
-                        {index < array.length - 1 && (
-                          <span className="text-gray-400"> • </span>
-                        )}
-                      </span>
-                    ))
-                ) : (
-                  <span>to be updated</span>
-                )}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Upcoming Milestone */}
-        <div className="-mt-2 pt-0">
-          <div className="space-y-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="cursor-help text-sm font-normal tracking-wide text-gray-600 uppercase">
-                  Upcoming milestone
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-gray-600">
-                  Steps which will be taken towards the delivery of the proposal
-                  concerned. Upcoming milestones may be updated as
-                  implementation progresses.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-            <div className="mt-2 border-l-2 border-un-blue bg-slate-50 py-3 pr-4 pl-4">
-              <p className="text-base leading-snug font-medium text-slate-600">
-                To be updated
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Updates */}
-        <div className="-mt-2 pt-0">
-          <div className="space-y-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="cursor-help text-sm font-normal tracking-wide text-gray-600 uppercase">
-                  Updates
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-gray-600">
-                  A summary of recent progress on the action.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-            <div className="mt-1 text-base text-gray-900">
-              <div className="text-gray-700">To be updated</div>
-              </div>
-          </div>
-        </div>
-
-        {/* MS Approval */}
-        {/* {action.ms_approval && (
-          <div className="border-t border-gray-200 pt-6">
-            <Field label="Member State Approval">
-              <div className="space-y-2">
-                <div className="text-sm font-medium text-gray-900">
-                  Required
+            {/* Upcoming Milestone */}
+            {action.upcoming_milestone && (
+              <>
+                <div className="my-3 border-t border-slate-200"></div>
+                <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold tracking-wide text-slate-700">
+                  Upcoming Milestone
+                  <HelpTooltip content="Steps which will be taken towards the delivery of the proposal concerned. Completed milestones are crossed out." />
+                </h3>
+                <div className="mt-2">
+                  <MilestoneTimeline
+                    milestones={[
+                      {
+                        label: action.upcoming_milestone,
+                        deliveryDate: action.delivery_date ?? null,
+                        isReached: false,
+                      },
+                    ]}
+                  />
                 </div>
-                {action.ms_body.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {action.ms_body.map((body, i) => (
-                      <span
-                        key={i}
-                        className="inline-block rounded-full bg-un-blue/10 px-3 py-1 text-sm font-medium text-un-blue"
-                      >
-                        {body}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </Field>
-          </div>
-        )} */}
+              </>
+            )}
 
-        {/* Budget */}
-        {/* {action.un_budget.length > 0 && (
-          <div className="border-t border-gray-200 pt-6">
-            <Field label="UN Budget">
-              <div className="flex flex-wrap gap-2">
-                {action.un_budget.map((budget, i) => (
-                  <span
-                    key={i}
-                    className="inline-block rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800"
-                  >
-                    {budget}
-                  </span>
-                ))}
-              </div>
-            </Field>
+            {/* Updates Section */}
+            <div className="my-6 border-t border-slate-200"></div>
+            <h3 className="mb-4 flex items-center gap-1.5 text-sm font-semibold tracking-wide text-slate-700">
+              Updates
+              <HelpTooltip content="A summary of recent progress on the action." />
+            </h3>
+            <div className="text-sm leading-relaxed text-slate-600">
+              Updates forthcoming
+            </div>
           </div>
-        )} */}
+        </SectionCard>
+
+        {/* Document Reference Section */}
+        {(action.doc_text || action.document_paragraph) && (
+          <SectionCard title="Document Reference">
+            <div className="space-y-3 p-5">
+              {/* Document Paragraph Number */}
+              {action.document_paragraph &&
+                (() => {
+                  const documentData = getDocumentReference({
+                    workPackageNumber: action.work_package_number,
+                    report: action.report,
+                    documentParagraph: action.document_paragraph,
+                  });
+
+                  if (documentData) {
+                    const documentUrl = getDocumentUrl(
+                      documentData.documentNumber,
+                    );
+                    return (
+                      <div className="flex flex-nowrap items-start gap-2">
+                        <FileText className="h-4 w-4 shrink-0 text-slate-600" />
+                        <a
+                          href={documentUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="min-w-0 flex-1 font-mono text-sm leading-tight text-un-blue hover:underline"
+                        >
+                          {documentData.text}
+                        </a>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+
+              {/* Document Text Quote */}
+              {action.doc_text && (
+                <div className="border-l-2 border-slate-300 bg-white py-3 pr-3 pl-4">
+                  <p className="text-sm leading-relaxed text-slate-700">
+                    &ldquo;{action.doc_text}&rdquo;
+                  </p>
+                </div>
+              )}
+            </div>
+          </SectionCard>
+        )}
+
+        {/* Work Package Reference Section */}
+        <SectionCard title="Work Package Reference">
+          <div className="p-5">
+            <div className="text-[15px] leading-snug text-slate-900">
+              <span className="font-semibold">
+                Work Package {action.work_package_number}
+              </span>
+              <span className="mx-2 text-slate-300">•</span>
+              <span className="font-medium text-slate-600">
+                {action.work_package_name}
+              </span>
+            </div>
+            {action.work_package_leads &&
+              action.work_package_leads.length > 0 && (
+                <div className="mt-3">
+                  <WPLeadsBadge leads={action.work_package_leads} />
+                </div>
+              )}
+          </div>
+        </SectionCard>
       </div>
     );
   };
@@ -432,8 +440,8 @@ export default function ActionModal({
       onClick={handleBackdropClick}
     >
       <div
-        ref={modalRef}
-        className={`h-full w-full overflow-y-auto bg-white shadow-2xl transition-transform duration-300 ease-out sm:w-3/4 md:w-1/2 lg:w-1/2 ${
+        ref={setModalRef}
+        className={`h-full w-full overflow-y-auto bg-white shadow-2xl transition-transform duration-300 ease-out sm:w-4/5 md:w-3/4 lg:w-1/2 ${
           isVisible && !isClosing ? "translate-x-0" : "translate-x-full"
         }`}
         onClick={(e) => e.stopPropagation()}
@@ -441,15 +449,19 @@ export default function ActionModal({
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        <div className="flex min-h-full flex-col">
-          {/* Header */}
-          <div className="border-b border-gray-200 bg-white px-6 py-5 sm:px-8 sm:py-6">
-            {renderHeader()}
-          </div>
+        <TooltipCollisionBoundaryProvider value={modalEl}>
+          <div className="flex min-h-full flex-col">
+            {/* Header */}
+            <div className="bg-white px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6">
+              {renderHeader()}
+            </div>
 
-          {/* Body */}
-          <div className="flex-1 px-6 pb-8 sm:px-8">{renderBody()}</div>
-        </div>
+            {/* Body */}
+            <div className="flex-1 bg-slate-50 px-4 pb-6 sm:px-6 sm:pb-8 md:px-8">
+              {renderBody()}
+            </div>
+          </div>
+        </TooltipCollisionBoundaryProvider>
       </div>
     </div>
   );

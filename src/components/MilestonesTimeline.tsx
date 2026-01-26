@@ -60,7 +60,9 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
           const milestone = milestoneMap.get(dateKey)!;
           milestone.count++;
           // Use deterministic hash-based distribution instead of Math.random()
-          const actionHash = hash(`${action.action_number}-${action.first_milestone}`);
+          const actionHash = hash(
+            `${action.action_number}-${action.first_milestone}`,
+          );
           if ((actionHash % 100) / 100 < 0.3) {
             milestone.completed++;
           }
@@ -232,26 +234,22 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
                           ) : (
                             milestoneActions.map((action) => {
                               // Convert Action to WorkPackageAction format
-                              // Use action_leads array for individual actions
-                              const actionLeads = action.action_leads
-                                ? action.action_leads
-                                    .map((lead) => lead.trim())
-                                    .filter((lead) => lead.length > 0)
-                                : [];
                               const wpAction = {
                                 text: action.indicative_activity,
                                 documentParagraph:
                                   action.document_paragraph || "",
-                                leads: actionLeads,
+                                leads: action.action_leads,
                                 report: action.report,
                                 docText: action.doc_text,
                                 actionNumber: action.action_number,
                                 firstMilestone: action.first_milestone,
-                                finalMilestoneDeadline:
-                                  action.final_milestone_deadline,
+                                deliveryDate: action.delivery_date || null,
                                 actionEntities: action.action_entities,
                                 subActionDetails:
                                   action.sub_action_details || null,
+                                actionStatus:
+                                  action.public_action_status ||
+                                  "Further work ongoing",
                               };
                               return (
                                 <div

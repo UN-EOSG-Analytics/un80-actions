@@ -125,8 +125,17 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   /* Collapsible animations */
-  --animate-collapsible-down: collapsible-down 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  --animate-collapsible-up: collapsible-up 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --collapsible-duration: 150ms;
+  --animate-collapsible-down: collapsible-down var(--collapsible-duration)
+    ease-out;
+  --animate-collapsible-up: collapsible-up var(--collapsible-duration) ease-out
+    forwards;
+  
+  /* Mobile viewport units */
+  --viewport-height: 100vh;
+  --viewport-height-small: 100svh;
+  --viewport-height-large: 100lvh;
+  --viewport-height-dynamic: 100dvh;
 }
 
 /* FIXME */
@@ -145,6 +154,13 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  
+  /* Mobile viewport and safe area support */
+  @supports (height: 100dvh) {
+    html {
+      height: 100dvh;
+    }
   }
 }
 
@@ -172,32 +188,99 @@ body {
   overflow-y: auto;
 }
 
-/* Hide scrollbar for Webkit browsers (Chrome, Safari) */
+/* Show styled scrollbar for Webkit browsers (Chrome, Safari) */
 body::-webkit-scrollbar {
-  width: 0;
-  background: transparent;
+  width: 12px;
+}
+
+body::-webkit-scrollbar-track {
+  background: #f1f5f9;
 }
 
 body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 6px;
+  border: 2px solid #f1f5f9;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Firefox scrollbar styling */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+/* Pretty scrollbars for sidebar charts and other scrollable areas */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
   background: transparent;
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Firefox scrollbar for scrollable areas */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 640px) {
+  /* Ensure touch targets are at least 44px */
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+  }
+
+  /* Prevent text from being too small on mobile */
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Improve tap highlight */
+  * {
+    -webkit-tap-highlight-color: rgba(0, 143, 213, 0.1);
+  }
+}
+
+/* Ensure modal is properly positioned on mobile with virtual keyboard */
+@supports (height: 100dvh) {
+  .fixed.inset-0 {
+    height: 100dvh;
+  }
 }
 
 /* Collapsible animations */
 @keyframes collapsible-down {
   from {
     height: 0;
-  }
-  to {
-    height: var(--radix-collapsible-content-height);
+    opacity: 0;
   }
 }
 
 @keyframes collapsible-up {
-  from {
+  0% {
     height: var(--radix-collapsible-content-height);
+    opacity: 1;
   }
-  to {
+  100% {
     height: 0;
+    opacity: 0;
   }
 }
 

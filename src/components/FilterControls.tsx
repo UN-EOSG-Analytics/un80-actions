@@ -18,6 +18,7 @@ import {
   User,
   Package,
   ListTodo,
+  Activity,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -48,6 +49,8 @@ interface FilterControlsProps {
   onSelectAction: (value: string[]) => void;
   selectedTeamMember: string[];
   onSelectTeamMember: (value: string[]) => void;
+  selectedActionStatus: string[];
+  onSelectActionStatus: (value: string[]) => void;
 
   // Search
   searchQuery: string;
@@ -63,6 +66,10 @@ interface FilterControlsProps {
 
   // Reset
   onResetFilters: () => void;
+
+  // Progress toggle
+  showProgress?: boolean;
+  onShowProgressChange?: (show: boolean) => void;
 }
 
 export function FilterControls({
@@ -85,6 +92,8 @@ export function FilterControls({
   onSelectAction,
   selectedTeamMember,
   onSelectTeamMember,
+  selectedActionStatus,
+  onSelectActionStatus,
   searchQuery,
   onSearchChange,
   uniqueWorkPackages,
@@ -121,7 +130,8 @@ export function FilterControls({
     selectedWorkstream.length > 0 ||
     selectedBigTicket.length > 0 ||
     selectedAction.length > 0 ||
-    selectedTeamMember.length > 0
+    selectedTeamMember.length > 0 ||
+    selectedActionStatus.length > 0
   );
 
   const hasActiveAdvancedFilters = !!(
@@ -130,14 +140,15 @@ export function FilterControls({
     selectedWorkstream.length > 0 ||
     selectedBigTicket.length > 0 ||
     selectedAction.length > 0 ||
-    selectedTeamMember.length > 0
+    selectedTeamMember.length > 0 ||
+    selectedActionStatus.length > 0
   );
 
   return (
     <>
       {/* Header with Advanced Filters Toggle and Sort */}
       <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-        <h2 className="flex shrink-0 items-center gap-2 text-[22px] leading-[25px] font-bold text-black sm:text-[24px] md:text-[26px]">
+        <h2 className="flex shrink-0 items-center gap-2 text-[22px] leading-6.25 font-bold text-black sm:text-[24px] md:text-[26px]">
           <Briefcase className="h-5 w-5 text-un-blue sm:h-6 sm:w-6" />
           Work Packages
         </h2>
@@ -443,16 +454,25 @@ export function FilterControls({
               selectedAction.length === 0
                 ? "Select action"
                 : selectedAction.length === 1
-                  ? selectedAction[0].length > 50
-                    ? `${selectedAction[0].substring(0, 50)}...`
-                    : selectedAction[0]
+                  ? (() => {
+                      const actionNum = selectedAction[0];
+                      const actionObj = uniqueActions.find(
+                        (a) => a.actionNumber === actionNum,
+                      );
+                      const displayText = actionObj
+                        ? `${actionObj.actionNumber}: ${actionObj.text}`
+                        : actionNum;
+                      return displayText.length > 50
+                        ? `${displayText.substring(0, 50)}...`
+                        : displayText;
+                    })()
                   : `${selectedAction.length} actions selected`
             }
             isFiltered={selectedAction.length > 0}
             allActive={false}
             options={uniqueActions.map(
               (action): FilterOption => ({
-                key: action.text,
+                key: action.actionNumber,
                 label: action.actionNumber
                   ? `${action.actionNumber}: ${action.text}`
                   : action.text,
@@ -503,13 +523,44 @@ export function FilterControls({
             enableSearch={true}
             searchPlaceholder="Search team members..."
           />
+
+          {/* Action Status Filter */}
+          <FilterDropdown
+            open={openFilterCollapsibles.has("actionStatus")}
+            onOpenChange={(open) =>
+              onToggleFilterCollapsible("actionStatus", open)
+            }
+            icon={<Activity className="h-4 w-4 text-un-blue" />}
+            triggerText={
+              selectedActionStatus.length === 0
+                ? "Select action status"
+                : selectedActionStatus[0]
+            }
+            isFiltered={selectedActionStatus.length > 0}
+            allActive={false}
+            options={[
+              { key: "Further work ongoing", label: "Further Work Ongoing" },
+              { key: "Decision taken", label: "Decision Taken" },
+            ]}
+            selectedKeys={new Set(selectedActionStatus)}
+            onToggle={(key) => {
+              // Single-select: if clicking the same status, deselect it; otherwise select only this one
+              const newSelected = selectedActionStatus.includes(key)
+                ? []
+                : [key];
+              onSelectActionStatus(newSelected);
+            }}
+            ariaLabel="Filter by action status"
+          />
         </div>
       )}
 
-      {/* Search Bar and Reset Button */}
+      {/* Search Bar, Progress Toggle, and Reset Button */}
       <div className="-mt-1 mb-4 flex w-full items-center justify-between gap-3">
         <SearchBar searchQuery={searchQuery} onSearchChange={onSearchChange} />
-        {hasActiveFilters && <ResetButton onClick={onResetFilters} />}
+        <div className="flex items-center gap-3">
+          {hasActiveFilters && <ResetButton onClick={onResetFilters} />}
+        </div>
       </div>
     </>
   );

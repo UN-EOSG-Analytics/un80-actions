@@ -11,6 +11,12 @@ export function useChartSearch() {
     useState<string>("");
   const [workpackageChartSearchQuery, setWorkpackageChartSearchQuery] =
     useState<string>("");
+  const [
+    upcomingMilestonesChartSearchQuery,
+    setUpcomingMilestonesChartSearchQuery,
+  ] = useState<string>("");
+  const [milestonesPerMonthSearchQuery, setMilestonesPerMonthSearchQuery] =
+    useState<string>("");
   const [leaderChecklistSearchQuery, setLeaderChecklistSearchQuery] =
     useState<string>("");
 
@@ -18,6 +24,9 @@ export function useChartSearch() {
     chartSearchQuery,
     workstreamChartSearchQuery,
     workpackageChartSearchQuery,
+    upcomingMilestonesChartSearchQuery,
+    milestonesPerMonthSearchQuery,
+    leaderChecklistSearchQuery,
   };
 
   return {
@@ -28,6 +37,10 @@ export function useChartSearch() {
     setWorkstreamChartSearchQuery,
     workpackageChartSearchQuery,
     setWorkpackageChartSearchQuery,
+    upcomingMilestonesChartSearchQuery,
+    setUpcomingMilestonesChartSearchQuery,
+    milestonesPerMonthSearchQuery,
+    setMilestonesPerMonthSearchQuery,
     leaderChecklistSearchQuery,
     setLeaderChecklistSearchQuery,
   };

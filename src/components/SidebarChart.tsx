@@ -12,6 +12,12 @@ export interface SidebarChartEntry {
   count: number;
   value: string;
   tooltip?: string;
+  deliveryDate?: string | null;
+  isUrgent?: boolean;
+  isUpcoming?: boolean;
+  actionNumber?: number | string | null;
+  workPackageNumber?: number | string | null;
+  workPackageName?: string | null;
 }
 
 interface SidebarChartProps {
@@ -19,20 +25,17 @@ interface SidebarChartProps {
   description: string;
   icon: React.ReactNode;
   data: SidebarChartEntry[];
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-  searchPlaceholder: string;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  searchPlaceholder?: string;
   selectedValue: string[];
   onSelectValue: (value: string[]) => void;
-  showAll: boolean;
-  onToggleShowAll: () => void;
-  initialDisplayCount?: number;
   barWidth?: number; // Width in pixels
+  maxHeight?: number; // Max height in pixels for scrollable area
 }
 
 export function SidebarChart({
   title,
-  description,
   icon,
   data,
   searchQuery,
@@ -40,12 +43,9 @@ export function SidebarChart({
   searchPlaceholder,
   selectedValue,
   onSelectValue,
-  showAll,
-  onToggleShowAll,
-  initialDisplayCount = 3,
   barWidth = 90,
+  maxHeight = 360,
 }: SidebarChartProps) {
-  const displayedData = showAll ? data : data.slice(0, initialDisplayCount);
   const maxCount =
     data.length > 0 ? Math.max(...data.map((d) => d.count ?? 0)) : 1;
 
@@ -57,12 +57,6 @@ export function SidebarChart({
   const countWidth =
     maxCountDigits === 1 ? "w-5" : maxCountDigits === 2 ? "w-7" : "w-9";
 
-  // Calculate the exact width needed for the longest label
-  // Use 7px per character for more compact spacing
-  const maxLabelLength =
-    data.length > 0 ? Math.max(...data.map((d) => (d.label ?? "").length)) : 0;
-  const labelWidth = maxLabelLength * 7;
-
   const handleClickBar = (value: string) => {
     const newSelected = selectedValue.includes(value)
       ? selectedValue.filter((v) => v !== value)
@@ -72,92 +66,154 @@ export function SidebarChart({
 
   return (
     <div className="rounded-xl bg-white pb-4 pl-4.5 sm:pb-5">
-      <h3 className="mb-2 flex h-[25px] items-center gap-2 text-[17px] font-semibold text-slate-900">
+      <h3 className="mb-2 flex h-6.25 items-center gap-2 text-[17px] font-semibold text-slate-900">
         <span className="flex h-5 w-5 items-center justify-center text-un-blue">
           {icon}
         </span>
         {title}
       </h3>
-      <p className="mb-1.5 text-[15px] text-slate-600">{description}</p>
 
       {/* Search Bar */}
-      <div className="relative mb-1 w-full">
-        <Search className="pointer-events-none absolute top-1/2 left-0 z-10 h-4 w-4 -translate-y-1/2 transform text-un-blue" />
-        <Input
-          type="text"
-          placeholder={searchPlaceholder}
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="h-9 w-full rounded-none border-0 border-b border-slate-300 bg-white py-2 pr-4 pl-6 text-[15px] text-slate-700 shadow-none transition-all placeholder:text-slate-400 hover:border-b-un-blue/60 focus:border-b-un-blue focus:shadow-none focus:ring-0 focus:ring-offset-0 focus:outline-none"
-        />
-      </div>
+      {onSearchChange && (
+        <div className="relative mb-1 w-full">
+          <Search className="pointer-events-none absolute top-1/2 left-0 z-10 h-4 w-4 -translate-y-1/2 transform text-un-blue" />
+          <Input
+            type="text"
+            placeholder={searchPlaceholder}
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="h-9 w-full rounded-none border-0 border-b border-slate-300 bg-white py-2 pr-4 pl-6 text-[15px] text-slate-700 shadow-none transition-all placeholder:text-slate-400 hover:border-b-un-blue/60 focus:border-b-un-blue focus:shadow-none focus:ring-0 focus:ring-offset-0 focus:outline-none"
+          />
+        </div>
+      )}
 
-      {/* Chart Data */}
-      <div className="overflow-hidden">
+      {/* Chart Data - Scrollable */}
+      <div
+        className="-mr-1 overflow-y-auto overscroll-contain pr-1"
+        style={{ maxHeight: `${maxHeight}px` }}
+      >
         <table className="w-full table-fixed">
           <tbody>
-            {displayedData.map((entry, index) => {
+            {data.map((entry, index) => {
               const percentage = (entry.count / maxCount) * 100;
               const isSelected = selectedValue.includes(entry.value);
               const isFiltered =
                 selectedValue.length > 0 &&
                 !selectedValue.includes(entry.value);
 
+              // Enhanced styling for urgent/upcoming milestones
+              const isUrgent = entry.isUrgent === true;
+              const isUpcoming = entry.isUpcoming === true;
+              const hasUrgencyIndicator = isUrgent || isUpcoming;
+
               return (
                 <tr
                   key={entry.value}
                   onClick={() => handleClickBar(entry.value)}
-                  className={`group cursor-pointer transition-colors ${
+                  className={`group cursor-pointer transition-all ${
                     isSelected
-                      ? "bg-un-blue/5 hover:bg-un-blue/10"
+                      ? isUrgent
+                        ? "border-l-2 border-red-400 bg-red-50/50 hover:bg-red-100/50"
+                        : "bg-un-blue/5 hover:bg-un-blue/10"
                       : isFiltered
                         ? "opacity-30 hover:bg-slate-50"
-                        : "hover:bg-slate-50"
-                  } ${index < displayedData.length - 1 ? "border-b border-slate-200" : ""}`}
+                        : isUrgent
+                          ? "border-l-2 border-red-300 bg-red-50/30 hover:bg-red-50/50"
+                          : isUpcoming
+                            ? "border-l-2 border-amber-300 bg-amber-50/30 hover:bg-amber-50/50"
+                            : "hover:bg-slate-50"
+                  } ${index < data.length - 1 ? "border-b border-slate-200" : ""} ${hasUrgencyIndicator ? "pl-1" : ""}`}
                 >
-                  <td className="py-2 pr-0">
-                    <div className="flex items-center justify-between gap-1">
-                      <div
-                        style={{ width: `${labelWidth}px`, flexShrink: 0 }}
-                        className="ml-0.5"
-                      >
+                  <td className="py-2.5 pr-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="ml-0.5 min-w-0 flex-1">
                         {entry.tooltip ? (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span
-                                className={`block cursor-help text-[14px] font-medium whitespace-nowrap transition-colors ${
-                                  isSelected
-                                    ? "font-semibold text-un-blue"
-                                    : "text-slate-600 group-hover:text-un-blue"
-                                }`}
-                              >
-                                {entry.label}
-                              </span>
+                              <div className="flex items-center gap-1.5">
+                                {isUrgent && (
+                                  <span
+                                    className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-red-500"
+                                    aria-label="Urgent"
+                                  />
+                                )}
+                                {!isUrgent && isUpcoming && (
+                                  <span
+                                    className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500"
+                                    aria-label="Upcoming"
+                                  />
+                                )}
+                                <span
+                                  className={`block cursor-help truncate text-[14px] font-medium transition-colors ${
+                                    isSelected
+                                      ? "font-semibold text-un-blue"
+                                      : isUrgent
+                                        ? "text-red-700 group-hover:text-red-800"
+                                        : isUpcoming
+                                          ? "text-amber-700 group-hover:text-amber-800"
+                                          : "text-slate-600 group-hover:text-un-blue"
+                                  }`}
+                                >
+                                  {entry.label}
+                                </span>
+                              </div>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p className="text-sm text-gray-600">
-                                {entry.tooltip}
-                              </p>
+                              <div className="text-sm text-gray-600">
+                                <p>{entry.tooltip || entry.label}</p>
+                                {isUrgent && (
+                                  <p className="mt-1 text-xs font-semibold text-red-600">
+                                    ⚠ Urgent
+                                  </p>
+                                )}
+                                {!isUrgent && isUpcoming && (
+                                  <p className="mt-1 text-xs text-amber-600">
+                                    ⏱ Upcoming
+                                  </p>
+                                )}
+                              </div>
                             </TooltipContent>
                           </Tooltip>
                         ) : (
-                          <span
-                            className={`block text-[14px] font-medium whitespace-nowrap transition-colors ${
-                              isSelected
-                                ? "font-semibold text-un-blue"
-                                : "text-slate-600 group-hover:text-un-blue"
-                            }`}
-                          >
-                            {entry.label}
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            {isUrgent && (
+                              <span
+                                className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-red-500"
+                                aria-label="Urgent"
+                              />
+                            )}
+                            {!isUrgent && isUpcoming && (
+                              <span
+                                className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500"
+                                aria-label="Upcoming"
+                              />
+                            )}
+                            <span
+                              className={`block text-[14px] font-medium transition-colors ${
+                                isSelected
+                                  ? "font-semibold text-un-blue"
+                                  : isUrgent
+                                    ? "text-red-700 group-hover:text-red-800"
+                                    : isUpcoming
+                                      ? "text-amber-700 group-hover:text-amber-800"
+                                      : "text-slate-600 group-hover:text-un-blue"
+                              }`}
+                            >
+                              {entry.label}
+                            </span>
+                          </div>
                         )}
                       </div>
                       <div className="flex shrink-0 items-center gap-1.5">
                         <span
-                          className={`text-[14px] font-normal ${countWidth} text-right font-mono tabular-nums ${
+                          className={`text-[14px] font-semibold ${countWidth} text-right tabular-nums ${
                             isSelected
-                              ? "font-semibold text-un-blue"
-                              : "text-un-blue"
+                              ? "text-un-blue"
+                              : isUrgent
+                                ? "text-red-600"
+                                : isUpcoming
+                                  ? "text-amber-600"
+                                  : "text-un-blue"
                           }`}
                         >
                           {entry.count}
@@ -168,7 +224,13 @@ export function SidebarChart({
                         >
                           <div
                             className={`h-full rounded-full transition-all ${
-                              isSelected ? "bg-un-blue" : "bg-un-blue/40"
+                              isSelected
+                                ? "bg-un-blue"
+                                : isUrgent
+                                  ? "bg-red-500"
+                                  : isUpcoming
+                                    ? "bg-amber-500"
+                                    : "bg-un-blue/50"
                             }`}
                             style={{ width: `${percentage}%` }}
                           />
@@ -181,18 +243,6 @@ export function SidebarChart({
             })}
           </tbody>
         </table>
-
-        {/* Show More/Less Button */}
-        {data.length > initialDisplayCount && (
-          <button
-            onClick={onToggleShowAll}
-            className="w-full py-2 text-left text-[14px] text-un-blue transition-colors hover:text-un-blue/80"
-          >
-            {showAll
-              ? "Show less"
-              : `Show ${data.length - initialDisplayCount} more`}
-          </button>
-        )}
       </div>
     </div>
   );

@@ -2,12 +2,7 @@
 
 import { useMemo } from "react";
 import type { Actions, WorkPackage } from "@/types";
-import {
-  TrendingUp,
-  Layers,
-  Briefcase,
-  Users,
-} from "lucide-react";
+import { TrendingUp, Layers, Briefcase, Users } from "lucide-react";
 
 interface OverallProgressDashboardProps {
   actions: Actions;

@@ -63,7 +63,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle>Login</DialogTitle>
           <DialogDescription>

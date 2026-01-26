@@ -1,75 +1,78 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import ActionModal from "./ActionModal";
 import { getActionByNumber } from "@/lib/actions";
+import { buildCleanQueryString, decodeUrlParam } from "@/lib/utils";
 import type { Action } from "@/types";
 
 export default function ModalHandler() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const actionParam = searchParams.get("action");
+  const milestoneParam = searchParams.get("milestone");
   const [action, setAction] = useState<Action | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // If there's no action param, clear state
-    if (!actionParam) {
-      setAction(null);
-      setError(null);
-      setLoading(false);
-      return;
-    }
-
-    // Parse action number
-    const actionNumber = parseInt(actionParam, 10);
-    if (isNaN(actionNumber)) {
-      console.warn(`Invalid action number: "${actionParam}"`);
-      setError("Invalid action number");
-      setLoading(false);
-      return;
-    }
-
-    // Get firstMilestone from URL if present (for subactions)
-    const milestoneParam = searchParams.get("milestone");
+    // Parse action number from query param
+    const actionNumber = actionParam ? parseInt(actionParam, 10) : null;
     const firstMilestone = milestoneParam
-      ? decodeURIComponent(milestoneParam)
+      ? decodeUrlParam(milestoneParam)
       : null;
 
-    setLoading(true);
-    setError(null);
+    // If there's no action, skip loading
+    if (!actionNumber || isNaN(actionNumber)) {
+      return;
+    }
 
-    // Load action data
-    getActionByNumber(actionNumber, firstMilestone)
-      .then((foundAction) => {
+    // Load action data in async function
+    const loadAction = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const foundAction = await getActionByNumber(
+          actionNumber,
+          firstMilestone,
+        );
         if (!foundAction) {
           console.warn(`Action ${actionNumber} not found`);
           setError("Action not found");
+          setAction(null);
         } else {
           setAction(foundAction);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Error loading action:", err);
         setError("Failed to load action");
-      })
-      .finally(() => {
+        setAction(null);
+      } finally {
         setLoading(false);
-      });
-  }, [actionParam, searchParams]);
+      }
+    };
+
+    loadAction();
+  }, [actionParam, milestoneParam]);
 
   const handleClose = () => {
-    // Restore previous URL from sessionStorage
-    const previousUrl = sessionStorage.getItem("previousUrl");
-    sessionStorage.removeItem("previousUrl");
+    // Preserve other query params when closing the modal (with clean encoding)
+    const params: Record<string, string> = {};
+    new URLSearchParams(window.location.search).forEach((value, key) => {
+      if (key !== "action" && key !== "milestone") {
+        params[key] = value;
+      }
+    });
 
-    const newUrl = previousUrl ? `?${previousUrl}` : "/";
-    router.replace(newUrl, { scroll: false });
+    const queryString = buildCleanQueryString(params);
+    const newUrl = queryString ? `?${queryString}` : "/";
+    window.history.pushState({}, "", newUrl);
+    // Trigger a re-render by dispatching popstate
+    window.dispatchEvent(new PopStateEvent("popstate"));
   };
 
-  // Don't render anything if no action param
+  // Only show modal if there's an action param
   if (!actionParam) return null;
 
   return (

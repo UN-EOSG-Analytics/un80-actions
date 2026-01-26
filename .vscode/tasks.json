@@ -1,0 +1,71 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "dev",
+      "label": "npm run dev",
+      "detail": "next dev",
+      "problemMatcher": [],
+      "isBackground": true
+    },
+    {
+      "type": "npm",
+      "script": "build",
+      "label": "npm run build",
+      "detail": "next build",
+      "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "install",
+      "label": "npm install",
+      "detail": "npm install",
+      "problemMatcher": [],
+      "isBackground": true
+    },
+    {
+      "type": "npm",
+      "script": "start",
+      "label": "npm run start",
+      "detail": "next start",
+      "problemMatcher": [],
+      "isBackground": true
+    },
+    {
+      "type": "npm",
+      "script": "lint",
+      "label": "npm run lint",
+      "detail": "eslint",
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "type": "npm",
+      "script": "typecheck",
+      "label": "npm run typecheck",
+      "detail": "tsc --noEmit",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "type": "npm",
+      "script": "format",
+      "label": "npm run format",
+      "detail": "prettier --write",
+      "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "format:check",
+      "label": "npm run format:check",
+      "detail": "prettier --check",
+      "problemMatcher": []
+    },
+    {
+      "type": "shell",
+      "command": "uv run python python/prepare_actions_data.py",
+      "label": "Process Actions Data",
+      "detail": "Run Python data processing pipeline",
+      "problemMatcher": []
+    }
+  ]
+}

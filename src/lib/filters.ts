@@ -4,6 +4,7 @@ import type {
   LeadChartEntry,
   WorkstreamChartEntry,
   WorkPackageChartEntry,
+  UpcomingMilestoneChartEntry,
   StatsData,
   FilterState,
 } from "@/types";
@@ -64,12 +65,17 @@ export function filterWorkPackages(
   // Search filter
   if (filters.searchQuery.trim()) {
     const query = filters.searchQuery.toLowerCase();
+    const queryWords = query.split(/\s+/);
     filtered = filtered.filter(
       (wp) =>
         wp.name.toLowerCase().includes(query) ||
         String(wp.number).includes(query) ||
         wp.leads.some((lead) => lead.toLowerCase().includes(query)) ||
-        wp.actions.some((action) => action.text.toLowerCase().includes(query)),
+        wp.actions.some(
+          (action) =>
+            action.text.toLowerCase().includes(query) ||
+            queryWords.some((w) => w === String(action.actionNumber)),
+        ),
     );
   }
 
@@ -135,10 +141,32 @@ export function filterWorkPackages(
   // Action filter (supports multiple selections)
   if (filters.selectedAction && filters.selectedAction.length > 0) {
     filtered = filtered.filter((wp) =>
-      wp.actions.some((action) =>
-        filters.selectedAction.includes(action.text.trim()),
-      ),
+      wp.actions.some((action) => {
+        const actionText = action.text ? action.text.trim() : "";
+        const actionNumberStr = String(action.actionNumber);
+        return filters.selectedAction.some((selected) => {
+          const selectedTrimmed = selected.trim();
+          return (
+            actionText === selectedTrimmed ||
+            actionNumberStr === selectedTrimmed
+          );
+        });
+      }),
     );
+  }
+
+  // Action Status filter (supports multiple selections)
+  if (filters.selectedActionStatus && filters.selectedActionStatus.length > 0) {
+    filtered = filtered.filter((wp) => {
+      const hasMatchingAction = wp.actions.some((action) => {
+        // Case-insensitive comparison to handle variations
+        const actionStatusLower = action.actionStatus?.toLowerCase() || "";
+        return filters.selectedActionStatus.some(
+          (status) => status.toLowerCase() === actionStatusLower,
+        );
+      });
+      return hasMatchingAction;
+    });
   }
 
   // Note: Team Member filter is applied at the action level in ListContainer,
@@ -458,6 +486,149 @@ export function calculateWorkPackageChartData(
 }
 
 /**
+ * Calculate upcoming milestones chart data
+ * Groups actions by their upcoming milestone and counts occurrences
+ * @param actions - Array of actions
+ * @param searchQuery - Search query to filter milestones
+ * @param selectedLead - Selected leads to filter by
+ * @param selectedWorkPackage - Selected work packages to filter by
+ * @param selectedWorkstream - Selected workstreams to filter by
+ * @returns Array of upcoming milestone chart entries sorted by delivery date (earliest first), then by count descending
+ */
+export function calculateUpcomingMilestonesChartData(
+  actions: Actions,
+  searchQuery = "",
+  selectedLead: string[] = [],
+  selectedWorkPackage: string[] = [],
+  selectedWorkstream: string[] = [],
+): UpcomingMilestoneChartEntry[] {
+  const milestoneCounts = new Map<
+    string,
+    {
+      count: number;
+      deliveryDate: string | null;
+      actionNumber: number | string | null;
+      workPackageNumber: number | string | null;
+      workPackageName: string | null;
+    }
+  >();
+
+  // Filter actions based on other chart selections
+  let filteredActions = actions;
+
+  // Only include actions that have upcoming milestones
+  filteredActions = filteredActions.filter(
+    (action) =>
+      action.upcoming_milestone && action.upcoming_milestone.trim() !== "",
+  );
+
+  if (selectedLead.length > 0) {
+    filteredActions = filteredActions.filter(
+      (action) =>
+        Array.isArray(action.work_package_leads) &&
+        action.work_package_leads.some((lead) =>
+          selectedLead.includes(normalizeLeaderName(lead)),
+        ),
+    );
+  }
+
+  if (selectedWorkPackage.length > 0) {
+    const selectedNumbers = selectedWorkPackage.map((wp) => {
+      const wpMatch = wp.match(/^(\d+):/);
+      return wpMatch ? wpMatch[1] : wp;
+    });
+
+    filteredActions = filteredActions.filter((action) => {
+      if (action.work_package_number) {
+        return selectedNumbers.includes(String(action.work_package_number));
+      } else {
+        return selectedNumbers.includes(action.work_package_name);
+      }
+    });
+  }
+
+  if (selectedWorkstream.length > 0) {
+    filteredActions = filteredActions.filter((action) =>
+      selectedWorkstream.includes(action.report),
+    );
+  }
+
+  filteredActions.forEach((action) => {
+    if (!action.upcoming_milestone || action.upcoming_milestone.trim() === "") {
+      return;
+    }
+
+    const milestoneText = action.upcoming_milestone.trim();
+
+    // Filter by chart search query if provided
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      if (!milestoneText.toLowerCase().includes(query)) {
+        return;
+      }
+    }
+
+    const existing = milestoneCounts.get(milestoneText);
+    const deliveryDate = action.delivery_date;
+
+    if (existing) {
+      // If multiple delivery dates exist, keep the earliest one
+      if (
+        deliveryDate &&
+        (!existing.deliveryDate || deliveryDate < existing.deliveryDate)
+      ) {
+        milestoneCounts.set(milestoneText, {
+          count: existing.count + 1,
+          deliveryDate: deliveryDate,
+          actionNumber: existing.actionNumber,
+          workPackageNumber: existing.workPackageNumber,
+          workPackageName: existing.workPackageName,
+        });
+      } else {
+        milestoneCounts.set(milestoneText, {
+          count: existing.count + 1,
+          deliveryDate: existing.deliveryDate,
+          actionNumber: existing.actionNumber,
+          workPackageNumber: existing.workPackageNumber,
+          workPackageName: existing.workPackageName,
+        });
+      }
+    } else {
+      milestoneCounts.set(milestoneText, {
+        count: 1,
+        deliveryDate: deliveryDate,
+        actionNumber: action.action_number ?? null,
+        workPackageNumber: action.work_package_number ?? null,
+        workPackageName: action.work_package_name ?? null,
+      });
+    }
+  });
+
+  return (
+    Array.from(milestoneCounts.entries()).map(([milestone, data]) => ({
+      milestone,
+      count: data.count,
+      deliveryDate: data.deliveryDate,
+      actionNumber: data.actionNumber,
+      workPackageNumber: data.workPackageNumber,
+      workPackageName: data.workPackageName,
+    })) as UpcomingMilestoneChartEntry[]
+  ).sort((a, b) => {
+    // Sort by deliveryDate first (earliest first, nulls last)
+    if (a.deliveryDate && b.deliveryDate) {
+      const dateComparison = a.deliveryDate.localeCompare(b.deliveryDate);
+      if (dateComparison !== 0) return dateComparison;
+    } else if (a.deliveryDate && !b.deliveryDate) {
+      return -1;
+    } else if (!a.deliveryDate && b.deliveryDate) {
+      return 1;
+    }
+    // Then by count descending
+    return b.count - a.count;
+  });
+}
+
+/**
  * Calculate statistics based on filtered data
  * @param actions - Array of all actions
  * @param filteredWorkPackages - Filtered work packages
@@ -478,6 +649,7 @@ export function calculateStatsData(
   // Search filter
   if (filters.searchQuery.trim()) {
     const query = filters.searchQuery.toLowerCase();
+    const queryWords = query.split(/\s+/);
     filteredActions = filteredActions.filter(
       (action) =>
         action.work_package_name.toLowerCase().includes(query) ||
@@ -486,7 +658,8 @@ export function calculateStatsData(
           action.work_package_leads.some((lead) =>
             normalizeLeaderName(lead).toLowerCase().includes(query),
           )) ||
-        action.indicative_activity.toLowerCase().includes(query),
+        action.indicative_activity.toLowerCase().includes(query) ||
+        queryWords.some((w) => w === String(action.action_number)),
     );
   }
 
@@ -565,9 +738,10 @@ export function calculateStatsData(
     }
   });
 
-  // Count only non-subactions for the actions card (exclude subactions from count)
+  // Count actions: exclude only subaction entries (is_subaction and sub_action_details);
+  // main actions with sub_action_details are counted to match total (86).
   const nonSubactionCount = filteredActions.filter(
-    (action) => !action.is_subaction,
+    (action) => !(action.sub_action_details && action.is_subaction),
   ).length;
 
   return {
