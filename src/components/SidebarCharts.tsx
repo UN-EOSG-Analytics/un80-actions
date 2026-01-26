@@ -1,24 +1,22 @@
-import React from "react";
-import { Users, Calendar, CalendarDays, Flag, Layers, Activity } from "lucide-react";
 import {
-  ACTION_STATUS,
-  getStatusStyles,
-  isDecisionTaken,
-} from "@/constants/actionStatus";
-import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
-import { buildCleanQueryString } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+    ACTION_STATUS,
+    getStatusStyles,
+    isDecisionTaken,
+} from "@/constants/actionStatus";
 import type {
-  LeadChartEntry,
-  WorkstreamChartEntry,
-  WorkPackageChartEntry,
-  UpcomingMilestoneChartEntry,
-  Action,
+    Action,
+    LeadChartEntry,
+    UpcomingMilestoneChartEntry,
+    WorkPackageChartEntry,
+    WorkstreamChartEntry,
 } from "@/types";
+import { Activity, CalendarDays, Flag, Layers, Users } from "lucide-react";
+import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
 
 interface SidebarChartsProps {
   // Leads chart
@@ -245,7 +243,7 @@ export function SidebarCharts({
             Action Status
           </h3>
 
-          <div className="flex flex-col gap-1.5 pr-4">
+          <div className="flex flex-col gap-1.5 pr-3">
             {/* Further Work Ongoing */}
             {(() => {
               const statusKey = ACTION_STATUS.FURTHER_WORK_ONGOING;
@@ -259,9 +257,7 @@ export function SidebarCharts({
                 <button
                   type="button"
                   className={`group flex flex-col gap-1 rounded-md p-1 text-left transition-all duration-150 ${
-                    isSelected
-                      ? styles.sidebar.selectedBg
-                      : "hover:bg-slate-50"
+                    isSelected ? styles.sidebar.selectedBg : "hover:bg-slate-50"
                   }`}
                   onClick={() => {
                     onSelectActionStatus(isSelected ? [] : [statusKey]);
@@ -284,13 +280,7 @@ export function SidebarCharts({
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
-                    <span
-                      className={`min-w-5 text-right text-[13px] font-semibold tabular-nums ${
-                        isSelected
-                          ? styles.sidebar.selectedText
-                          : "text-slate-900"
-                      }`}
-                    >
+                    <span className="mr-1 w-9 text-right text-[14px] font-semibold text-slate-900 tabular-nums">
                       {furtherWorkCount}
                     </span>
                   </div>
@@ -313,9 +303,7 @@ export function SidebarCharts({
                 <button
                   type="button"
                   className={`group flex flex-col gap-1 rounded-md p-1 text-left transition-all duration-150 ${
-                    isSelected
-                      ? styles.sidebar.selectedBg
-                      : "hover:bg-slate-50"
+                    isSelected ? styles.sidebar.selectedBg : "hover:bg-slate-50"
                   }`}
                   onClick={() => {
                     onSelectActionStatus(isSelected ? [] : [statusKey]);
@@ -338,13 +326,7 @@ export function SidebarCharts({
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
-                    <span
-                      className={`min-w-5 text-right text-[13px] font-semibold tabular-nums ${
-                        isSelected
-                          ? styles.sidebar.selectedText
-                          : "text-slate-900"
-                      }`}
-                    >
+                    <span className="mr-1 w-9 text-right text-[14px] font-semibold text-slate-900 tabular-nums">
                       {decisionTakenCount}
                     </span>
                   </div>
