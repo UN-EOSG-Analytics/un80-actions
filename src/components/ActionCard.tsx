@@ -72,10 +72,7 @@ export function HighlightedText({
  * Displays a single action item within a work package.
  * Shows the action text, leads, document references, and optional doc text.
  */
-export function ActionItem({
-  action,
-  searchQuery = "",
-}: ActionItemProps) {
+export function ActionItem({ action, searchQuery = "" }: ActionItemProps) {
   const searchParams = useSearchParams();
   const [showAllTeamMembers, setShowAllTeamMembers] = useState(false);
 

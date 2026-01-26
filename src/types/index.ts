@@ -47,11 +47,11 @@ export interface Action {
   /** Final milestone deadline date in ISO format (e.g., "2026-02-28") or null */
   final_milestone_deadline: string | null;
 
-  /** Action entities (team members) separated by semicolons or null */
-  action_entities: string | null;
+  /** Action entities (comma-separated string, e.g., "DPPA; DPO; UNDP") */
+  action_entities: string;
 
   /** Whether this is a subaction (not displayed on dashboard) */
-  is_subaction?: boolean;
+  is_subaction: boolean;
 
   /** Work package goal description or null */
   work_package_goal: string | null;
@@ -62,14 +62,8 @@ export interface Action {
   /** Upcoming milestone description or null */
   upcoming_milestone: string | null;
 
-  /** Upcoming milestone deadline date in ISO format (e.g., "2026-02-28") or null */
-  upcoming_milestone_deadline: string | null;
-
   /** Updates text or null */
   updates: string | null;
-
-  /** Link to updates document or null */
-  link_updates: string | null;
 
   /** Delivery date in ISO format (e.g., "2026-02-28") or null */
   delivery_date: string | null;
