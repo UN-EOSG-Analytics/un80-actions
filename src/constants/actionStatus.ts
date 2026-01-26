@@ -40,7 +40,7 @@ const STATUS_COLORS = {
     badgeText: "text-amber-700",
     // Icon color
     icon: "text-amber-700",
-    
+
     // Bar/progress colors
     bar: "bg-amber-100",
     barTrack: "bg-slate-100",

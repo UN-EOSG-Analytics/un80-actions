@@ -13,29 +13,44 @@ import {
  * Custom hook to manage filter state with URL as single source of truth
  * Uses router.replace with startTransition for URL updates
  * URL params use underscores for spaces and commas as delimiters for clean, readable URLs
+ * When action modal is open, uses frozen filters from sessionStorage to maintain background state
  */
 export function useFilters() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
-  // Derive all state directly from URL - URL is the single source of truth
+  // Check if modal is open - if so, use frozen filters from return URL
+  const isModalOpen =
+    typeof window !== "undefined" &&
+    sessionStorage.getItem("actionModalOpen") === "true";
+  const returnUrl =
+    typeof window !== "undefined"
+      ? sessionStorage.getItem("actionModalReturnUrl")
+      : null;
+  const frozenParams =
+    isModalOpen && returnUrl ? new URLSearchParams(returnUrl) : null;
+
+  // Use frozen params when modal is open, otherwise use current URL params
+  const effectiveParams = frozenParams || searchParams;
+
+  // Derive all state directly from URL (or frozen state when modal is open)
   // Decode underscores back to spaces for display
-  const searchQuery = decodeUrlParam(searchParams.get("search") || "");
-  const selectedWorkPackage = decodeUrlParamArray(searchParams.get("wp"));
-  const selectedLead = decodeUrlParamArray(searchParams.get("lead"));
-  const selectedWorkstream = decodeUrlParamArray(searchParams.get("ws"));
-  const selectedWpFamily = decodeUrlParam(searchParams.get("family") || "");
-  const selectedBigTicket = decodeUrlParamArray(searchParams.get("type"));
-  const selectedAction = decodeUrlParamArray(searchParams.get("actions"));
-  const selectedTeamMember = decodeUrlParamArray(searchParams.get("team"));
+  const searchQuery = decodeUrlParam(effectiveParams.get("search") || "");
+  const selectedWorkPackage = decodeUrlParamArray(effectiveParams.get("wp"));
+  const selectedLead = decodeUrlParamArray(effectiveParams.get("lead"));
+  const selectedWorkstream = decodeUrlParamArray(effectiveParams.get("ws"));
+  const selectedWpFamily = decodeUrlParam(effectiveParams.get("family") || "");
+  const selectedBigTicket = decodeUrlParamArray(effectiveParams.get("type"));
+  const selectedAction = decodeUrlParamArray(effectiveParams.get("actions"));
+  const selectedTeamMember = decodeUrlParamArray(effectiveParams.get("team"));
   const selectedActionStatus = decodeUrlParamArray(
-    searchParams.get("action_status"),
+    effectiveParams.get("action_status"),
   );
   const selectedMilestoneMonth = decodeUrlParamArray(
-    searchParams.get("milestone_month"),
+    effectiveParams.get("milestone_month"),
   );
-  const sortOption = searchParams.get("sort") || "number-asc";
+  const sortOption = effectiveParams.get("sort") || "number-asc";
 
   // Helper to build a clean, human-readable query string
   const buildQueryString = useCallback(

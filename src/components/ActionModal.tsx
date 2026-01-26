@@ -39,7 +39,7 @@ const SectionCard = ({
 }) => (
   <div className="rounded-lg border border-slate-200 bg-white">
     <div className="-ml-px rounded-tl-[9px] border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
-      <h3 className="text-xs sm:text-sm font-extrabold tracking-widest text-slate-800 uppercase">
+      <h3 className="text-xs font-extrabold tracking-widest text-slate-800 uppercase sm:text-sm">
         {title}
       </h3>
     </div>
@@ -50,10 +50,8 @@ const SectionCard = ({
 const CHIPS_PER_LINE = 5;
 const breadcrumbBaseClass =
   "inline-flex !min-h-0 items-center text-[10px] leading-4 font-medium tracking-wide uppercase transition-colors sm:text-xs sm:leading-5 md:text-sm md:tracking-wider";
-const breadcrumbLinkClass =
-  `${breadcrumbBaseClass} text-slate-500 hover:text-un-blue hover:underline`;
-const breadcrumbActionClass =
-  `${breadcrumbBaseClass} text-un-blue hover:underline`;
+const breadcrumbLinkClass = `${breadcrumbBaseClass} text-slate-500 hover:text-un-blue hover:underline`;
+const breadcrumbActionClass = `${breadcrumbBaseClass} text-un-blue hover:underline`;
 const chevronClass =
   "h-2.5 w-2.5 shrink-0 text-slate-400 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5";
 
@@ -206,7 +204,7 @@ export default function ActionModal({
 
     return (
       <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           {/* Breadcrumb */}
           <div className="mb-2 flex flex-wrap items-center gap-x-1 gap-y-1 sm:mb-3 sm:gap-x-1.5 sm:gap-y-0.5">
             <Link
@@ -320,11 +318,14 @@ export default function ActionModal({
           <div className="p-5">
             {/* Decision Status */}
             <div>
-              <h3 className="mb-1.5 text-xs sm:text-sm font-semibold tracking-wide text-slate-700">
+              <h3 className="mb-1.5 text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
                 Status
               </h3>
               <DecisionStatusBadge
-                status={action.public_action_status || ACTION_STATUS.FURTHER_WORK_ONGOING}
+                status={
+                  action.public_action_status ||
+                  ACTION_STATUS.FURTHER_WORK_ONGOING
+                }
               />
             </div>
 
@@ -332,7 +333,7 @@ export default function ActionModal({
             {action.upcoming_milestone && (
               <>
                 <div className="my-3 border-t border-slate-200"></div>
-                <h3 className="mb-3 flex items-center gap-1.5 text-xs sm:text-sm font-semibold tracking-wide text-slate-700">
+                <h3 className="mb-3 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
                   Upcoming Milestone
                   <HelpTooltip content="Steps which will be taken towards the delivery of the proposal concerned. Completed milestones are crossed out." />
                 </h3>
@@ -352,11 +353,11 @@ export default function ActionModal({
 
             {/* Updates Section */}
             <div className="my-6 border-t border-slate-200"></div>
-            <h3 className="mb-4 flex items-center gap-1.5 text-xs sm:text-sm font-semibold tracking-wide text-slate-700">
+            <h3 className="mb-4 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
               Updates
               <HelpTooltip content="A summary of recent progress on the action." />
             </h3>
-            <div className="text-xs sm:text-sm leading-relaxed text-slate-600">
+            <div className="text-xs leading-relaxed text-slate-600 sm:text-sm">
               {action.updates && action.updates.trim() ? (
                 <p className="whitespace-pre-wrap">{action.updates}</p>
               ) : (
@@ -403,7 +404,7 @@ export default function ActionModal({
               {/* Document Text Quote */}
               {action.doc_text && (
                 <div className="border-l-2 border-slate-300 bg-white py-3 pr-3 pl-4">
-                  <p className="text-xs sm:text-sm leading-relaxed text-slate-700">
+                  <p className="text-xs leading-relaxed text-slate-700 sm:text-sm">
                     &ldquo;{action.doc_text}&rdquo;
                   </p>
                 </div>
@@ -415,7 +416,7 @@ export default function ActionModal({
         {/* Work Package Reference Section */}
         <SectionCard title="Work Package Reference">
           <div className="p-5">
-            <div className="text-sm sm:text-[15px] leading-snug text-slate-900">
+            <div className="text-sm leading-snug text-slate-900 sm:text-[15px]">
               <span className="font-semibold">
                 Work Package {action.work_package_number}
               </span>
@@ -457,7 +458,7 @@ export default function ActionModal({
         <TooltipCollisionBoundaryProvider value={modalEl}>
           <div className="flex min-h-full flex-col">
             {/* Header */}
-            <div className="bg-white px-4 pt-4 pb-3 sm:px-6 sm:pt-5 sm:pb-4 md:px-8 md:pt-6 md:pb-5 border-b border-slate-200 shadow-sm">
+            <div className="border-b border-slate-200 bg-white px-4 pt-4 pb-3 shadow-sm sm:px-6 sm:pt-5 sm:pb-4 md:px-8 md:pt-6 md:pb-5">
               {renderHeader()}
             </div>
 

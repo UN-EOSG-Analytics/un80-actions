@@ -93,23 +93,14 @@ export function ActionItem({ action, searchQuery = "" }: ActionItemProps) {
 
   const handleClick = () => {
     // Save current URL to sessionStorage before opening modal
-    const currentUrl = searchParams.toString();
-    if (currentUrl) {
-      sessionStorage.setItem("previousUrl", currentUrl);
-    } else {
-      sessionStorage.removeItem("previousUrl");
-    }
+    const currentUrl = window.location.search || "/";
+    sessionStorage.setItem("actionModalReturnUrl", currentUrl);
+    // Mark that modal is open (for useFilters to freeze state)
+    sessionStorage.setItem("actionModalOpen", "true");
 
-    // Build URL with query param: ?action=14 (preserving other params with clean encoding)
-    const params: Record<string, string> = {};
-    new URLSearchParams(window.location.search).forEach((value, key) => {
-      params[key] = value;
-    });
-    params.action = String(action.actionNumber);
-    const url = `?${buildCleanQueryString(params)}`;
-
-    // Update URL without navigating (for static export compatibility)
-    window.history.pushState({}, "", url);
+    // Navigate to clean URL with only action param
+    const cleanUrl = `?action=${action.actionNumber}`;
+    window.history.pushState({}, "", cleanUrl);
     // Trigger a popstate event to notify ModalHandler
     window.dispatchEvent(new PopStateEvent("popstate"));
   };
@@ -134,7 +125,7 @@ export function ActionItem({ action, searchQuery = "" }: ActionItemProps) {
     >
       {/* Header row: Action Number + Decision Status */}
       <div className="mb-2.5 flex items-center gap-2.5">
-        <span className="rounded bg-un-blue/8 px-2 py-0.5 text-[10px] sm:text-xs font-semibold tracking-wide text-un-blue uppercase">
+        <span className="rounded bg-un-blue/8 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-un-blue uppercase sm:text-xs">
           Action {action.actionNumber || ""}
         </span>
         <span onClick={stopPropagationOnMobile} className="inline-flex">
@@ -147,7 +138,7 @@ export function ActionItem({ action, searchQuery = "" }: ActionItemProps) {
         {isCompleted && (
           <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-un-blue" />
         )}
-        <p className="text-sm sm:text-[15px] leading-snug font-medium text-slate-900">
+        <p className="text-sm leading-snug font-medium text-slate-900 sm:text-[15px]">
           <HighlightedText text={action.text} query={searchQuery} />
           {action.subActionDetails && (
             <>

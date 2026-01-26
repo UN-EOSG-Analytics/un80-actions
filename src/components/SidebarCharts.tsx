@@ -1,11 +1,10 @@
 import React from "react";
+import { Users, Calendar, Layers, Activity } from "lucide-react";
 import {
-  Users,
-  Calendar,
-  Layers,
-  Activity,
-} from "lucide-react";
-import { ACTION_STATUS, getStatusStyles, isDecisionTaken } from "@/constants/actionStatus";
+  ACTION_STATUS,
+  getStatusStyles,
+  isDecisionTaken,
+} from "@/constants/actionStatus";
 import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
 import { buildCleanQueryString } from "@/lib/utils";
 import {
@@ -94,8 +93,8 @@ export function SidebarCharts({
     (a) => !(a.sub_action_details && a.is_subaction),
   );
   const totalActions = mainActions.length;
-  const decisionTakenCount = mainActions.filter(
-    (a) => isDecisionTaken(a.public_action_status),
+  const decisionTakenCount = mainActions.filter((a) =>
+    isDecisionTaken(a.public_action_status),
   ).length;
   const furtherWorkCount = totalActions - decisionTakenCount;
 
@@ -257,16 +256,20 @@ export function SidebarCharts({
               return (
                 <div
                   className={`group flex cursor-pointer items-center justify-between gap-2 py-1.5 pl-0.5 transition-all ${
-                    isSelected ? styles.sidebar.selectedBg : styles.sidebar.hoverBg
+                    isSelected
+                      ? styles.sidebar.selectedBg
+                      : styles.sidebar.hoverBg
                   }`}
                   onClick={() => {
                     onSelectActionStatus(isSelected ? [] : [statusKey]);
                   }}
                 >
                   <div className="flex min-w-0 items-center gap-2">
-                    <IconComponent className={`h-4 w-4 shrink-0 ${styles.sidebar.icon}`} />
+                    <IconComponent
+                      className={`h-4 w-4 shrink-0 ${styles.sidebar.icon}`}
+                    />
                     <span
-                      className={`text-[14px] font-semibold leading-tight transition-colors ${
+                      className={`text-[14px] leading-tight font-semibold transition-colors ${
                         isSelected
                           ? styles.sidebar.selectedText
                           : `${styles.sidebar.count} ${styles.sidebar.hoverText}`
@@ -278,15 +281,21 @@ export function SidebarCharts({
                   <div className="flex shrink-0 items-center gap-1.5">
                     <span
                       className={`w-7 text-right text-[14px] font-semibold tabular-nums ${
-                        isSelected ? styles.sidebar.selectedText : styles.sidebar.count
+                        isSelected
+                          ? styles.sidebar.selectedText
+                          : styles.sidebar.count
                       }`}
                     >
                       {furtherWorkCount}
                     </span>
-                    <div className={`relative mr-2 h-2 w-[85px] overflow-hidden rounded-full ${styles.sidebar.barTrack}`}>
+                    <div
+                      className={`relative mr-2 h-2 w-[85px] overflow-hidden rounded-full ${styles.sidebar.barTrack}`}
+                    >
                       <div
                         className={`h-full rounded-full transition-all ${
-                          isSelected ? styles.sidebar.selectedBar : styles.sidebar.bar
+                          isSelected
+                            ? styles.sidebar.selectedBar
+                            : styles.sidebar.bar
                         }`}
                         style={{
                           width:
@@ -311,16 +320,20 @@ export function SidebarCharts({
               return (
                 <div
                   className={`group flex cursor-pointer items-center justify-between gap-2 py-1.5 pl-0.5 transition-all ${
-                    isSelected ? styles.sidebar.selectedBg : styles.sidebar.hoverBg
+                    isSelected
+                      ? styles.sidebar.selectedBg
+                      : styles.sidebar.hoverBg
                   }`}
                   onClick={() => {
                     onSelectActionStatus(isSelected ? [] : [statusKey]);
                   }}
                 >
                   <div className="flex min-w-0 items-center gap-2">
-                    <IconComponent className={`h-4 w-4 shrink-0 ${styles.sidebar.icon}`} />
+                    <IconComponent
+                      className={`h-4 w-4 shrink-0 ${styles.sidebar.icon}`}
+                    />
                     <span
-                      className={`text-[14px] font-semibold leading-tight transition-colors ${
+                      className={`text-[14px] leading-tight font-semibold transition-colors ${
                         isSelected
                           ? styles.sidebar.selectedText
                           : `${styles.sidebar.count} ${styles.sidebar.hoverText}`
@@ -332,15 +345,21 @@ export function SidebarCharts({
                   <div className="flex shrink-0 items-center gap-1.5">
                     <span
                       className={`w-7 text-right text-[14px] font-semibold tabular-nums ${
-                        isSelected ? styles.sidebar.selectedText : styles.sidebar.count
+                        isSelected
+                          ? styles.sidebar.selectedText
+                          : styles.sidebar.count
                       }`}
                     >
                       {decisionTakenCount}
                     </span>
-                    <div className={`relative mr-2 h-2 w-[85px] overflow-hidden rounded-full ${styles.sidebar.barTrack}`}>
+                    <div
+                      className={`relative mr-2 h-2 w-[85px] overflow-hidden rounded-full ${styles.sidebar.barTrack}`}
+                    >
                       <div
                         className={`h-full rounded-full transition-all ${
-                          isSelected ? styles.sidebar.selectedBar : styles.sidebar.bar
+                          isSelected
+                            ? styles.sidebar.selectedBar
+                            : styles.sidebar.bar
                         }`}
                         style={{
                           width:
@@ -384,23 +403,14 @@ export function SidebarCharts({
               const handleMilestoneClick = () => {
                 if (entry.actionNumber) {
                   // Save current URL to sessionStorage before opening modal
-                  const currentUrl = window.location.search;
-                  if (currentUrl) {
-                    sessionStorage.setItem("previousUrl", currentUrl);
-                  } else {
-                    sessionStorage.removeItem("previousUrl");
-                  }
+                  const currentUrl = window.location.search || "/";
+                  sessionStorage.setItem("actionModalReturnUrl", currentUrl);
+                  // Mark that modal is open (for useFilters to freeze state)
+                  sessionStorage.setItem("actionModalOpen", "true");
 
-                  // Build URL with query param: ?action=14 (preserving other params with clean encoding)
-                  const params: Record<string, string> = {};
-                  new URLSearchParams(window.location.search).forEach(
-                    (value, key) => {
-                      params[key] = value;
-                    },
-                  );
-                  params.action = String(entry.actionNumber);
-                  const url = `?${buildCleanQueryString(params)}`;
-                  window.history.pushState({}, "", url);
+                  // Navigate to clean URL with only action param
+                  const cleanUrl = `?action=${entry.actionNumber}`;
+                  window.history.pushState({}, "", cleanUrl);
                   // Trigger a popstate event to notify ModalHandler
                   window.dispatchEvent(new PopStateEvent("popstate"));
                 }

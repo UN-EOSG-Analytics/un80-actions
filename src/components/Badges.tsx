@@ -266,11 +266,15 @@ export function DecisionStatusBadge({
     <div
       className={cn(
         "inline-flex items-center rounded-full font-medium",
-        isSmall ? "gap-1 px-2 py-0.5 text-[10px] sm:text-xs" : "gap-1.5 px-3 py-1 text-xs sm:text-sm",
+        isSmall
+          ? "gap-1 px-2 py-0.5 text-[10px] sm:text-xs"
+          : "gap-1.5 px-3 py-1 text-xs sm:text-sm",
         styles.badge,
       )}
     >
-      <IconComponent className={cn(isSmall ? "h-3 w-3" : "h-4 w-4", styles.icon.className)} />
+      <IconComponent
+        className={cn(isSmall ? "h-3 w-3" : "h-4 w-4", styles.icon.className)}
+      />
       <span>{styles.label}</span>
     </div>
   );

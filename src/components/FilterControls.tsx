@@ -540,7 +540,10 @@ export function FilterControls({
             isFiltered={selectedActionStatus.length > 0}
             allActive={false}
             options={[
-              { key: ACTION_STATUS.FURTHER_WORK_ONGOING, label: "Further Work Ongoing" },
+              {
+                key: ACTION_STATUS.FURTHER_WORK_ONGOING,
+                label: "Further Work Ongoing",
+              },
               { key: ACTION_STATUS.DECISION_TAKEN, label: "Decision Taken" },
             ]}
             selectedKeys={new Set(selectedActionStatus)}

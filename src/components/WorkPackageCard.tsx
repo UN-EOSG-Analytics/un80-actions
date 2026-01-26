@@ -76,7 +76,7 @@ function WorkPackageActions({
   if (actions.length === 0) {
     return (
       <div className="rounded-[6px] border border-slate-200 bg-white p-4.25">
-        <p className="text-xs sm:text-sm leading-tight font-normal text-slate-900">
+        <p className="text-xs leading-tight font-normal text-slate-900 sm:text-sm">
           No actions available
         </p>
       </div>
@@ -125,7 +125,7 @@ function WorkPackageActions({
         <>
           <button
             onClick={() => setShowUnmatched(!showUnmatched)}
-            className="flex w-full items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-2.5 text-xs sm:text-sm font-medium text-slate-500 transition-all hover:border-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="flex w-full items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-2.5 text-xs font-medium text-slate-500 transition-all hover:border-slate-400 hover:bg-slate-100 hover:text-slate-600 sm:text-sm"
           >
             <ChevronDown
               className={`h-4 w-4 transition-transform duration-200 ${showUnmatched ? "rotate-180" : ""}`}
@@ -236,7 +236,7 @@ export function WorkPackageItem({
             {wp.number ? (
               <>
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="text-xs sm:text-sm leading-5 font-medium tracking-wider text-slate-500 uppercase">
+                  <span className="text-xs leading-5 font-medium tracking-wider text-slate-500 uppercase sm:text-sm">
                     Work package {wp.number}
                   </span>
                   {/* Progress Bar */}
@@ -246,7 +246,7 @@ export function WorkPackageItem({
                         <Progress value={0} className="h-1.5" />
                         <div className="absolute top-0 left-0 h-1.5 w-0.5 rounded-l-full bg-un-blue" />
                       </div>
-                      <span className="text-[10px] sm:text-xs font-semibold whitespace-nowrap text-un-blue">
+                      <span className="text-[10px] font-semibold whitespace-nowrap text-un-blue sm:text-xs">
                         0%
                       </span>
                     </div>
@@ -267,7 +267,7 @@ export function WorkPackageItem({
           {wp.goal && (
             <div className="mb-3 flex items-stretch gap-2.5 text-left sm:mb-4">
               <div className="w-0.75 shrink-0 rounded-full bg-un-blue" />
-              <p className="py-0.5 text-xs sm:text-sm leading-snug font-medium text-slate-600 md:text-base">
+              <p className="py-0.5 text-xs leading-snug font-medium text-slate-600 sm:text-sm md:text-base">
                 <span className="font-semibold text-un-blue">Goal:</span>{" "}
                 <HighlightedText
                   text={formatGoalText(wp.goal)}
@@ -327,7 +327,10 @@ export function WorkPackageItem({
               </div>
               {/* Dots - shared between both states */}
               <div className="absolute left-0 flex items-center gap-2">
-                <div style={{ width: 'max-content' }} className="invisible text-sm font-semibold sm:text-base">
+                <div
+                  style={{ width: "max-content" }}
+                  className="invisible text-sm font-semibold sm:text-base"
+                >
                   {hasActiveFilter
                     ? `${matchedActionsCount}/${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`
                     : `${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`}
@@ -352,7 +355,7 @@ export function WorkPackageItem({
         {/* Details Button */}
         <button
           type="button"
-          className="absolute top-3 right-3 !flex !size-9 !min-h-9 !min-w-9 !max-h-9 !max-w-9 items-center justify-center rounded-md bg-slate-500 !p-0 text-white transition-colors hover:bg-slate-600 sm:!h-auto sm:!w-auto sm:!min-h-0 sm:!min-w-0 sm:!max-h-none sm:!max-w-none sm:gap-1.5 sm:rounded-[6px] sm:!px-3 sm:!py-1.5"
+          className="absolute top-3 right-3 !flex !size-9 !max-h-9 !min-h-9 !max-w-9 !min-w-9 items-center justify-center rounded-md bg-slate-500 !p-0 text-white transition-colors hover:bg-slate-600 sm:!h-auto sm:!max-h-none sm:!min-h-0 sm:!w-auto sm:!max-w-none sm:!min-w-0 sm:gap-1.5 sm:rounded-[6px] sm:!px-3 sm:!py-1.5"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();

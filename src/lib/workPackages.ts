@@ -103,7 +103,8 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           deliveryDate: action.delivery_date || null,
           actionEntities: action.action_entities || null,
           subActionDetails: action.sub_action_details || null,
-          actionStatus: action.public_action_status || ACTION_STATUS.FURTHER_WORK_ONGOING,
+          actionStatus:
+            action.public_action_status || ACTION_STATUS.FURTHER_WORK_ONGOING,
         });
       } else {
         // Merge leads if action already exists
