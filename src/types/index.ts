@@ -116,7 +116,6 @@ export interface WorkPackageAction {
   docText: string | null;
   actionNumber: number;
   firstMilestone: string | null;
-  finalMilestoneDeadline: string | null;
   actionEntities: string | null;
   subActionDetails: string | null;
   actionStatus: "Further work ongoing" | "Decision taken";
@@ -189,7 +188,7 @@ export interface WorkPackageChartEntry {
 export interface UpcomingMilestoneChartEntry {
   milestone: string;
   count: number;
-  deadline: string | null;
+  deliveryDate: string | null;
   actionNumber: number | string | null;
   workPackageNumber: number | string | null;
   workPackageName: string | null;

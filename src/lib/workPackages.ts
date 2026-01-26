@@ -99,7 +99,6 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           docText: action.doc_text || null,
           actionNumber: action.action_number || 0,
           firstMilestone: action.first_milestone || null,
-          finalMilestoneDeadline: action.final_milestone_deadline || null,
           actionEntities: action.action_entities || null,
           subActionDetails: action.sub_action_details || null,
           actionStatus: action.public_action_status || "Further work ongoing",
@@ -125,13 +124,6 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
         // Update milestone fields if not already set
         if (action.first_milestone && !existingAction.firstMilestone) {
           existingAction.firstMilestone = action.first_milestone;
-        }
-        if (
-          action.final_milestone_deadline &&
-          !existingAction.finalMilestoneDeadline
-        ) {
-          existingAction.finalMilestoneDeadline =
-            action.final_milestone_deadline;
         }
         // Update actionEntities if not already set
         if (action.action_entities && !existingAction.actionEntities) {

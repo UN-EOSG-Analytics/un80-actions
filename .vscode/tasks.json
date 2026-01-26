@@ -59,6 +59,13 @@
       "label": "npm run format:check",
       "detail": "prettier --check",
       "problemMatcher": []
+    },
+    {
+      "type": "shell",
+      "command": "uv run python python/prepare_actions_data.py",
+      "label": "Process Actions Data",
+      "detail": "Run Python data processing pipeline",
+      "problemMatcher": []
     }
   ]
 }

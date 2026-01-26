@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 interface Milestone {
   label: string;
-  deadline: string | null;
+  deliveryDate: string | null;
   isReached: boolean;
 }
 
@@ -25,10 +25,10 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
     <div className="relative space-y-0">
       {milestones.map((milestone, index) => {
         const isLast = index === milestones.length - 1;
-        const deadlineDate = milestone.deadline
-          ? parseDate(milestone.deadline)
+        const deliveryDateObj = milestone.deliveryDate
+          ? parseDate(milestone.deliveryDate)
           : null;
-        const isPast = deadlineDate ? deadlineDate < now : false;
+        const isPast = deliveryDateObj ? deliveryDateObj < now : false;
         const isReached = milestone.isReached || isPast;
 
         return (
@@ -81,9 +81,9 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
                 >
                   {milestone.label}
                 </p>
-                {deadlineDate && (
+                {deliveryDateObj && (
                   <p className="text-sm text-gray-600">
-                    {formatDateMonthYear(deadlineDate)}
+                    {formatDateMonthYear(deliveryDateObj)}
                   </p>
                 )}
               </div>

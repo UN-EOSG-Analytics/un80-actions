@@ -119,10 +119,10 @@ export function SidebarCharts({
   const upcomingMilestonesChartEntries: SidebarChartEntry[] =
     upcomingMilestonesData
       .filter((entry) => {
-        // Only show milestones with deadlines in January
-        if (!entry.deadline) return false;
-        const deadlineDate = new Date(entry.deadline);
-        return deadlineDate >= januaryStart && deadlineDate <= januaryEnd;
+        // Only show milestones with delivery dates in January
+        if (!entry.deliveryDate) return false;
+        const deliveryDate = new Date(entry.deliveryDate);
+        return deliveryDate >= januaryStart && deliveryDate <= januaryEnd;
       })
       .sort((a, b) => {
         const an = a.actionNumber != null ? Number(a.actionNumber) : Infinity;
@@ -130,41 +130,43 @@ export function SidebarCharts({
         return an - bn;
       })
       .map((entry) => {
-        const deadlineDate = entry.deadline ? new Date(entry.deadline) : null;
-        const daysUntilDeadline = deadlineDate
+        const deliveryDate = entry.deliveryDate
+          ? new Date(entry.deliveryDate)
+          : null;
+        const daysUntilDelivery = deliveryDate
           ? Math.ceil(
-              (deadlineDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+              (deliveryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
             )
           : null;
 
         const isUpcoming =
-          daysUntilDeadline !== null &&
-          daysUntilDeadline >= 0 &&
-          daysUntilDeadline <= 90;
+          daysUntilDelivery !== null &&
+          daysUntilDelivery >= 0 &&
+          daysUntilDelivery <= 90;
         const isUrgent =
-          daysUntilDeadline !== null &&
-          daysUntilDeadline >= 0 &&
-          daysUntilDeadline <= 30;
+          daysUntilDelivery !== null &&
+          daysUntilDelivery >= 0 &&
+          daysUntilDelivery <= 30;
 
-        let deadlineText = "";
-        if (deadlineDate) {
-          const formattedDate = deadlineDate.toLocaleDateString("en-US", {
+        let deliveryText = "";
+        if (deliveryDate) {
+          const formattedDate = deliveryDate.toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
             year: "numeric",
           });
-          if (daysUntilDeadline === null || daysUntilDeadline < 0) {
-            deadlineText = `Past: ${formattedDate}`;
-          } else if (daysUntilDeadline === 0) {
-            deadlineText = `Due today: ${formattedDate}`;
-          } else if (daysUntilDeadline === 1) {
-            deadlineText = `Due tomorrow: ${formattedDate}`;
-          } else if (daysUntilDeadline <= 7) {
-            deadlineText = `Due in ${daysUntilDeadline} days: ${formattedDate}`;
-          } else if (daysUntilDeadline <= 30) {
-            deadlineText = `Due in ${Math.ceil(daysUntilDeadline / 7)} weeks: ${formattedDate}`;
+          if (daysUntilDelivery === null || daysUntilDelivery < 0) {
+            deliveryText = `Past: ${formattedDate}`;
+          } else if (daysUntilDelivery === 0) {
+            deliveryText = `Due today: ${formattedDate}`;
+          } else if (daysUntilDelivery === 1) {
+            deliveryText = `Due tomorrow: ${formattedDate}`;
+          } else if (daysUntilDelivery <= 7) {
+            deliveryText = `Due in ${daysUntilDelivery} days: ${formattedDate}`;
+          } else if (daysUntilDelivery <= 30) {
+            deliveryText = `Due in ${Math.ceil(daysUntilDelivery / 7)} weeks: ${formattedDate}`;
           } else {
-            deadlineText = `Due ${formattedDate}`;
+            deliveryText = `Due ${formattedDate}`;
           }
         }
 
@@ -172,8 +174,8 @@ export function SidebarCharts({
           label: entry.milestone,
           count: entry.count,
           value: entry.milestone,
-          tooltip: deadlineText || undefined,
-          deadline: entry.deadline,
+          tooltip: deliveryText || undefined,
+          deliveryDate: entry.deliveryDate,
           isUrgent: isUrgent || false,
           isUpcoming: isUpcoming || false,
           actionNumber: entry.actionNumber,
@@ -200,9 +202,9 @@ export function SidebarCharts({
   const milestonesPerMonthMap = new Map<number, number>();
 
   upcomingMilestonesData.forEach((entry) => {
-    if (entry.deadline) {
-      const deadlineDate = new Date(entry.deadline);
-      const month = deadlineDate.getMonth();
+    if (entry.deliveryDate) {
+      const deliveryDate = new Date(entry.deliveryDate);
+      const month = deliveryDate.getMonth();
       milestonesPerMonthMap.set(
         month,
         (milestonesPerMonthMap.get(month) || 0) + entry.count,
@@ -382,11 +384,11 @@ export function SidebarCharts({
           {/* Milestones List - ~3.5 entries visible, rest scrollable */}
           <div className="-mr-1 max-h-[15.5rem] divide-y divide-slate-100 overflow-y-auto overscroll-contain pr-1">
             {upcomingMilestonesChartEntries.map((entry, index) => {
-              const deadlineDate = entry.deadline
-                ? new Date(entry.deadline)
+              const deliveryDateObj = entry.deliveryDate
+                ? new Date(entry.deliveryDate)
                 : null;
-              const monthShort = deadlineDate
-                ? deadlineDate
+              const monthShort = deliveryDateObj
+                ? deliveryDateObj
                     .toLocaleDateString("en-US", { month: "short" })
                     .toUpperCase()
                 : null;

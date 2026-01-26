@@ -338,7 +338,7 @@ export default function ActionModal({
                     milestones={[
                       {
                         label: action.upcoming_milestone,
-                        deadline: action.delivery_date ?? null,
+                        deliveryDate: action.delivery_date ?? null,
                         isReached: false,
                       },
                     ]}

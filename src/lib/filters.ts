@@ -489,7 +489,7 @@ export function calculateWorkPackageChartData(
  * @param selectedLead - Selected leads to filter by
  * @param selectedWorkPackage - Selected work packages to filter by
  * @param selectedWorkstream - Selected workstreams to filter by
- * @returns Array of upcoming milestone chart entries sorted by deadline (earliest first), then by count descending
+ * @returns Array of upcoming milestone chart entries sorted by delivery date (earliest first), then by count descending
  */
 export function calculateUpcomingMilestonesChartData(
   actions: Actions,
@@ -502,7 +502,7 @@ export function calculateUpcomingMilestonesChartData(
     string,
     {
       count: number;
-      deadline: string | null;
+      deliveryDate: string | null;
       actionNumber: number | string | null;
       workPackageNumber: number | string | null;
       workPackageName: string | null;
@@ -565,14 +565,17 @@ export function calculateUpcomingMilestonesChartData(
     }
 
     const existing = milestoneCounts.get(milestoneText);
-    const deadline = action.delivery_date;
+    const deliveryDate = action.delivery_date;
 
     if (existing) {
-      // If multiple deadlines exist, keep the earliest one
-      if (deadline && (!existing.deadline || deadline < existing.deadline)) {
+      // If multiple delivery dates exist, keep the earliest one
+      if (
+        deliveryDate &&
+        (!existing.deliveryDate || deliveryDate < existing.deliveryDate)
+      ) {
         milestoneCounts.set(milestoneText, {
           count: existing.count + 1,
-          deadline: deadline,
+          deliveryDate: deliveryDate,
           actionNumber: existing.actionNumber,
           workPackageNumber: existing.workPackageNumber,
           workPackageName: existing.workPackageName,
@@ -580,7 +583,7 @@ export function calculateUpcomingMilestonesChartData(
       } else {
         milestoneCounts.set(milestoneText, {
           count: existing.count + 1,
-          deadline: existing.deadline,
+          deliveryDate: existing.deliveryDate,
           actionNumber: existing.actionNumber,
           workPackageNumber: existing.workPackageNumber,
           workPackageName: existing.workPackageName,
@@ -589,7 +592,7 @@ export function calculateUpcomingMilestonesChartData(
     } else {
       milestoneCounts.set(milestoneText, {
         count: 1,
-        deadline: deadline,
+        deliveryDate: deliveryDate,
         actionNumber: action.action_number ?? null,
         workPackageNumber: action.work_package_number ?? null,
         workPackageName: action.work_package_name ?? null,
@@ -597,28 +600,28 @@ export function calculateUpcomingMilestonesChartData(
     }
   });
 
-  return Array.from(milestoneCounts.entries())
-    .map(([milestone, data]) => ({
+  return (
+    Array.from(milestoneCounts.entries()).map(([milestone, data]) => ({
       milestone,
       count: data.count,
-      deadline: data.deadline,
+      deliveryDate: data.deliveryDate,
       actionNumber: data.actionNumber,
       workPackageNumber: data.workPackageNumber,
       workPackageName: data.workPackageName,
-    }))
-    .sort((a, b) => {
-      // Sort by deadline first (earliest first, nulls last)
-      if (a.deadline && b.deadline) {
-        const dateComparison = a.deadline.localeCompare(b.deadline);
-        if (dateComparison !== 0) return dateComparison;
-      } else if (a.deadline && !b.deadline) {
-        return -1;
-      } else if (!a.deadline && b.deadline) {
-        return 1;
-      }
-      // Then by count descending
-      return b.count - a.count;
-    });
+    })) as UpcomingMilestoneChartEntry[]
+  ).sort((a, b) => {
+    // Sort by deliveryDate first (earliest first, nulls last)
+    if (a.deliveryDate && b.deliveryDate) {
+      const dateComparison = a.deliveryDate.localeCompare(b.deliveryDate);
+      if (dateComparison !== 0) return dateComparison;
+    } else if (a.deliveryDate && !b.deliveryDate) {
+      return -1;
+    } else if (!a.deliveryDate && b.deliveryDate) {
+      return 1;
+    }
+    // Then by count descending
+    return b.count - a.count;
+  });
 }
 
 /**

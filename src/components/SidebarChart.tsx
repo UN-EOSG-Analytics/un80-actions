@@ -12,7 +12,7 @@ export interface SidebarChartEntry {
   count: number;
   value: string;
   tooltip?: string;
-  deadline?: string | null;
+  deliveryDate?: string | null;
   isUrgent?: boolean;
   isUpcoming?: boolean;
   actionNumber?: number | string | null;

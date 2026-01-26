@@ -123,30 +123,8 @@ export function ActionItem({ action, searchQuery = "" }: ActionItemProps) {
     }
   };
 
-  // Calculate progress to determine if action is completed
-  // Icon only appears when progress reaches 100% based on elapsed time calculation
-  const isCompleted = (() => {
-    if (!action.finalMilestoneDeadline || !action.firstMilestone) return false;
-
-    const deadlineDate = parseDate(action.finalMilestoneDeadline);
-    const startDate = parseDate(action.firstMilestone);
-    const now = new Date();
-
-    // Both dates must be valid and startDate must be before deadlineDate
-    if (!deadlineDate || !startDate) return false;
-    if (isNaN(deadlineDate.getTime()) || isNaN(startDate.getTime()))
-      return false;
-    if (startDate >= deadlineDate) return false;
-
-    const totalDuration = deadlineDate.getTime() - startDate.getTime();
-    const elapsed = now.getTime() - startDate.getTime();
-    const progress = Math.min(
-      Math.max((elapsed / totalDuration) * 100, 0),
-      100,
-    );
-
-    return progress >= 100;
-  })();
+  // Completion status is based on action status, not time-based calculation
+  const isCompleted = action.actionStatus === "Decision taken";
 
   return (
     <div
