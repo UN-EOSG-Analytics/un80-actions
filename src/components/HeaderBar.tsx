@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -10,16 +10,33 @@ interface HeaderProps {
   showLogin?: boolean;
 }
 
+// https://www.un.org/dgacm/en/content/editorial-manual/numbers-dates-time#dates
 function formatLastUpdated(iso: string): string {
   try {
     const d = new Date(iso);
-    return d.toLocaleDateString(undefined, {
+    const formatted = d.toLocaleString("en-US", {
       day: "numeric",
-      month: "short",
+      month: "long",
       year: "numeric",
-      hour: "2-digit",
+      hour: "numeric",
       minute: "2-digit",
+      hour12: true,
+      timeZone: "America/New_York",
     });
+
+    // Get timezone abbreviation separately
+    const tzName = d
+      .toLocaleString("en-US", {
+        timeZone: "America/New_York",
+        timeZoneName: "short",
+      })
+      .split(" ")
+      .pop();
+
+    // Convert AM/PM to lowercase a.m./p.m. per UN style
+    return (
+      formatted.replace(/\sAM/, " a.m.").replace(/\sPM/, " p.m.") + ` ${tzName}`
+    );
   } catch {
     return "";
   }
