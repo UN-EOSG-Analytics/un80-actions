@@ -47,8 +47,12 @@ const SectionCard = ({
 );
 
 const CHIPS_PER_LINE = 5;
+const breadcrumbBaseClass =
+  "inline-flex !min-h-0 items-center text-[10px] leading-4 font-medium tracking-wide uppercase transition-colors sm:text-xs sm:leading-5 md:text-sm md:tracking-wider";
 const breadcrumbLinkClass =
-  "text-[10px] leading-4 font-medium tracking-wide text-slate-500 uppercase transition-colors hover:text-un-blue hover:underline sm:text-xs sm:leading-5 md:text-sm md:tracking-wider";
+  `${breadcrumbBaseClass} text-slate-500 hover:text-un-blue hover:underline`;
+const breadcrumbActionClass =
+  `${breadcrumbBaseClass} text-un-blue hover:underline`;
 const chevronClass =
   "h-2.5 w-2.5 shrink-0 text-slate-400 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5";
 
@@ -201,9 +205,9 @@ export default function ActionModal({
 
     return (
       <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {/* Breadcrumb */}
-          <div className="mb-2 flex flex-wrap items-center gap-x-1 gap-y-0.5 sm:mb-3 sm:gap-x-1.5">
+          <div className="mb-2 flex flex-wrap items-center gap-x-1 gap-y-1 sm:mb-3 sm:gap-x-1.5 sm:gap-y-0.5">
             <Link
               href={`/?ws=${action.report}`}
               onClick={handleClose}
@@ -230,7 +234,7 @@ export default function ActionModal({
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   }}
-                  className="cursor-pointer text-[10px] leading-4 font-medium tracking-wide text-un-blue uppercase transition-all hover:underline sm:text-xs sm:leading-5 md:text-sm md:tracking-wider"
+                  className={`${breadcrumbActionClass} cursor-pointer`}
                 >
                   Action {action.action_number}
                 </button>
