@@ -130,6 +130,12 @@
     ease-out;
   --animate-collapsible-up: collapsible-up var(--collapsible-duration) ease-out
     forwards;
+  
+  /* Mobile viewport units */
+  --viewport-height: 100vh;
+  --viewport-height-small: 100svh;
+  --viewport-height-large: 100lvh;
+  --viewport-height-dynamic: 100dvh;
 }
 
 /* FIXME */
@@ -148,6 +154,13 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  
+  /* Mobile viewport and safe area support */
+  @supports (height: 100dvh) {
+    html {
+      height: 100dvh;
+    }
   }
 }
 

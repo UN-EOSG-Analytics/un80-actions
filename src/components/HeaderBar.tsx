@@ -63,7 +63,7 @@ export function Header({ onReset }: HeaderProps) {
   return (
     <>
       <header className="w-full border-b bg-background">
-        <div className="mx-auto mt-1 mb-[-5] w-full max-w-4xl px-3 py-1.5 sm:px-8 sm:py-2 md:px-12 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
+        <div className="mx-auto w-full max-w-4xl px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pb-3 pt-[calc(env(safe-area-inset-top)+1rem)] sm:px-8 sm:py-4 md:px-12 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
           <div className="flex flex-row items-center justify-between sm:gap-3">
             {/* Title Section */}
             <Link href="/" onClick={handleClick} className="group">

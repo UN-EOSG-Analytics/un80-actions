@@ -390,12 +390,12 @@ export function WorkPackagesPageContent() {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-dvh bg-white">
         {/* Fixed Header */}
         <Header onReset={handleResetAllWithCollapse} showLogin={false} />
 
         {/* Main Container */}
-        <main className="mx-auto w-full max-w-4xl px-3 pt-3 sm:px-8 sm:pt-8 md:px-12 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
+        <main className="mx-auto w-full max-w-4xl px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-3 sm:px-8 sm:pt-8 md:px-12 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
           <div className="space-y-6 pb-16">
             {/* Header with context info */}
             <ExplainerText />
