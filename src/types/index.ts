@@ -116,6 +116,7 @@ export interface WorkPackageAction {
   docText: string | null;
   actionNumber: number;
   firstMilestone: string | null;
+  deliveryDate: string | null;
   actionEntities: string | null;
   subActionDetails: string | null;
   actionStatus: "Further work ongoing" | "Decision taken";
@@ -151,6 +152,7 @@ export interface FilterState {
   selectedAction: string[];
   selectedTeamMember: string[];
   selectedActionStatus: string[];
+  selectedMilestoneMonth: string[];
   sortOption: string;
 }
 

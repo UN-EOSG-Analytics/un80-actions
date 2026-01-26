@@ -243,6 +243,7 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
                                 docText: action.doc_text,
                                 actionNumber: action.action_number,
                                 firstMilestone: action.first_milestone,
+                                deliveryDate: action.delivery_date || null,
                                 actionEntities: action.action_entities,
                                 subActionDetails:
                                   action.sub_action_details || null,

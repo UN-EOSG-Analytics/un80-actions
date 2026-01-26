@@ -11,6 +11,7 @@ interface WorkPackageListProps {
   selectedActions?: string[];
   selectedTeamMembers?: string[];
   selectedActionStatus?: string[];
+  selectedMilestoneMonth?: string[];
   isLoading?: boolean;
   showProgress?: boolean;
   searchQuery?: string;
@@ -25,6 +26,7 @@ export function WorkPackageList({
   selectedActions = [],
   selectedTeamMembers = [],
   selectedActionStatus = [],
+  selectedMilestoneMonth = [],
   isLoading = false,
   showProgress = false,
   searchQuery = "",
@@ -85,6 +87,7 @@ export function WorkPackageList({
           });
         }
 
+        // Don't filter by milestone month or status here - let WorkPackageCard handle display
         // Check if any actions match the status filter (to determine if work package should show)
         const hasMatchingStatusAction =
           selectedActionStatus.length === 0 ||
@@ -95,27 +98,47 @@ export function WorkPackageList({
             );
           });
 
+        // Check if any actions match the milestone month filter (to determine if work package should show)
+        const hasMatchingMilestoneMonth =
+          selectedMilestoneMonth.length === 0 ||
+          filteredActions.some((action) => {
+            if (!action.deliveryDate) return false;
+            const deliveryDate = new Date(action.deliveryDate);
+            const monthName = deliveryDate.toLocaleDateString("en-US", {
+              month: "long",
+            });
+            return selectedMilestoneMonth.includes(monthName);
+          });
+
         // If there are no actions to display, don't render an (empty) collapsible
         if (
           !filteredActions ||
           filteredActions.length === 0 ||
-          !hasMatchingStatusAction
+          !hasMatchingStatusAction ||
+          !hasMatchingMilestoneMonth
         ) {
           return null;
         }
 
-        // Create a work package with filtered actions (by selected actions and team members)
-        // but keep all actions for status filter - let WorkPackageCard handle the display
+        // Create a work package with filtered actions (by selected actions and team members only)
+        // Status and milestone month filtering is handled by WorkPackageCard for display purposes
         const filteredWorkPackage = {
           ...wp,
           actions: filteredActions,
         };
 
+        // Auto-expand work package if there are active filters and matched actions
+        const hasActiveFilters =
+          searchQuery.trim().length > 0 ||
+          selectedActionStatus.length > 0 ||
+          selectedMilestoneMonth.length > 0;
+        const shouldBeOpen = hasActiveFilters || isOpen;
+
         return (
           <WorkPackageItem
             key={collapsibleKey}
             workPackage={filteredWorkPackage}
-            isOpen={isOpen}
+            isOpen={shouldBeOpen}
             onToggle={() => onToggleCollapsible(collapsibleKey)}
             collapsibleKey={collapsibleKey}
             onSelectLead={onSelectLead}
@@ -123,6 +146,7 @@ export function WorkPackageList({
             showProgress={showProgress}
             searchQuery={searchQuery}
             selectedActionStatus={selectedActionStatus}
+            selectedMilestoneMonth={selectedMilestoneMonth}
           />
         );
       })}

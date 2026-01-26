@@ -62,6 +62,8 @@ interface SidebarChartsProps {
   onMilestonesPerMonthSearchChange: (query: string) => void;
   showAllMilestonesPerMonth: boolean;
   onToggleShowAllMilestonesPerMonth: () => void;
+  selectedMilestoneMonth: string[];
+  onSelectMilestoneMonth: (month: string[]) => void;
 
   // Action Status filter
   selectedActionStatus: string[];
@@ -82,6 +84,8 @@ export function SidebarCharts({
   onSelectWorkstream,
   upcomingMilestonesData,
   milestonesPerMonthSearchQuery,
+  selectedMilestoneMonth,
+  onSelectMilestoneMonth,
   selectedActionStatus,
   onSelectActionStatus,
   actions,
@@ -382,7 +386,7 @@ export function SidebarCharts({
           </h3>
 
           {/* Milestones List - ~3.5 entries visible, rest scrollable */}
-          <div className="-mr-1 max-h-[15.5rem] divide-y divide-slate-100 overflow-y-auto overscroll-contain pr-1">
+          <div className="-mr-1 max-h-62 divide-y divide-slate-100 overflow-y-auto overscroll-contain pr-1">
             {upcomingMilestonesChartEntries.map((entry, index) => {
               const deliveryDateObj = entry.deliveryDate
                 ? new Date(entry.deliveryDate)
@@ -482,8 +486,8 @@ export function SidebarCharts({
             description="Number of milestones by month"
             icon={<Calendar />}
             data={milestonesPerMonthEntries}
-            selectedValue={[]}
-            onSelectValue={() => {}}
+            selectedValue={selectedMilestoneMonth}
+            onSelectValue={onSelectMilestoneMonth}
             barWidth={105}
             maxHeight={155}
           />

@@ -45,6 +45,8 @@ export function WorkPackagesPageContent() {
     setSelectedTeamMember,
     selectedActionStatus,
     setSelectedActionStatus,
+    selectedMilestoneMonth,
+    setSelectedMilestoneMonth,
     sortOption,
     setSortOption,
     handleResetFilters,
@@ -539,6 +541,7 @@ export function WorkPackagesPageContent() {
                     selectedActions={selectedAction}
                     selectedTeamMembers={selectedTeamMember}
                     selectedActionStatus={selectedActionStatus}
+                    selectedMilestoneMonth={selectedMilestoneMonth}
                     isLoading={isLoading}
                     showProgress={showProgress}
                     searchQuery={searchQuery}
@@ -591,6 +594,8 @@ export function WorkPackagesPageContent() {
                   onToggleShowAllMilestonesPerMonth={() =>
                     setShowAllMilestonesPerMonth(!showAllMilestonesPerMonth)
                   }
+                  selectedMilestoneMonth={selectedMilestoneMonth}
+                  onSelectMilestoneMonth={setSelectedMilestoneMonth}
                   selectedActionStatus={selectedActionStatus}
                   onSelectActionStatus={setSelectedActionStatus}
                   actions={actions}

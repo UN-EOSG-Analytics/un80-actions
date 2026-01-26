@@ -99,6 +99,7 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           docText: action.doc_text || null,
           actionNumber: action.action_number || 0,
           firstMilestone: action.first_milestone || null,
+          deliveryDate: action.delivery_date || null,
           actionEntities: action.action_entities || null,
           subActionDetails: action.sub_action_details || null,
           actionStatus: action.public_action_status || "Further work ongoing",

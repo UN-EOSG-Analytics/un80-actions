@@ -16,6 +16,7 @@ interface WorkPackageActionsProps {
   workPackageNumber: number | "";
   searchQuery?: string;
   selectedActionStatus?: string[];
+  selectedMilestoneMonth?: string[];
 }
 
 /**
@@ -48,12 +49,27 @@ function actionMatchesStatus(
     (status) => status.toLowerCase() === actionStatusLower,
   );
 }
-
+/**
+ * Helper to check if an action matches the milestone month filter
+ */
+function actionMatchesMilestoneMonth(
+  action: WorkPackageAction,
+  selectedMonths: string[],
+): boolean {
+  if (selectedMonths.length === 0) return true;
+  if (!action.deliveryDate) return false;
+  const deliveryDate = new Date(action.deliveryDate);
+  const monthName = deliveryDate.toLocaleDateString("en-US", {
+    month: "long",
+  });
+  return selectedMonths.includes(monthName);
+}
 function WorkPackageActions({
   actions,
   workPackageNumber,
   searchQuery = "",
   selectedActionStatus = [],
+  selectedMilestoneMonth = [],
 }: WorkPackageActionsProps) {
   const [showUnmatched, setShowUnmatched] = useState(false);
 
@@ -67,23 +83,27 @@ function WorkPackageActions({
     );
   }
 
-  // Separate matched and unmatched actions based on both search and status filters
+  // Separate matched and unmatched actions based on search, status, and milestone month filters
   const hasActiveSearch = searchQuery.trim().length > 0;
   const hasActiveStatusFilter = selectedActionStatus.length > 0;
-  const hasActiveFilter = hasActiveSearch || hasActiveStatusFilter;
+  const hasActiveMilestoneMonthFilter = selectedMilestoneMonth.length > 0;
+  const hasActiveFilter =
+    hasActiveSearch || hasActiveStatusFilter || hasActiveMilestoneMonthFilter;
 
   const matchedActions = hasActiveFilter
     ? actions.filter(
         (action) =>
           actionMatchesSearch(action, searchQuery) &&
-          actionMatchesStatus(action, selectedActionStatus),
+          actionMatchesStatus(action, selectedActionStatus) &&
+          actionMatchesMilestoneMonth(action, selectedMilestoneMonth),
       )
     : actions;
   const unmatchedActions = hasActiveFilter
     ? actions.filter(
         (action) =>
           !actionMatchesSearch(action, searchQuery) ||
-          !actionMatchesStatus(action, selectedActionStatus),
+          !actionMatchesStatus(action, selectedActionStatus) ||
+          !actionMatchesMilestoneMonth(action, selectedMilestoneMonth),
       )
     : [];
 
@@ -145,6 +165,7 @@ interface WorkPackageItemProps {
   showProgress?: boolean;
   searchQuery?: string;
   selectedActionStatus?: string[];
+  selectedMilestoneMonth?: string[];
 }
 
 export function WorkPackageItem({
@@ -156,9 +177,26 @@ export function WorkPackageItem({
   showProgress = false,
   searchQuery = "",
   selectedActionStatus = [],
+  selectedMilestoneMonth = [],
 }: WorkPackageItemProps) {
   // Calculate animation duration: base 150ms + 30ms per action, capped at 400ms
   const collapsibleDuration = Math.min(150 + wp.actions.length * 30, 400);
+
+  // Calculate matched actions for filter display
+  const hasActiveSearch = searchQuery.trim().length > 0;
+  const hasActiveStatusFilter = selectedActionStatus.length > 0;
+  const hasActiveMilestoneMonthFilter = selectedMilestoneMonth.length > 0;
+  const hasActiveFilter =
+    hasActiveSearch || hasActiveStatusFilter || hasActiveMilestoneMonthFilter;
+
+  const matchedActionsCount = hasActiveFilter
+    ? wp.actions.filter(
+        (action) =>
+          actionMatchesSearch(action, searchQuery) &&
+          actionMatchesStatus(action, selectedActionStatus) &&
+          actionMatchesMilestoneMonth(action, selectedMilestoneMonth),
+      ).length
+    : wp.actions.length;
 
   return (
     <Collapsible open={isOpen} onOpenChange={onToggle}>
@@ -213,7 +251,7 @@ export function WorkPackageItem({
           {/* Goal from work package data */}
           {wp.goal && (
             <div className="mb-3 flex items-stretch gap-2.5 text-left sm:mb-4">
-              <div className="w-[3px] shrink-0 rounded-full bg-un-blue" />
+              <div className="w-0.75 shrink-0 rounded-full bg-un-blue" />
               <p className="py-0.5 text-sm leading-snug font-medium text-slate-600 sm:text-base">
                 <span className="font-semibold text-un-blue">Goal:</span>{" "}
                 <HighlightedText
@@ -255,8 +293,9 @@ export function WorkPackageItem({
                 }`}
               >
                 <span className="text-sm font-semibold text-slate-500">
-                  {wp.actions.length} Indicative{" "}
-                  {wp.actions.length === 1 ? "Action" : "Actions"}
+                  {hasActiveFilter
+                    ? `${matchedActionsCount}/${wp.actions.length} Indicative ${wp.actions.length === 1 ? "Action" : "Actions"}`
+                    : `${wp.actions.length} Indicative ${wp.actions.length === 1 ? "Action" : "Actions"}`}
                 </span>
                 <div className="flex -space-x-1.5">
                   {Array.from({ length: wp.actions.length }).map((_, i) => (
@@ -278,8 +317,9 @@ export function WorkPackageItem({
                 }`}
               >
                 <h3 className="text-left text-lg font-semibold tracking-wider text-slate-700">
-                  {wp.actions.length} Indicative{" "}
-                  {wp.actions.length === 1 ? "Action" : "Actions"}
+                  {hasActiveFilter
+                    ? `${matchedActionsCount}/${wp.actions.length} Indicative ${wp.actions.length === 1 ? "Action" : "Actions"}`
+                    : `${wp.actions.length} Indicative ${wp.actions.length === 1 ? "Action" : "Actions"}`}
                 </h3>
                 <div className="flex -space-x-1.5">
                   {Array.from({ length: wp.actions.length }).map((_, i) => (
@@ -320,6 +360,7 @@ export function WorkPackageItem({
               workPackageNumber={wp.number}
               searchQuery={searchQuery}
               selectedActionStatus={selectedActionStatus}
+              selectedMilestoneMonth={selectedMilestoneMonth}
             />
           </div>
         </CollapsibleContent>

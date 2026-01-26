@@ -37,7 +37,7 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
             {!isLast && (
               <div
                 className={cn(
-                  "absolute top-8 left-[11px] w-0.5",
+                  "absolute top-8 left-2.75 w-0.5",
                   isReached ? "bg-un-blue" : "bg-gray-300",
                 )}
                 style={{ height: "calc(100% + 0.5rem)" }}
@@ -46,7 +46,7 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
             {/* Continuation line for last item - dashed to indicate path continues */}
             {isLast && (
               <div
-                className="absolute top-8 left-[10px] w-1"
+                className="absolute top-8 left-2.5 w-1"
                 style={{
                   height: "20px",
                   backgroundImage:
