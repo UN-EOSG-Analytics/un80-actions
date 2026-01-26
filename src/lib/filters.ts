@@ -143,9 +143,13 @@ export function filterWorkPackages(
     filtered = filtered.filter((wp) =>
       wp.actions.some((action) => {
         const actionText = action.text ? action.text.trim() : "";
+        const actionNumberStr = String(action.actionNumber);
         return filters.selectedAction.some((selected) => {
           const selectedTrimmed = selected.trim();
-          return actionText === selectedTrimmed;
+          return (
+            actionText === selectedTrimmed ||
+            actionNumberStr === selectedTrimmed
+          );
         });
       }),
     );

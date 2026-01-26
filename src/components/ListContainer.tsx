@@ -58,9 +58,13 @@ export function WorkPackageList({
           selectedActions.length > 0
             ? wp.actions.filter((action) => {
                 const actionText = action.text ? action.text.trim() : "";
+                const actionNumberStr = String(action.actionNumber);
                 return selectedActions.some((selected) => {
                   const selectedTrimmed = selected.trim();
-                  return actionText === selectedTrimmed;
+                  return (
+                    actionText === selectedTrimmed ||
+                    actionNumberStr === selectedTrimmed
+                  );
                 });
               })
             : wp.actions;
@@ -145,8 +149,11 @@ export function WorkPackageList({
             onSelectWorkstream={onSelectWorkstream}
             showProgress={showProgress}
             searchQuery={searchQuery}
+            selectedActions={selectedActions}
+            selectedTeamMembers={selectedTeamMembers}
             selectedActionStatus={selectedActionStatus}
             selectedMilestoneMonth={selectedMilestoneMonth}
+            originalActionsCount={wp.actions.length}
           />
         );
       })}

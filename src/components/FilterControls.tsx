@@ -454,16 +454,25 @@ export function FilterControls({
               selectedAction.length === 0
                 ? "Select action"
                 : selectedAction.length === 1
-                  ? selectedAction[0].length > 50
-                    ? `${selectedAction[0].substring(0, 50)}...`
-                    : selectedAction[0]
+                  ? (() => {
+                      const actionNum = selectedAction[0];
+                      const actionObj = uniqueActions.find(
+                        (a) => a.actionNumber === actionNum,
+                      );
+                      const displayText = actionObj
+                        ? `${actionObj.actionNumber}: ${actionObj.text}`
+                        : actionNum;
+                      return displayText.length > 50
+                        ? `${displayText.substring(0, 50)}...`
+                        : displayText;
+                    })()
                   : `${selectedAction.length} actions selected`
             }
             isFiltered={selectedAction.length > 0}
             allActive={false}
             options={uniqueActions.map(
               (action): FilterOption => ({
-                key: action.text,
+                key: action.actionNumber,
                 label: action.actionNumber
                   ? `${action.actionNumber}: ${action.text}`
                   : action.text,

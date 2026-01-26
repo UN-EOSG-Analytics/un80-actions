@@ -164,8 +164,11 @@ interface WorkPackageItemProps {
   onSelectWorkstream?: (workstream: string[]) => void;
   showProgress?: boolean;
   searchQuery?: string;
+  selectedActions?: string[];
+  selectedTeamMembers?: string[];
   selectedActionStatus?: string[];
   selectedMilestoneMonth?: string[];
+  originalActionsCount?: number;
 }
 
 export function WorkPackageItem({
@@ -176,18 +179,30 @@ export function WorkPackageItem({
   onSelectWorkstream,
   showProgress = false,
   searchQuery = "",
+  selectedActions = [],
+  selectedTeamMembers = [],
   selectedActionStatus = [],
   selectedMilestoneMonth = [],
+  originalActionsCount,
 }: WorkPackageItemProps) {
   // Calculate animation duration: base 150ms + 30ms per action, capped at 400ms
   const collapsibleDuration = Math.min(150 + wp.actions.length * 30, 400);
+
+  // Use the original total count if provided, otherwise use current actions length
+  const totalActionsCount = originalActionsCount ?? wp.actions.length;
 
   // Calculate matched actions for filter display
   const hasActiveSearch = searchQuery.trim().length > 0;
   const hasActiveStatusFilter = selectedActionStatus.length > 0;
   const hasActiveMilestoneMonthFilter = selectedMilestoneMonth.length > 0;
+  const hasActiveActionFilter = selectedActions.length > 0;
+  const hasActiveTeamMemberFilter = selectedTeamMembers.length > 0;
   const hasActiveFilter =
-    hasActiveSearch || hasActiveStatusFilter || hasActiveMilestoneMonthFilter;
+    hasActiveSearch ||
+    hasActiveStatusFilter ||
+    hasActiveMilestoneMonthFilter ||
+    hasActiveActionFilter ||
+    hasActiveTeamMemberFilter;
 
   const matchedActionsCount = hasActiveFilter
     ? wp.actions.filter(
@@ -294,17 +309,17 @@ export function WorkPackageItem({
               >
                 <span className="text-sm font-semibold text-slate-500">
                   {hasActiveFilter
-                    ? `${matchedActionsCount}/${wp.actions.length} Indicative ${wp.actions.length === 1 ? "Action" : "Actions"}`
-                    : `${wp.actions.length} Indicative ${wp.actions.length === 1 ? "Action" : "Actions"}`}
+                    ? `${matchedActionsCount}/${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`
+                    : `${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`}
                 </span>
                 <div className="flex -space-x-1.5">
-                  {Array.from({ length: wp.actions.length }).map((_, i) => (
+                  {Array.from({ length: totalActionsCount }).map((_, i) => (
                     <div
                       key={i}
                       className="h-4 w-4 rounded-full border-2 border-slate-100 bg-un-blue transition-colors group-hover:border-[#E0F5FF]"
                       style={{
                         opacity: Math.max(0.3, 1 - i * 0.08),
-                        zIndex: wp.actions.length - i,
+                        zIndex: totalActionsCount - i,
                       }}
                     />
                   ))}
@@ -318,17 +333,17 @@ export function WorkPackageItem({
               >
                 <h3 className="text-left text-lg font-semibold tracking-wider text-slate-700">
                   {hasActiveFilter
-                    ? `${matchedActionsCount}/${wp.actions.length} Indicative ${wp.actions.length === 1 ? "Action" : "Actions"}`
-                    : `${wp.actions.length} Indicative ${wp.actions.length === 1 ? "Action" : "Actions"}`}
+                    ? `${matchedActionsCount}/${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`
+                    : `${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`}
                 </h3>
                 <div className="flex -space-x-1.5">
-                  {Array.from({ length: wp.actions.length }).map((_, i) => (
+                  {Array.from({ length: totalActionsCount }).map((_, i) => (
                     <div
                       key={i}
                       className="h-4 w-4 rounded-full border-2 border-slate-100 bg-un-blue transition-colors group-hover:border-[#E0F5FF]"
                       style={{
                         opacity: Math.max(0.3, 1 - i * 0.08),
-                        zIndex: wp.actions.length - i,
+                        zIndex: totalActionsCount - i,
                       }}
                     />
                   ))}

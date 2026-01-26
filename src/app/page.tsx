@@ -122,7 +122,11 @@ export function WorkPackagesPageContent() {
   );
   useFilterSync(selectedLead, uniqueLeads, setSelectedLead);
   useFilterSync(selectedWorkstream, uniqueWorkstreams, setSelectedWorkstream);
-  useFilterSync(selectedAction, uniqueActionTexts, setSelectedAction);
+  useFilterSync(
+    selectedAction,
+    uniqueActions.map((a) => a.actionNumber),
+    setSelectedAction,
+  );
   useFilterSync(selectedTeamMember, uniqueTeamMembers, setSelectedTeamMember);
   useFilterSync(
     selectedBigTicket,
@@ -205,10 +209,10 @@ export function WorkPackagesPageContent() {
       filteredWorkPackages.forEach((wp, index) => {
         // Check if this work package contains any of the selected actions
         const hasSelectedAction = wp.actions.some((action) => {
-          const actionText = action.text ? action.text.trim() : "";
+          const actionNumber = String(action.actionNumber || "");
           return selectedAction.some((selected) => {
             const selectedTrimmed = selected.trim();
-            return actionText === selectedTrimmed;
+            return actionNumber === selectedTrimmed;
           });
         });
 

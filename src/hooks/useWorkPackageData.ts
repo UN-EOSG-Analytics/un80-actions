@@ -123,6 +123,20 @@ export function useWorkPackageData(
     ) => {
       let filtered = workPackages;
 
+      // Debug: Check if WP 22 exists at start
+      const wp22 = workPackages.find((wp) => wp.number === 22);
+      if (wp22) {
+        console.log("WP 22 exists at start:", {
+          number: wp22.number,
+          name: wp22.name,
+          actionCount: wp22.actions.length,
+          hasAction1: wp22.actions.some((a) => a.actionNumber === 1),
+          action1: wp22.actions.find((a) => a.actionNumber === 1),
+        });
+      } else {
+        console.log("WP 22 NOT found at start");
+      }
+
       // Always apply search query
       if (filters.searchQuery.trim()) {
         const query = filters.searchQuery.toLowerCase();
@@ -217,11 +231,23 @@ export function useWorkPackageData(
       ) {
         filtered = filtered.filter((wp) =>
           wp.actions.some((action) => {
-            const actionText = action.text ? action.text.trim() : "";
-            return filters.selectedAction!.some((selected) => {
+            const actionNumber = String(action.actionNumber || "");
+            const match = filters.selectedAction!.some((selected) => {
               const selectedTrimmed = selected.trim();
-              return actionText === selectedTrimmed;
+              const result = actionNumber === selectedTrimmed;
+              if (selected === "1") {
+                console.log("Debug action filter:", {
+                  wpNumber: wp.number,
+                  actionNumber: action.actionNumber,
+                  actionNumberStr: actionNumber,
+                  selected,
+                  selectedTrimmed,
+                  result,
+                });
+              }
+              return result;
             });
+            return match;
           }),
         );
       }
