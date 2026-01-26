@@ -265,7 +265,7 @@ export function DecisionStatusBadge({
     <div
       className={cn(
         "inline-flex items-center rounded-full font-medium",
-        isSmall ? "gap-1 px-2 py-0.5 text-xs" : "gap-1.5 px-3 py-1 text-sm",
+        isSmall ? "gap-1 px-2 py-0.5 text-[10px] sm:text-xs" : "gap-1.5 px-3 py-1 text-xs sm:text-sm",
         isDecisionTaken
           ? "bg-green-100 text-green-700"
           : "bg-amber-100 text-amber-700",

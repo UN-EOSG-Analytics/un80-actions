@@ -38,7 +38,7 @@ const SectionCard = ({
 }) => (
   <div className="rounded-lg border border-slate-200 bg-white">
     <div className="-ml-px rounded-tl-[9px] border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
-      <h3 className="text-sm font-extrabold tracking-widest text-slate-800 uppercase">
+      <h3 className="text-xs sm:text-sm font-extrabold tracking-widest text-slate-800 uppercase">
         {title}
       </h3>
     </div>
@@ -246,7 +246,7 @@ export default function ActionModal({
               </TooltipContent>
             </Tooltip>
           </div>
-          <h2 className="text-base leading-snug font-semibold text-slate-900 sm:text-lg md:text-xl">
+          <h2 className="text-base leading-snug font-semibold text-slate-900 sm:text-lg">
             {action.indicative_activity}
             {action.sub_action_details && (
               <>
@@ -259,7 +259,7 @@ export default function ActionModal({
           </h2>
           {/* Action Leads and Team Members - one line, rest in "+x more" */}
           {allChips.length > 0 && (
-            <div className="mt-3 flex flex-wrap items-center gap-1">
+            <div className="mt-2 flex flex-wrap items-center gap-1">
               {displayedChips.map((c) =>
                 c.type === "lead" ? (
                   <ActionLeadsBadge key={c.name} leads={[c.name]} inline />
@@ -319,7 +319,7 @@ export default function ActionModal({
           <div className="p-5">
             {/* Decision Status */}
             <div>
-              <h3 className="mb-1.5 text-sm font-semibold tracking-wide text-slate-700">
+              <h3 className="mb-1.5 text-xs sm:text-sm font-semibold tracking-wide text-slate-700">
                 Status
               </h3>
               <DecisionStatusBadge
@@ -331,7 +331,7 @@ export default function ActionModal({
             {action.upcoming_milestone && (
               <>
                 <div className="my-3 border-t border-slate-200"></div>
-                <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold tracking-wide text-slate-700">
+                <h3 className="mb-3 flex items-center gap-1.5 text-xs sm:text-sm font-semibold tracking-wide text-slate-700">
                   Upcoming Milestone
                   <HelpTooltip content="Steps which will be taken towards the delivery of the proposal concerned. Completed milestones are crossed out." />
                 </h3>
@@ -351,11 +351,11 @@ export default function ActionModal({
 
             {/* Updates Section */}
             <div className="my-6 border-t border-slate-200"></div>
-            <h3 className="mb-4 flex items-center gap-1.5 text-sm font-semibold tracking-wide text-slate-700">
+            <h3 className="mb-4 flex items-center gap-1.5 text-xs sm:text-sm font-semibold tracking-wide text-slate-700">
               Updates
               <HelpTooltip content="A summary of recent progress on the action." />
             </h3>
-            <div className="text-sm leading-relaxed text-slate-600">
+            <div className="text-xs sm:text-sm leading-relaxed text-slate-600">
               {action.updates && action.updates.trim() ? (
                 <p className="whitespace-pre-wrap">{action.updates}</p>
               ) : (
@@ -402,7 +402,7 @@ export default function ActionModal({
               {/* Document Text Quote */}
               {action.doc_text && (
                 <div className="border-l-2 border-slate-300 bg-white py-3 pr-3 pl-4">
-                  <p className="text-sm leading-relaxed text-slate-700">
+                  <p className="text-xs sm:text-sm leading-relaxed text-slate-700">
                     &ldquo;{action.doc_text}&rdquo;
                   </p>
                 </div>
@@ -414,7 +414,7 @@ export default function ActionModal({
         {/* Work Package Reference Section */}
         <SectionCard title="Work Package Reference">
           <div className="p-5">
-            <div className="text-[15px] leading-snug text-slate-900">
+            <div className="text-sm sm:text-[15px] leading-snug text-slate-900">
               <span className="font-semibold">
                 Work Package {action.work_package_number}
               </span>

@@ -134,7 +134,7 @@ export function ActionItem({ action, searchQuery = "" }: ActionItemProps) {
     >
       {/* Header row: Action Number + Decision Status */}
       <div className="mb-2.5 flex items-center gap-2.5">
-        <span className="rounded bg-un-blue/8 px-2 py-0.5 text-xs font-semibold tracking-wide text-un-blue uppercase">
+        <span className="rounded bg-un-blue/8 px-2 py-0.5 text-[10px] sm:text-xs font-semibold tracking-wide text-un-blue uppercase">
           Action {action.actionNumber || ""}
         </span>
         <span onClick={stopPropagationOnMobile} className="inline-flex">
@@ -147,7 +147,7 @@ export function ActionItem({ action, searchQuery = "" }: ActionItemProps) {
         {isCompleted && (
           <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-un-blue" />
         )}
-        <p className="text-[15px] leading-snug font-medium text-slate-900">
+        <p className="text-sm sm:text-[15px] leading-snug font-medium text-slate-900">
           <HighlightedText text={action.text} query={searchQuery} />
           {action.subActionDetails && (
             <>

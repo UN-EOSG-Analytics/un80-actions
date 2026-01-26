@@ -76,7 +76,7 @@ function WorkPackageActions({
   if (actions.length === 0) {
     return (
       <div className="rounded-[6px] border border-slate-200 bg-white p-4.25">
-        <p className="text-sm leading-tight font-normal text-slate-900">
+        <p className="text-xs sm:text-sm leading-tight font-normal text-slate-900">
           No actions available
         </p>
       </div>
@@ -125,7 +125,7 @@ function WorkPackageActions({
         <>
           <button
             onClick={() => setShowUnmatched(!showUnmatched)}
-            className="flex w-full items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-500 transition-all hover:border-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="flex w-full items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-2.5 text-xs sm:text-sm font-medium text-slate-500 transition-all hover:border-slate-400 hover:bg-slate-100 hover:text-slate-600"
           >
             <ChevronDown
               className={`h-4 w-4 transition-transform duration-200 ${showUnmatched ? "rotate-180" : ""}`}
@@ -236,7 +236,7 @@ export function WorkPackageItem({
             {wp.number ? (
               <>
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="text-sm leading-5 font-medium tracking-wider text-slate-500 uppercase">
+                  <span className="text-xs sm:text-sm leading-5 font-medium tracking-wider text-slate-500 uppercase">
                     Work package {wp.number}
                   </span>
                   {/* Progress Bar */}
@@ -246,7 +246,7 @@ export function WorkPackageItem({
                         <Progress value={0} className="h-1.5" />
                         <div className="absolute top-0 left-0 h-1.5 w-0.5 rounded-l-full bg-un-blue" />
                       </div>
-                      <span className="text-xs font-semibold whitespace-nowrap text-un-blue">
+                      <span className="text-[10px] sm:text-xs font-semibold whitespace-nowrap text-un-blue">
                         0%
                       </span>
                     </div>
@@ -267,7 +267,7 @@ export function WorkPackageItem({
           {wp.goal && (
             <div className="mb-3 flex items-stretch gap-2.5 text-left sm:mb-4">
               <div className="w-0.75 shrink-0 rounded-full bg-un-blue" />
-              <p className="py-0.5 text-sm leading-snug font-medium text-slate-600 sm:text-base">
+              <p className="py-0.5 text-xs sm:text-sm leading-snug font-medium text-slate-600 md:text-base">
                 <span className="font-semibold text-un-blue">Goal:</span>{" "}
                 <HighlightedText
                   text={formatGoalText(wp.goal)}
@@ -307,7 +307,7 @@ export function WorkPackageItem({
                   isOpen ? "pointer-events-none opacity-0" : "opacity-100"
                 }`}
               >
-                <span className="text-sm font-semibold text-slate-500">
+                <span className="text-sm font-semibold text-slate-500 sm:text-base">
                   {hasActiveFilter
                     ? `${matchedActionsCount}/${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`
                     : `${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`}
@@ -331,7 +331,7 @@ export function WorkPackageItem({
                   isOpen ? "opacity-100" : "pointer-events-none opacity-0"
                 }`}
               >
-                <h3 className="text-left text-lg font-semibold tracking-wider text-slate-700">
+                <h3 className="text-left text-base font-semibold tracking-wider text-slate-700 sm:text-lg">
                   {hasActiveFilter
                     ? `${matchedActionsCount}/${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`
                     : `${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`}
