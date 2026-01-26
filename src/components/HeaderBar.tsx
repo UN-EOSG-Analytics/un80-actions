@@ -3,14 +3,42 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface HeaderProps {
   onReset?: () => void;
   showLogin?: boolean;
 }
 
+function formatLastUpdated(iso: string): string {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return "";
+  }
+}
+
 export function Header({ onReset }: HeaderProps) {
   const router = useRouter();
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/data/last-updated.json")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { lastUpdated?: string } | null) => {
+        if (data?.lastUpdated) {
+          setLastUpdated(formatLastUpdated(data.lastUpdated));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -52,6 +80,13 @@ export function Header({ onReset }: HeaderProps) {
                 </div>
               </div>
             </Link>
+
+            {/* Last updated – top right */}
+            {lastUpdated && (
+              <p className="shrink-0 text-right text-xs text-slate-500 sm:text-sm">
+                Last updated: {lastUpdated}
+              </p>
+            )}
           </div>
         </div>
       </header>

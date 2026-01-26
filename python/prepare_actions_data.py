@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -222,6 +223,14 @@ output_path.parent.mkdir(parents=True, exist_ok=True)
 
 # Save cleaned JSON
 df.to_json(output_path, orient="records", force_ascii=False, indent=2)
+
+# Write last-updated timestamp for the dashboard header
+last_updated_path = output_path.parent / "last-updated.json"
+last_updated_path.write_text(
+    json.dumps({"lastUpdated": datetime.now(timezone.utc).isoformat()}),
+    encoding="utf-8",
+)
+print(f"✓ Last updated written to {last_updated_path.resolve()}")
 
 print(f"✓ Cleaned JSON written to {output_path.resolve()}")
 print(
