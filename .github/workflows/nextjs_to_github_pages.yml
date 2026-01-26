@@ -5,9 +5,15 @@
 name: Deploy Next.js site to Pages
 
 on:
-    # Runs after the data processing workflow completes successfully
+    # Runs on pushes to the main branch
+    push:
+        branches: ["main"]
+
+    # Runs after the data processing workflow completes
+    # This creates a workflow chain: when "Process raw actions data from Power Automate" finishes on main,
+    # this workflow automatically triggers to rebuild and deploy the site with updated data
     workflow_run:
-        workflows: ["Process raw JSON data"]
+        workflows: ["Process raw actions data from Power Automate"]
         types:
             - completed
         branches: ["main"]
