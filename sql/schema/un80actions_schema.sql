@@ -66,13 +66,14 @@ create table users (
     created_at timestamp not null default now(),
     last_login_at timestamp
 );
-create table magic_link_tokens (
-    id serial primary key,
-    token text not null unique,
-    user_id int not null references users(id) on delete cascade,
-    expires_at timestamp not null,
-    used_at timestamp,
-    created_at timestamp not null default now()
+-- Passwordless authentication tokens
+-- Uses timestamptz for unambiguous expiration handling across timezones
+create table magic_tokens (
+    token text not null primary key,
+    email text not null,
+    expires_at timestamptz not null,
+    used_at timestamptz,
+    created_at timestamptz not null default now()
 );
 -- =========================================================
 -- CORE TABLES
@@ -89,9 +90,8 @@ create table workstreams (
 );
 -- Work packages (scoped to a workstream)
 create table work_packages (
-    id int primary key,
+    id int not null primary key,
     workstream_id int not null references workstreams(id) on delete restrict,
-    number int not null,
     name text not null,
     goal text,
     constraint work_packages_workstream_number_key unique (workstream_id, number)
@@ -200,9 +200,8 @@ create index approved_users_lead_id_idx on approved_users(lead_id);
 create index users_entity_id_idx on users(entity_id);
 create index users_lead_id_idx on users(lead_id);
 create index users_role_idx on users(role);
-create index magic_link_tokens_token_idx on magic_link_tokens(token);
-create index magic_link_tokens_user_id_idx on magic_link_tokens(user_id);
-create index magic_link_tokens_expires_at_idx on magic_link_tokens(expires_at);
+create index magic_tokens_email_idx on magic_tokens(email);
+create index magic_tokens_expires_at_idx on magic_tokens(expires_at);
 create index action_notes_action_id_idx on action_notes(action_id);
 create index action_notes_user_id_idx on action_notes(user_id);
 create index action_notes_created_at_idx on action_notes(created_at);
