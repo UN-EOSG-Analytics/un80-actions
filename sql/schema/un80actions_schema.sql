@@ -11,8 +11,69 @@ set search_path = un80actions,
 -- =========================================================
 create type public_action_status as enum ('Further work ongoing', 'Decision taken');
 create type milestone_type as enum ('first', 'final', 'upcoming');
-create type user_role as enum ('Principal', 'Support', 'Focal', 'Assistant', 'Admin');
+create type milestone_status as enum (
+    'draft',
+    'submitted',
+    'under_review',
+    'approved',
+    'rejected'
+);
+create type user_role as enum (
+    'Principal',
+    'Support',
+    'Focal',
+    'Assistant',
+    'Admin',
+    'Legal'
+);
 -- Admin is UN80 internal
+-- =========================================================
+-- ENTITIES & LEADS (Created first - no dependencies)
+-- =========================================================
+-- Organizational entities (from systemchart)
+create table un_entities (id text primary key, entity_long text);
+-- Leads pool - shared by both work packages and actions
+-- Examples: "USG DPPA", "USG DPO", "USG DESA", "Administrator UNDP"
+create table leads (
+    id serial primary key,
+    entity_id text not null references un_entities(id) on delete restrict,
+    name text not null unique
+);
+comment on table leads is 'Shared pool of leadership positions. Both work packages and actions draw leads from this single table.';
+-- =========================================================
+-- USERS & AUTHENTICATION
+-- =========================================================
+-- Pre-approved users whitelist
+-- Defines who is allowed to access the system and their default permissions
+create table approved_users (
+    id serial primary key,
+    email text not null unique,
+    entity_id text not null references un_entities(id) on delete restrict,
+    role user_role not null,
+    lead_id int references leads(id) on delete restrict,
+    created_at timestamp not null default now()
+);
+comment on table approved_users is 'Pre-approval registry. Users must have an entry here to authenticate. Email links to users table.';
+-- Actual authenticated users
+-- Populated from approved_users on first login via email match
+-- APPLICATION LOGIC: Only create users entry if email exists in approved_users
+create table users (
+    id serial primary key,
+    email text not null unique,
+    role user_role not null,
+    lead_id int references leads(id) on delete restrict,
+    entity_id text not null references un_entities(id) on delete restrict,
+    created_at timestamp not null default now(),
+    last_login_at timestamp
+);
+create table magic_link_tokens (
+    id serial primary key,
+    token text not null unique,
+    user_id int not null references users(id) on delete cascade,
+    expires_at timestamp not null,
+    used_at timestamp,
+    created_at timestamp not null default now()
+);
 -- =========================================================
 -- CORE TABLES
 -- =========================================================
@@ -23,7 +84,8 @@ create table workstreams (
     id int primary key check (
         id between 1 and 3
     ),
-    code text not null unique
+    code text not null unique,
+    report text
 );
 -- Work packages (scoped to a workstream)
 create table work_packages (
@@ -57,65 +119,40 @@ create table action_milestones (
     delivery_date date,
     deadline date,
     updates text,
-    constraint action_milestones_action_type_key unique (action_id, milestone_type)
+    status milestone_status not null default 'draft',
+    submitted_by int references users(id) on delete
+    set null,
+        submitted_by_entity text references un_entities(id) on delete
+    set null,
+        submitted_at timestamp,
+        reviewed_by int references users(id) on delete
+    set null,
+        reviewed_at timestamp,
+        approved_by int references users(id) on delete
+    set null,
+        approved_at timestamp,
+        constraint action_milestones_action_type_key unique (action_id, milestone_type)
 );
 -- =========================================================
--- ENTITIES & LEADS
+-- RELATIONSHIP TABLES
 -- =========================================================
--- from systemchart
-create table entities (id text primary key, entity_long text);
--- Leads table - all possible leads (e.g., USG DESA)
-create table leads (
-    id serial primary key,
-    entity_id text not null references entities(id) on delete restrict,
-    name text not null unique
-);
--- Work package ↔ leads
+-- Work package ↔ leads (from shared pool)
 create table work_package_leads (
     work_package_id int not null references work_packages(id) on delete cascade,
     lead_id int not null references leads(id) on delete restrict,
     primary key (work_package_id, lead_id)
 );
--- Action ↔ leads
+-- Action ↔ leads (from same shared pool)
 create table action_leads (
     action_id int not null references actions(id) on delete cascade,
     lead_id int not null references leads(id) on delete restrict,
     primary key (action_id, lead_id)
 );
+-- Action ↔ entities (responsible organizations)
 create table action_entities (
     action_id int not null references actions(id) on delete cascade,
-    entity_id text not null references entities(id) on delete restrict,
+    entity_id text not null references un_entities(id) on delete restrict,
     primary key (action_id, entity_id)
-);
--- =========================================================
--- USERS & AUTHENTICATION
--- =========================================================
--- Pre-approved users whitelist
-create table approved_users (
-    id serial primary key,
-    email text not null unique,
-    entity_id text not null references entities(id) on delete restrict,
-    role user_role not null,
-    lead_id int references leads(id) on delete restrict,
-    created_at timestamp not null default now()
-);
--- Actual authenticated users
-create table users (
-    id serial primary key,
-    email text not null unique,
-    role user_role not null,
-    lead_id int references leads(id) on delete restrict,
-    entity_id text not null references entities(id) on delete restrict,
-    created_at timestamp not null default now(),
-    last_login_at timestamp
-);
-create table magic_link_tokens (
-    id serial primary key,
-    token text not null unique,
-    user_id int not null references users(id) on delete cascade,
-    expires_at timestamp not null,
-    used_at timestamp,
-    created_at timestamp not null default now()
 );
 -- =========================================================
 -- NOTES & QUESTIONS
@@ -125,7 +162,6 @@ create table action_notes (
     action_id int not null references actions(id) on delete cascade,
     user_id int not null references users(id) on delete restrict,
     content text not null,
-    parent_id int references action_notes(id) on delete cascade,
     created_at timestamp not null default now(),
     updated_at timestamp
 );
@@ -145,15 +181,19 @@ create table action_questions (
 -- INDEXES (DASHBOARD / FILTERING)
 -- =========================================================
 create index actions_work_package_id_idx on actions(work_package_id);
-create index actions_delivery_date_idx on actions(delivery_date);
 create index actions_status_idx on actions(public_action_status);
 create index actions_big_ticket_idx on actions(is_big_ticket);
 create index action_milestones_action_id_idx on action_milestones(action_id);
 create index action_milestones_deadline_idx on action_milestones(deadline);
+create index action_milestones_status_idx on action_milestones(status);
+create index action_milestones_submitted_by_idx on action_milestones(submitted_by);
+create index action_milestones_reviewed_by_idx on action_milestones(reviewed_by);
+create index action_milestones_approved_by_idx on action_milestones(approved_by);
 create index leads_entity_id_idx on leads(entity_id);
 create index work_package_leads_lead_id_idx on work_package_leads(lead_id);
 create index action_leads_lead_id_idx on action_leads(lead_id);
 create index action_entities_entity_id_idx on action_entities(entity_id);
+create index un_entities_id_idx on un_entities(id);
 create index approved_users_email_idx on approved_users(email);
 create index approved_users_entity_id_idx on approved_users(entity_id);
 create index approved_users_lead_id_idx on approved_users(lead_id);
@@ -165,7 +205,6 @@ create index magic_link_tokens_user_id_idx on magic_link_tokens(user_id);
 create index magic_link_tokens_expires_at_idx on magic_link_tokens(expires_at);
 create index action_notes_action_id_idx on action_notes(action_id);
 create index action_notes_user_id_idx on action_notes(user_id);
-create index action_notes_parent_id_idx on action_notes(parent_id);
 create index action_notes_created_at_idx on action_notes(created_at);
 create index action_questions_action_id_idx on action_questions(action_id);
 create index action_questions_user_id_idx on action_questions(user_id);
