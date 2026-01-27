@@ -70,9 +70,10 @@ create table users (
 -- Uses timestamptz for unambiguous expiration handling across timezones
 create table magic_tokens (
     token text not null primary key,
-    email text not null,
+    email text not null references approved_users(email) on delete cascade,
     expires_at timestamptz not null,
     used_at timestamptz,
+    used_by int references users(id) on delete set null,
     created_at timestamptz not null default now()
 );
 -- =========================================================
@@ -92,13 +93,16 @@ create table workstreams (
 create table work_packages (
     id int not null primary key,
     workstream_id int not null references workstreams(id) on delete restrict,
+    number int not null,
     name text not null,
     goal text,
     constraint work_packages_workstream_number_key unique (workstream_id, number)
 );
 -- Actions
+-- Uniquely identified by id + sub_id (e.g., id=94, sub_id="(a)")
 create table actions (
-    id int primary key,
+    id int not null,
+    sub_id text not null,
     work_package_id int not null references work_packages(id) on delete cascade,
     document_paragraph text,
     action_number int not null,
@@ -108,12 +112,14 @@ create table actions (
     sub_action_details text,
     doc_text text,
     public_action_status public_action_status,
+    primary key (id, sub_id),
     constraint actions_wp_action_number_key unique (work_package_id, action_number)
 );
 -- Action milestones
 create table action_milestones (
     id int primary key,
-    action_id int not null references actions(id) on delete cascade,
+    action_id int not null,
+    action_sub_id text not null,
     milestone_type milestone_type not null,
     description text,
     delivery_date date,
@@ -131,7 +137,8 @@ create table action_milestones (
         approved_by int references users(id) on delete
     set null,
         approved_at timestamp,
-        constraint action_milestones_action_type_key unique (action_id, milestone_type)
+        foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade,
+        constraint action_milestones_action_type_key unique (action_id, action_sub_id, milestone_type)
 );
 -- =========================================================
 -- RELATIONSHIP TABLES
@@ -144,30 +151,37 @@ create table work_package_leads (
 );
 -- Action ↔ leads (from same shared pool)
 create table action_leads (
-    action_id int not null references actions(id) on delete cascade,
+    action_id int not null,
+    action_sub_id text not null,
     lead_id int not null references leads(id) on delete restrict,
-    primary key (action_id, lead_id)
+    foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade,
+    primary key (action_id, action_sub_id, lead_id)
 );
 -- Action ↔ entities (responsible organizations)
 create table action_entities (
-    action_id int not null references actions(id) on delete cascade,
+    action_id int not null,
+    action_sub_id text not null,
     entity_id text not null references un_entities(id) on delete restrict,
-    primary key (action_id, entity_id)
+    foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade,
+    primary key (action_id, action_sub_id, entity_id)
 );
 -- =========================================================
 -- NOTES & QUESTIONS
 -- =========================================================
 create table action_notes (
     id serial primary key,
-    action_id int not null references actions(id) on delete cascade,
+    action_id int not null,
+    action_sub_id text not null,
     user_id int not null references users(id) on delete restrict,
     content text not null,
     created_at timestamp not null default now(),
-    updated_at timestamp
+    updated_at timestamp,
+    foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
 );
 create table action_questions (
     id serial primary key,
-    action_id int not null references actions(id) on delete cascade,
+    action_id int not null,
+    action_sub_id text not null,
     user_id int not null references users(id) on delete restrict,
     question text not null,
     answer text,
@@ -175,7 +189,8 @@ create table action_questions (
     set null,
         answered_at timestamp,
         created_at timestamp not null default now(),
-        updated_at timestamp
+        updated_at timestamp,
+        foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
 );
 -- =========================================================
 -- INDEXES (DASHBOARD / FILTERING)
@@ -183,7 +198,7 @@ create table action_questions (
 create index actions_work_package_id_idx on actions(work_package_id);
 create index actions_status_idx on actions(public_action_status);
 create index actions_big_ticket_idx on actions(is_big_ticket);
-create index action_milestones_action_id_idx on action_milestones(action_id);
+create index action_milestones_action_idx on action_milestones(action_id, action_sub_id);
 create index action_milestones_deadline_idx on action_milestones(deadline);
 create index action_milestones_status_idx on action_milestones(status);
 create index action_milestones_submitted_by_idx on action_milestones(submitted_by);
@@ -191,7 +206,9 @@ create index action_milestones_reviewed_by_idx on action_milestones(reviewed_by)
 create index action_milestones_approved_by_idx on action_milestones(approved_by);
 create index leads_entity_id_idx on leads(entity_id);
 create index work_package_leads_lead_id_idx on work_package_leads(lead_id);
+create index action_leads_action_idx on action_leads(action_id, action_sub_id);
 create index action_leads_lead_id_idx on action_leads(lead_id);
+create index action_entities_action_idx on action_entities(action_id, action_sub_id);
 create index action_entities_entity_id_idx on action_entities(entity_id);
 create index un_entities_id_idx on un_entities(id);
 create index approved_users_email_idx on approved_users(email);
