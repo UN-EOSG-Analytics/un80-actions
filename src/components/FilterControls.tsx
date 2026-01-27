@@ -1,3 +1,4 @@
+import { ExpandCollapseToggle } from "@/components/ExpandCollapseButtons";
 import FilterDropdown, { FilterOption } from "@/components/FilterDropdown";
 import ResetButton from "@/components/ResetButton";
 import { SearchBar } from "@/components/SearchBar";
@@ -71,6 +72,12 @@ interface FilterControlsProps {
   // Progress toggle
   showProgress?: boolean;
   onShowProgressChange?: (show: boolean) => void;
+
+  // Expand/Collapse All
+  onExpandAll: () => void;
+  onCollapseAll: () => void;
+  totalWorkPackages: number;
+  expandedWorkPackages: number;
 }
 
 export function FilterControls({
@@ -104,6 +111,10 @@ export function FilterControls({
   uniqueTeamMembers,
   availableBigTicketOptions,
   onResetFilters,
+  onExpandAll,
+  onCollapseAll,
+  totalWorkPackages,
+  expandedWorkPackages,
 }: FilterControlsProps) {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -158,27 +169,14 @@ export function FilterControls({
         <div className="flex w-full shrink-0 flex-wrap items-center justify-start gap-2 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-3">
           {/* Mobile: Simple buttons aligned left */}
           <div className="flex items-center gap-2 sm:hidden">
-            {/* Advanced Filtering Collapsible */}
-            <Collapsible
-              open={isAdvancedFilterOpen}
-              onOpenChange={onAdvancedFilterOpenChange}
-            >
-              <CollapsibleTrigger
-                className={`flex h-8 touch-manipulation items-center gap-2 rounded-lg border px-2 text-xs transition-colors ${
-                  hasActiveAdvancedFilters
-                    ? "border-un-blue bg-un-blue/10 text-un-blue hover:border-un-blue"
-                    : "border-gray-300 bg-white text-gray-900 hover:border-un-blue hover:bg-un-blue/10 hover:text-un-blue"
-                } `}
-              >
-                <Filter className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">Advanced Filters</span>
-                <ChevronDown
-                  className={`h-3.5 w-3.5 shrink-0 transition-transform ${
-                    isAdvancedFilterOpen ? "rotate-180 transform" : ""
-                  }`}
-                />
-              </CollapsibleTrigger>
-            </Collapsible>
+            {/* Expand/Collapse Toggle - Mobile */}
+            <ExpandCollapseToggle
+              onExpandAll={onExpandAll}
+              onCollapseAll={onCollapseAll}
+              totalCount={totalWorkPackages}
+              expandedCount={expandedWorkPackages}
+              mobile
+            />
 
             {/* Sort Option - Mobile Style */}
             {isMobile && (
@@ -191,10 +189,10 @@ export function FilterControls({
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className={`flex h-8 touch-manipulation items-center gap-2 rounded-lg border px-2 text-xs transition-colors ${
+                  className={`flex h-10 touch-manipulation items-center gap-2 rounded-lg border px-3 text-sm transition-colors ${
                       sortOption !== "number-asc"
                         ? "border-un-blue bg-un-blue/10 text-un-blue hover:border-un-blue"
-                        : "border-gray-200 bg-white text-gray-500 hover:border-un-blue hover:bg-un-blue/10 hover:text-un-blue"
+                        : "border-gray-300 bg-white text-gray-900 hover:border-un-blue hover:bg-un-blue/10 hover:text-un-blue"
                     } `}
                   >
                     <ArrowUpDown className="h-3.5 w-3.5 shrink-0" />
@@ -256,71 +254,113 @@ export function FilterControls({
           </div>
 
           {/* Desktop: Original layout */}
-          <div className="hidden items-center gap-3 sm:flex">
-            {/* Advanced Filtering Collapsible */}
-            <Collapsible
-              open={isAdvancedFilterOpen}
-              onOpenChange={onAdvancedFilterOpenChange}
-            >
-              <CollapsibleTrigger
-                className={`flex h-10 touch-manipulation items-center gap-3 rounded-lg border px-3 text-base transition-colors ${
-                  hasActiveAdvancedFilters
-                    ? "border-un-blue bg-un-blue/10 text-un-blue hover:border-un-blue"
-                    : "border-gray-300 bg-white text-gray-900 hover:border-un-blue hover:bg-un-blue/10 hover:text-un-blue"
-                } `}
-              >
-                <Filter className="h-4 w-4 shrink-0" />
-                <span className="truncate">Advanced Filters</span>
-                <ChevronDown
-                  className={`h-4 w-4 shrink-0 transition-transform ${
-                    isAdvancedFilterOpen ? "rotate-180 transform" : ""
-                  }`}
-                />
-              </CollapsibleTrigger>
-            </Collapsible>
+          <div className="hidden items-center gap-2 sm:flex">
+            {/* Expand/Collapse Toggle - Desktop */}
+            <ExpandCollapseToggle
+              onExpandAll={onExpandAll}
+              onCollapseAll={onCollapseAll}
+              totalCount={totalWorkPackages}
+              expandedCount={expandedWorkPackages}
+            />
 
             {/* Sort Option */}
-            <div className="w-32">
-              <FilterDropdown
-                open={!isMobile && openFilterCollapsibles.has("sort")}
-                onOpenChange={(open) => {
-                  if (!isMobile) {
-                    onToggleFilterCollapsible("sort", open);
-                  }
-                }}
-                icon={<ArrowUpDown className="h-4 w-4" />}
-                triggerText={
-                  sortOption === "number-desc"
-                    ? "31-1"
-                    : sortOption === "name-asc"
-                      ? "A-Z"
-                      : sortOption === "name-desc"
-                        ? "Z-A"
-                        : "Sort"
+            <FilterDropdown
+              open={!isMobile && openFilterCollapsibles.has("sort")}
+              onOpenChange={(open) => {
+                if (!isMobile) {
+                  onToggleFilterCollapsible("sort", open);
                 }
-                isFiltered={sortOption !== "number-asc"}
-                allActive={false}
-                options={[
-                  { key: "number-asc", label: "Number (1-31)" },
-                  { key: "number-desc", label: "Number (31-1)" },
-                  { key: "name-asc", label: "Name (A-Z)" },
-                  { key: "name-desc", label: "Name (Z-A)" },
-                ]}
-                selectedKeys={new Set([sortOption])}
-                onToggle={(key) => {
-                  onSortChange(key);
-                  onCloseFilterCollapsible("sort");
-                }}
-                ariaLabel="Sort work packages"
-              />
-            </div>
+              }}
+              icon={<ArrowUpDown className="h-4 w-4" />}
+              triggerText={
+                sortOption === "number-desc"
+                  ? "31-1"
+                  : sortOption === "name-asc"
+                    ? "A-Z"
+                    : sortOption === "name-desc"
+                      ? "Z-A"
+                      : "Sort"
+              }
+              isFiltered={sortOption !== "number-asc"}
+              allActive={false}
+              options={[
+                { key: "number-asc", label: "Number (1-31)" },
+                { key: "number-desc", label: "Number (31-1)" },
+                { key: "name-asc", label: "Name (A-Z)" },
+                { key: "name-desc", label: "Name (Z-A)" },
+              ]}
+              selectedKeys={new Set([sortOption])}
+              onToggle={(key) => {
+                onSortChange(key);
+                onCloseFilterCollapsible("sort");
+              }}
+              ariaLabel="Sort work packages"
+            />
           </div>
         </div>
       </div>
 
-      {/* Advanced Filters Content - Expands Below */}
+      {/* Search Bar, Advanced Filters, and Reset Button */}
+      <div className="mb-4 flex w-full items-center gap-3">
+        <SearchBar searchQuery={searchQuery} onSearchChange={onSearchChange} />
+
+        {hasActiveFilters && <ResetButton onClick={onResetFilters} />}
+
+        {/* Spacer to push Advanced Filters to right - Desktop only */}
+        <div className="hidden flex-1 sm:flex" />
+
+        {/* Advanced Filtering Collapsible - Mobile */}
+        <div className="sm:hidden flex-1">
+          <Collapsible
+            open={isAdvancedFilterOpen}
+            onOpenChange={onAdvancedFilterOpenChange}
+          >
+            <CollapsibleTrigger
+              className={`w-full flex h-10 touch-manipulation items-center justify-center gap-2 rounded-lg border px-3 text-sm transition-colors ${
+                hasActiveAdvancedFilters
+                  ? "border-un-blue bg-un-blue/10 text-un-blue hover:border-un-blue"
+                  : "border-gray-300 bg-white text-gray-900 hover:border-un-blue hover:bg-un-blue/10 hover:text-un-blue"
+              } `}
+            >
+              <Filter className="h-4 w-4 shrink-0" />
+              <span className="truncate">Advanced Filters</span>
+              <ChevronDown
+                className={`h-4 w-4 shrink-0 transition-transform ${
+                  isAdvancedFilterOpen ? "rotate-180 transform" : ""
+                }`}
+              />
+            </CollapsibleTrigger>
+          </Collapsible>
+        </div>
+
+        {/* Advanced Filtering Collapsible - Desktop */}
+        <div className="hidden sm:block">
+          <Collapsible
+            open={isAdvancedFilterOpen}
+            onOpenChange={onAdvancedFilterOpenChange}
+          >
+            <CollapsibleTrigger
+              className={`flex h-10 touch-manipulation items-center gap-3 rounded-lg border px-3 text-base transition-colors ${
+                hasActiveAdvancedFilters
+                  ? "border-un-blue bg-un-blue/10 text-un-blue hover:border-un-blue"
+                  : "border-gray-300 bg-white text-gray-900 hover:border-un-blue hover:bg-un-blue/10 hover:text-un-blue"
+              } `}
+            >
+              <Filter className="h-4 w-4 shrink-0" />
+              <span className="truncate">Advanced Filters</span>
+              <ChevronDown
+                className={`h-4 w-4 shrink-0 transition-transform ${
+                  isAdvancedFilterOpen ? "rotate-180 transform" : ""
+                }`}
+              />
+            </CollapsibleTrigger>
+          </Collapsible>
+        </div>
+      </div>
+
+      {/* Advanced Filters Content - Expands Below Search Bar */}
       {isAdvancedFilterOpen && (
-        <div className="mb-3 grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="mb-4 grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
           {/* Work Package Leads Filter */}
           <FilterDropdown
             open={openFilterCollapsibles.has("lead")}
@@ -558,14 +598,6 @@ export function FilterControls({
           />
         </div>
       )}
-
-      {/* Search Bar, Progress Toggle, and Reset Button */}
-      <div className="-mt-1 mb-4 flex w-full items-center justify-between gap-3">
-        <SearchBar searchQuery={searchQuery} onSearchChange={onSearchChange} />
-        <div className="flex items-center gap-3">
-          {hasActiveFilters && <ResetButton onClick={onResetFilters} />}
-        </div>
-      </div>
     </>
   );
 }

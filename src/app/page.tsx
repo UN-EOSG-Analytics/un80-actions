@@ -530,6 +530,23 @@ export function WorkPackagesPageContent() {
                     uniqueTeamMembers={uniqueTeamMembers}
                     availableBigTicketOptions={availableBigTicketOptions}
                     onResetFilters={handleResetFiltersWithCollapse}
+                    onExpandAll={() => {
+                      const allKeys = filteredWorkPackages.map(
+                        (wp, index) =>
+                          `${wp.report.join("-")}-${wp.number || "empty"}-${index}`,
+                      );
+                      expandCollapsibles(allKeys);
+                    }}
+                    onCollapseAll={collapseAllWorkPackages}
+                    totalWorkPackages={filteredWorkPackages.length}
+                    expandedWorkPackages={(() => {
+                      let count = 0;
+                      filteredWorkPackages.forEach((wp, index) => {
+                        const key = `${wp.report.join("-")}-${wp.number || "empty"}-${index}`;
+                        if (openCollapsibles.has(key)) count++;
+                      });
+                      return count;
+                    })()}
                   />
 
                   <WorkPackageList
