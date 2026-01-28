@@ -21,3 +21,5 @@
 - always use `uv`
   - `uv add <package>`
   - `uv run python <script>`
+- use Psycopg 3 with `"psycopg[binary]"` for connecting to Azure Postgres database
+- find the schema in `sql/schema/`
