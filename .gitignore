@@ -262,3 +262,7 @@ __marimo__/
 
 
 data/*
+*.csv
+*.json
+*.pkl
+*.parquet
