@@ -4,6 +4,7 @@ import type {
   WorkPackageStats,
   NextMilestone,
 } from "@/types";
+import { ACTION_STATUS } from "@/constants/actionStatus";
 import { parseDate, formatDate, normalizeLeaderName } from "./utils";
 
 /**
@@ -87,7 +88,9 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
 
       if (!existingAction) {
         // Normalize action leads
-        const actionLeads = action.action_leads.map((lead) => normalizeLeaderName(lead));
+        const actionLeads = action.action_leads.map((lead) =>
+          normalizeLeaderName(lead),
+        );
 
         wp.actions.push({
           text: action.indicative_activity,
@@ -97,14 +100,17 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
           docText: action.doc_text || null,
           actionNumber: action.action_number || 0,
           firstMilestone: action.first_milestone || null,
-          finalMilestoneDeadline: action.final_milestone_deadline || null,
+          deliveryDate: action.delivery_date || null,
           actionEntities: action.action_entities || null,
           subActionDetails: action.sub_action_details || null,
-          actionStatus: action.public_action_status || "Further work ongoing",
+          actionStatus:
+            action.public_action_status || ACTION_STATUS.FURTHER_WORK_ONGOING,
         });
       } else {
         // Merge leads if action already exists
-        const actionLeads = action.action_leads.map((lead) => normalizeLeaderName(lead));
+        const actionLeads = action.action_leads.map((lead) =>
+          normalizeLeaderName(lead),
+        );
         actionLeads.forEach((lead) => {
           if (!existingAction.leads.includes(lead)) {
             existingAction.leads.push(lead);
@@ -116,18 +122,11 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
         }
         // Ensure actionStatus is set (default to "Further work ongoing" if missing)
         if (!existingAction.actionStatus) {
-          existingAction.actionStatus = "Further work ongoing";
+          existingAction.actionStatus = ACTION_STATUS.FURTHER_WORK_ONGOING;
         }
         // Update milestone fields if not already set
         if (action.first_milestone && !existingAction.firstMilestone) {
           existingAction.firstMilestone = action.first_milestone;
-        }
-        if (
-          action.final_milestone_deadline &&
-          !existingAction.finalMilestoneDeadline
-        ) {
-          existingAction.finalMilestoneDeadline =
-            action.final_milestone_deadline;
         }
         // Update actionEntities if not already set
         if (action.action_entities && !existingAction.actionEntities) {

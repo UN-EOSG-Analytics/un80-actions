@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Actions } from "@/types";
+import { ACTION_STATUS } from "@/constants/actionStatus";
 import {
   Calendar,
   CheckCircle2,
@@ -243,14 +244,13 @@ export function MilestonesTimeline({ actions }: MilestonesTimelineProps) {
                                 docText: action.doc_text,
                                 actionNumber: action.action_number,
                                 firstMilestone: action.first_milestone,
-                                finalMilestoneDeadline:
-                                  action.final_milestone_deadline,
+                                deliveryDate: action.delivery_date || null,
                                 actionEntities: action.action_entities,
                                 subActionDetails:
                                   action.sub_action_details || null,
                                 actionStatus:
                                   action.public_action_status ||
-                                  "Further work ongoing",
+                                  ACTION_STATUS.FURTHER_WORK_ONGOING,
                               };
                               return (
                                 <div

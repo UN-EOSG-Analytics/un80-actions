@@ -25,7 +25,7 @@
     ],
     "upcoming_milestone":"Draft review of the future of peace operations (requested in GA resolution 79\/1) submitted for the Secretary-General's consideration",
     "updates":null,
-    "delivery_date":"2026-06-10",
+    "delivery_date":"2026-02-15",
     "public_action_status":"Further work ongoing",
     "is_subaction":false
   },
@@ -55,7 +55,7 @@
     ],
     "upcoming_milestone":"Draft review of the future of peace operations (requested in GA resolution 79\/1) submitted for the Secretary-General's consideration",
     "updates":null,
-    "delivery_date":"2026-03-30",
+    "delivery_date":"2026-02-15",
     "public_action_status":"Further work ongoing",
     "is_subaction":false
   },
@@ -165,7 +165,7 @@
     "action_leads":[
       "USG OCHA"
     ],
-    "upcoming_milestone":"Collaborative established, scaling joint platforms, financing, capacities and standards",
+    "upcoming_milestone":"Data collaborative established, scaling joint platforms, financing, capacities and standards",
     "updates":null,
     "delivery_date":"2026-08-30",
     "public_action_status":"Further work ongoing",
@@ -221,9 +221,9 @@
     "action_leads":[
       "USG OCHA"
     ],
-    "upcoming_milestone":"Approaches for more coherent work finalized for priority settings",
+    "upcoming_milestone":"Relevant entities demonstrate clearer alignment in priority settings",
     "updates":null,
-    "delivery_date":"2026-01-30",
+    "delivery_date":"2026-08-30",
     "public_action_status":"Further work ongoing",
     "is_subaction":false
   },
@@ -831,7 +831,7 @@
       "ASG DCO",
       "DSG"
     ],
-    "upcoming_milestone":"Proposal for harmonization of UN system organizational arrangements developed as part of the overall proposal for regional reset and shared with the Secretary-General for his consideration",
+    "upcoming_milestone":"Proposal developed as part of the overall proposal for a regional reset and shared with the Secretary-General for his consideration",
     "updates":null,
     "delivery_date":"2026-03-31",
     "public_action_status":"Further work ongoing",
@@ -1115,7 +1115,7 @@
       "SG ITU",
       "Co-Chairs DTN"
     ],
-    "upcoming_milestone":"Portfolio of 3 high-impact technology acceleration use cases presented to UN80 Steering Committee",
+    "upcoming_milestone":"Portfolio of at least 3 high-impact use cases presented to UN80 Steering Committee",
     "updates":null,
     "delivery_date":"2026-02-08",
     "public_action_status":"Further work ongoing",
@@ -1169,7 +1169,7 @@
     "first_milestone":"As part of ambition and delivery setup, system-wide leadership commitment secured for a joint programme in support of the UN System Data Commons, incl. potential resource contributions",
     "first_milestone_deadline":"2026-02-27",
     "final_milestone":"Joint programme for UN System Data Commons fully set up, incl. initial resource contributions, and recommendations drafted for 2027 scaling",
-    "final_milestone_deadline":"2025-09-14",
+    "final_milestone_deadline":"2026-09-14",
     "doc_text":"Building on partnerships such as the Complex Risk Analytics Fund (CRAF'd), we will scale pooled funding approaches for data to support the Data Commons, reduce duplication, and multiply value while providing incentives that overcome data-hoarding, nurture shared capacities, and encourage openness.",
     "work_package_goal":"A data commons approach across all pillars",
     "action_entities":"EOSG (USG Policy); DESA; UNICEF; ILO; ECLAC; ECA; UNIDO",
@@ -1240,7 +1240,7 @@
     "action_leads":[
       "ED UNITAR"
     ],
-    "upcoming_milestone":"Executive heads of UNITAR and UNSSC, together with Action 68 Team agree overall roadmap, stakeholder engagement strategy and key milestones. UNITAR and UNSSC agree detailed workplan for merger of the two institutions incl. needs assessment, scope, methodology and analytical questions",
+    "upcoming_milestone":"Executive heads of UNITAR and UNSSC, together with Action 68 Team agree overall roadmap, detailed workplan, stakeholder engagement and key milestones.",
     "updates":null,
     "delivery_date":"2026-01-31",
     "public_action_status":"Further work ongoing",
@@ -1269,7 +1269,7 @@
     "action_leads":[
       "Rector UNU"
     ],
-    "upcoming_milestone":"UNU reviews UNRISD's administrative framework (financial, communications, HR, legal), to gather information regarding integration",
+    "upcoming_milestone":"UNU and UNRISD leadership review administrative framework to gather information regarding integration",
     "updates":null,
     "delivery_date":"2026-03-31",
     "public_action_status":"Further work ongoing",
@@ -1299,7 +1299,7 @@
       "ED UNITAR",
       "Rector UNU"
     ],
-    "upcoming_milestone":"Plan in place setting out the scope and key considerations of the system-wide knowledge mapping exercise, including entities to be engaged",
+    "upcoming_milestone":"Plan in place on scope and key considerations of the system-wide mapping exercise",
     "updates":null,
     "delivery_date":"2026-01-31",
     "public_action_status":"Further work ongoing",
@@ -1479,7 +1479,7 @@
       "USG Policy",
       "USG DGACM"
     ],
-    "upcoming_milestone":"Mapping of available support of mandate creation system-wide finalized for the Secretary-General's consideration",
+    "upcoming_milestone":"Mapping of available system-wide support finalized for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-03-31",
     "public_action_status":"Further work ongoing",
@@ -1537,7 +1537,7 @@
     "action_leads":[
       "CDC"
     ],
-    "upcoming_milestone":"Terms of reference developed and assessment lead confirmed",
+    "upcoming_milestone":"Terms of reference developed and assessment lead proposed for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-03-30",
     "public_action_status":"Further work ongoing",
@@ -1621,7 +1621,7 @@
     "action_leads":[
       "SA Reform"
     ],
-    "upcoming_milestone":"Action plan for a strengthened UN System-Wide Management for Results (MfR) Mechanism finalized for the Secretary-General's consideration",
+    "upcoming_milestone":"Action plan finalized for the Secretary-General's consideration",
     "updates":null,
     "delivery_date":"2026-05-30",
     "public_action_status":"Further work ongoing",
@@ -2086,7 +2086,7 @@
       "USG OCT"
     ],
     "first_milestone":"Concept note developed",
-    "first_milestone_deadline":"2026-04-29",
+    "first_milestone_deadline":"2026-03-31",
     "final_milestone":"ECOSOC resolution adopted",
     "final_milestone_deadline":"2026-07-30",
     "doc_text":"We plan to integrate the UN Interregional Crime and Justice Research Institute (UNICRI) into the UN Office on Drugs and Crime (UNODC), embedding UNICRI expertise within a global network. The UN Institute for Disarmament Research (UNIDIR) would be integrated into the Office for disarmament Affairs (ODA) so its analysis informs negotiations and field support. In both cases, research independence would be preserved.",
@@ -2096,7 +2096,7 @@
     "action_leads":[
       "USG UNODC"
     ],
-    "upcoming_milestone":"Concept note to integrate the UN Interregional Crime and Justice Research Institute (UNICRI) into the UN Office on Drugs and Crime (UNODC) submitted to the Secretary-General",
+    "upcoming_milestone":"Concept note on integration submitted to the Secretary-General",
     "updates":null,
     "delivery_date":"2026-04-29",
     "public_action_status":"Further work ongoing",
@@ -2243,7 +2243,7 @@
       "USG UNEP",
       "ES UNFCCC"
     ],
-    "upcoming_milestone":"Assessment of current arrangements and proposals on possible structural changes and programme realignments on environmental issues finalized for the Secretary-General’s consideration",
+    "upcoming_milestone":"Assessment of current arrangements and proposals on possible structural changes and programme realignments finalized for the Secretary-General’s consideration",
     "updates":null,
     "delivery_date":"2026-09-17",
     "public_action_status":"Further work ongoing",
@@ -2475,7 +2475,7 @@
     "action_leads":[
       "CDC"
     ],
-    "upcoming_milestone":"Download count solution implemented",
+    "upcoming_milestone":"Download count solutions implemented",
     "updates":null,
     "delivery_date":"2026-03-31",
     "public_action_status":"Further work ongoing",

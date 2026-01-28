@@ -12,7 +12,7 @@ export interface SidebarChartEntry {
   count: number;
   value: string;
   tooltip?: string;
-  deadline?: string | null;
+  deliveryDate?: string | null;
   isUrgent?: boolean;
   isUpcoming?: boolean;
   actionNumber?: number | string | null;
@@ -49,14 +49,6 @@ export function SidebarChart({
   const maxCount =
     data.length > 0 ? Math.max(...data.map((d) => d.count ?? 0)) : 1;
 
-  // Calculate fixed width for count based on max count across ALL data
-  const maxCountDigits =
-    data.length > 0
-      ? Math.max(...data.map((d) => d.count ?? 0)).toString().length
-      : 1;
-  const countWidth =
-    maxCountDigits === 1 ? "w-5" : maxCountDigits === 2 ? "w-7" : "w-9";
-
   const handleClickBar = (value: string) => {
     const newSelected = selectedValue.includes(value)
       ? selectedValue.filter((v) => v !== value)
@@ -67,7 +59,7 @@ export function SidebarChart({
   return (
     <div className="rounded-xl bg-white pb-4 pl-4.5 sm:pb-5">
       <h3 className="mb-2 flex h-6.25 items-center gap-2 text-[17px] font-semibold text-slate-900">
-        <span className="flex h-5 w-5 items-center justify-center text-un-blue">
+        <span className="flex h-5 w-5 items-center justify-center text-slate-500">
           {icon}
         </span>
         {title}
@@ -89,7 +81,7 @@ export function SidebarChart({
 
       {/* Chart Data - Scrollable */}
       <div
-        className="-mr-1 overflow-y-auto overscroll-contain pr-1"
+        className="overflow-y-auto overscroll-contain pr-4"
         style={{ maxHeight: `${maxHeight}px` }}
       >
         <table className="w-full table-fixed">
@@ -205,21 +197,8 @@ export function SidebarChart({
                         )}
                       </div>
                       <div className="flex shrink-0 items-center gap-1.5">
-                        <span
-                          className={`text-[14px] font-semibold ${countWidth} text-right tabular-nums ${
-                            isSelected
-                              ? "text-un-blue"
-                              : isUrgent
-                                ? "text-red-600"
-                                : isUpcoming
-                                  ? "text-amber-600"
-                                  : "text-un-blue"
-                          }`}
-                        >
-                          {entry.count}
-                        </span>
                         <div
-                          className="relative mr-2 h-2 overflow-hidden rounded-full bg-slate-100"
+                          className="relative h-2 overflow-hidden rounded-full bg-slate-100"
                           style={{ width: `${barWidth}px` }}
                         >
                           <div
@@ -235,6 +214,19 @@ export function SidebarChart({
                             style={{ width: `${percentage}%` }}
                           />
                         </div>
+                        <span
+                          className={`mr-1 w-9 text-right text-[14px] font-semibold tabular-nums ${
+                            isSelected
+                              ? "text-un-blue"
+                              : isUrgent
+                                ? "text-red-600"
+                                : isUpcoming
+                                  ? "text-amber-600"
+                                  : "text-un-blue"
+                          }`}
+                        >
+                          {entry.count}
+                        </span>
                       </div>
                     </div>
                   </td>

@@ -6,13 +6,14 @@ import {
   ActionLeadsBadge,
   DecisionStatusBadge,
   TeamBadge,
+  ShowMoreBadge,
 } from "@/components/Badges";
 import { CheckCircle2 } from "lucide-react";
 import {
-  parseDate,
   buildCleanQueryString,
   normalizeTeamMemberForDisplay,
 } from "@/lib/utils";
+import { isDecisionTaken } from "@/constants/actionStatus";
 import type { WorkPackageAction } from "@/types";
 
 /**
@@ -32,12 +33,21 @@ interface ActionItemProps {
 /**
  * Highlights matching text in a string with a faint UN blue background
  */
-export function HighlightedText({ text, query }: { text: string; query: string }) {
+export function HighlightedText({
+  text,
+  query,
+}: {
+  text: string;
+  query: string;
+}) {
   if (!query.trim()) {
     return <>{text}</>;
   }
 
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  const regex = new RegExp(
+    `(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+    "gi",
+  );
   const parts = text.split(regex);
 
   return (
@@ -63,7 +73,7 @@ export function HighlightedText({ text, query }: { text: string; query: string }
  * Displays a single action item within a work package.
  * Shows the action text, leads, document references, and optional doc text.
  */
-export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionItemProps) {
+export function ActionItem({ action, searchQuery = "" }: ActionItemProps) {
   const searchParams = useSearchParams();
   const [showAllTeamMembers, setShowAllTeamMembers] = useState(false);
 
@@ -83,58 +93,30 @@ export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionIt
 
   const handleClick = () => {
     // Save current URL to sessionStorage before opening modal
-    const currentUrl = searchParams.toString();
-    if (currentUrl) {
-      sessionStorage.setItem("previousUrl", currentUrl);
-    } else {
-      sessionStorage.removeItem("previousUrl");
-    }
+    const currentUrl = window.location.search || "/";
+    sessionStorage.setItem("actionModalReturnUrl", currentUrl);
+    // Mark that modal is open (for useFilters to freeze state)
+    sessionStorage.setItem("actionModalOpen", "true");
 
-    // Build URL with query param: ?action=14 (preserving other params with clean encoding)
-    const params: Record<string, string> = {};
-    new URLSearchParams(window.location.search).forEach((value, key) => {
-      params[key] = value;
-    });
-    params.action = String(action.actionNumber);
-    const url = `?${buildCleanQueryString(params)}`;
-
-    // Update URL without navigating (for static export compatibility)
-    window.history.pushState({}, "", url);
+    // Navigate to clean URL with only action param
+    const cleanUrl = `?action=${action.actionNumber}`;
+    window.history.pushState({}, "", cleanUrl);
     // Trigger a popstate event to notify ModalHandler
     window.dispatchEvent(new PopStateEvent("popstate"));
   };
 
   // On mobile: prevent chip clicks from opening the modal (so tooltips can be used)
   const stopPropagationOnMobile = (e: React.MouseEvent) => {
-    if (typeof window !== "undefined" && window.matchMedia("(max-width: 640px)").matches) {
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 640px)").matches
+    ) {
       e.stopPropagation();
     }
   };
 
-  // Calculate progress to determine if action is completed
-  // Icon only appears when progress reaches 100% based on elapsed time calculation
-  const isCompleted = (() => {
-    if (!action.finalMilestoneDeadline || !action.firstMilestone) return false;
-
-    const deadlineDate = parseDate(action.finalMilestoneDeadline);
-    const startDate = parseDate(action.firstMilestone);
-    const now = new Date();
-
-    // Both dates must be valid and startDate must be before deadlineDate
-    if (!deadlineDate || !startDate) return false;
-    if (isNaN(deadlineDate.getTime()) || isNaN(startDate.getTime()))
-      return false;
-    if (startDate >= deadlineDate) return false;
-
-    const totalDuration = deadlineDate.getTime() - startDate.getTime();
-    const elapsed = now.getTime() - startDate.getTime();
-    const progress = Math.min(
-      Math.max((elapsed / totalDuration) * 100, 0),
-      100,
-    );
-
-    return progress >= 100;
-  })();
+  // Completion status is based on action status, not time-based calculation
+  const isCompleted = isDecisionTaken(action.actionStatus);
 
   return (
     <div
@@ -143,7 +125,7 @@ export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionIt
     >
       {/* Header row: Action Number + Decision Status */}
       <div className="mb-2.5 flex items-center gap-2.5">
-        <span className="rounded bg-un-blue/8 px-2 py-0.5 text-xs font-semibold tracking-wide text-un-blue uppercase">
+        <span className="rounded bg-un-blue/8 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-un-blue uppercase sm:text-xs">
           Action {action.actionNumber || ""}
         </span>
         <span onClick={stopPropagationOnMobile} className="inline-flex">
@@ -156,13 +138,17 @@ export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionIt
         {isCompleted && (
           <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-un-blue" />
         )}
-        <p className="text-[15px] leading-snug font-medium text-slate-900">
+        <p className="text-sm leading-snug font-medium text-slate-900 sm:text-[15px]">
           <HighlightedText text={action.text} query={searchQuery} />
           {action.subActionDetails && (
             <>
               {" "}
               <span className="font-semibold text-slate-600">
-                – <HighlightedText text={action.subActionDetails} query={searchQuery} />
+                –{" "}
+                <HighlightedText
+                  text={action.subActionDetails}
+                  query={searchQuery}
+                />
               </span>
             </>
           )}
@@ -172,7 +158,10 @@ export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionIt
       {/* Metadata section - Action Leads and Team Members */}
       {(action.leads.length > 0 || teamMembers.length > 0) && (
         <div className="mt-3 border-t border-slate-100 pt-3">
-          <div className="flex flex-wrap items-center gap-1" onClick={stopPropagationOnMobile}>
+          <div
+            className="flex flex-wrap items-center gap-1"
+            onClick={stopPropagationOnMobile}
+          >
             {/* Action Leads - uses centralized sorting */}
             <ActionLeadsBadge leads={action.leads} inline />
             {/* Separator */}
@@ -183,17 +172,14 @@ export function ActionItem({ action, searchQuery = "", isSearchMatch }: ActionIt
             <TeamBadge leads={displayedTeamMembers} inline />
             {/* Show all/less button - inline with badges */}
             {hasMoreThanFour && (
-              <button
+              <ShowMoreBadge
+                showAll={showAllTeamMembers}
+                hiddenCount={teamMembers.length - 4}
                 onClick={(e) => {
                   e.stopPropagation();
                   setShowAllTeamMembers(!showAllTeamMembers);
                 }}
-                className="inline-flex h-5 items-center justify-center rounded-full border border-dashed border-slate-300 bg-white px-2 text-[11px] font-medium leading-none text-slate-500 transition-all duration-150 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
-              >
-                {showAllTeamMembers
-                  ? "show less"
-                  : `+${teamMembers.length - 4} more`}
-              </button>
+              />
             )}
           </div>
         </div>

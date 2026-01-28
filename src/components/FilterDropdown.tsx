@@ -95,22 +95,20 @@ export default function FilterDropdown({
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <button
-          className={`relative flex h-10 w-full touch-manipulation items-center gap-3 rounded-lg border px-3 text-base transition-colors ${
+          className={`relative flex h-9 touch-manipulation items-center gap-3 rounded-lg border px-3 text-base transition-colors ${
             isFiltered
               ? "border-un-blue bg-un-blue/10 text-un-blue hover:border-un-blue"
-              : "border-gray-200 bg-white text-gray-500 hover:border-un-blue hover:bg-un-blue/10 hover:text-un-blue"
+              : "border-gray-300 bg-white text-gray-900 hover:border-un-blue hover:bg-un-blue/10 hover:text-un-blue"
           } `}
           aria-label={ariaLabel}
         >
           <div className="shrink-0">{icon}</div>
-          <span className="flex-1 truncate text-left">{triggerText}</span>
-          <div className="ml-auto shrink-0">
-            {open ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </div>
+          <span className="truncate">{triggerText}</span>
+          {open ? (
+            <ChevronUp className="h-4 w-4 shrink-0" />
+          ) : (
+            <ChevronDown className="h-4 w-4 shrink-0" />
+          )}
         </button>
       </PopoverTrigger>
       <PopoverContent

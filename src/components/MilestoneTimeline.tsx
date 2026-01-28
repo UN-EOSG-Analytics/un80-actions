@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 interface Milestone {
   label: string;
-  deadline: string | null;
+  deliveryDate: string | null;
   isReached: boolean;
 }
 
@@ -25,10 +25,10 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
     <div className="relative space-y-0">
       {milestones.map((milestone, index) => {
         const isLast = index === milestones.length - 1;
-        const deadlineDate = milestone.deadline
-          ? parseDate(milestone.deadline)
+        const deliveryDateObj = milestone.deliveryDate
+          ? parseDate(milestone.deliveryDate)
           : null;
-        const isPast = deadlineDate ? deadlineDate < now : false;
+        const isPast = deliveryDateObj ? deliveryDateObj < now : false;
         const isReached = milestone.isReached || isPast;
 
         return (
@@ -37,18 +37,18 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
             {!isLast && (
               <div
                 className={cn(
-                  "absolute top-8 left-[11px] w-0.5",
+                  "absolute top-8 left-2.75 w-0.5",
                   isReached ? "bg-un-blue" : "bg-gray-300",
                 )}
                 style={{ height: "calc(100% + 0.5rem)" }}
               />
             )}
-            {/* Continuation line for last item - dashed to indicate path continues */}
+            {/* Short dashed line for last item */}
             {isLast && (
               <div
-                className="absolute top-8 left-[10px] w-1"
+                className="absolute top-8 left-2.5 w-1"
                 style={{
-                  height: "20px",
+                  height: "12px",
                   backgroundImage:
                     "repeating-linear-gradient(to bottom, #cbd5e1 0px, #cbd5e1 3px, transparent 3px, transparent 6px)",
                 }}
@@ -75,15 +75,18 @@ export function MilestoneTimeline({ milestones }: MilestoneTimelineProps) {
               >
                 <p
                   className={cn(
-                    "text-base font-medium text-gray-900",
+                    "text-base font-medium",
                     isReached && "line-through",
+                    milestone.label.toLowerCase() === "no longer relevant"
+                      ? "text-slate-500 italic"
+                      : "text-gray-900",
                   )}
                 >
                   {milestone.label}
                 </p>
-                {deadlineDate && (
+                {deliveryDateObj && (
                   <p className="text-sm text-gray-600">
-                    {formatDateMonthYear(deadlineDate)}
+                    {formatDateMonthYear(deliveryDateObj)}
                   </p>
                 )}
               </div>

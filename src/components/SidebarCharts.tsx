@@ -1,26 +1,22 @@
-import React from "react";
 import {
-  Users,
-  Calendar,
-  Clock,
-  SquareCheckBig,
-  Layers,
-  Activity,
-} from "lucide-react";
-import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
-import { buildCleanQueryString } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+    ACTION_STATUS,
+    getStatusStyles,
+    isDecisionTaken,
+} from "@/constants/actionStatus";
 import type {
-  LeadChartEntry,
-  WorkstreamChartEntry,
-  WorkPackageChartEntry,
-  UpcomingMilestoneChartEntry,
-  Action,
+    Action,
+    LeadChartEntry,
+    UpcomingMilestoneChartEntry,
+    WorkPackageChartEntry,
+    WorkstreamChartEntry,
 } from "@/types";
+import { Activity, CalendarDays, Flag, Layers, Users } from "lucide-react";
+import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
 
 interface SidebarChartsProps {
   // Leads chart
@@ -62,6 +58,8 @@ interface SidebarChartsProps {
   onMilestonesPerMonthSearchChange: (query: string) => void;
   showAllMilestonesPerMonth: boolean;
   onToggleShowAllMilestonesPerMonth: () => void;
+  selectedMilestoneMonth: string[];
+  onSelectMilestoneMonth: (month: string[]) => void;
 
   // Action Status filter
   selectedActionStatus: string[];
@@ -82,6 +80,8 @@ export function SidebarCharts({
   onSelectWorkstream,
   upcomingMilestonesData,
   milestonesPerMonthSearchQuery,
+  selectedMilestoneMonth,
+  onSelectMilestoneMonth,
   selectedActionStatus,
   onSelectActionStatus,
   actions,
@@ -91,8 +91,8 @@ export function SidebarCharts({
     (a) => !(a.sub_action_details && a.is_subaction),
   );
   const totalActions = mainActions.length;
-  const decisionTakenCount = mainActions.filter(
-    (a) => a.public_action_status?.toLowerCase() === "decision taken",
+  const decisionTakenCount = mainActions.filter((a) =>
+    isDecisionTaken(a.public_action_status),
   ).length;
   const furtherWorkCount = totalActions - decisionTakenCount;
 
@@ -119,10 +119,10 @@ export function SidebarCharts({
   const upcomingMilestonesChartEntries: SidebarChartEntry[] =
     upcomingMilestonesData
       .filter((entry) => {
-        // Only show milestones with deadlines in January
-        if (!entry.deadline) return false;
-        const deadlineDate = new Date(entry.deadline);
-        return deadlineDate >= januaryStart && deadlineDate <= januaryEnd;
+        // Only show milestones with delivery dates in January
+        if (!entry.deliveryDate) return false;
+        const deliveryDate = new Date(entry.deliveryDate);
+        return deliveryDate >= januaryStart && deliveryDate <= januaryEnd;
       })
       .sort((a, b) => {
         const an = a.actionNumber != null ? Number(a.actionNumber) : Infinity;
@@ -130,50 +130,52 @@ export function SidebarCharts({
         return an - bn;
       })
       .map((entry) => {
-        const deadlineDate = entry.deadline ? new Date(entry.deadline) : null;
-        const daysUntilDeadline = deadlineDate
+        const deliveryDate = entry.deliveryDate
+          ? new Date(entry.deliveryDate)
+          : null;
+        const daysUntilDelivery = deliveryDate
           ? Math.ceil(
-              (deadlineDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+              (deliveryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
             )
           : null;
 
         const isUpcoming =
-          daysUntilDeadline !== null &&
-          daysUntilDeadline >= 0 &&
-          daysUntilDeadline <= 90;
+          daysUntilDelivery !== null &&
+          daysUntilDelivery >= 0 &&
+          daysUntilDelivery <= 90;
         const isUrgent =
-          daysUntilDeadline !== null &&
-          daysUntilDeadline >= 0 &&
-          daysUntilDeadline <= 30;
+          daysUntilDelivery !== null &&
+          daysUntilDelivery >= 0 &&
+          daysUntilDelivery <= 30;
 
-        let deadlineText = "";
-        if (deadlineDate) {
-          const formattedDate = deadlineDate.toLocaleDateString("en-US", {
+        let deliveryText = "";
+        if (deliveryDate) {
+          const formattedDate = deliveryDate.toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
             year: "numeric",
           });
-          if (daysUntilDeadline === null || daysUntilDeadline < 0) {
-            deadlineText = `Past: ${formattedDate}`;
-          } else if (daysUntilDeadline === 0) {
-            deadlineText = `Due today: ${formattedDate}`;
-          } else if (daysUntilDeadline === 1) {
-            deadlineText = `Due tomorrow: ${formattedDate}`;
-          } else if (daysUntilDeadline <= 7) {
-            deadlineText = `Due in ${daysUntilDeadline} days: ${formattedDate}`;
-          } else if (daysUntilDeadline <= 30) {
-            deadlineText = `Due in ${Math.ceil(daysUntilDeadline / 7)} weeks: ${formattedDate}`;
+          if (daysUntilDelivery === null || daysUntilDelivery < 0) {
+            deliveryText = `Past: ${formattedDate}`;
+          } else if (daysUntilDelivery === 0) {
+            deliveryText = `Due today: ${formattedDate}`;
+          } else if (daysUntilDelivery === 1) {
+            deliveryText = `Due tomorrow: ${formattedDate}`;
+          } else if (daysUntilDelivery <= 7) {
+            deliveryText = `Due in ${daysUntilDelivery} days: ${formattedDate}`;
+          } else if (daysUntilDelivery <= 30) {
+            deliveryText = `Due in ${Math.ceil(daysUntilDelivery / 7)} weeks: ${formattedDate}`;
           } else {
-            deadlineText = `Due ${formattedDate}`;
+            deliveryText = `Due ${formattedDate}`;
           }
         }
 
-      return {
+        return {
           label: entry.milestone,
-        count: entry.count,
+          count: entry.count,
           value: entry.milestone,
-          tooltip: deadlineText || undefined,
-          deadline: entry.deadline,
+          tooltip: deliveryText || undefined,
+          deliveryDate: entry.deliveryDate,
           isUrgent: isUrgent || false,
           isUpcoming: isUpcoming || false,
           actionNumber: entry.actionNumber,
@@ -200,9 +202,9 @@ export function SidebarCharts({
   const milestonesPerMonthMap = new Map<number, number>();
 
   upcomingMilestonesData.forEach((entry) => {
-    if (entry.deadline) {
-      const deadlineDate = new Date(entry.deadline);
-      const month = deadlineDate.getMonth();
+    if (entry.deliveryDate) {
+      const deliveryDate = new Date(entry.deliveryDate);
+      const month = deliveryDate.getMonth();
       milestonesPerMonthMap.set(
         month,
         (milestonesPerMonthMap.get(month) || 0) + entry.count,
@@ -235,111 +237,119 @@ export function SidebarCharts({
       {totalActions > 0 && (
         <div className="py-5 pl-4.5 first:pt-0">
           <h3 className="mb-3 flex h-6.25 items-center gap-2 text-[17px] font-semibold text-slate-900">
-            <span className="flex h-5 w-5 items-center justify-center text-un-blue">
+            <span className="flex h-5 w-5 items-center justify-center text-slate-500">
               <Activity className="h-5 w-5" />
             </span>
             Action Status
           </h3>
 
-          <div className="space-y-3 pr-4">
+          <div className="flex flex-col gap-1.5 pr-3">
             {/* Further Work Ongoing */}
             {(() => {
-              const isSelected = selectedActionStatus.includes("Further work ongoing");
+              const statusKey = ACTION_STATUS.FURTHER_WORK_ONGOING;
+              const isSelected = selectedActionStatus.includes(statusKey);
+              const styles = getStatusStyles(statusKey);
+              const IconComponent = styles.icon.component;
+              const percentage =
+                totalActions > 0 ? (furtherWorkCount / totalActions) * 100 : 0;
+
               return (
-                <div
-                  className={`group min-w-0 flex-1 cursor-pointer rounded-md px-2 py-1.5 transition-all ${
-                    isSelected
-                      ? "bg-un-blue/10 ring-2 ring-un-blue/30"
-                      : "hover:bg-slate-50"
+                <button
+                  type="button"
+                  className={`group flex flex-col gap-1 rounded-md p-1 text-left transition-all duration-150 ${
+                    isSelected ? styles.sidebar.selectedBg : "hover:bg-slate-50"
                   }`}
                   onClick={() => {
-                    // Toggle: if selected, clear; if not selected, select only this one
-                    onSelectActionStatus(isSelected ? [] : ["Further work ongoing"]);
+                    onSelectActionStatus(isSelected ? [] : [statusKey]);
                   }}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <Clock className={`h-4 w-4 shrink-0 transition-transform group-hover:scale-110 ${
-                        isSelected ? "text-un-blue" : "text-un-blue"
-                      }`} />
-                      <span className={`text-sm font-medium transition-colors ${
-                        isSelected ? "text-un-blue" : "text-slate-700 group-hover:text-slate-900"
-                      }`}>
-                        Further Work Ongoing
-                      </span>
+                  <div className="flex items-center gap-1.5">
+                    <IconComponent
+                      className={`h-4 w-4 shrink-0 ${styles.sidebar.icon}`}
+                    />
+                    <span className="text-[13px] font-medium text-slate-900">
+                      Further work ongoing
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div
+                      className={`relative h-2 min-w-32 flex-1 overflow-hidden rounded-full ${styles.sidebar.barTrack}`}
+                    >
+                      <div
+                        className={`h-full rounded-full transition-all ${styles.sidebar.selectedBar}`}
+                        style={{ width: `${percentage}%` }}
+                      />
                     </div>
-                    <span className={`shrink-0 text-[14px] font-semibold tabular-nums ${
-                      isSelected ? "text-un-blue" : "text-un-blue"
-                    }`}>
+                    <span className="mr-1 w-9 text-right text-[14px] font-semibold text-slate-900 tabular-nums">
                       {furtherWorkCount}
                     </span>
                   </div>
-                  <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                    <div
-                      className={`h-full rounded-full transition-all ${
-                        isSelected ? "bg-un-blue" : "bg-un-blue/50 group-hover:bg-un-blue/60"
-                      }`}
-                      style={{
-                        width:
-                          totalActions > 0
-                            ? `${(furtherWorkCount / totalActions) * 100}%`
-                            : "0%",
-                      }}
-                    />
-                  </div>
-                </div>
+                </button>
               );
             })()}
 
             {/* Decision Taken */}
             {(() => {
-              const isSelected = selectedActionStatus.includes("Decision taken");
+              const statusKey = ACTION_STATUS.DECISION_TAKEN;
+              const isSelected = selectedActionStatus.includes(statusKey);
+              const styles = getStatusStyles(statusKey);
+              const IconComponent = styles.icon.component;
+              const percentage =
+                totalActions > 0
+                  ? (decisionTakenCount / totalActions) * 100
+                  : 0;
+
               return (
-                <div
-                  className={`group min-w-0 flex-1 cursor-pointer rounded-md px-2 py-1.5 transition-all ${
-                    isSelected
-                      ? "bg-un-blue/10 ring-2 ring-un-blue/30"
-                      : "hover:bg-slate-50"
+                <button
+                  type="button"
+                  className={`group flex flex-col gap-1 rounded-md p-1 text-left transition-all duration-150 ${
+                    isSelected ? styles.sidebar.selectedBg : "hover:bg-slate-50"
                   }`}
                   onClick={() => {
-                    // Toggle: if selected, clear; if not selected, select only this one
-                    onSelectActionStatus(isSelected ? [] : ["Decision taken"]);
+                    onSelectActionStatus(isSelected ? [] : [statusKey]);
                   }}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <SquareCheckBig className={`h-4 w-4 shrink-0 transition-transform group-hover:scale-110 ${
-                        isSelected ? "text-un-blue" : "text-un-blue"
-                      }`} />
-                      <span className={`text-sm font-medium transition-colors ${
-                        isSelected ? "text-un-blue" : "text-slate-700 group-hover:text-slate-900"
-                      }`}>
-                        Decision Taken
-                      </span>
+                  <div className="flex items-center gap-1.5">
+                    <IconComponent
+                      className={`h-4 w-4 shrink-0 ${styles.sidebar.icon}`}
+                    />
+                    <span className="text-[13px] font-medium text-slate-900">
+                      Decision taken
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div
+                      className={`relative h-2 min-w-32 flex-1 overflow-hidden rounded-full ${styles.sidebar.barTrack}`}
+                    >
+                      <div
+                        className={`h-full rounded-full transition-all ${styles.sidebar.selectedBar}`}
+                        style={{ width: `${percentage}%` }}
+                      />
                     </div>
-                    <span className={`shrink-0 text-[14px] font-semibold tabular-nums ${
-                      isSelected ? "text-un-blue" : "text-un-blue"
-                    }`}>
+                    <span className="mr-1 w-9 text-right text-[14px] font-semibold text-slate-900 tabular-nums">
                       {decisionTakenCount}
                     </span>
                   </div>
-                  <div className="relative mt-1.5 mr-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                    <div
-                      className={`h-full rounded-full transition-all ${
-                        isSelected ? "bg-un-blue" : "bg-un-blue/50 group-hover:bg-un-blue/60"
-                      }`}
-                      style={{
-                        width:
-                          totalActions > 0
-                            ? `${(decisionTakenCount / totalActions) * 100}%`
-                            : "0%",
-                      }}
-                    />
-                  </div>
-                </div>
+                </button>
               );
             })()}
           </div>
+        </div>
+      )}
+
+      {/* Upcoming Milestones by Month */}
+      {milestonesPerMonthEntries.length > 0 && (
+        <div className="py-5">
+          <SidebarChart
+            title="Upcoming Milestones by Month"
+            description="Number of milestones by month"
+            icon={<CalendarDays />}
+            data={milestonesPerMonthEntries}
+            selectedValue={selectedMilestoneMonth}
+            onSelectValue={onSelectMilestoneMonth}
+            barWidth={105}
+            maxHeight={155}
+          />
         </div>
       )}
 
@@ -348,20 +358,20 @@ export function SidebarCharts({
         <div className="py-5 pl-4.5">
           {/* Header */}
           <h3 className="mb-3 flex h-6.25 items-center gap-2 text-[17px] font-semibold text-slate-900">
-            <span className="flex h-5 w-5 items-center justify-center text-un-blue">
-              <Calendar className="h-5 w-5" />
+            <span className="flex h-5 w-5 items-center justify-center text-slate-500">
+              <Flag className="h-5 w-5" />
             </span>
             Upcoming Milestones
           </h3>
 
           {/* Milestones List - ~3.5 entries visible, rest scrollable */}
-          <div className="-mr-1 max-h-[15.5rem] divide-y divide-slate-100 overflow-y-auto overscroll-contain pr-1">
+          <div className="-mr-1 max-h-62 divide-y divide-slate-100 overflow-y-auto overscroll-contain pr-1">
             {upcomingMilestonesChartEntries.map((entry, index) => {
-              const deadlineDate = entry.deadline
-                ? new Date(entry.deadline)
+              const deliveryDateObj = entry.deliveryDate
+                ? new Date(entry.deliveryDate)
                 : null;
-              const monthShort = deadlineDate
-                ? deadlineDate
+              const monthShort = deliveryDateObj
+                ? deliveryDateObj
                     .toLocaleDateString("en-US", { month: "short" })
                     .toUpperCase()
                 : null;
@@ -369,23 +379,14 @@ export function SidebarCharts({
               const handleMilestoneClick = () => {
                 if (entry.actionNumber) {
                   // Save current URL to sessionStorage before opening modal
-                  const currentUrl = window.location.search;
-                  if (currentUrl) {
-                    sessionStorage.setItem("previousUrl", currentUrl);
-                  } else {
-                    sessionStorage.removeItem("previousUrl");
-                  }
+                  const currentUrl = window.location.search || "/";
+                  sessionStorage.setItem("actionModalReturnUrl", currentUrl);
+                  // Mark that modal is open (for useFilters to freeze state)
+                  sessionStorage.setItem("actionModalOpen", "true");
 
-                  // Build URL with query param: ?action=14 (preserving other params with clean encoding)
-                  const params: Record<string, string> = {};
-                  new URLSearchParams(window.location.search).forEach(
-                    (value, key) => {
-                      params[key] = value;
-                    },
-                  );
-                  params.action = String(entry.actionNumber);
-                  const url = `?${buildCleanQueryString(params)}`;
-                  window.history.pushState({}, "", url);
+                  // Navigate to clean URL with only action param
+                  const cleanUrl = `?action=${entry.actionNumber}`;
+                  window.history.pushState({}, "", cleanUrl);
                   // Trigger a popstate event to notify ModalHandler
                   window.dispatchEvent(new PopStateEvent("popstate"));
                 }
@@ -447,49 +448,33 @@ export function SidebarCharts({
         </div>
       )}
 
-      {/* Upcoming Milestones by Month */}
-      {milestonesPerMonthEntries.length > 0 && (
-        <div className="py-5">
-          <SidebarChart
-            title="Upcoming Milestones by Month"
-            description="Number of milestones by month"
-            icon={<Calendar />}
-            data={milestonesPerMonthEntries}
-            selectedValue={[]}
-            onSelectValue={() => {}}
-            barWidth={105}
-            maxHeight={155}
-          />
-        </div>
-      )}
-
       <div className="py-5">
-      <SidebarChart
-        title="Work Packages per Leader"
-        description="Number of packages by leader"
-        icon={<Users />}
-        data={leadsChartEntries}
-        searchQuery={leadsSearchQuery}
-        onSearchChange={onLeadsSearchChange}
-        searchPlaceholder="Search principals"
-        selectedValue={selectedLead}
-        onSelectValue={onSelectLead}
-        barWidth={105}
+        <SidebarChart
+          title="Work Packages per Leader"
+          description="Number of packages by leader"
+          icon={<Users />}
+          data={leadsChartEntries}
+          searchQuery={leadsSearchQuery}
+          onSearchChange={onLeadsSearchChange}
+          searchPlaceholder="Search principals"
+          selectedValue={selectedLead}
+          onSelectValue={onSelectLead}
+          barWidth={105}
           maxHeight={145}
-      />
+        />
       </div>
 
       {/* Actions per Workstream */}
       <div className="py-5 last:pb-0">
-      <SidebarChart
-        title="Actions per Workstream"
+        <SidebarChart
+          title="Actions per Workstream"
           description="Number of actions by workstream"
-        icon={<Layers />}
-        data={workstreamsChartEntries}
-        selectedValue={selectedWorkstream}
-        onSelectValue={onSelectWorkstream}
-        barWidth={105}
-      />
+          icon={<Layers />}
+          data={workstreamsChartEntries}
+          selectedValue={selectedWorkstream}
+          onSelectValue={onSelectWorkstream}
+          barWidth={105}
+        />
       </div>
     </div>
   );

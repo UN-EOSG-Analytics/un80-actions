@@ -8,6 +8,7 @@ import { Header } from "@/components/HeaderBar";
 import { SidebarCharts } from "@/components/SidebarCharts";
 import { WorkPackageList } from "@/components/ListContainer";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ACTION_STATUS } from "@/constants/actionStatus";
 import { useActions } from "@/hooks/useActions";
 import { useChartSearch } from "@/hooks/useChartSearch";
 import { useCollapsibles } from "@/hooks/useCollapsibles";
@@ -24,7 +25,7 @@ import {
 
 export function WorkPackagesPageContent() {
   // Custom hooks for state management
-  const { actions, isLoading } = useActions();
+  const { actions } = useActions();
   const showProgress = false;
 
   const {
@@ -45,6 +46,8 @@ export function WorkPackagesPageContent() {
     setSelectedTeamMember,
     selectedActionStatus,
     setSelectedActionStatus,
+    selectedMilestoneMonth,
+    setSelectedMilestoneMonth,
     sortOption,
     setSortOption,
     handleResetFilters,
@@ -120,7 +123,11 @@ export function WorkPackagesPageContent() {
   );
   useFilterSync(selectedLead, uniqueLeads, setSelectedLead);
   useFilterSync(selectedWorkstream, uniqueWorkstreams, setSelectedWorkstream);
-  useFilterSync(selectedAction, uniqueActionTexts, setSelectedAction);
+  useFilterSync(
+    selectedAction,
+    uniqueActions.map((a) => a.actionNumber),
+    setSelectedAction,
+  );
   useFilterSync(selectedTeamMember, uniqueTeamMembers, setSelectedTeamMember);
   useFilterSync(
     selectedBigTicket,
@@ -129,7 +136,7 @@ export function WorkPackagesPageContent() {
   );
   useFilterSync(
     selectedActionStatus,
-    ["Further work ongoing", "Decision taken"],
+    [ACTION_STATUS.FURTHER_WORK_ONGOING, ACTION_STATUS.DECISION_TAKEN],
     setSelectedActionStatus,
   );
 
@@ -203,10 +210,10 @@ export function WorkPackagesPageContent() {
       filteredWorkPackages.forEach((wp, index) => {
         // Check if this work package contains any of the selected actions
         const hasSelectedAction = wp.actions.some((action) => {
-          const actionText = action.text ? action.text.trim() : "";
+          const actionNumber = String(action.actionNumber || "");
           return selectedAction.some((selected) => {
             const selectedTrimmed = selected.trim();
-            return actionText === selectedTrimmed;
+            return actionNumber === selectedTrimmed;
           });
         });
 
@@ -293,10 +300,11 @@ export function WorkPackagesPageContent() {
 
     // Skip if we've already processed this exact combination
     // But always process if we have data and haven't processed initial load yet
-    const shouldProcess = 
-      selectedActionStatus.length > 0 && 
+    const shouldProcess =
+      selectedActionStatus.length > 0 &&
       filteredWorkPackages.length > 0 &&
-      (dataKey !== lastProcessedActionStatusRef.current || !hasProcessedInitialActionStatusRef.current);
+      (dataKey !== lastProcessedActionStatusRef.current ||
+        !hasProcessedInitialActionStatusRef.current);
 
     if (shouldProcess) {
       const collapsibleKeysToExpand: string[] = [];
@@ -306,7 +314,7 @@ export function WorkPackagesPageContent() {
         const hasMatchingAction = wp.actions.some((action) => {
           const actionStatusLower = action.actionStatus?.toLowerCase() || "";
           return selectedActionStatus.some(
-            (status) => status.toLowerCase() === actionStatusLower
+            (status) => status.toLowerCase() === actionStatusLower,
           );
         });
 
@@ -326,7 +334,10 @@ export function WorkPackagesPageContent() {
       // Mark this selection as processed
       lastProcessedActionStatusRef.current = dataKey;
       hasProcessedInitialActionStatusRef.current = true;
-    } else if (selectedActionStatus.length === 0 && hasProcessedInitialActionStatusRef.current) {
+    } else if (
+      selectedActionStatus.length === 0 &&
+      hasProcessedInitialActionStatusRef.current
+    ) {
       // Collapse all work packages when action status filter is cleared
       collapseAllWorkPackages();
       // Reset tracking refs
@@ -341,12 +352,12 @@ export function WorkPackagesPageContent() {
 
   // Collapse work packages when all filters are cleared
   useEffect(() => {
-    const hasActiveFilters = 
+    const hasActiveFilters =
       searchQuery.trim().length > 0 ||
       selectedAction.length > 0 ||
       selectedActionStatus.length > 0 ||
       selectedWorkPackage.length > 0;
-    
+
     // If we previously had filters and now we don't, collapse all
     if (prevHadFiltersRef.current && !hasActiveFilters) {
       collapseAllWorkPackages();
@@ -357,9 +368,15 @@ export function WorkPackagesPageContent() {
       lastProcessedActionStatusRef.current = "";
       hasProcessedInitialActionStatusRef.current = false;
     }
-    
+
     prevHadFiltersRef.current = hasActiveFilters;
-  }, [searchQuery, selectedAction, selectedActionStatus, selectedWorkPackage, collapseAllWorkPackages]);
+  }, [
+    searchQuery,
+    selectedAction,
+    selectedActionStatus,
+    selectedWorkPackage,
+    collapseAllWorkPackages,
+  ]);
 
   // Wrapper for reset that also collapses work packages
   const handleResetFiltersWithCollapse = useCallback(() => {
@@ -374,12 +391,12 @@ export function WorkPackagesPageContent() {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-dvh bg-white">
         {/* Fixed Header */}
         <Header onReset={handleResetAllWithCollapse} showLogin={false} />
 
         {/* Main Container */}
-        <main className="mx-auto w-full max-w-4xl px-4 pt-6 sm:px-8 sm:pt-8 md:px-12 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
+        <main className="mx-auto w-full max-w-4xl px-[max(1rem,env(safe-area-inset-left))] pt-3 pr-[max(1rem,env(safe-area-inset-right))] sm:px-8 sm:pt-8 md:px-12 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
           <div className="space-y-6 pb-16">
             {/* Header with context info */}
             <ExplainerText />
@@ -400,15 +417,15 @@ export function WorkPackagesPageContent() {
 
                   // Calculate total counts (unfiltered) - use all workPackages and actions
                   const totalWorkstreams = new Set(
-                    workPackages.flatMap((wp) => wp.report)
+                    workPackages.flatMap((wp) => wp.report),
                   ).size;
                   // Include all actions except subaction entries (is_subaction + sub_action_details);
                   // main actions with sub_action_details (e.g. "Harmonized in-country logistics") are counted.
                   const totalActions = actions.filter(
-                    (a) => !(a.sub_action_details && a.is_subaction)
+                    (a) => !(a.sub_action_details && a.is_subaction),
                   ).length;
                   const totalLeads = new Set(
-                    workPackages.flatMap((wp) => wp.leads)
+                    workPackages.flatMap((wp) => wp.leads),
                   ).size;
                   // Get unique team members from all actions (normalized)
                   const allTeamMembers = new Set<string>();
@@ -429,7 +446,6 @@ export function WorkPackagesPageContent() {
                         title="Workstreams"
                         value={totalWorkstreams}
                         icon={Layers}
-                        isLoading={isLoading}
                         showProgress={showProgress}
                         completed={0}
                         showFiltered={hasActiveFilters}
@@ -439,7 +455,6 @@ export function WorkPackagesPageContent() {
                         title="Work Packages"
                         value={workPackages.length}
                         icon={BriefcaseIcon}
-                        isLoading={isLoading}
                         showProgress={showProgress}
                         completed={0}
                         showFiltered={hasActiveFilters}
@@ -449,7 +464,6 @@ export function WorkPackagesPageContent() {
                         title="Actions"
                         value={totalActions}
                         icon={ListTodo}
-                        isLoading={isLoading}
                         showProgress={showProgress}
                         completed={0}
                         showFiltered={hasActiveFilters}
@@ -459,7 +473,6 @@ export function WorkPackagesPageContent() {
                         title="UN System Leaders"
                         value={totalLeads}
                         icon={Users}
-                        isLoading={isLoading}
                         showProgress={showProgress}
                         completed={0}
                         showFiltered={hasActiveFilters}
@@ -469,7 +482,6 @@ export function WorkPackagesPageContent() {
                         title="UN System Entities"
                         value={totalTeamMembers}
                         icon={User}
-                        isLoading={isLoading}
                         showProgress={showProgress}
                         completed={0}
                         showFiltered={hasActiveFilters}
@@ -518,6 +530,23 @@ export function WorkPackagesPageContent() {
                     uniqueTeamMembers={uniqueTeamMembers}
                     availableBigTicketOptions={availableBigTicketOptions}
                     onResetFilters={handleResetFiltersWithCollapse}
+                    onExpandAll={() => {
+                      const allKeys = filteredWorkPackages.map(
+                        (wp, index) =>
+                          `${wp.report.join("-")}-${wp.number || "empty"}-${index}`,
+                      );
+                      expandCollapsibles(allKeys);
+                    }}
+                    onCollapseAll={collapseAllWorkPackages}
+                    totalWorkPackages={filteredWorkPackages.length}
+                    expandedWorkPackages={(() => {
+                      let count = 0;
+                      filteredWorkPackages.forEach((wp, index) => {
+                        const key = `${wp.report.join("-")}-${wp.number || "empty"}-${index}`;
+                        if (openCollapsibles.has(key)) count++;
+                      });
+                      return count;
+                    })()}
                   />
 
                   <WorkPackageList
@@ -529,7 +558,7 @@ export function WorkPackagesPageContent() {
                     selectedActions={selectedAction}
                     selectedTeamMembers={selectedTeamMember}
                     selectedActionStatus={selectedActionStatus}
-                    isLoading={isLoading}
+                    selectedMilestoneMonth={selectedMilestoneMonth}
                     showProgress={showProgress}
                     searchQuery={searchQuery}
                   />
@@ -581,6 +610,8 @@ export function WorkPackagesPageContent() {
                   onToggleShowAllMilestonesPerMonth={() =>
                     setShowAllMilestonesPerMonth(!showAllMilestonesPerMonth)
                   }
+                  selectedMilestoneMonth={selectedMilestoneMonth}
+                  onSelectMilestoneMonth={setSelectedMilestoneMonth}
                   selectedActionStatus={selectedActionStatus}
                   onSelectActionStatus={setSelectedActionStatus}
                   actions={actions}

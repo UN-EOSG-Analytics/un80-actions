@@ -1,24 +1,59 @@
 "use client";
 
 import {
-    ActionLeadsBadge,
-    DecisionStatusBadge,
-    TeamBadge,
-    WPLeadsBadge,
+  ActionLeadsBadge,
+  DecisionStatusBadge,
+  ShowMoreBadge,
+  TeamBadge,
+  WPLeadsBadge,
 } from "@/components/Badges";
+import { HelpTooltip } from "@/components/HelpTooltip";
 import { MilestoneTimeline } from "@/components/MilestoneTimeline";
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipCollisionBoundaryProvider,
-    TooltipTrigger,
+  Tooltip,
+  TooltipCollisionBoundaryProvider,
+  TooltipContent,
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ACTION_STATUS } from "@/constants/actionStatus";
 import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
-import { normalizeTeamMemberForDisplay, parseDate } from "@/lib/utils";
+import { normalizeTeamMemberForDisplay } from "@/lib/utils";
 import type { Action } from "@/types";
-import { ChevronRight, FileText, HelpCircle, X } from "lucide-react";
+import { ChevronRight, FileText, X } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+
+// Modal-specific section card component
+const SectionCard = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) => (
+  <div className="rounded-lg border border-slate-200 bg-white">
+    <div className="-ml-px rounded-tl-[9px] border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
+      <h3 className="text-xs font-extrabold tracking-widest text-slate-800 uppercase sm:text-sm">
+        {title}
+      </h3>
+    </div>
+    {children}
+  </div>
+);
+
+const CHIPS_PER_LINE = 5;
+const breadcrumbBaseClass =
+  "inline-flex !min-h-0 items-center text-[10px] leading-4 font-medium tracking-wide uppercase transition-colors sm:text-xs sm:leading-5 md:text-sm md:tracking-wider";
+const breadcrumbLinkClass = `${breadcrumbBaseClass} text-slate-500 hover:text-un-blue hover:underline`;
+const breadcrumbActionClass = `${breadcrumbBaseClass} text-un-blue hover:underline`;
+const chevronClass =
+  "h-2.5 w-2.5 shrink-0 text-slate-400 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5";
 
 interface ActionModalProps {
   action: Action | null;
@@ -39,11 +74,20 @@ export default function ActionModal({
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [showAllChips, setShowAllChips] = useState(false);
+  const prevActionNumberRef = useRef<number | undefined>(undefined);
 
   const setModalRef = useCallback((el: HTMLDivElement | null) => {
     (modalRef as { current: HTMLDivElement | null }).current = el;
     setModalEl(el);
   }, []);
+
+  // Reset chips expand when action changes
+  if (prevActionNumberRef.current !== action?.action_number) {
+    prevActionNumberRef.current = action?.action_number;
+    if (showAllChips) {
+      setShowAllChips(false);
+    }
+  }
 
   // Animation state management
   useEffect(() => {
@@ -95,24 +139,14 @@ export default function ActionModal({
     }
   };
 
-  // Prevent body scroll when modal is open while maintaining scrollbar space
+  // Prevent body scroll when modal is open
   useEffect(() => {
-    // Store original values
     const originalOverflow = document.documentElement.style.overflow;
-
-    // Prevent scrolling on the html element instead of body to preserve scrollbar
     document.documentElement.style.overflow = "hidden";
-
     return () => {
-      // Restore original values
       document.documentElement.style.overflow = originalOverflow;
     };
   }, []);
-
-  // Reset chips expand when switching to another action
-  useEffect(() => {
-    setShowAllChips(false);
-  }, [action?.action_number]);
 
   // Handle click outside to close
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -135,7 +169,10 @@ export default function ActionModal({
       return (
         <div className="flex items-center justify-between gap-4">
           <p className="text-lg text-slate-500">Action not found</p>
-          <button onClick={handleClose} className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600">
+          <button
+            onClick={handleClose}
+            className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+          >
             <X size={24} />
           </button>
         </div>
@@ -160,31 +197,32 @@ export default function ActionModal({
       seen.add(n);
       allChips.push({ name: n, type: "team" });
     }
-    const CHIPS_PER_LINE = 5;
-    const displayedChips = showAllChips ? allChips : allChips.slice(0, CHIPS_PER_LINE);
+    const displayedChips = showAllChips
+      ? allChips
+      : allChips.slice(0, CHIPS_PER_LINE);
     const hasMore = allChips.length > CHIPS_PER_LINE;
 
     return (
       <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           {/* Breadcrumb */}
-          <div className="mb-2 flex flex-wrap items-center gap-x-1 gap-y-0.5 sm:mb-3 sm:gap-x-1.5">
+          <div className="mb-2 flex flex-wrap items-center gap-x-1 gap-y-1 sm:mb-3 sm:gap-x-1.5 sm:gap-y-0.5">
             <Link
               href={`/?ws=${action.report}`}
               onClick={handleClose}
-              className="text-[10px] leading-4 font-medium tracking-wide text-slate-500 uppercase transition-colors hover:text-un-blue hover:underline sm:text-xs sm:leading-5 md:text-sm md:tracking-wider"
+              className={breadcrumbLinkClass}
             >
               {action.report}
             </Link>
-            <ChevronRight className="h-2.5 w-2.5 shrink-0 text-slate-400 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5" />
+            <ChevronRight className={chevronClass} />
             <Link
               href={`/?wp=${action.work_package_number}`}
               onClick={handleClose}
-              className="text-[10px] leading-4 font-medium tracking-wide text-slate-500 uppercase transition-colors hover:text-un-blue hover:underline sm:text-xs sm:leading-5 md:text-sm md:tracking-wider"
+              className={breadcrumbLinkClass}
             >
               WORK PACKAGE {action.work_package_number}
             </Link>
-            <ChevronRight className="h-2.5 w-2.5 shrink-0 text-slate-400 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5" />
+            <ChevronRight className={chevronClass} />
             <Tooltip open={copied ? true : undefined}>
               <TooltipTrigger asChild>
                 <button
@@ -195,17 +233,19 @@ export default function ActionModal({
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   }}
-                  className="cursor-pointer text-[10px] leading-4 font-medium tracking-wide text-un-blue uppercase transition-all hover:underline sm:text-xs sm:leading-5 md:text-sm md:tracking-wider"
+                  className={`${breadcrumbActionClass} cursor-pointer`}
                 >
                   Action {action.action_number}
                 </button>
               </TooltipTrigger>
               <TooltipContent>
-                <p className="text-sm text-gray-600">{copied ? "Copied!" : "Click to copy link"}</p>
+                <p className="text-sm text-gray-600">
+                  {copied ? "Copied!" : "Click to copy link"}
+                </p>
               </TooltipContent>
             </Tooltip>
           </div>
-          <h2 className="text-base leading-snug font-semibold text-slate-900 sm:text-lg md:text-xl">
+          <h2 className="text-base leading-snug font-semibold text-slate-900 sm:text-lg">
             {action.indicative_activity}
             {action.sub_action_details && (
               <>
@@ -218,7 +258,7 @@ export default function ActionModal({
           </h2>
           {/* Action Leads and Team Members - one line, rest in "+x more" */}
           {allChips.length > 0 && (
-            <div className="mt-3 flex flex-wrap items-center gap-1">
+            <div className="mt-2 flex flex-wrap items-center gap-1">
               {displayedChips.map((c) =>
                 c.type === "lead" ? (
                   <ActionLeadsBadge key={c.name} leads={[c.name]} inline />
@@ -227,16 +267,14 @@ export default function ActionModal({
                 ),
               )}
               {hasMore && (
-                <button
-                  type="button"
+                <ShowMoreBadge
+                  showAll={showAllChips}
+                  hiddenCount={allChips.length - CHIPS_PER_LINE}
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowAllChips((s) => !s);
                   }}
-                  className="inline-flex h-5 items-center justify-center rounded-full border border-dashed border-slate-300 bg-white px-2 text-[11px] font-medium leading-none text-slate-500 transition-all duration-150 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
-                >
-                  {showAllChips ? "show less" : `+${allChips.length - CHIPS_PER_LINE} more`}
-                </button>
+                />
               )}
             </div>
           )}
@@ -274,55 +312,37 @@ export default function ActionModal({
 
     // Action content
     return (
-      <div className="space-y-4 pt-4">
-        {/* Combined Action Details, Milestones, and Updates Section */}
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-          {/* Action Details Header */}
-          <div className="border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
-            <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-800">
-              Action Details
-            </h3>
-          </div>
-          {/* Action Details Content */}
+      <div className="space-y-6">
+        {/* Action Details Section */}
+        <SectionCard title="Action Details">
           <div className="p-5">
             {/* Decision Status */}
             <div>
-              <h3 className="mb-1.5 text-sm font-semibold tracking-wide text-slate-700">
+              <h3 className="mb-1.5 text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
                 Status
               </h3>
-              <DecisionStatusBadge status={action.public_action_status || "Further Work Ongoing"} />
+              <DecisionStatusBadge
+                status={
+                  action.public_action_status ||
+                  ACTION_STATUS.FURTHER_WORK_ONGOING
+                }
+              />
             </div>
 
-            {/* Upcoming Milestone – only the single upcoming milestone */}
+            {/* Upcoming Milestone */}
             {action.upcoming_milestone && (
               <>
                 <div className="my-3 border-t border-slate-200"></div>
-                <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold tracking-wide text-slate-700">
+                <h3 className="mb-3 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
                   Upcoming Milestone
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        aria-label="What is Upcoming Milestone?"
-                        className="inline-flex size-6 shrink-0 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-700 sm:size-5 sm:text-slate-400 sm:hover:bg-slate-100 sm:hover:text-slate-600"
-                      >
-                        <HelpCircle className="size-4 sm:size-3.5" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" align="center">
-                      <p className="text-gray-600">
-                        Steps which will be taken towards the delivery of the
-                        proposal concerned. Completed milestones are crossed out.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
+                  <HelpTooltip content="Steps which will be taken towards the delivery of the proposal concerned. Completed milestones are crossed out." />
                 </h3>
                 <div className="mt-2">
                   <MilestoneTimeline
                     milestones={[
                       {
                         label: action.upcoming_milestone,
-                        deadline: action.upcoming_milestone_deadline ?? action.delivery_date ?? null,
+                        deliveryDate: action.delivery_date ?? null,
                         isReached: false,
                       },
                     ]}
@@ -332,46 +352,24 @@ export default function ActionModal({
             )}
 
             {/* Updates Section */}
-            <div className="my-3 border-t border-slate-200"></div>
-            <h3 className="mb-4 flex items-center gap-1.5 text-sm font-semibold tracking-wide text-slate-700">
+            <div className="my-6 border-t border-slate-200"></div>
+            <h3 className="mb-4 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
               Updates
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label="What are Updates?"
-                    className="inline-flex size-6 shrink-0 items-center justify-center rounded-full text-slate-600 transition-colors hover:text-slate-700 sm:size-5 sm:text-slate-400 sm:hover:bg-slate-100 sm:hover:text-slate-600"
-                  >
-                    <HelpCircle className="size-4 sm:size-3.5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top" align="center">
-                  <p className="text-gray-600">
-                    A summary of recent progress on the action.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
+              <HelpTooltip content="A summary of recent progress on the action." />
             </h3>
-            <div className="text-sm leading-relaxed text-slate-600">
+            <div className="text-xs leading-relaxed text-slate-600 sm:text-sm">
               {action.updates && action.updates.trim() ? (
-                action.updates
+                <p className="whitespace-pre-wrap">{action.updates}</p>
               ) : (
-                "Updates forthcoming"
+                <p className="text-slate-400 italic">Updates forthcoming</p>
               )}
             </div>
           </div>
-        </div>
+        </SectionCard>
 
         {/* Document Reference Section */}
         {(action.doc_text || action.document_paragraph) && (
-          <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-            {/* Document Reference Header */}
-            <div className="border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
-              <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-800">
-                Document Reference
-              </h3>
-            </div>
-            {/* Document Reference Content */}
+          <SectionCard title="Document Reference">
             <div className="space-y-3 p-5">
               {/* Document Paragraph Number */}
               {action.document_paragraph &&
@@ -406,33 +404,27 @@ export default function ActionModal({
               {/* Document Text Quote */}
               {action.doc_text && (
                 <div className="border-l-2 border-slate-300 bg-white py-3 pr-3 pl-4">
-                  <p className="text-sm leading-relaxed text-slate-700">
+                  <p className="text-xs leading-relaxed text-slate-700 sm:text-sm">
                     &ldquo;{action.doc_text}&rdquo;
                   </p>
                 </div>
               )}
             </div>
-          </div>
+          </SectionCard>
         )}
 
         {/* Work Package Reference Section */}
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-          {/* Work Package Reference Header */}
-          <div className="border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
-            <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-800">
-              Work Package Reference
-            </h3>
-          </div>
-          {/* Work Package Reference Content */}
+        <SectionCard title="Work Package Reference">
           <div className="p-5">
-            <div className="text-[15px] leading-snug text-slate-900">
+            <div className="text-sm leading-snug text-slate-900 sm:text-[15px]">
               <span className="font-semibold">
                 Work Package {action.work_package_number}
               </span>
               <span className="mx-2 text-slate-300">•</span>
-              <span className="font-medium text-slate-600">{action.work_package_name}</span>
+              <span className="font-medium text-slate-600">
+                {action.work_package_name}
+              </span>
             </div>
-            {/* Work Package Leads */}
             {action.work_package_leads &&
               action.work_package_leads.length > 0 && (
                 <div className="mt-3">
@@ -440,50 +432,7 @@ export default function ActionModal({
                 </div>
               )}
           </div>
-        </div>
-
-        {/* MS Approval */}
-        {/* {action.ms_approval && (
-          <div className="border-t border-gray-200 pt-6">
-            <Field label="Member State Approval">
-              <div className="space-y-2">
-                <div className="text-sm font-medium text-gray-900">
-                  Required
-                </div>
-                {action.ms_body.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {action.ms_body.map((body, i) => (
-                      <span
-                        key={i}
-                        className="inline-block rounded-full bg-un-blue/10 px-3 py-1 text-sm font-medium text-un-blue"
-                      >
-                        {body}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </Field>
-          </div>
-        )} */}
-
-        {/* Budget */}
-        {/* {action.un_budget.length > 0 && (
-          <div className="border-t border-gray-200 pt-6">
-            <Field label="UN Budget">
-              <div className="flex flex-wrap gap-2">
-                {action.un_budget.map((budget, i) => (
-                  <span
-                    key={i}
-                    className="inline-block rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800"
-                  >
-                    {budget}
-                  </span>
-                ))}
-              </div>
-            </Field>
-          </div>
-        )} */}
+        </SectionCard>
       </div>
     );
   };
@@ -507,17 +456,17 @@ export default function ActionModal({
         onTouchEnd={onTouchEnd}
       >
         <TooltipCollisionBoundaryProvider value={modalEl}>
-        <div className="flex min-h-full flex-col">
-          {/* Header */}
-          <div className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6">
-            {renderHeader()}
-          </div>
+          <div className="flex min-h-full flex-col">
+            {/* Header */}
+            <div className="border-b border-slate-200 bg-white px-4 pt-4 pb-3 shadow-sm sm:px-6 sm:pt-5 sm:pb-4 md:px-8 md:pt-6 md:pb-5">
+              {renderHeader()}
+            </div>
 
-          {/* Body */}
-          <div className="flex-1 bg-slate-50 px-4 pb-6 sm:px-6 sm:pb-8 md:px-8">
-            {renderBody()}
+            {/* Body */}
+            <div className="flex-1 bg-slate-50 px-4 pt-6 pb-8 sm:px-6 sm:pt-8 sm:pb-12 md:px-8">
+              {renderBody()}
+            </div>
           </div>
-        </div>
         </TooltipCollisionBoundaryProvider>
       </div>
     </div>

@@ -46,7 +46,6 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
-      console.error("Login error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +62,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle>Login</DialogTitle>
           <DialogDescription>

@@ -82,7 +82,9 @@ export function LabelBadge({
         <TooltipContent>
           <div className="space-y-1">
             {tooltipLabel && (
-              <p className="text-xs font-semibold text-gray-700">{tooltipLabel}</p>
+              <p className="text-xs font-semibold text-gray-700">
+                {tooltipLabel}
+              </p>
             )}
             <p className="text-sm text-gray-600">{fullName}</p>
           </div>
@@ -116,17 +118,67 @@ interface LeadBadgeProps {
 
 /** Work Package Leads - primary (solid blue) */
 export function WPLeadsBadge({ leads, onSelect, inline }: LeadBadgeProps) {
-  return <LabelBadge items={leads} variant="primary" onSelect={onSelect} inline={inline} tooltipLabel="Lead" />;
+  return (
+    <LabelBadge
+      items={leads}
+      variant="primary"
+      onSelect={onSelect}
+      inline={inline}
+      tooltipLabel="Lead"
+    />
+  );
 }
 
 /** Action Leads - secondary (outlined blue) */
 export function ActionLeadsBadge({ leads, onSelect, inline }: LeadBadgeProps) {
-  return <LabelBadge items={leads} variant="secondary" onSelect={onSelect} inline={inline} tooltipLabel="Action Lead" />;
+  return (
+    <LabelBadge
+      items={leads}
+      variant="secondary"
+      onSelect={onSelect}
+      inline={inline}
+      tooltipLabel="Action Lead"
+    />
+  );
 }
 
 /** Team Members - tertiary (dashed, subtle) */
 export function TeamBadge({ leads, onSelect, inline }: LeadBadgeProps) {
-  return <LabelBadge items={leads} variant="tertiary" onSelect={onSelect} inline={inline} tooltipLabel="Team Member" />;
+  return (
+    <LabelBadge
+      items={leads}
+      variant="tertiary"
+      onSelect={onSelect}
+      inline={inline}
+      tooltipLabel="Team Member"
+    />
+  );
+}
+
+/** Show More/Less Badge - for expanding collapsed badge lists */
+interface ShowMoreBadgeProps {
+  /** Whether all items are currently shown */
+  showAll: boolean;
+  /** Number of additional items hidden */
+  hiddenCount: number;
+  /** Click handler to toggle show all state */
+  onClick: (e: React.MouseEvent) => void;
+}
+
+export function ShowMoreBadge({
+  showAll,
+  hiddenCount,
+  onClick,
+}: ShowMoreBadgeProps) {
+  return (
+    <Badge
+      variant="outline"
+      className="cursor-pointer border-dashed border-slate-300 bg-white text-slate-500 transition-all duration-150 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
+      onClick={onClick}
+    >
+      {showAll ? "show less" : `+${hiddenCount} more`}
+    </Badge>
+  );
 }
 
 /** Workstream Labels - muted (slate fill) */
@@ -185,7 +237,9 @@ export function WorkstreamLabels({
 // Decision Status Badge
 // ============================================================================
 
-export type DecisionStatus = "Decision taken" | "Further work ongoing";
+import { getStatusStyles, type ActionStatus } from "@/constants/actionStatus";
+
+export type DecisionStatus = ActionStatus;
 
 interface DecisionStatusBadgeProps {
   /** The public_action_status value */
@@ -198,30 +252,30 @@ interface DecisionStatusBadgeProps {
  * Decision Status Badge - shows amber for "Further work ongoing" or green for "Decision taken"
  * Accepts public_action_status values (case-insensitive comparison)
  */
-export function DecisionStatusBadge({ status, size = "default" }: DecisionStatusBadgeProps) {
+export function DecisionStatusBadge({
+  status,
+  size = "default",
+}: DecisionStatusBadgeProps) {
   if (!status) return null;
 
-  // Compare case-insensitively to handle variations
-  const normalizedStatus = status.toLowerCase();
-  const isDecisionTaken = normalizedStatus === "decision taken";
+  const styles = getStatusStyles(status);
   const isSmall = size === "sm";
+  const IconComponent = styles.icon.component;
 
   return (
     <div
       className={cn(
         "inline-flex items-center rounded-full font-medium",
-        isSmall ? "gap-1 px-2 py-0.5 text-xs" : "gap-1.5 px-3 py-1 text-sm",
-        isDecisionTaken
-          ? "bg-green-100 text-green-700"
-          : "bg-amber-100 text-amber-700",
+        isSmall
+          ? "gap-1 px-2 py-0.5 text-[10px] sm:text-xs"
+          : "gap-1.5 px-3 py-1 text-xs sm:text-sm",
+        styles.badge,
       )}
     >
-      {isDecisionTaken ? (
-        <SquareCheckBig className={isSmall ? "h-3 w-3" : "h-4 w-4"} />
-      ) : (
-        <Clock className={isSmall ? "h-3 w-3" : "h-4 w-4"} />
-      )}
-      <span>{isDecisionTaken ? "Decision Taken" : "Further Work Ongoing"}</span>
+      <IconComponent
+        className={cn(isSmall ? "h-3 w-3" : "h-4 w-4", styles.icon.className)}
+      />
+      <span>{styles.label}</span>
     </div>
   );
 }

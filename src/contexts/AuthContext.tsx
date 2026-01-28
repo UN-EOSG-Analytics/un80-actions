@@ -29,7 +29,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }, 0);
         }
       } catch (error) {
-        console.error("Error parsing stored auth data:", error);
         localStorage.removeItem("auth");
       }
     }

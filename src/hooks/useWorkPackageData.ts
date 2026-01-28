@@ -217,11 +217,13 @@ export function useWorkPackageData(
       ) {
         filtered = filtered.filter((wp) =>
           wp.actions.some((action) => {
-            const actionText = action.text ? action.text.trim() : "";
-            return filters.selectedAction!.some((selected) => {
+            const actionNumber = String(action.actionNumber || "");
+            const match = filters.selectedAction!.some((selected) => {
               const selectedTrimmed = selected.trim();
-              return actionText === selectedTrimmed;
+              const result = actionNumber === selectedTrimmed;
+              return result;
             });
+            return match;
           }),
         );
       }

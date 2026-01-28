@@ -1,25 +1,23 @@
 import type { Action, Actions } from "@/types";
 import { normalizeLeaderName } from "./utils";
-// Import JSON directly for faster loading - data is bundled at build time instead of fetched at runtime
+// Import JSON directly - data is bundled at build time (no network request)
 import actionsData from "../../public/data/actions.json";
 
 /**
- * Fetch actions data from the JSON file
- * Note: JSON is imported directly (no network request) for optimal performance on GitHub Pages
+ * Get filtered actions data
+ * Note: JSON is imported directly for optimal performance on GitHub Pages (static export)
  * Filters out subactions (actions with is_subaction = true) - they are stored in data but not displayed on dashboard
  * Exception: Subactions for actions 94 and 95 are included to display them in work package 31
- * @returns Promise resolving to the actions array (excluding most subactions, but including subactions for actions 94 and 95)
+ * @returns The actions array (excluding most subactions, but including subactions for actions 94 and 95)
  */
-export async function fetchActions(): Promise<Actions> {
+export function getActions(): Actions {
   const allActions = actionsData as unknown as Actions;
   // Include regular actions and subactions for actions 94 and 95
-  return Promise.resolve(
-    allActions.filter(
-      (action) =>
-        !action.is_subaction ||
-        action.action_number === 94 ||
-        action.action_number === 95,
-    ),
+  return allActions.filter(
+    (action) =>
+      !action.is_subaction ||
+      action.action_number === 94 ||
+      action.action_number === 95,
   );
 }
 
@@ -86,11 +84,11 @@ export function countByBigTicket(actions: Actions): {
  * @param firstMilestone - Optional first milestone to distinguish subactions with the same action number
  * @returns The action with the given number (and optionally matching first milestone), or null if not found
  */
-export async function getActionByNumber(
+export function getActionByNumber(
   actionNumber: number,
   firstMilestone?: string | null,
-): Promise<Action | null> {
-  const actions = await fetchActions();
+): Action | null {
+  const actions = getActions();
   const matchingActions = actions.filter(
     (action) => action.action_number === actionNumber,
   );
@@ -115,10 +113,10 @@ export async function getActionByNumber(
  * @param workPackageNumber - The work package number
  * @returns Array of unique normalized leader names
  */
-export async function getWorkPackageLeads(
+export function getWorkPackageLeads(
   workPackageNumber: number | string,
-): Promise<string[]> {
-  const actions = await fetchActions();
+): string[] {
+  const actions = getActions();
 
   const wpActions = actions.filter(
     (action) => action.work_package_number === workPackageNumber,

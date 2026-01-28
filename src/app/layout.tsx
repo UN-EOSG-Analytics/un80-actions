@@ -22,6 +22,14 @@ export const metadata: Metadata = {
   description: "",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,9 +37,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${roboto.className} antialiased`}>
-      <body className="flex min-h-screen flex-col">
+      <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      </head>
+      <body className="flex min-h-dvh flex-col">
         <Providers>
-          <div className="flex min-h-screen flex-col">
+          <div className="flex min-h-dvh flex-col">
             <AnimatedCornerLogo />
             <div className="flex-1">{children}</div>
             <Footer />
