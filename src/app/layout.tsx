@@ -5,8 +5,6 @@ import { Suspense } from "react";
 import "./globals.css";
 import { AnimatedCornerLogo } from "@/components/AnimatedCornerLogo";
 import Footer from "@/components/Footer";
-import { Providers } from "@/components/Providers";
-import ModalHandler from "@/components/ModalHandler";
 
 // https://fonts.google.com/specimen/Roboto
 // 100 (Thin), 300 (Light), 400 (Regular), 500 (Medium), 700 (Bold), 800 (ExtraBold), 900 (Black)
@@ -18,7 +16,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "UN80 Initiative Actions Dashboard",
+  title: "UN80 Initiative Actions Platform",
   description: "",
 };
 
