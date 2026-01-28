@@ -10,6 +10,12 @@ set search_path = un80actions,
 -- ENUM TYPES
 -- =========================================================
 create type public_action_status as enum ('Further work ongoing', 'Decision taken');
+create type action_tracking_status as enum (
+    'Finalized',
+    'Attention to timeline',
+    'No submission',
+    'Confirmation needed'
+);
 create type milestone_type as enum ('first', 'final', 'upcoming');
 create type milestone_status as enum (
     'draft',
@@ -73,8 +79,9 @@ create table magic_tokens (
     email text not null references approved_users(email) on delete cascade,
     expires_at timestamptz not null,
     used_at timestamptz,
-    used_by int references users(id) on delete set null,
-    created_at timestamptz not null default now()
+    used_by int references users(id) on delete
+    set null,
+        created_at timestamptz not null default now()
 );
 -- =========================================================
 -- CORE TABLES
@@ -83,17 +90,15 @@ create table magic_tokens (
 -- NOTE: This was called "reports" in earlier schema drafts.
 -- IDs are fixed: 1, 2, 3 (representing WS1, WS2, WS3)
 create table workstreams (
-    id int primary key check (
-        id between 1 and 3
-    ),
-    code text not null unique,
-    report text
+    id text primary key code text not null unique,
+    workstream_title text,
+    report_title text,
+    report_document_symbol text
 );
 -- Work packages (scoped to a workstream)
 create table work_packages (
     id int not null primary key,
-    workstream_id int not null references workstreams(id) on delete restrict,
-    number int not null,
+    workstream_id text not null references workstreams(id) on delete restrict,
     name text not null,
     goal text,
     constraint work_packages_workstream_number_key unique (workstream_id, number)
@@ -104,12 +109,14 @@ create table actions (
     id int not null,
     sub_id text not null,
     work_package_id int not null references work_packages(id) on delete cascade,
-    document_paragraph text,
+    document_lgraph_number text,
+    document_paragraph_text text,
     action_number int not null,
-    indicative_activity text not null,
+    indicative_action text not null,
+    indicative_sub_action text,
     is_big_ticket boolean not null default false,
     is_subaction boolean not null default false,
-    sub_action_details text,
+    tracking_status action_tracking_status,
     doc_text text,
     public_action_status public_action_status,
     primary key (id, sub_id),
