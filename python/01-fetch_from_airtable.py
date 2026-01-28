@@ -2,7 +2,7 @@
 Fetch UN80 Actions data from Airtable.
 
 This script:
-1. Connects to Airtable using API credentials from .env
+1. Connects to Airtable using API credentials from .env or Github Actions Secrets
 2. Fetches all records from the specified base and table
 3. Validates data quality (checks for duplicates, missing fields)
 4. Selects relevant columns for processing
@@ -27,8 +27,8 @@ from pyairtable import Api
 load_dotenv()
 
 # Initialize Airtable API connection
-# https://airtable.com/create/tokens
 api = Api(os.environ["AIRTABLE_API_KEY"])
+
 
 BASE_ID = os.environ["AIRTABLE_BASE_ID"]
 TABLE_ID = os.environ["AIRTABLE_TABLE_ID"]
@@ -50,7 +50,7 @@ df = df.dropna(how="all")
 if len(df) < 1:
     raise ValueError(f"\nExpected at least 1 record, but got {len(df)}")
 
-print(f"\nNumber of actions fetched: {df.shape[0]}")
+print(f"\nNumber of actions fetched: {len(df)}")
 
 # Check for duplicate actions (data integrity validation)
 if "Action ID" in df.columns:
@@ -58,7 +58,9 @@ if "Action ID" in df.columns:
     if duplicates_mask.any():
         duplicate_rows = df[duplicates_mask][["Action ID"]].drop_duplicates()
         duplicates_info = duplicate_rows.to_string(index=False)
-        raise ValueError(f"Duplicate actions found in the input data:\n{duplicates_info}")
+        raise ValueError(
+            f"Duplicate actions found in the input data:\n{duplicates_info}"
+        )
     else:
         print("\nAll action IDs are unique.")
 
