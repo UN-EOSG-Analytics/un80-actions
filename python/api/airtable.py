@@ -19,16 +19,14 @@ def fetch_airtable_table(
 
     Args:
         table_id: The ID of the Airtable table
-        base_id: The ID of the Airtable base. If None, uses AIRTABLE_BASE_ID from env
+        base_id: The ID of the Airtable base. Uses AIRTABLE_BASE_ID from .env by default.
 
     Returns:
         DataFrame containing all records from the table
 
     Raises:
-        ValueError: If no records found in the table
+        ValueError: If no records found in the table.
     """
-    if base_id is None:
-        base_id = os.environ["AIRTABLE_BASE_ID"]
 
     table = api.table(base_id, table_id)
     records = table.all()
