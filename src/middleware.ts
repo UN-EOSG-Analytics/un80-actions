@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/about", "/login", "/verify", "/api/auth", "/api/documents"];
+const PUBLIC_PATHS = ["/login", "/verify", "/api/auth", "/api/documents"];
 
 async function verifySessionToken(token: string): Promise<boolean> {
   try {
@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
   if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) return NextResponse.next();
   if (pathname.startsWith("/_next") || pathname.startsWith("/images") || pathname.startsWith("/data")) return NextResponse.next();
   const session = request.cookies.get("auth_session")?.value;
-  if (!session || !(await verifySessionToken(session))) return NextResponse.redirect(new URL("/about", request.url));
+  if (!session || !(await verifySessionToken(session))) return NextResponse.redirect(new URL("/login", request.url));
   return NextResponse.next();
 }
 

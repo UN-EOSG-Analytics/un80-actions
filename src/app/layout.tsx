@@ -1,6 +1,9 @@
 import { GoogleAnalytics } from "@next/third-parties/google";
 import type { Metadata, Viewport } from "next";
 import { Roboto } from "next/font/google";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { getCurrentUser } from "@/lib/auth";
 import "./globals.css";
 
 // https://fonts.google.com/specimen/Roboto
@@ -27,15 +30,21 @@ export const viewport: Viewport = {
   themeColor: "#009edb",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getCurrentUser();
+
   return (
     <html lang="en" className={`${roboto.className} antialiased`}>
       <body>
-        {children}
+        <div className="flex min-h-screen flex-col">
+          <Header user={user} />
+          {children}
+          <Footer />
+        </div>
         <GoogleAnalytics gaId="G-XYZ" />
       </body>
     </html>

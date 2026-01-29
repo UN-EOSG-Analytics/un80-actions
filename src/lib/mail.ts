@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 export async function sendMagicLink(email: string, token: string) {
   const baseUrl = process.env.BASE_URL || "http://localhost:3000";
   const link = `${baseUrl}/verify?token=${token}`;
-  const logoUrl = `${baseUrl}/images/UN_Logo_Stacked_Colour_English.png`;
+  const logoUrl = `${baseUrl}/images/un-logo-stacked-colour-english.png`;
 
   await transporter.sendMail({
     from: `"${SITE_TITLE}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,

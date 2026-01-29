@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isAllowedDomain, createMagicToken, recentTokenExists } from "@/lib/auth";
+import { isApprovedUser, createMagicToken, recentTokenExists } from "@/lib/auth";
 import { sendMagicLink } from "@/lib/mail";
 
 export async function POST(request: Request) {
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
   if (!email || typeof email !== "string") return NextResponse.json({ error: "Email required" }, { status: 400 });
-  if (!(await isAllowedDomain(email))) return NextResponse.json({ error: "Email domain not allowed" }, { status: 403 });
+  if (!(await isApprovedUser(email))) return NextResponse.json({ error: "Email not in approved users list" }, { status: 403 });
   if (await recentTokenExists(email)) return NextResponse.json({ error: "Magic link recently sent. Check your email or wait." }, { status: 429 });
   const token = await createMagicToken(email);
   await sendMagicLink(email, token);

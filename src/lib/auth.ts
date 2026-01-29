@@ -12,12 +12,10 @@ const getSecret = () => {
 };
 const COOKIE_NAME = "auth_session";
 
-export async function isAllowedDomain(email: string): Promise<boolean> {
-  const domain = email.toLowerCase().split("@")[1];
-  if (!domain) return false;
+export async function isApprovedUser(email: string): Promise<boolean> {
   const rows = await query<{ count: string }>(
-    `SELECT COUNT(*) as count FROM ${tables.allowed_domains} WHERE domain = $1`,
-    [domain]
+    `SELECT COUNT(*) as count FROM ${tables.approved_users} WHERE email = $1`,
+    [email.toLowerCase()]
   );
   return parseInt(rows[0]?.count || "0") > 0;
 }
@@ -113,10 +111,10 @@ export async function clearSession() {
 export async function getCurrentUser() {
   const session = await getSession();
   if (!session) return null;
-  const rows = await query<{ id: string; email: string; entity: string | null }>(
-    `SELECT id, email, entity FROM ${tables.users} WHERE id = $1`,
+  const rows = await query<{ id: string; email: string }>(
+    `SELECT id, email FROM ${tables.users} WHERE id = $1`,
     [session.userId]
   );
   if (!rows[0]) return null;
-  return { id: rows[0].id, email: rows[0].email, entity: rows[0].entity };
+  return { id: rows[0].id, email: rows[0].email };
 }
