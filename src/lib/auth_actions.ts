@@ -32,7 +32,17 @@ export async function requestMagicLinkAction(email: string): Promise<ActionResul
     return { success: true };
   } catch (error) {
     console.error("Error sending magic link:", error);
-    return { success: false, error: "Failed to send email. Please try again." };
+    const msg =
+      error instanceof Error && error.message
+        ? error.message
+        : "Failed to send email. Please try again.";
+    return {
+      success: false,
+      error:
+        process.env.NODE_ENV === "development"
+          ? `Email failed: ${msg}`
+          : "Failed to send email. Please try again.",
+    };
   }
 }
 
