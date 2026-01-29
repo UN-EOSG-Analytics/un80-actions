@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import ActionModal from "./ActionModal";
-import { getActionByNumber } from "@/lib/actions";
+import { getActionByNumber } from "@/lib/auth_actions";
 import { decodeUrlParam } from "@/lib/utils";
 import type { Action } from "@/types";
 

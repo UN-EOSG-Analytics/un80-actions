@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { verifyMagicTokenAction } from "@/lib/actions";
+import { verifyMagicTokenAction } from "@/lib/auth_actions";
 
 export function VerifyForm() {
   const searchParams = useSearchParams();

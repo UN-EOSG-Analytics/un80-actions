@@ -1,6 +1,6 @@
 "use client";
 
-import { logoutAction } from "@/lib/actions";
+import { logoutAction } from "@/lib/auth_actions";
 
 interface Props {
   email: string;
