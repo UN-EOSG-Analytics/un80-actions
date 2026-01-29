@@ -4,7 +4,6 @@ import { query } from "./db";
 import type {
   Action,
   ActionFilters,
-  ActionMilestone,
   ActionsResponse,
   PaginationOptions,
   SortOptions,
@@ -201,7 +200,8 @@ function rowToAction(row: ActionRow): Action {
     is_big_ticket: row.is_big_ticket,
     needs_member_state_engagement: row.needs_member_state_engagement,
     tracking_status: row.tracking_status as Action["tracking_status"],
-    public_action_status: row.public_action_status as Action["public_action_status"],
+    public_action_status:
+      row.public_action_status as Action["public_action_status"],
     action_leads: row.action_leads ?? [],
     work_package_leads: row.work_package_leads ?? [],
     action_focal_points: row.action_focal_points ?? [],
@@ -219,7 +219,7 @@ function rowToAction(row: ActionRow): Action {
  */
 function buildWhereClause(
   filters: ActionFilters,
-  startParamIndex: number = 1
+  startParamIndex: number = 1,
 ): { clause: string; params: unknown[]; nextIndex: number } {
   const conditions: string[] = [];
   const params: unknown[] = [];
@@ -335,7 +335,7 @@ function buildOrderClause(sort?: SortOptions): string {
  */
 export async function getActionById(
   id: number,
-  subId?: string | null
+  subId?: string | null,
 ): Promise<Action | null> {
   const whereClause = subId
     ? "WHERE a.id = $1 AND a.sub_id = $2"
@@ -343,7 +343,10 @@ export async function getActionById(
 
   const params = subId ? [id, subId] : [id];
 
-  const rows = await query<ActionRow>(`${ACTION_SELECT} ${whereClause}`, params);
+  const rows = await query<ActionRow>(
+    `${ACTION_SELECT} ${whereClause}`,
+    params,
+  );
 
   return rows.length > 0 ? rowToAction(rows[0]) : null;
 }
@@ -356,7 +359,7 @@ export async function getActionById(
 export async function getActionByNumber(
   actionNumber: number,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  firstMilestone?: string | null
+  firstMilestone?: string | null,
 ): Promise<Action | null> {
   // First try to find exact match (no sub_id), then fall back to any with that ID
   // TODO: Use firstMilestone to filter or highlight specific milestone
@@ -365,7 +368,7 @@ export async function getActionByNumber(
      WHERE a.id = $1
      ORDER BY a.sub_id ASC NULLS FIRST
      LIMIT 1`,
-    [actionNumber]
+    [actionNumber],
   );
 
   if (rows.length === 0) return null;
@@ -384,11 +387,12 @@ export async function getActionByNumber(
 export async function getActions(
   filters: ActionFilters = {},
   pagination: PaginationOptions = {},
-  sort?: SortOptions
+  sort?: SortOptions,
 ): Promise<ActionsResponse> {
   const { limit = 50, offset = 0 } = pagination;
 
-  const { clause: whereClause, params: filterParams } = buildWhereClause(filters);
+  const { clause: whereClause, params: filterParams } =
+    buildWhereClause(filters);
   const orderClause = buildOrderClause(sort);
 
   // Get total count
@@ -412,7 +416,11 @@ export async function getActions(
     OFFSET $${filterParams.length + 2}
   `;
 
-  const rows = await query<ActionRow>(dataQuery, [...filterParams, limit, offset]);
+  const rows = await query<ActionRow>(dataQuery, [
+    ...filterParams,
+    limit,
+    offset,
+  ]);
 
   return {
     actions: rows.map(rowToAction),
@@ -428,7 +436,7 @@ export async function getActions(
 export async function getActionsByWorkstream(
   workstreamId: string,
   pagination?: PaginationOptions,
-  sort?: SortOptions
+  sort?: SortOptions,
 ): Promise<ActionsResponse> {
   return getActions({ workstream_id: workstreamId }, pagination, sort);
 }
@@ -439,7 +447,7 @@ export async function getActionsByWorkstream(
 export async function getActionsByWorkPackage(
   workPackageId: number,
   pagination?: PaginationOptions,
-  sort?: SortOptions
+  sort?: SortOptions,
 ): Promise<ActionsResponse> {
   return getActions({ work_package_id: workPackageId }, pagination, sort);
 }
@@ -450,7 +458,7 @@ export async function getActionsByWorkPackage(
 export async function getActionsByLead(
   leadName: string,
   pagination?: PaginationOptions,
-  sort?: SortOptions
+  sort?: SortOptions,
 ): Promise<ActionsResponse> {
   return getActions({ lead_name: leadName }, pagination, sort);
 }
@@ -461,7 +469,7 @@ export async function getActionsByLead(
 export async function getActionsByEntity(
   entity: string,
   pagination?: PaginationOptions,
-  sort?: SortOptions
+  sort?: SortOptions,
 ): Promise<ActionsResponse> {
   return getActions({ entity }, pagination, sort);
 }
@@ -473,56 +481,9 @@ export async function searchActions(
   searchQuery: string,
   filters?: Omit<ActionFilters, "search">,
   pagination?: PaginationOptions,
-  sort?: SortOptions
+  sort?: SortOptions,
 ): Promise<ActionsResponse> {
   return getActions({ ...filters, search: searchQuery }, pagination, sort);
-}
-
-/**
- * Fetch all milestones for a specific action.
- */
-export async function getActionMilestones(
-  actionId: number,
-  subId?: string | null
-): Promise<ActionMilestone[]> {
-  const whereClause = subId !== undefined
-    ? "WHERE action_id = $1 AND (action_sub_id IS NOT DISTINCT FROM $2)"
-    : "WHERE action_id = $1";
-
-  const params = subId !== undefined ? [actionId, subId] : [actionId];
-
-  const rows = await query<ActionMilestone>(
-    `SELECT
-      id,
-      action_id,
-      action_sub_id,
-      milestone_type,
-      description,
-      deadline::text,
-      updates,
-      status,
-      submitted_by,
-      submitted_by_entity,
-      submitted_at,
-      reviewed_by,
-      reviewed_at,
-      approved_by,
-      approved_at
-    FROM action_milestones
-    ${whereClause}
-    ORDER BY
-      CASE milestone_type
-        WHEN 'first' THEN 1
-        WHEN 'second' THEN 2
-        WHEN 'third' THEN 3
-        WHEN 'upcoming' THEN 4
-        WHEN 'final' THEN 5
-      END,
-      deadline ASC NULLS LAST`,
-    params
-  );
-
-  return rows;
 }
 
 // =========================================================
@@ -536,28 +497,30 @@ export async function getWorkstreams(): Promise<Workstream[]> {
   return query<Workstream>(
     `SELECT id, workstream_title, report_title, report_document_symbol
      FROM workstreams
-     ORDER BY id`
+     ORDER BY id`,
   );
 }
 
 /**
  * Fetch all work packages, optionally filtered by workstream.
  */
-export async function getWorkPackages(workstreamId?: string): Promise<WorkPackage[]> {
+export async function getWorkPackages(
+  workstreamId?: string,
+): Promise<WorkPackage[]> {
   if (workstreamId) {
     return query<WorkPackage>(
       `SELECT id, workstream_id, work_package_title, work_package_goal
        FROM work_packages
        WHERE workstream_id = $1
        ORDER BY id`,
-      [workstreamId]
+      [workstreamId],
     );
   }
 
   return query<WorkPackage>(
     `SELECT id, workstream_id, work_package_title, work_package_goal
      FROM work_packages
-     ORDER BY workstream_id, id`
+     ORDER BY workstream_id, id`,
   );
 }
 
@@ -566,7 +529,7 @@ export async function getWorkPackages(workstreamId?: string): Promise<WorkPackag
  */
 export async function getLeadNames(): Promise<string[]> {
   const rows = await query<{ name: string }>(
-    `SELECT DISTINCT name FROM leads ORDER BY name`
+    `SELECT DISTINCT name FROM leads ORDER BY name`,
   );
   return rows.map((r) => r.name);
 }
@@ -576,7 +539,7 @@ export async function getLeadNames(): Promise<string[]> {
  */
 export async function getActionEntities(): Promise<string[]> {
   const rows = await query<{ entity_id: string }>(
-    `SELECT DISTINCT entity_id FROM action_member_entities ORDER BY entity_id`
+    `SELECT DISTINCT entity_id FROM action_member_entities ORDER BY entity_id`,
   );
   return rows.map((r) => r.entity_id);
 }
@@ -597,7 +560,7 @@ export async function getActionCountsByWorkstream(): Promise<
      LEFT JOIN work_packages wp ON wp.workstream_id = ws.id
      LEFT JOIN actions a ON a.work_package_id = wp.id
      GROUP BY ws.id
-     ORDER BY ws.id`
+     ORDER BY ws.id`,
   );
 }
 
@@ -605,7 +568,7 @@ export async function getActionCountsByWorkstream(): Promise<
  * Get action counts grouped by work package.
  */
 export async function getActionCountsByWorkPackage(
-  workstreamId?: string
+  workstreamId?: string,
 ): Promise<Array<{ work_package_id: number; count: number }>> {
   const whereClause = workstreamId ? "WHERE wp.workstream_id = $1" : "";
   const params = workstreamId ? [workstreamId] : [];
@@ -617,7 +580,7 @@ export async function getActionCountsByWorkPackage(
      ${whereClause}
      GROUP BY wp.id
      ORDER BY wp.id`,
-    params
+    params,
   );
 }
 
@@ -631,7 +594,7 @@ export async function getActionCountsByStatus(): Promise<
     `SELECT public_action_status as status, COUNT(*)::int as count
      FROM actions
      GROUP BY public_action_status
-     ORDER BY public_action_status`
+     ORDER BY public_action_status`,
   );
 }
 
@@ -644,21 +607,25 @@ export async function getActionsSummary(): Promise<{
   big_ticket_count: number;
   member_state_engagement_count: number;
 }> {
-  const [totalResult, statusCounts, bigTicketResult, memberStateResult] = await Promise.all([
-    query<{ count: string }>(`SELECT COUNT(*)::text as count FROM actions`),
-    getActionCountsByStatus(),
-    query<{ count: string }>(
-      `SELECT COUNT(*)::text as count FROM actions WHERE is_big_ticket = true`
-    ),
-    query<{ count: string }>(
-      `SELECT COUNT(*)::text as count FROM actions WHERE needs_member_state_engagement = true`
-    ),
-  ]);
+  const [totalResult, statusCounts, bigTicketResult, memberStateResult] =
+    await Promise.all([
+      query<{ count: string }>(`SELECT COUNT(*)::text as count FROM actions`),
+      getActionCountsByStatus(),
+      query<{ count: string }>(
+        `SELECT COUNT(*)::text as count FROM actions WHERE is_big_ticket = true`,
+      ),
+      query<{ count: string }>(
+        `SELECT COUNT(*)::text as count FROM actions WHERE needs_member_state_engagement = true`,
+      ),
+    ]);
 
   return {
     total: parseInt(totalResult[0]?.count || "0", 10),
     by_status: statusCounts,
     big_ticket_count: parseInt(bigTicketResult[0]?.count || "0", 10),
-    member_state_engagement_count: parseInt(memberStateResult[0]?.count || "0", 10),
+    member_state_engagement_count: parseInt(
+      memberStateResult[0]?.count || "0",
+      10,
+    ),
   };
 }
