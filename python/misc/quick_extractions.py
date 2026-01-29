@@ -2,8 +2,6 @@ import pandas as pd
 import re
 
 
-
-
 # Email regex pattern
 EMAIL_PATTERN = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
 
@@ -32,10 +30,13 @@ def extract_emails_from_text(text):
     return ",".join(emails)
 
 
-df["extracted_emails"] = df["FP Specific for WP-Level -- SUPERSEDED"].apply(extract_emails_from_text)
+df["extracted_emails"] = df["FP Specific for WP-Level -- SUPERSEDED"].apply(
+    extract_emails_from_text
+)
 
 
 ##########################################
+
 
 # Validation: Check if @ count matches between original and extracted
 def count_at_signs(text):
@@ -45,7 +46,9 @@ def count_at_signs(text):
     return str(text).count("@")
 
 
-df["original_at_count"] = df["FP Specific for WP-Level -- SUPERSEDED"].apply(count_at_signs)
+df["original_at_count"] = df["FP Specific for WP-Level -- SUPERSEDED"].apply(
+    count_at_signs
+)
 df["extracted_at_count"] = df["extracted_emails"].apply(count_at_signs)
 df["at_count_mismatch"] = df["original_at_count"] != df["extracted_at_count"]
 

@@ -17,7 +17,9 @@ api = Api(os.environ["AIRTABLE_API_KEY"])
 table = api.table(base_id=os.environ["AIRTABLE_BASE_ID"], table_name=ACTIONS_TABLE_ID)
 
 # Docs: https://pyairtable.readthedocs.io/en/stable/api.html?highlight=cell_format#pyairtable.Table.all
-records = table.all(cell_format="string",user_locale="en-ca", time_zone="America/New_York")
+records = table.all(
+    cell_format="string", user_locale="en-ca", time_zone="America/New_York"
+)
 
 records
 

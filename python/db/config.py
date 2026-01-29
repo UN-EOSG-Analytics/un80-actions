@@ -28,5 +28,6 @@ POSTGRES_DSN = (
     f"dbname={os.environ.get('AZURE_POSTGRES_DB', 'postgres')} "
     f"user={os.environ['AZURE_POSTGRES_USER']} "
     f"password={os.environ['AZURE_POSTGRES_PASSWORD']} "
-    "sslmode=require"
+    "sslmode=require "
+    "options=-csearch_path=un80actions,systemchart,public"
 )

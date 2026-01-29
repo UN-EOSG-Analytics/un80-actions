@@ -28,8 +28,6 @@ df = convert_linked_columns_to_lists(df, linked_columns)
 # add SQL types
 
 
-
-
 # Export ------------------------------------------------------
 
 # Create output directory if needed

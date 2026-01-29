@@ -48,7 +48,9 @@ db = os.getenv("POSTGRES_DB", "")
 ssl_mode = os.getenv("POSTGRES_SSL_MODE", "prefer")
 
 # First, connect to default 'postgres' database to create the target database if needed
-default_connection_string = f"postgresql://{user}:{password}@{host}:{port}/postgres?sslmode={ssl_mode}"
+default_connection_string = (
+    f"postgresql://{user}:{password}@{host}:{port}/postgres?sslmode={ssl_mode}"
+)
 default_engine = create_engine(default_connection_string)
 
 try:
@@ -69,19 +71,21 @@ finally:
     default_engine.dispose()
 
 # Now connect to the target database
-connection_string = f"postgresql://{user}:{password}@{host}:{port}/{db}?sslmode={ssl_mode}"
+connection_string = (
+    f"postgresql://{user}:{password}@{host}:{port}/{db}?sslmode={ssl_mode}"
+)
 engine = create_engine(connection_string)
 print(f"Connected to Postgres: {host}/{db}")
 
 try:
     # TODO: Map Airtable columns to un80actions schema tables
     # This depends on your final Airtable structure and schema design
-    
+
     # Example structure (adjust based on your actual data):
     # - actions_df: Data for un80actions.actions table
     # - action_leads_df: Data for un80actions.action_leads table
     # - action_entities_df: Data for un80actions.action_entities table
-    
+
     # For now, export to a staging table for inspection
     with engine.begin() as conn:
         # Create staging table if needed
@@ -92,7 +96,7 @@ try:
             );
         """)
         conn.exec_driver_sql("DELETE FROM un80actions.actions_staging;")
-    
+
     # Insert raw data into staging table for initial review
     df.to_sql(
         "actions_staging",
