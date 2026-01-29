@@ -1,15 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { UserMenu } from "./UserMenu";
+import { SITE_SUBTITLE, SITE_TITLE } from "@/constants/site";
 
 interface Props {
   user?: { email: string } | null;
   children?: React.ReactNode;
   maxWidth?: "6xl" | "7xl";
 }
-
-export const SITE_TITLE = "UN Web App";
-export const SITE_SUBTITLE = "A modern web application for the United Nations";
 
 export function Header({ user, children, maxWidth = "7xl" }: Props) {
   const isLoggedIn = !!user;

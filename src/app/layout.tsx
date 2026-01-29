@@ -1,8 +1,9 @@
 import { GoogleAnalytics } from "@next/third-parties/google";
 import type { Metadata, Viewport } from "next";
 import { Roboto } from "next/font/google";
-import { Header } from "@/components/Header";
+import { Header } from "@/components/HeaderBar";
 import { Footer } from "@/components/Footer";
+import { SITE_DESCRIPTION, SITE_TITLE } from "@/constants/site";
 import { getCurrentUser } from "@/lib/auth";
 import "./globals.css";
 
@@ -14,11 +15,11 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "United Nations",
-  description: "A modern web application for the United Nations.",
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
   openGraph: {
-    title: "United Nations",
-    description: "A modern web application for the United Nations.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     type: "website",
     locale: "en_US",
   },
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#009edb",
+  themeColor: "#009edb", // UN Blue
 };
 
 export default async function RootLayout({
