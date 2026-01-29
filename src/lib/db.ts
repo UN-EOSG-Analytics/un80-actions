@@ -23,9 +23,9 @@ function getConnectionConfig() {
     database,
     port,
     ssl: { rejectUnauthorized: false },
-    max: 20,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    max: 2, // Lower for serverless to avoid connection exhaustion
+    idleTimeoutMillis: 10000,
+    connectionTimeoutMillis: 5000,
     options: "-c search_path=un80actions,systemchart,public",
   };
 }

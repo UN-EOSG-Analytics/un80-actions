@@ -17,6 +17,22 @@ This Dashboard is an annex to the [UN80 Initiative Action Plan](https://www.un.o
 npm install
 ```
 
+### Environment Variables
+
+Copy `.env.example` to `.env` and fill in the required values:
+
+```bash
+cp .env.example .env
+```
+
+Required variables:
+- `AZURE_POSTGRES_HOST` - Azure PostgreSQL host
+- `AZURE_POSTGRES_USER` - Database username
+- `AZURE_POSTGRES_PASSWORD` - Database password
+- `AUTH_SECRET` - Random secret for JWT signing
+- `RESEND_API_KEY` - API key for email service
+- `EMAIL_FROM` - Sender email address
+
 ### Development
 
 Run the development server:
@@ -62,5 +78,19 @@ npm audit
 
 ## Deployment
 
-- GitHub Pages
-- Vercel
+### Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Import project in Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy
+
+The application is optimized for Vercel with:
+- Standalone output for smaller deployments
+- Serverless-optimized database connection pooling
+- Automatic edge caching
+- 10s function timeout for API routes
+
+### Environment Variables on Vercel
+
+Make sure to set all variables from `.env.example` in your Vercel project settings.
