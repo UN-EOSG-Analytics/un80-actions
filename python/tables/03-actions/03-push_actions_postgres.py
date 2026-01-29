@@ -79,7 +79,7 @@ work_package_rows = [
 
 print(f"Found {len(work_package_rows)} unique work packages")
 
-# Prepare actions data (main table)
+# Prepare actions data (main table - milestones excluded, will be loaded separately)
 action_rows = []
 for _, row in df_clean.iterrows():
     action_rows.append(
@@ -105,30 +105,6 @@ for _, row in df_clean.iterrows():
             if pd.notna(row.get("proposal_advancement_scenario"))
             else None,
             row.get("un_budgets") if pd.notna(row.get("un_budgets")) else None,
-            row.get("milestone_1") if pd.notna(row.get("milestone_1")) else None,
-            pd.to_datetime(row["milestone_1_deadline"]).date()
-            if pd.notna(row.get("milestone_1_deadline"))
-            else None,
-            row.get("milestone_2") if pd.notna(row.get("milestone_2")) else None,
-            pd.to_datetime(row["milestone_2_deadline"]).date()
-            if pd.notna(row.get("milestone_2_deadline"))
-            else None,
-            row.get("milestone_3") if pd.notna(row.get("milestone_3")) else None,
-            pd.to_datetime(row["milestone_3_deadline"]).date()
-            if pd.notna(row.get("milestone_3_deadline"))
-            else None,
-            row.get("milestone_upcoming")
-            if pd.notna(row.get("milestone_upcoming"))
-            else None,
-            pd.to_datetime(row["milestone_upcoming_deadline"]).date()
-            if pd.notna(row.get("milestone_upcoming_deadline"))
-            else None,
-            row.get("milestone_final")
-            if pd.notna(row.get("milestone_final"))
-            else None,
-            pd.to_datetime(row["milestone_final_deadline"]).date()
-            if pd.notna(row.get("milestone_final_deadline"))
-            else None,
             bool(row.get("is_big_ticket", False)),
             bool(row.get("needs_member_state_engagement", False)),
             row.get("tracking_status")
@@ -137,8 +113,6 @@ for _, row in df_clean.iterrows():
             row.get("public_action_status")
             if pd.notna(row.get("public_action_status"))
             else None,
-            row.get("action_notes") if pd.notna(row.get("action_notes")) else None,
-            row.get("action_updates") if pd.notna(row.get("action_updates")) else None,
             row.get("action_record_id")
             if pd.notna(row.get("action_record_id"))
             else None,
@@ -382,22 +356,16 @@ try:
                 cur.executemany(UPSERT_WORK_PACKAGES_SQL, work_package_rows)
                 print(f"✓ Upserted {len(work_package_rows)} work packages")
 
-            # 3. Upsert actions
+            # 3. Upsert actions (milestones, notes, updates excluded - loaded separately)
             UPSERT_ACTIONS_SQL = """
             INSERT INTO un80actions.actions (
                 id, sub_id, work_package_id, indicative_action, sub_action,
                 document_paragraph_number, document_paragraph_text,
                 scope_definition, legal_considerations, proposal_advancement_scenario, un_budgets,
-                milestone_1, milestone_1_deadline,
-                milestone_2, milestone_2_deadline,
-                milestone_3, milestone_3_deadline,
-                milestone_upcoming, milestone_upcoming_deadline,
-                miletstone_final, milestone_final_deadline,
                 is_big_ticket, needs_member_state_engagement,
-                tracking_status, public_action_status,
-                action_notes, action_updates, action_record_id
+                tracking_status, public_action_status, action_record_id
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (id, sub_id) DO UPDATE SET
                 work_package_id = EXCLUDED.work_package_id,
                 indicative_action = EXCLUDED.indicative_action,
@@ -408,22 +376,10 @@ try:
                 legal_considerations = EXCLUDED.legal_considerations,
                 proposal_advancement_scenario = EXCLUDED.proposal_advancement_scenario,
                 un_budgets = EXCLUDED.un_budgets,
-                milestone_1 = EXCLUDED.milestone_1,
-                milestone_1_deadline = EXCLUDED.milestone_1_deadline,
-                milestone_2 = EXCLUDED.milestone_2,
-                milestone_2_deadline = EXCLUDED.milestone_2_deadline,
-                milestone_3 = EXCLUDED.milestone_3,
-                milestone_3_deadline = EXCLUDED.milestone_3_deadline,
-                milestone_upcoming = EXCLUDED.milestone_upcoming,
-                milestone_upcoming_deadline = EXCLUDED.milestone_upcoming_deadline,
-                miletstone_final = EXCLUDED.miletstone_final,
-                milestone_final_deadline = EXCLUDED.milestone_final_deadline,
                 is_big_ticket = EXCLUDED.is_big_ticket,
                 needs_member_state_engagement = EXCLUDED.needs_member_state_engagement,
                 tracking_status = EXCLUDED.tracking_status,
                 public_action_status = EXCLUDED.public_action_status,
-                action_notes = EXCLUDED.action_notes,
-                action_updates = EXCLUDED.action_updates,
                 action_record_id = EXCLUDED.action_record_id
             """
             cur.executemany(UPSERT_ACTIONS_SQL, action_rows)

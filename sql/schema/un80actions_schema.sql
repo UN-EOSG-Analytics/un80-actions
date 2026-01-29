@@ -14,7 +14,7 @@ create type action_tracking_status as enum (
     'No submission',
     'Confirmation needed'
 );
-create type milestone_type as enum ('first', 'final', 'upcoming');
+create type milestone_type as enum ('first', 'second', 'third', 'upcoming', 'final');
 create type milestone_status as enum (
     'draft',
     'submitted',
@@ -30,6 +30,7 @@ create type user_roles as enum (
     'Admin',
     'Legal'
 );
+create type user_status as enum ('Active', 'Inactive');
 -- =========================================================
 -- USERS & AUTHENTICATION
 -- =========================================================
@@ -39,9 +40,9 @@ create table approved_users (
     email text not null unique primary key,
     full_name text,
     entity text references systemchart.entities(entity) on delete restrict,
-    user_status text,
+    user_status user_status,
     user_role user_roles,
-    created_at timestamp not null default now()
+    created_at timestamp with time zone not null default now()
 );
 comment on table approved_users is 'Pre-approval registry. Users must have an entry here to authenticate. Email links to users table.';
 -- =========================================================
@@ -66,23 +67,20 @@ create table approved_user_leads (
 -- Actual authenticated users
 -- Populated from approved_users on first login via email match
 -- APPLICATION LOGIC: Only create users entry if email exists in approved_users
+-- This table tracks people who actually used the platform
 create table users (
-    id serial primary key,
+    id uuid primary key default gen_random_uuid() not null,
     email text not null unique references approved_users(email),
-    entity_id text not null references systemchart.entities(entity) on delete restrict,
-    created_at timestamp not null default now(),
-    last_login_at timestamp
+    created_at timestamp with time zone default now(),
+    updated_at timestamp with time zone default now(),
+    last_login_at timestamp with time zone
 );
 -- Passwordless authentication tokens
--- Uses timestamptz for unambiguous expiration handling across timezones
 create table magic_tokens (
     token text not null primary key,
-    email text not null references approved_users(email) on delete cascade,
-    expires_at timestamptz not null,
-    used_at timestamptz,
-    used_by int references users(id) on delete
-    set null,
-        created_at timestamptz not null default now()
+    email text not null,
+    expires_at timestamp with time zone not null,
+    used_at timestamp with time zone
 );
 -- =========================================================
 -- CORE TABLES
@@ -120,27 +118,12 @@ create table actions (
     legal_considerations text,
     proposal_advancement_scenario text,
     un_budgets text,
-    -- Milestones (stored as text in this table, separate milestone table exists)
-    milestone_1 text,
-    milestone_1_deadline date,
-    milestone_2 text,
-    milestone_2_deadline date,
-    milestone_3 text,
-    milestone_3_deadline date,
-    milestone_upcoming text,
-    milestone_upcoming_deadline date,
-    miletstone_final text,
-    -- Note: typo in CSV
-    milestone_final_deadline date,
     -- Flags
     is_big_ticket boolean not null default false,
     needs_member_state_engagement boolean not null default false,
     -- Status & tracking
     tracking_status action_tracking_status,
     public_action_status public_action_status,
-    -- Notes
-    action_notes text,
-    action_updates text,
     -- Airtable reference
     action_record_id text,
     -- Unique constraint that treats NULL as a value
@@ -148,23 +131,22 @@ create table actions (
 );
 -- Action milestones
 create table action_milestones (
-    id int primary key,
+    id uuid primary key default gen_random_uuid(),
     action_id int not null,
     action_sub_id text,
     milestone_type milestone_type not null,
     description text,
-    delivery_date date,
     deadline date,
     updates text,
     status milestone_status not null default 'draft',
-    submitted_by int references users(id) on delete cascade,
+    submitted_by uuid references users(id) on delete cascade,
     submitted_by_entity text references systemchart.entities(entity) on delete
     set null,
-        submitted_at timestamp,
-        reviewed_by int references users(id) on delete cascade,
-        reviewed_at timestamp,
-        approved_by int references users(id) on delete cascade,
-        approved_at timestamp,
+        submitted_at timestamp with time zone,
+        reviewed_by uuid references users(id) on delete cascade,
+        reviewed_at timestamp with time zone,
+        approved_by uuid references users(id) on delete cascade,
+        approved_at timestamp with time zone,
         foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade,
         constraint action_milestones_action_type_key unique (action_id, action_sub_id, milestone_type)
 );
@@ -227,26 +209,36 @@ create table action_member_entities (
 -- NOTES & QUESTIONS
 -- =========================================================
 create table action_notes (
-    id serial primary key,
+    id uuid primary key default gen_random_uuid(),
     action_id int not null,
     action_sub_id text,
-    user_id int not null references users(id) on delete cascade,
+    user_id uuid references users(id) on delete cascade,
     content text not null,
-    created_at timestamp not null default now(),
-    updated_at timestamp,
+    created_at timestamp with time zone not null default now(),
+    updated_at timestamp with time zone,
     foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
 );
 create table action_questions (
-    id serial primary key,
+    id uuid primary key default gen_random_uuid(),
     action_id int not null,
     action_sub_id text,
-    user_id int not null references users(id) on delete cascade,
+    user_id uuid not null references users(id) on delete cascade,
     question text not null,
     answer text,
-    answered_by int references users(id) on delete
+    answered_by uuid references users(id) on delete
     set null,
-        answered_at timestamp,
-        created_at timestamp not null default now(),
-        updated_at timestamp,
+        answered_at timestamp with time zone,
+        created_at timestamp with time zone not null default now(),
+        updated_at timestamp with time zone,
         foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
+);
+create table action_updates (
+    id uuid primary key default gen_random_uuid(),
+    action_id int not null,
+    action_sub_id text,
+    user_id uuid references users(id) on delete cascade,
+    content text not null,
+    created_at timestamp with time zone not null default now(),
+    updated_at timestamp with time zone,
+    foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
 );
