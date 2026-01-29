@@ -1,89 +1,92 @@
-"use client";
+// OLD CODE FOR REFERENCE ONLY
+// NOT UPDATED TO NEW DATA SERVICE YET
 
-import { useSearchParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import ActionModal from "./ActionModal";
-import { getActionByNumber } from "@/lib/auth_actions";
-import { decodeUrlParam } from "@/lib/utils";
-import type { Action } from "@/types";
+// "use client";
 
-// Session storage key for return URL (set by ActionCard before opening modal)
-const RETURN_URL_KEY = "actionModalReturnUrl";
+// import { useSearchParams, useRouter } from "next/navigation";
+// import { useState, useEffect } from "react";
+// import ActionModal from "./ActionModal";
+// import { getActionByNumber } from "@/lib/actions";
+// import { decodeUrlParam } from "@/lib/utils";
+// import type { Action } from "@/types";
 
-export default function ModalHandler() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const actionParam = searchParams.get("action");
-  const milestoneParam = searchParams.get("milestone");
-  const [action, setAction] = useState<Action | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+// // Session storage key for return URL (set by ActionCard before opening modal)
+// const RETURN_URL_KEY = "actionModalReturnUrl";
 
-  useEffect(() => {
-    // If there's no action param, clear state
-    if (!actionParam) {
-      setAction(null);
-      setError(null);
-      setLoading(false);
-      return;
-    }
+// export default function ModalHandler() {
+//   const searchParams = useSearchParams();
+//   const router = useRouter();
+//   const actionParam = searchParams.get("action");
+//   const milestoneParam = searchParams.get("milestone");
+//   const [action, setAction] = useState<Action | null>(null);
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
 
-    // Parse action number from query param
-    const actionNumber = parseInt(actionParam, 10);
-    const firstMilestone = milestoneParam
-      ? decodeUrlParam(milestoneParam)
-      : null;
+//   useEffect(() => {
+//     // If there's no action param, clear state
+//     if (!actionParam) {
+//       setAction(null);
+//       setError(null);
+//       setLoading(false);
+//       return;
+//     }
 
-    // If invalid action number, show error
-    if (isNaN(actionNumber)) {
-      setError("Invalid action number");
-      setLoading(false);
-      return;
-    }
+//     // Parse action number from query param
+//     const actionNumber = parseInt(actionParam, 10);
+//     const firstMilestone = milestoneParam
+//       ? decodeUrlParam(milestoneParam)
+//       : null;
 
-    // Load action data
-    const loadAction = async () => {
-      setLoading(true);
-      setError(null);
+//     // If invalid action number, show error
+//     if (isNaN(actionNumber)) {
+//       setError("Invalid action number");
+//       setLoading(false);
+//       return;
+//     }
 
-      try {
-        const foundAction = await getActionByNumber(
-          actionNumber,
-          firstMilestone,
-        );
-        if (!foundAction) {
-          setError("Action not found");
-          setAction(null);
-        } else {
-          setAction(foundAction);
-        }
-      } catch (err) {
-        setError("Failed to load action");
-        setAction(null);
-      } finally {
-        setLoading(false);
-      }
-    };
+//     // Load action data
+//     const loadAction = async () => {
+//       setLoading(true);
+//       setError(null);
 
-    loadAction();
-  }, [actionParam, milestoneParam]);
+//       try {
+//         const foundAction = await getActionByNumber(
+//           actionNumber,
+//           firstMilestone,
+//         );
+//         if (!foundAction) {
+//           setError("Action not found");
+//           setAction(null);
+//         } else {
+//           setAction(foundAction);
+//         }
+//       } catch (err) {
+//         setError("Failed to load action");
+//         setAction(null);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
 
-  const handleClose = () => {
-    // Get stored return URL and clear it
-    const returnUrl = sessionStorage.getItem(RETURN_URL_KEY) || "/";
-    sessionStorage.removeItem(RETURN_URL_KEY);
-    sessionStorage.removeItem("actionModalOpen");
-    router.replace(returnUrl, { scroll: false });
-  };
+//     loadAction();
+//   }, [actionParam, milestoneParam]);
 
-  // Only show modal if there's an action param
-  if (!actionParam) return null;
+//   const handleClose = () => {
+//     // Get stored return URL and clear it
+//     const returnUrl = sessionStorage.getItem(RETURN_URL_KEY) || "/";
+//     sessionStorage.removeItem(RETURN_URL_KEY);
+//     sessionStorage.removeItem("actionModalOpen");
+//     router.replace(returnUrl, { scroll: false });
+//   };
 
-  return (
-    <ActionModal
-      action={error ? null : action}
-      onClose={handleClose}
-      loading={loading}
-    />
-  );
-}
+//   // Only show modal if there's an action param
+//   if (!actionParam) return null;
+
+//   return (
+//     <ActionModal
+//       action={error ? null : action}
+//       onClose={handleClose}
+//       loading={loading}
+//     />
+//   );
+// }
