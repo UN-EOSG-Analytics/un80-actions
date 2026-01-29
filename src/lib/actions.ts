@@ -1,6 +1,7 @@
 "use server";
 
 import { query } from "./db";
+import { getActionMilestones } from "./milestones";
 import type {
   Action,
   ActionFilters,
