@@ -99,32 +99,49 @@ create table workstreams (
 create table work_packages (
     id int not null primary key,
     workstream_id text not null references workstreams(id) on delete restrict,
+    work_package_title text not null,
     name text not null,
-    goal text,
+    work_package_goal text,
+    -- work_package_leads FIXME
     constraint work_packages_workstream_number_key unique (workstream_id, number)
 );
 -- Actions
 -- Uniquely identified by id + sub_id (e.g., id=94, sub_id="(a)")
 create table actions (
+    primary key (id, sub_id),
     id int not null,
     sub_id text not null,
+    constraint actions_wp_action_number_key unique (work_package_id, action_number) -- 
+    -- action_leads FIXME
+    -- action_member_persons
+    -- action_support_persons
+    -- 
+    -- 
     work_package_id int not null references work_packages(id) on delete cascade,
+    -- 
+    indicative_action text not null,
+    sub_action text,
+    -- 
     document_paragraph_number text,
     document_paragraph_text text,
+    -- 
     scope_definition text,
     legal_considerations text,
-    action_number int not null,
-    indicative_action text not null,
+    --  maybe ENUM?
+    proposal_advancement_scenario text,
+    --  maybe ENUM?
     un_budgets text [],
-    indicative_sub_action text,
+    --  maybe ENUM? or different table?
+    -- 
     is_big_ticket boolean not null default false,
     is_subaction boolean not null default false,
+    needs_member_state_engagement boolean not null default false,
+    -- 
     tracking_status action_tracking_status,
-    doc_text text,
     public_action_status text,
-    proposal_advancement_scenario text,
-    primary key (id, sub_id),
-    constraint actions_wp_action_number_key unique (work_package_id, action_number)
+    -- 
+    action_notes text,
+    action_updates text,
 );
 -- Action milestones
 create table action_milestones (

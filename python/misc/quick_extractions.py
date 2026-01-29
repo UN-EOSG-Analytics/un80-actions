@@ -32,7 +32,7 @@ def extract_emails_from_text(text):
     return ",".join(emails)
 
 
-df["extracted_emails"] = df["action_support_RAW"].apply(extract_emails_from_text)
+df["extracted_emails"] = df["FP Specific for WP-Level -- SUPERSEDED"].apply(extract_emails_from_text)
 
 
 ##########################################
@@ -45,7 +45,7 @@ def count_at_signs(text):
     return str(text).count("@")
 
 
-df["original_at_count"] = df["action_support_RAW"].apply(count_at_signs)
+df["original_at_count"] = df["FP Specific for WP-Level -- SUPERSEDED"].apply(count_at_signs)
 df["extracted_at_count"] = df["extracted_emails"].apply(count_at_signs)
 df["at_count_mismatch"] = df["original_at_count"] != df["extracted_at_count"]
 

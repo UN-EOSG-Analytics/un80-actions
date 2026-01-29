@@ -27,9 +27,17 @@ def fetch_airtable_table(
     Raises:
         ValueError: If no records found in the table.
     """
+    table = api.table(
+        base_id,
+        table_id,
+    )
 
-    table = api.table(base_id, table_id)
-    records = table.all()
+    # Docs: https://pyairtable.readthedocs.io/en/stable/api.html?highlight=cell_format#pyairtable.Table.all
+    records = table.all(
+        cell_format="string", user_locale="en-ca", time_zone="America/New_York"
+    )
+
+    # cell_format – The cell format to request from the Airtable API. Supported options are json (the default) and string. json will return cells as a JSON object. string will return the cell as a string. user_locale and time_zone must be set when using string.
 
     if not records:
         raise ValueError(f"No records found in Airtable table {table_id}")
