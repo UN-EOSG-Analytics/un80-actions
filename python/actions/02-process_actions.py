@@ -1,8 +1,6 @@
-import ast
 from pathlib import Path
 
 import pandas as pd
-
 from utils.utils import export_dataframe
 
 input_path = Path("data") / "input" / "actions_raw.parquet"
@@ -44,10 +42,12 @@ for col in linked_columns:
 # add SQL types
 
 
+
+
 # Export ------------------------------------------------------
 
 # Create output directory if needed
 output_dir = Path("data") / "processed"
-export_dataframe(df,"actions", output_dir)
+export_dataframe(df, "actions", output_dir)
 
 print("\nData processing complete!")
