@@ -103,10 +103,11 @@ create table work_packages (
 );
 -- Actions
 -- Uniquely identified by id + sub_id (e.g., id=94, sub_id="(a)")
+-- sub_id is NULL for actions without sub-actions
+-- Use COALESCE in unique constraint to handle NULL values
 create table actions (
-    primary key (id, sub_id),
     id int not null,
-    sub_id text not null default '',
+    sub_id text,
     -- 
     work_package_id int not null references work_packages(id) on delete cascade,
     -- Content & description
@@ -141,13 +142,15 @@ create table actions (
     action_notes text,
     action_updates text,
     -- Airtable reference
-    action_record_id text
+    action_record_id text,
+    -- Unique constraint that treats NULL as a value
+    unique (id, sub_id)
 );
 -- Action milestones
 create table action_milestones (
     id int primary key,
     action_id int not null,
-    action_sub_id text not null,
+    action_sub_id text,
     milestone_type milestone_type not null,
     description text,
     delivery_date date,
@@ -177,48 +180,48 @@ create table work_package_leads (
 -- Work package ↔ focal points (users via email)
 create table work_package_focal_points (
     work_package_id int not null references work_packages(id) on delete cascade,
-    user_email text not null references users(email) on delete cascade,
+    user_email text not null references approved_users(email) on delete cascade,
     primary key (work_package_id, user_email)
 );
 -- Action ↔ leads (from same shared pool)
 create table action_leads (
     action_id int not null,
-    action_sub_id text not null,
+    action_sub_id text,
     lead_name text not null references leads(name) on delete restrict,
     foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade,
-    primary key (action_id, action_sub_id, lead_name)
+    unique (action_id, action_sub_id, lead_name)
 );
 -- Action ↔ focal points (users via email)
 create table action_focal_points (
     action_id int not null,
-    action_sub_id text not null,
-    user_email text not null references users(email) on delete cascade,
+    action_sub_id text,
+    user_email text not null references approved_users(email) on delete cascade,
     foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade,
-    primary key (action_id, action_sub_id, user_email)
+    unique (action_id, action_sub_id, user_email)
 );
 -- Action ↔ member persons (users via email)
 create table action_member_persons (
     action_id int not null,
-    action_sub_id text not null,
-    user_email text not null references users(email) on delete cascade,
+    action_sub_id text,
+    user_email text not null references approved_users(email) on delete cascade,
     foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade,
-    primary key (action_id, action_sub_id, user_email)
+    unique (action_id, action_sub_id, user_email)
 );
 -- Action ↔ support persons (users via email)
 create table action_support_persons (
     action_id int not null,
-    action_sub_id text not null,
-    user_email text not null references users(email) on delete cascade,
+    action_sub_id text,
+    user_email text not null references approved_users(email) on delete cascade,
     foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade,
-    primary key (action_id, action_sub_id, user_email)
+    unique (action_id, action_sub_id, user_email)
 );
 -- Action ↔ member entities (responsible organizations)
 create table action_member_entities (
     action_id int not null,
-    action_sub_id text not null,
+    action_sub_id text,
     entity_id text not null references systemchart.entities(entity) on delete restrict,
     foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade,
-    primary key (action_id, action_sub_id, entity_id)
+    unique (action_id, action_sub_id, entity_id)
 );
 -- =========================================================
 -- NOTES & QUESTIONS
@@ -226,7 +229,7 @@ create table action_member_entities (
 create table action_notes (
     id serial primary key,
     action_id int not null,
-    action_sub_id text not null,
+    action_sub_id text,
     user_id int not null references users(id) on delete cascade,
     content text not null,
     created_at timestamp not null default now(),
@@ -236,7 +239,7 @@ create table action_notes (
 create table action_questions (
     id serial primary key,
     action_id int not null,
-    action_sub_id text not null,
+    action_sub_id text,
     user_id int not null references users(id) on delete cascade,
     question text not null,
     answer text,

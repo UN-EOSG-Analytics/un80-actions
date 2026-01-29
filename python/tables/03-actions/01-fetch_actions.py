@@ -18,9 +18,10 @@ The output CSV is consumed by 02-process_actions_data.py for further processing.
 
 from pathlib import Path
 
-import pandas as pd
-from api.airtable import fetch_airtable_table
 from natsort import natsort_keygen
+
+from python.api.airtable import fetch_airtable_table
+from python.utils.utils import export_dataframe
 
 ACTIONS_TABLE_ID = "tblizWEdO7EsfFGlz"
 
@@ -65,7 +66,6 @@ for col in all_columns:
 selected_columns = [
     "id",
     "sub_id",
-    # "Work Package Deliverables",
     "action_focal_points",
     "action_leads",
     "action_member_persons",
@@ -76,7 +76,6 @@ selected_columns = [
     "document_paragraph_number",
     "document_paragraph_text",
     "indicative_action",
-    # "intergovernmental_bodies -- TBD",
     "is_big_ticket",
     "legal_considerations",
     "milestone_1",
@@ -88,7 +87,7 @@ selected_columns = [
     "milestone_final_deadline",
     "milestone_upcoming",
     "milestone_upcoming_deadline",
-    "miletstone_final",
+    "milestone_final",
     "needs_member_state_engagement",
     "proposal_advancement_scenario",
     "public_action_status",
@@ -102,26 +101,19 @@ selected_columns = [
     "work_package_leads",
     "work_package_title",
     "workstream_id",
+    "action_member_entities",
 ]
 
-df = df[[col for col in selected_columns if col in df.columns]]
+df = df[selected_columns]
+
+# Print columns that were not selected
+non_selected = [col for col in all_columns if col not in selected_columns]
+print("\nColumns not selected:")
+for col in non_selected:
+    print(f"  - {col}")
 
 
 ## Export ##
 
-# Create output directory if it doesn't exist
 output_dir = Path("data") / "input"
-output_dir.mkdir(parents=True, exist_ok=True)
-
-# Export raw data with all fields (including attachments) for backup
-output_path = output_dir / "actions_raw.parquet"
-df.to_parquet(output_path)
-
-print(f"\nSaved parquet file to: {output_path}")
-
-# Export to CSV for next processing step
-output_path = output_dir / "actions_raw.csv"
-df.to_csv(output_path, index=False)
-print(f"Saved CSV file to: {output_path}")
-
-print("\nData fetch and export complete!")
+export_dataframe(df, "actions_raw", output_dir)

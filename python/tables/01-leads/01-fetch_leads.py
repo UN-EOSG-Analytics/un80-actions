@@ -1,6 +1,7 @@
 from pathlib import Path
-from api.airtable import fetch_airtable_table
-from utils.utils import export_dataframe
+
+from python.api.airtable import fetch_airtable_table
+from python.utils.utils import export_dataframe
 
 LEADS_TABLE_ID = "tbl4sybRFswhbZM2v"
 

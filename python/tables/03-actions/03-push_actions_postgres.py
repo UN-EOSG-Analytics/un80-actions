@@ -1,120 +1,572 @@
 """
 Push UN80 Actions data to PostgreSQL database.
 
+This script upserts:
+1. Workstreams
+2. Work packages
+3. Actions
+4. Work package leads and focal points
+5. Action leads, focal points, member persons, support persons, and member entities
+
 Usage:
-    uv run python python/03-push_to_postgres.py
+    uv run python python/tables/03-actions/03-push_actions_postgres.py
 """
 
-import os
 from pathlib import Path
-from urllib.parse import quote_plus
 
+import numpy as np
 import pandas as pd
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
 
-load_dotenv()
+from python.db.connection import get_conn
 
-# Verify required environment variables
-required_vars = [
-    "POSTGRES_HOST",
-    "POSTGRES_DB",
-    "POSTGRES_USER",
-    "POSTGRES_PASSWORD",
+# Load processed actions data
+parquet_path = Path("data") / "processed" / "actions.parquet"
+df_actions = pd.read_parquet(parquet_path)
+
+print(f"Loaded {len(df_actions):,} actions from Parquet")
+print(f"Columns: {list(df_actions.columns)}")
+
+
+# Convert NaN to None for database compatibility
+def clean_value(val):
+    """Convert NaN/NaT to None, preserve lists and other values"""
+    if pd.isna(val):
+        return None
+    if isinstance(val, (list, np.ndarray)):
+        return list(val) if len(val) > 0 else []
+    return val
+
+
+# Clean all columns
+df_clean = df_actions.copy()
+for col in df_clean.columns:
+    if col not in [
+        "action_leads",
+        "action_focal_points",
+        "action_member_persons",
+        "action_support_persons",
+        "action_member_entities",
+        "work_package_leads",
+        "work_package_focal_points",
+    ]:
+        df_clean[col] = df_clean[col].apply(clean_value)
+
+print(f"Processing {len(df_clean):,} actions")
+
+# Extract unique workstreams
+workstreams = df_clean[["workstream_id"]].drop_duplicates().dropna()
+workstreams["workstream_title"] = None  # Can be populated if available in data
+workstream_rows = [
+    (row["workstream_id"], row["workstream_title"]) for _, row in workstreams.iterrows()
 ]
-missing_vars = [var for var in required_vars if not os.getenv(var)]
-if missing_vars:
-    raise ValueError(
-        f"Missing required environment variables: {', '.join(missing_vars)}"
+
+print(f"Found {len(workstream_rows)} unique workstreams")
+
+# Extract unique work packages
+work_packages = df_clean[
+    ["work_package_id", "workstream_id", "work_package_title", "work_package_goal"]
+].drop_duplicates()
+work_packages = work_packages[work_packages["work_package_id"].notna()]
+work_package_rows = [
+    (
+        int(row["work_package_id"]),
+        row["workstream_id"],
+        row["work_package_title"],
+        row["work_package_goal"],
     )
+    for _, row in work_packages.iterrows()
+]
 
-# Load data
-csv_path = Path("data") / "output" / "actions.csv"
-if not csv_path.exists():
-    raise FileNotFoundError(f"Actions CSV not found: {csv_path}")
+print(f"Found {len(work_package_rows)} unique work packages")
 
-df = pd.read_csv(csv_path)
-print(f"Loaded {len(df):,} actions from CSV")
-print(f"Columns: {list(df.columns)}")
-
-# Create database connection
-user = quote_plus(os.getenv("POSTGRES_USER", ""))
-password = quote_plus(os.getenv("POSTGRES_PASSWORD", ""))
-host = os.getenv("POSTGRES_HOST", "")
-port = os.getenv("POSTGRES_PORT", "5432")
-db = os.getenv("POSTGRES_DB", "")
-
-# Determine SSL mode (default to require for production, disable for local dev)
-ssl_mode = os.getenv("POSTGRES_SSL_MODE", "prefer")
-
-# First, connect to default 'postgres' database to create the target database if needed
-default_connection_string = (
-    f"postgresql://{user}:{password}@{host}:{port}/postgres?sslmode={ssl_mode}"
-)
-default_engine = create_engine(default_connection_string)
-
-try:
-    with default_engine.begin() as conn:
-        # Check if database exists
-        result = conn.exec_driver_sql(
-            f"SELECT 1 FROM pg_database WHERE datname = '{db}';"
+# Prepare actions data (main table)
+action_rows = []
+for _, row in df_clean.iterrows():
+    action_rows.append(
+        (
+            int(row["id"]),
+            str(row["sub_id"]) if pd.notna(row["sub_id"]) and row["sub_id"] else None,
+            int(row["work_package_id"]) if pd.notna(row["work_package_id"]) else None,
+            row["indicative_action"] if pd.notna(row["indicative_action"]) else None,
+            row.get("sub_action") if pd.notna(row.get("sub_action")) else None,
+            str(row["document_paragraph_number"])
+            if pd.notna(row.get("document_paragraph_number"))
+            else None,
+            row.get("document_paragraph_text")
+            if pd.notna(row.get("document_paragraph_text"))
+            else None,
+            row.get("scope_definition")
+            if pd.notna(row.get("scope_definition"))
+            else None,
+            row.get("legal_considerations")
+            if pd.notna(row.get("legal_considerations"))
+            else None,
+            row.get("proposal_advancement_scenario")
+            if pd.notna(row.get("proposal_advancement_scenario"))
+            else None,
+            row.get("un_budgets") if pd.notna(row.get("un_budgets")) else None,
+            row.get("milestone_1") if pd.notna(row.get("milestone_1")) else None,
+            pd.to_datetime(row["milestone_1_deadline"]).date()
+            if pd.notna(row.get("milestone_1_deadline"))
+            else None,
+            row.get("milestone_2") if pd.notna(row.get("milestone_2")) else None,
+            pd.to_datetime(row["milestone_2_deadline"]).date()
+            if pd.notna(row.get("milestone_2_deadline"))
+            else None,
+            row.get("milestone_3") if pd.notna(row.get("milestone_3")) else None,
+            pd.to_datetime(row["milestone_3_deadline"]).date()
+            if pd.notna(row.get("milestone_3_deadline"))
+            else None,
+            row.get("milestone_upcoming")
+            if pd.notna(row.get("milestone_upcoming"))
+            else None,
+            pd.to_datetime(row["milestone_upcoming_deadline"]).date()
+            if pd.notna(row.get("milestone_upcoming_deadline"))
+            else None,
+            row.get("milestone_final")
+            if pd.notna(row.get("milestone_final"))
+            else None,
+            pd.to_datetime(row["milestone_final_deadline"]).date()
+            if pd.notna(row.get("milestone_final_deadline"))
+            else None,
+            bool(row.get("is_big_ticket", False)),
+            bool(row.get("needs_member_state_engagement", False)),
+            row.get("tracking_status")
+            if pd.notna(row.get("tracking_status"))
+            else None,
+            row.get("public_action_status")
+            if pd.notna(row.get("public_action_status"))
+            else None,
+            row.get("action_notes") if pd.notna(row.get("action_notes")) else None,
+            row.get("action_updates") if pd.notna(row.get("action_updates")) else None,
+            row.get("action_record_id")
+            if pd.notna(row.get("action_record_id"))
+            else None,
         )
-        if not result.fetchone():
-            print(f"Database '{db}' does not exist. Creating...")
-            conn.exec_driver_sql(f"CREATE DATABASE {db};")
-            print(f"✓ Created database '{db}'")
-        else:
-            print(f"✓ Database '{db}' already exists")
-except Exception as e:
-    print(f"Note: Could not check/create database: {e}")
-finally:
-    default_engine.dispose()
-
-# Now connect to the target database
-connection_string = (
-    f"postgresql://{user}:{password}@{host}:{port}/{db}?sslmode={ssl_mode}"
-)
-engine = create_engine(connection_string)
-print(f"Connected to Postgres: {host}/{db}")
-
-try:
-    # TODO: Map Airtable columns to un80actions schema tables
-    # This depends on your final Airtable structure and schema design
-
-    # Example structure (adjust based on your actual data):
-    # - actions_df: Data for un80actions.actions table
-    # - action_leads_df: Data for un80actions.action_leads table
-    # - action_entities_df: Data for un80actions.action_entities table
-
-    # For now, export to a staging table for inspection
-    with engine.begin() as conn:
-        # Create staging table if needed
-        conn.exec_driver_sql("""
-            CREATE TABLE IF NOT EXISTS un80actions.actions_staging (
-                id SERIAL PRIMARY KEY,
-                data JSONB
-            );
-        """)
-        conn.exec_driver_sql("DELETE FROM un80actions.actions_staging;")
-
-    # Insert raw data into staging table for initial review
-    df.to_sql(
-        "actions_staging",
-        engine,
-        if_exists="append",
-        index=False,
-        schema="un80actions",
-        method="multi",
-        chunksize=100,
     )
-    print(f"✓ Successfully pushed {len(df):,} actions to un80actions.actions_staging")
-    print("\nNext steps:")
-    print("1. Review data structure and mapping in staging table")
-    print("2. Update script to properly parse Airtable fields")
-    print("3. Map to production tables (actions, action_leads, action_entities, etc.)")
+
+print(f"Prepared {len(action_rows)} action records")
+
+# Prepare relationship data
+work_package_leads_links = []
+work_package_focal_points_links = []
+action_leads_links = []
+action_focal_points_links = []
+action_member_persons_links = []
+action_support_persons_links = []
+action_member_entities_links = []
+
+for _, row in df_clean.iterrows():
+    action_id = int(row["id"])
+    action_sub_id = (
+        str(row["sub_id"]) if pd.notna(row["sub_id"]) and row["sub_id"] else None
+    )
+    wp_id = int(row["work_package_id"]) if pd.notna(row["work_package_id"]) else None
+
+    # Work package leads
+    if (
+        wp_id
+        and "work_package_leads" in row
+        and isinstance(row["work_package_leads"], (list, np.ndarray))
+    ):
+        for lead in row["work_package_leads"]:
+            if lead:
+                work_package_leads_links.append((wp_id, lead))
+
+    # Work package focal points
+    if (
+        wp_id
+        and "work_package_focal_points" in row
+        and isinstance(row["work_package_focal_points"], (list, np.ndarray))
+    ):
+        for email in row["work_package_focal_points"]:
+            if email:
+                work_package_focal_points_links.append((wp_id, email.strip().lower()))
+
+    # Action leads
+    if "action_leads" in row and isinstance(row["action_leads"], (list, np.ndarray)):
+        for lead in row["action_leads"]:
+            if lead:
+                action_leads_links.append((action_id, action_sub_id, lead))
+
+    # Action focal points
+    if "action_focal_points" in row and isinstance(
+        row["action_focal_points"], (list, np.ndarray)
+    ):
+        for email in row["action_focal_points"]:
+            if email:
+                action_focal_points_links.append(
+                    (action_id, action_sub_id, email.strip().lower())
+                )
+
+    # Action member persons
+    if "action_member_persons" in row and isinstance(
+        row["action_member_persons"], (list, np.ndarray)
+    ):
+        for email in row["action_member_persons"]:
+            if email:
+                action_member_persons_links.append(
+                    (action_id, action_sub_id, email.strip().lower())
+                )
+
+    # Action support persons
+    if "action_support_persons" in row and isinstance(
+        row["action_support_persons"], (list, np.ndarray)
+    ):
+        for email in row["action_support_persons"]:
+            if email:
+                action_support_persons_links.append(
+                    (action_id, action_sub_id, email.strip().lower())
+                )
+
+    # Action member entities
+    if "action_member_entities" in row and isinstance(
+        row["action_member_entities"], (list, np.ndarray)
+    ):
+        for entity in row["action_member_entities"]:
+            if entity:
+                action_member_entities_links.append((action_id, action_sub_id, entity))
+
+# Remove duplicates
+work_package_leads_links = list(set(work_package_leads_links))
+work_package_focal_points_links = list(set(work_package_focal_points_links))
+action_leads_links = list(set(action_leads_links))
+action_focal_points_links = list(set(action_focal_points_links))
+action_member_persons_links = list(set(action_member_persons_links))
+action_support_persons_links = list(set(action_support_persons_links))
+action_member_entities_links = list(set(action_member_entities_links))
+
+print(f"\nPrepared relationship data:")
+print(f"  - {len(work_package_leads_links)} work package leads")
+print(f"  - {len(work_package_focal_points_links)} work package focal points")
+print(f"  - {len(action_leads_links)} action leads")
+print(f"  - {len(action_focal_points_links)} action focal points")
+print(f"  - {len(action_member_persons_links)} action member persons")
+print(f"  - {len(action_support_persons_links)} action support persons")
+print(f"  - {len(action_member_entities_links)} action member entities")
+
+# Upsert into database
+try:
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            print("\n--- Starting database upsert ---")
+
+            # Fetch existing emails from approved_users to validate foreign keys
+            cur.execute("SELECT email FROM un80actions.approved_users")
+            existing_emails = {row[0] for row in cur.fetchall()}
+            print(f"\nFound {len(existing_emails)} existing emails in approved_users")
+
+            # Fetch existing leads to validate foreign keys
+            cur.execute("SELECT name FROM un80actions.leads")
+            existing_leads = {row[0] for row in cur.fetchall()}
+            print(f"Found {len(existing_leads)} existing leads")
+
+            # Fetch existing entities to validate foreign keys
+            cur.execute("SELECT entity FROM systemchart.entities")
+            existing_entities = {row[0] for row in cur.fetchall()}
+            print(f"Found {len(existing_entities)} existing entities")
+
+            # Filter relationship links to only include existing references
+            def filter_email_links(links, email_idx):
+                """Filter links to only include emails that exist in approved_users"""
+                filtered = [
+                    link for link in links if link[email_idx] in existing_emails
+                ]
+                missing = [
+                    link[email_idx]
+                    for link in links
+                    if link[email_idx] not in existing_emails
+                ]
+                if missing:
+                    unique_missing = sorted(set(missing))
+                    print(
+                        f"  ⚠ Warning: Skipping {len(missing)} links with {len(unique_missing)} missing emails:"
+                    )
+                    for email in unique_missing[:10]:  # Show first 10
+                        print(f"    - {email}")
+                    if len(unique_missing) > 10:
+                        print(f"    ... and {len(unique_missing) - 10} more")
+                return filtered
+
+            def filter_lead_links(links, lead_idx):
+                """Filter links to only include leads that exist in leads table"""
+                filtered = [link for link in links if link[lead_idx] in existing_leads]
+                missing = [
+                    link[lead_idx]
+                    for link in links
+                    if link[lead_idx] not in existing_leads
+                ]
+                if missing:
+                    unique_missing = sorted(set(missing))
+                    print(
+                        f"  ⚠ Warning: Skipping {len(missing)} links with {len(unique_missing)} missing leads:"
+                    )
+                    for lead in unique_missing[:10]:
+                        print(f"    - {lead}")
+                    if len(unique_missing) > 10:
+                        print(f"    ... and {len(unique_missing) - 10} more")
+                return filtered
+
+            def filter_entity_links(links, entity_idx):
+                """Filter links to only include entities that exist in entities table"""
+                filtered = [
+                    link for link in links if link[entity_idx] in existing_entities
+                ]
+                missing = [
+                    link[entity_idx]
+                    for link in links
+                    if link[entity_idx] not in existing_entities
+                ]
+                if missing:
+                    unique_missing = sorted(set(missing))
+                    print(
+                        f"  ⚠ Warning: Skipping {len(missing)} links with {len(unique_missing)} missing entities:"
+                    )
+                    for entity in unique_missing[:10]:
+                        print(f"    - {entity}")
+                    if len(unique_missing) > 10:
+                        print(f"    ... and {len(unique_missing) - 10} more")
+                return filtered
+
+            # Apply filters
+            print("\nValidating foreign key references...")
+            work_package_leads_links = filter_lead_links(work_package_leads_links, 1)
+            work_package_focal_points_links = filter_email_links(
+                work_package_focal_points_links, 1
+            )
+            action_leads_links = filter_lead_links(action_leads_links, 2)
+            action_focal_points_links = filter_email_links(action_focal_points_links, 2)
+            action_member_persons_links = filter_email_links(
+                action_member_persons_links, 2
+            )
+            action_support_persons_links = filter_email_links(
+                action_support_persons_links, 2
+            )
+            action_member_entities_links = filter_entity_links(
+                action_member_entities_links, 2
+            )
+
+            print(f"\nFiltered relationship data ready for insert:")
+            print(f"  - {len(work_package_leads_links)} work package leads")
+            print(
+                f"  - {len(work_package_focal_points_links)} work package focal points"
+            )
+            print(f"  - {len(action_leads_links)} action leads")
+            print(f"  - {len(action_focal_points_links)} action focal points")
+            print(f"  - {len(action_member_persons_links)} action member persons")
+            print(f"  - {len(action_support_persons_links)} action support persons")
+            print(f"  - {len(action_member_entities_links)} action member entities")
+            print()
+
+            # 1. Upsert workstreams
+            if workstream_rows:
+                UPSERT_WORKSTREAMS_SQL = """
+                INSERT INTO un80actions.workstreams (id, workstream_title)
+                VALUES (%s, %s)
+                ON CONFLICT (id) DO UPDATE SET
+                    workstream_title = COALESCE(EXCLUDED.workstream_title, un80actions.workstreams.workstream_title)
+                """
+                cur.executemany(UPSERT_WORKSTREAMS_SQL, workstream_rows)
+                print(f"✓ Upserted {len(workstream_rows)} workstreams")
+
+            # 2. Upsert work packages
+            if work_package_rows:
+                UPSERT_WORK_PACKAGES_SQL = """
+                INSERT INTO un80actions.work_packages (id, workstream_id, work_package_title, work_package_goal)
+                VALUES (%s, %s, %s, %s)
+                ON CONFLICT (id) DO UPDATE SET
+                    workstream_id = EXCLUDED.workstream_id,
+                    work_package_title = EXCLUDED.work_package_title,
+                    work_package_goal = EXCLUDED.work_package_goal
+                """
+                cur.executemany(UPSERT_WORK_PACKAGES_SQL, work_package_rows)
+                print(f"✓ Upserted {len(work_package_rows)} work packages")
+
+            # 3. Upsert actions
+            UPSERT_ACTIONS_SQL = """
+            INSERT INTO un80actions.actions (
+                id, sub_id, work_package_id, indicative_action, sub_action,
+                document_paragraph_number, document_paragraph_text,
+                scope_definition, legal_considerations, proposal_advancement_scenario, un_budgets,
+                milestone_1, milestone_1_deadline,
+                milestone_2, milestone_2_deadline,
+                milestone_3, milestone_3_deadline,
+                milestone_upcoming, milestone_upcoming_deadline,
+                miletstone_final, milestone_final_deadline,
+                is_big_ticket, needs_member_state_engagement,
+                tracking_status, public_action_status,
+                action_notes, action_updates, action_record_id
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (id, sub_id) DO UPDATE SET
+                work_package_id = EXCLUDED.work_package_id,
+                indicative_action = EXCLUDED.indicative_action,
+                sub_action = EXCLUDED.sub_action,
+                document_paragraph_number = EXCLUDED.document_paragraph_number,
+                document_paragraph_text = EXCLUDED.document_paragraph_text,
+                scope_definition = EXCLUDED.scope_definition,
+                legal_considerations = EXCLUDED.legal_considerations,
+                proposal_advancement_scenario = EXCLUDED.proposal_advancement_scenario,
+                un_budgets = EXCLUDED.un_budgets,
+                milestone_1 = EXCLUDED.milestone_1,
+                milestone_1_deadline = EXCLUDED.milestone_1_deadline,
+                milestone_2 = EXCLUDED.milestone_2,
+                milestone_2_deadline = EXCLUDED.milestone_2_deadline,
+                milestone_3 = EXCLUDED.milestone_3,
+                milestone_3_deadline = EXCLUDED.milestone_3_deadline,
+                milestone_upcoming = EXCLUDED.milestone_upcoming,
+                milestone_upcoming_deadline = EXCLUDED.milestone_upcoming_deadline,
+                miletstone_final = EXCLUDED.miletstone_final,
+                milestone_final_deadline = EXCLUDED.milestone_final_deadline,
+                is_big_ticket = EXCLUDED.is_big_ticket,
+                needs_member_state_engagement = EXCLUDED.needs_member_state_engagement,
+                tracking_status = EXCLUDED.tracking_status,
+                public_action_status = EXCLUDED.public_action_status,
+                action_notes = EXCLUDED.action_notes,
+                action_updates = EXCLUDED.action_updates,
+                action_record_id = EXCLUDED.action_record_id
+            """
+            cur.executemany(UPSERT_ACTIONS_SQL, action_rows)
+            print(f"✓ Upserted {len(action_rows)} actions")
+
+            # 4. Clear and repopulate work package leads
+            if work_package_leads_links:
+                wp_ids = list(set(link[0] for link in work_package_leads_links))
+                cur.execute(
+                    "DELETE FROM un80actions.work_package_leads WHERE work_package_id = ANY(%s)",
+                    (wp_ids,),
+                )
+                INSERT_WP_LEADS_SQL = """
+                INSERT INTO un80actions.work_package_leads (work_package_id, lead_name)
+                VALUES (%s, %s)
+                ON CONFLICT (work_package_id, lead_name) DO NOTHING
+                """
+                cur.executemany(INSERT_WP_LEADS_SQL, work_package_leads_links)
+                print(f"✓ Upserted {len(work_package_leads_links)} work package leads")
+
+            # 5. Clear and repopulate work package focal points
+            if work_package_focal_points_links:
+                wp_ids = list(set(link[0] for link in work_package_focal_points_links))
+                cur.execute(
+                    "DELETE FROM un80actions.work_package_focal_points WHERE work_package_id = ANY(%s)",
+                    (wp_ids,),
+                )
+                INSERT_WP_FPS_SQL = """
+                INSERT INTO un80actions.work_package_focal_points (work_package_id, user_email)
+                VALUES (%s, %s)
+                ON CONFLICT (work_package_id, user_email) DO NOTHING
+                """
+                cur.executemany(INSERT_WP_FPS_SQL, work_package_focal_points_links)
+                print(
+                    f"✓ Upserted {len(work_package_focal_points_links)} work package focal points"
+                )
+
+            # 6. Clear and repopulate action leads
+            if action_leads_links:
+                action_ids = [(link[0], link[1]) for link in action_leads_links]
+                unique_actions = list(set(action_ids))
+                for action_id, action_sub_id in unique_actions:
+                    cur.execute(
+                        "DELETE FROM un80actions.action_leads WHERE action_id = %s AND action_sub_id = %s",
+                        (action_id, action_sub_id),
+                    )
+                INSERT_ACTION_LEADS_SQL = """
+                INSERT INTO un80actions.action_leads (action_id, action_sub_id, lead_name)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (action_id, action_sub_id, lead_name) DO NOTHING
+                """
+                cur.executemany(INSERT_ACTION_LEADS_SQL, action_leads_links)
+                print(f"✓ Upserted {len(action_leads_links)} action leads")
+
+            # 7. Clear and repopulate action focal points
+            if action_focal_points_links:
+                action_ids = [(link[0], link[1]) for link in action_focal_points_links]
+                unique_actions = list(set(action_ids))
+                for action_id, action_sub_id in unique_actions:
+                    cur.execute(
+                        "DELETE FROM un80actions.action_focal_points WHERE action_id = %s AND action_sub_id = %s",
+                        (action_id, action_sub_id),
+                    )
+                INSERT_ACTION_FPS_SQL = """
+                INSERT INTO un80actions.action_focal_points (action_id, action_sub_id, user_email)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (action_id, action_sub_id, user_email) DO NOTHING
+                """
+                cur.executemany(INSERT_ACTION_FPS_SQL, action_focal_points_links)
+                print(
+                    f"✓ Upserted {len(action_focal_points_links)} action focal points"
+                )
+
+            # 8. Clear and repopulate action member persons
+            if action_member_persons_links:
+                action_ids = [
+                    (link[0], link[1]) for link in action_member_persons_links
+                ]
+                unique_actions = list(set(action_ids))
+                for action_id, action_sub_id in unique_actions:
+                    cur.execute(
+                        "DELETE FROM un80actions.action_member_persons WHERE action_id = %s AND action_sub_id = %s",
+                        (action_id, action_sub_id),
+                    )
+                INSERT_ACTION_MEMBERS_SQL = """
+                INSERT INTO un80actions.action_member_persons (action_id, action_sub_id, user_email)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (action_id, action_sub_id, user_email) DO NOTHING
+                """
+                cur.executemany(INSERT_ACTION_MEMBERS_SQL, action_member_persons_links)
+                print(
+                    f"✓ Upserted {len(action_member_persons_links)} action member persons"
+                )
+
+            # 9. Clear and repopulate action support persons
+            if action_support_persons_links:
+                action_ids = [
+                    (link[0], link[1]) for link in action_support_persons_links
+                ]
+                unique_actions = list(set(action_ids))
+                for action_id, action_sub_id in unique_actions:
+                    cur.execute(
+                        "DELETE FROM un80actions.action_support_persons WHERE action_id = %s AND action_sub_id = %s",
+                        (action_id, action_sub_id),
+                    )
+                INSERT_ACTION_SUPPORT_SQL = """
+                INSERT INTO un80actions.action_support_persons (action_id, action_sub_id, user_email)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (action_id, action_sub_id, user_email) DO NOTHING
+                """
+                cur.executemany(INSERT_ACTION_SUPPORT_SQL, action_support_persons_links)
+                print(
+                    f"✓ Upserted {len(action_support_persons_links)} action support persons"
+                )
+
+            # 10. Clear and repopulate action member entities
+            if action_member_entities_links:
+                action_ids = [
+                    (link[0], link[1]) for link in action_member_entities_links
+                ]
+                unique_actions = list(set(action_ids))
+                for action_id, action_sub_id in unique_actions:
+                    cur.execute(
+                        "DELETE FROM un80actions.action_member_entities WHERE action_id = %s AND action_sub_id = %s",
+                        (action_id, action_sub_id),
+                    )
+                INSERT_ACTION_ENTITIES_SQL = """
+                INSERT INTO un80actions.action_member_entities (action_id, action_sub_id, entity_id)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (action_id, action_sub_id, entity_id) DO NOTHING
+                """
+                cur.executemany(
+                    INSERT_ACTION_ENTITIES_SQL, action_member_entities_links
+                )
+                print(
+                    f"✓ Upserted {len(action_member_entities_links)} action member entities"
+                )
+
+            conn.commit()
+            print(f"\n✓ Successfully completed all database operations")
 
 except Exception as e:
-    print(f"✗ Error: {e}")
+    print(f"✗ Error uploading actions: {e}")
     raise
-finally:
-    engine.dispose()
+
+print("\nDone!")

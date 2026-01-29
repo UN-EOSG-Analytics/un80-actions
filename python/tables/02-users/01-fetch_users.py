@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from api.airtable import fetch_airtable_table
-from utils.utils import convert_linked_columns_to_lists, export_dataframe
+from python.api.airtable import fetch_airtable_table
+from python.utils.utils import convert_linked_columns_to_lists, export_dataframe
 
 USER_TABLE_ID = "tbl38pZDARtrQKbHT"
 

@@ -174,7 +174,7 @@ try:
             """
             user_emails = [row[0] for row in user_rows]
             cur.execute(DELETE_USER_LEADS_SQL, (user_emails,))
-            print(f"✓ Cleared existing user-lead links")
+            print("✓ Cleared existing user-lead links")
 
             # Then insert new links
             if user_lead_links:
@@ -189,7 +189,7 @@ try:
                 )
 
             conn.commit()
-            print(f"\n✓ Successfully completed all database operations")
+            print("\n✓ Successfully completed all database operations")
 
 except Exception as e:
     print(f"✗ Error uploading users: {e}")
