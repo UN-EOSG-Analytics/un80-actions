@@ -7,18 +7,19 @@ from db.connection import get_conn  # assumes you expose a pooled conn context m
 
 
 UPSERT_APPROVED_USERS = """
-INSERT INTO approved_users (email, entity_id, role, lead_id)
-VALUES (%s, %s, %s, %s)
+INSERT INTO un80actions.approved_users (email, full_name, system_entity, status, role)
+VALUES (%s, %s, %s, %s, %s)
 ON CONFLICT (email) DO UPDATE
 SET
-  entity_id = EXCLUDED.entity_id,
-  role      = EXCLUDED.role,
-  lead_id   = EXCLUDED.lead_id
+  full_name = EXCLUDED.full_name,
+  system_entity = EXCLUDED.system_entity,
+  status = EXCLUDED.status,
+  role = EXCLUDED.role
 """
 
 
-REQUIRED_COLS = ("email", "entity_id", "role")
-ALL_COLS = ("email", "entity_id", "role", "lead_id")
+REQUIRED_COLS = ("email", "full_name", "system_entity", "role")
+ALL_COLS = ("email", "full_name", "system_entity", "status", "role")
 
 
 def _normalize_approved_users_df(df: pd.DataFrame) -> pd.DataFrame:
@@ -28,7 +29,7 @@ def _normalize_approved_users_df(df: pd.DataFrame) -> pd.DataFrame:
 
     work = df.copy()
 
-    # Ensure all expected cols exist (lead_id optional)
+    # Ensure all expected cols exist (status optional)
     for c in ALL_COLS:
         if c not in work.columns:
             work[c] = None
@@ -37,36 +38,28 @@ def _normalize_approved_users_df(df: pd.DataFrame) -> pd.DataFrame:
 
     # Clean strings
     work["email"] = work["email"].astype(str).str.strip().str.lower()
-    work["entity_id"] = work["entity_id"].astype(str).str.strip()
+    work["full_name"] = work["full_name"].astype(str).str.strip()
+    work["system_entity"] = work["system_entity"].astype(str).str.strip()
     work["role"] = work["role"].astype(str).str.strip()
+
+    # Status is optional
+    if "status" in work.columns:
+        work["status"] = work["status"].astype(str).str.strip()
+        work.loc[work["status"] == "nan", "status"] = None
 
     # Convert pandas NaN/NaT -> None (so psycopg sends NULL)
     work = work.where(pd.notna(work), None)
 
-    # lead_id: accept None, int, or numeric strings
-    def to_int_or_none(x) -> Optional[int]:
-        if x is None:
-            return None
-        # handle floats like 12.0
-        if isinstance(x, float):
-            return int(x)
-        if isinstance(x, int):
-            return x
-        s = str(x).strip()
-        return int(s) if s else None
-
-    work["lead_id"] = work["lead_id"].apply(to_int_or_none)
-
     return work
 
 
-def _df_to_rows(df: pd.DataFrame) -> list[Tuple[str, str, str, Optional[int]]]:
+def _df_to_rows(df: pd.DataFrame) -> list[Tuple[str, str, str, Optional[str], str]]:
     # Convert to python tuples for executemany
     rows = list(df.itertuples(index=False, name=None))
     # Type cast for clarity/type checkers
     return [
-        (str(e), str(ent), str(r), (lid if lid is None else int(lid)))
-        for e, ent, r, lid in rows
+        (str(e), str(fn), str(se), (st if st is None else str(st)), str(r))
+        for e, fn, se, st, r in rows
     ]
 
 

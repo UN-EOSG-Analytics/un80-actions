@@ -19,6 +19,9 @@ dependencies = [
 ]
 
 [tool.uv]
-package = false
+package = true
+
+[tool.setuptools]
+packages = ["python"]
 
 [tool.uv.sources]

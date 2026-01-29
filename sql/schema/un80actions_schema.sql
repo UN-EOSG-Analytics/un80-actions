@@ -22,7 +22,7 @@ create type milestone_status as enum (
     'approved',
     'rejected'
 );
-create type user_role as enum (
+create type user_roles as enum (
     'Principal',
     'Support',
     'Focal',
@@ -37,8 +37,11 @@ create type user_role as enum (
 -- Defines who is allowed to access the system and their default permissions
 create table approved_users (
     email text not null unique primary key,
-    entity text not null references systemchart.entities(entity) on delete restrict,
-    role user_role not null,
+    full_name text not null,
+    system_entity text not null references systemchart.entities(entity) on delete restrict,
+    lead_positions text[],
+    user_status text,
+    user_role user_roles not null,
     created_at timestamp not null default now()
 );
 comment on table approved_users is 'Pre-approval registry. Users must have an entry here to authenticate. Email links to users table.';
@@ -47,21 +50,27 @@ comment on table approved_users is 'Pre-approval registry. Users must have an en
 -- =========================================================
 -- Organizational entities (from systemchart)
 -- create table systemchart.entities (id text primary key, entity_long text);
--- Leads pool - shared by both work packages and actions
--- Examples: "USG DPPA", "USG DPO", "USG DESA", "Administrator UNDP"
+-- Leads - shared by both work packages and actions
+-- Examples: "USG DPPA", "USG DPO", "USG DESA", "Administrator UNDP", "Chair HLCM"
 create table leads (
     name text primary key,
-    entity text not null references systemchart.entities(entity) on delete restrict,
-    person text not null references approved_users(email)
+    entity text references systemchart.entities(entity) on delete restrict
+);
+
+-- Approved users ↔ leads (many-to-many)
+-- Links approved users to their lead positions
+-- Supports: one user with multiple positions, multiple users sharing one position (e.g., "Co-Chairs BIG")
+create table approved_user_leads (
+    user_email text not null references approved_users(email) on delete cascade,
+    lead_name text not null references leads(name) on delete restrict,
+    primary key (user_email, lead_name)
 );
 -- Actual authenticated users
 -- Populated from approved_users on first login via email match
 -- APPLICATION LOGIC: Only create users entry if email exists in approved_users
 create table users (
     id serial primary key,
-    email text not null unique,
-    role user_role not null,
-    lead_name text references leads(name) on delete restrict,
+    email text not null unique references approved_users(email),
     entity_id text not null references systemchart.entities(entity) on delete restrict,
     created_at timestamp not null default now(),
     last_login_at timestamp
@@ -205,8 +214,8 @@ create table action_support_persons (
     foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade,
     primary key (action_id, action_sub_id, user_email)
 );
--- Action ↔ entities (responsible organizations)
-create table action_entities (
+-- Action ↔ member entities (responsible organizations)
+create table action_member_entities (
     action_id int not null,
     action_sub_id text not null,
     entity_id text not null references systemchart.entities(entity) on delete restrict,

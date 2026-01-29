@@ -1,17 +1,15 @@
-# Single, reusable connection helper
+# Simple connection helper without pooling
 
-from psycopg_pool import ConnectionPool
+from contextlib import contextmanager
+import psycopg
 from .config import POSTGRES_DSN
 
 
-_pool = ConnectionPool(
-    conninfo=POSTGRES_DSN,
-    min_size=1,
-    max_size=5,
-    open=True,
-)
-
-
+@contextmanager
 def get_conn():
-    with _pool.connection() as conn:
+    """Get a direct connection to the database."""
+    conn = psycopg.connect(POSTGRES_DSN)
+    try:
         yield conn
+    finally:
+        conn.close()
