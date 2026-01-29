@@ -11,8 +11,8 @@ import pandas as pd
 
 from python.db.connection import get_conn
 
-input_path = Path("data") / "processed" / "df_leads.csv"
-df = pd.read_csv(input_path)
+input_path = Path("data") / "processed" / "df_leads.parquet"
+df = pd.read_parquet(input_path)
 
 # Convert DataFrame to list of dicts, replacing NaN with None
 records = df.to_dict("records")

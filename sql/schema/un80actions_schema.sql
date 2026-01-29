@@ -25,7 +25,7 @@ create type milestone_status as enum (
 create type user_roles as enum (
     'Principal',
     'Support',
-    'Focal',
+    'Focal Point',
     'Assistant',
     'Admin',
     'Legal'
@@ -37,11 +37,10 @@ create type user_roles as enum (
 -- Defines who is allowed to access the system and their default permissions
 create table approved_users (
     email text not null unique primary key,
-    full_name text not null,
-    system_entity text not null references systemchart.entities(entity) on delete restrict,
-    lead_positions text[],
+    full_name text,
+    entity text references systemchart.entities(entity) on delete restrict,
     user_status text,
-    user_role user_roles not null,
+    user_role user_roles,
     created_at timestamp not null default now()
 );
 comment on table approved_users is 'Pre-approval registry. Users must have an entry here to authenticate. Email links to users table.';
@@ -56,7 +55,6 @@ create table leads (
     name text primary key,
     entity text references systemchart.entities(entity) on delete restrict
 );
-
 -- Approved users ↔ leads (many-to-many)
 -- Links approved users to their lead positions
 -- Supports: one user with multiple positions, multiple users sharing one position (e.g., "Co-Chairs BIG")
