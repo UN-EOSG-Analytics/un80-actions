@@ -15,6 +15,8 @@ export interface ActionWithMilestones {
   action_id: number;
   action_sub_id: string | null;
   indicative_action: string;
+  tracking_status: string | null;
+  is_big_ticket: boolean;
   milestones: MilestoneRow[];
 }
 

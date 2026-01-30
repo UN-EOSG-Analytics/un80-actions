@@ -15,7 +15,7 @@ import type {
   QuestionRow,
   UpdateRow,
   WorkPackageWithActions,
-} from "@/types/actions-table";
+} from "@/types";
 
 function toIso(d: Date | null | undefined): string {
   if (!d) return "";
@@ -42,6 +42,8 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
         action_id: number;
         action_sub_id: string | null;
         indicative_action: string;
+        tracking_status: string | null;
+        is_big_ticket: boolean;
         milestone_type: string | null;
         milestone_description: string | null;
         milestone_deadline: string | null;
@@ -54,6 +56,8 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
           a.id AS action_id,
           a.sub_id AS action_sub_id,
           a.indicative_action,
+          a.tracking_status,
+          a.is_big_ticket,
           m.milestone_type,
           m.description AS milestone_description,
           m.deadline::text AS milestone_deadline,
@@ -160,6 +164,8 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
           action_id: r.action_id,
           action_sub_id: r.action_sub_id,
           indicative_action: r.indicative_action,
+          tracking_status: r.tracking_status,
+          is_big_ticket: r.is_big_ticket,
           milestones: [],
         };
         actionsMap.set(key, action);

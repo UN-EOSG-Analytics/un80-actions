@@ -1,4 +1,4 @@
-import { ReportsTableShell } from "@/components/ReportsTableShell";
+import { ReportsTableShell } from "@/components/ActionsTable";
 import { getActionsTableData } from "@/lib/actions-table-data";
 
 export default async function Home() {

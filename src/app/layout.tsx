@@ -1,8 +1,10 @@
 import { GoogleAnalytics } from "@next/third-parties/google";
 import type { Metadata, Viewport } from "next";
 import { Roboto } from "next/font/google";
+import { Suspense } from "react";
 import { Header } from "@/components/HeaderBar";
 import { Footer } from "@/components/Footer";
+import ModalHandler from "@/components/ModalHandler";
 import { SITE_DESCRIPTION, SITE_TITLE } from "@/constants/site";
 import { getCurrentUser } from "@/lib/auth";
 import "./globals.css";
@@ -46,6 +48,9 @@ export default async function RootLayout({
           {children}
           <Footer />
         </div>
+        <Suspense fallback={null}>
+          <ModalHandler />
+        </Suspense>
         <GoogleAnalytics gaId="G-XYZ" />
       </body>
     </html>

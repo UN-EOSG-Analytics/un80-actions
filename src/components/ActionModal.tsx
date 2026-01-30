@@ -1,478 +1,958 @@
-// OLD CODE FOR REFERENCE ONLY
-// NOT UPDATED TO NEW DATA SERVICE YET
+"use client";
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getStatusStyles } from "@/constants/actionStatus";
+import { getActionMilestones, updateMilestone } from "@/lib/milestones";
+import { createNote, getActionNotes } from "@/lib/notes";
+import { createQuestion, getActionQuestions } from "@/lib/questions";
+import type {
+  Action,
+  ActionMilestone,
+  ActionNote,
+  ActionQuestion,
+} from "@/types";
+import {
+  Calendar,
+  Check,
+  ChevronRight,
+  Clock,
+  FileText,
+  Lightbulb,
+  Loader2,
+  MessageCircle,
+  Pencil,
+  Plus,
+  Send,
+  StickyNote,
+  Target,
+  Users,
+  X,
+} from "lucide-react";
+import Link from "next/link";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 
-// "use client";
+// =========================================================
+// CONSTANTS
+// =========================================================
 
-// import {
-//   ActionLeadsBadge,
-//   DecisionStatusBadge,
-//   ShowMoreBadge,
-//   TeamBadge,
-//   WPLeadsBadge,
-// } from "@/components/Badges";
-// import { HelpTooltip } from "@/components/HelpTooltip";
-// import { MilestoneTimeline } from "@/components/MilestoneTimeline";
-// import {
-//   Tooltip,
-//   TooltipCollisionBoundaryProvider,
-//   TooltipContent,
-//   TooltipTrigger,
-// } from "@/components/ui/tooltip";
-// import { ACTION_STATUS } from "@/constants/actionStatus";
-// import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
-// import { normalizeTeamMemberForDisplay } from "@/lib/utils";
-// import type { Action } from "@/types";
-// import { ChevronRight, FileText, X } from "lucide-react";
-// import Link from "next/link";
-// import {
-//   useCallback,
-//   useEffect,
-//   useRef,
-//   useState,
-//   type ReactNode,
-// } from "react";
+const breadcrumbBaseClass =
+  "inline-flex !min-h-0 items-center text-[10px] leading-4 font-medium tracking-wide uppercase transition-colors sm:text-xs sm:leading-5 md:text-sm md:tracking-wider";
+const breadcrumbLinkClass = `${breadcrumbBaseClass} text-slate-500 hover:text-un-blue hover:underline`;
+const breadcrumbActionClass = `${breadcrumbBaseClass} text-un-blue`;
+const chevronClass =
+  "h-2.5 w-2.5 shrink-0 text-slate-400 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5";
 
-// // Modal-specific section card component
-// const SectionCard = ({
-//   title,
-//   children,
-// }: {
-//   title: string;
-//   children: ReactNode;
-// }) => (
-//   <div className="rounded-lg border border-slate-200 bg-white">
-//     <div className="-ml-px rounded-tl-[9px] border-l-4 border-slate-300 bg-slate-200 px-5 py-4">
-//       <h3 className="text-xs font-extrabold tracking-widest text-slate-800 uppercase sm:text-sm">
-//         {title}
-//       </h3>
-//     </div>
-//     {children}
-//   </div>
-// );
+// =========================================================
+// HELPER COMPONENTS
+// =========================================================
 
-// const CHIPS_PER_LINE = 5;
-// const breadcrumbBaseClass =
-//   "inline-flex !min-h-0 items-center text-[10px] leading-4 font-medium tracking-wide uppercase transition-colors sm:text-xs sm:leading-5 md:text-sm md:tracking-wider";
-// const breadcrumbLinkClass = `${breadcrumbBaseClass} text-slate-500 hover:text-un-blue hover:underline`;
-// const breadcrumbActionClass = `${breadcrumbBaseClass} text-un-blue hover:underline`;
-// const chevronClass =
-//   "h-2.5 w-2.5 shrink-0 text-slate-400 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5";
+const SectionCard = ({
+  title,
+  icon: Icon,
+  children,
+}: {
+  title: string;
+  icon?: typeof FileText;
+  children: ReactNode;
+}) => (
+  <div className="rounded-lg border border-slate-200 bg-white">
+    <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-3">
+      {Icon && <Icon className="h-4 w-4 text-slate-500" />}
+      <h3 className="text-sm font-semibold text-slate-700">{title}</h3>
+    </div>
+    <div className="p-4">{children}</div>
+  </div>
+);
 
-// interface ActionModalProps {
-//   action: Action | null;
-//   onClose: () => void;
-//   loading: boolean;
-// }
+const InfoRow = ({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) => (
+  <div className="flex flex-col gap-1">
+    <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
+      {label}
+    </span>
+    <div className="text-sm text-slate-700">{children}</div>
+  </div>
+);
 
-// export default function ActionModal({
-//   action,
-//   onClose,
-//   loading,
-// }: ActionModalProps) {
-//   const [isVisible, setIsVisible] = useState(false);
-//   const [isClosing, setIsClosing] = useState(false);
-//   const [copied, setCopied] = useState(false);
-//   const [modalEl, setModalEl] = useState<HTMLDivElement | null>(null);
-//   const modalRef = useRef<HTMLDivElement>(null);
-//   const [touchStart, setTouchStart] = useState<number | null>(null);
-//   const [touchEnd, setTouchEnd] = useState<number | null>(null);
-//   const [showAllChips, setShowAllChips] = useState(false);
-//   const prevActionNumberRef = useRef<number | undefined>(undefined);
+const EmptyState = ({ message }: { message: string }) => (
+  <div className="flex flex-col items-center justify-center py-8 text-center">
+    <p className="text-sm text-slate-400">{message}</p>
+  </div>
+);
 
-//   const setModalRef = useCallback((el: HTMLDivElement | null) => {
-//     (modalRef as { current: HTMLDivElement | null }).current = el;
-//     setModalEl(el);
-//   }, []);
+const LoadingState = () => (
+  <div className="flex items-center justify-center py-8">
+    <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-un-blue" />
+  </div>
+);
 
-//   // Reset chips expand when action changes
-//   if (prevActionNumberRef.current !== action?.action_number) {
-//     prevActionNumberRef.current = action?.action_number;
-//     if (showAllChips) {
-//       setShowAllChips(false);
-//     }
-//   }
+// =========================================================
+// TAB CONTENT COMPONENTS
+// =========================================================
 
-//   // Animation state management
-//   useEffect(() => {
-//     // Trigger entrance animation after mount
-//     const timer = setTimeout(() => setIsVisible(true), 10);
-//     return () => clearTimeout(timer);
-//   }, []);
+function OverviewTab({ action }: { action: Action }) {
+  const statusStyles = getStatusStyles(action.public_action_status);
+  const StatusIcon = statusStyles.icon.component;
 
-//   const handleClose = useCallback(() => {
-//     setIsClosing(true);
-//     // Wait for exit animation before actually closing
-//     setTimeout(() => {
-//       onClose();
-//     }, 300);
-//   }, [onClose]);
+  return (
+    <div className="space-y-4">
+      {/* Status & Key Info */}
+      <SectionCard title="Status" icon={Target}>
+        <div className="flex flex-wrap items-center gap-3">
+          <Badge className={statusStyles.badge}>
+            <StatusIcon
+              className={`h-3.5 w-3.5 ${statusStyles.icon.className}`}
+            />
+            {statusStyles.label}
+          </Badge>
+          {action.is_big_ticket && (
+            <Badge className="bg-purple-100 text-purple-800 border border-purple-200">
+              Big Ticket
+            </Badge>
+          )}
+          {action.needs_member_state_engagement && (
+            <Badge className="bg-blue-100 text-blue-800 border border-blue-200">
+              Member State Engagement
+            </Badge>
+          )}
+        </div>
+      </SectionCard>
 
-//   // Close modal on escape key
-//   useEffect(() => {
-//     const handleKeyPress = (e: KeyboardEvent) => {
-//       if (e.key === "Escape") {
-//         handleClose();
-//       }
-//     };
+      {/* Work Package Info */}
+      <SectionCard title="Work Package" icon={FileText}>
+        <div className="space-y-3">
+          <InfoRow label="Title">{action.work_package_name}</InfoRow>
+          {action.work_package_goal && (
+            <InfoRow label="Goal">
+              <p className="whitespace-pre-wrap">{action.work_package_goal}</p>
+            </InfoRow>
+          )}
+          {action.work_package_leads && action.work_package_leads.length > 0 && (
+            <InfoRow label="Work Package Leads">
+              <div className="flex flex-wrap gap-1.5">
+                {action.work_package_leads.map((lead) => (
+                  <Badge
+                    key={lead}
+                    variant="outline"
+                    className="bg-slate-50 text-slate-700"
+                  >
+                    {lead}
+                  </Badge>
+                ))}
+              </div>
+            </InfoRow>
+          )}
+        </div>
+      </SectionCard>
 
-//     document.addEventListener("keydown", handleKeyPress);
-//     return () => document.removeEventListener("keydown", handleKeyPress);
-//   }, [handleClose]);
+      {/* Action Details */}
+      <SectionCard title="Action Details" icon={Lightbulb}>
+        <div className="space-y-3">
+          <InfoRow label="Indicative Activity">
+            <p className="whitespace-pre-wrap">{action.indicative_activity}</p>
+          </InfoRow>
+          {action.sub_action_details && (
+            <InfoRow label="Sub-Action">
+              <p className="whitespace-pre-wrap">{action.sub_action_details}</p>
+            </InfoRow>
+          )}
+          {action.action_leads && action.action_leads.length > 0 && (
+            <InfoRow label="Action Leads">
+              <div className="flex flex-wrap gap-1.5">
+                {action.action_leads.map((lead) => (
+                  <Badge
+                    key={lead}
+                    className="bg-un-blue/10 text-un-blue border border-un-blue/20"
+                  >
+                    {lead}
+                  </Badge>
+                ))}
+              </div>
+            </InfoRow>
+          )}
+          {action.action_entities && (
+            <InfoRow label="Entities">
+              <div className="flex flex-wrap gap-1.5">
+                {action.action_entities.split(";").filter(Boolean).map((entity) => (
+                  <Badge
+                    key={entity}
+                    variant="outline"
+                    className="bg-slate-50 text-slate-600"
+                  >
+                    {entity.trim()}
+                  </Badge>
+                ))}
+              </div>
+            </InfoRow>
+          )}
+        </div>
+      </SectionCard>
 
-//   // Swipe handling
-//   const minSwipeDistance = 50;
+      {/* Document Reference */}
+      {(action.document_paragraph || action.doc_text) && (
+        <SectionCard title="Document Reference" icon={FileText}>
+          <div className="space-y-3">
+            {action.document_paragraph && (
+              <InfoRow label="Paragraph">
+                <span className="font-mono text-sm">
+                  {action.document_paragraph}
+                </span>
+              </InfoRow>
+            )}
+            {action.doc_text && (
+              <div className="border-l-2 border-slate-300 bg-slate-50 py-2 pl-3 pr-2">
+                <p className="text-sm leading-relaxed text-slate-600 italic">
+                  &ldquo;{action.doc_text}&rdquo;
+                </p>
+              </div>
+            )}
+          </div>
+        </SectionCard>
+      )}
 
-//   const onTouchStart = (e: React.TouchEvent) => {
-//     setTouchEnd(null);
-//     setTouchStart(e.targetTouches[0].clientX);
-//   };
+      {/* Implementation Details */}
+      {(action.scope_definition ||
+        action.legal_considerations ||
+        action.proposal_advancement_scenario ||
+        action.un_budgets) && (
+        <SectionCard title="Implementation Details" icon={Users}>
+          <div className="space-y-3">
+            {action.scope_definition && (
+              <InfoRow label="Scope Definition">
+                <p className="whitespace-pre-wrap">{action.scope_definition}</p>
+              </InfoRow>
+            )}
+            {action.legal_considerations && (
+              <InfoRow label="Legal Considerations">
+                <p className="whitespace-pre-wrap">
+                  {action.legal_considerations}
+                </p>
+              </InfoRow>
+            )}
+            {action.proposal_advancement_scenario && (
+              <InfoRow label="Proposal Advancement Scenario">
+                <p className="whitespace-pre-wrap">
+                  {action.proposal_advancement_scenario}
+                </p>
+              </InfoRow>
+            )}
+            {action.un_budgets && (
+              <InfoRow label="UN Budgets">
+                <p className="whitespace-pre-wrap">{action.un_budgets}</p>
+              </InfoRow>
+            )}
+          </div>
+        </SectionCard>
+      )}
 
-//   const onTouchMove = (e: React.TouchEvent) => {
-//     setTouchEnd(e.targetTouches[0].clientX);
-//   };
+      {/* Latest Update */}
+      {action.updates && (
+        <SectionCard title="Latest Update" icon={Clock}>
+          <p className="whitespace-pre-wrap text-sm text-slate-600">
+            {action.updates}
+          </p>
+        </SectionCard>
+      )}
+    </div>
+  );
+}
 
-//   const onTouchEnd = () => {
-//     if (!touchStart || !touchEnd) return;
-//     const distance = touchStart - touchEnd;
-//     const isRightSwipe = distance < -minSwipeDistance;
+function MilestonesTab({ action }: { action: Action }) {
+  const [milestones, setMilestones] = useState<ActionMilestone[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({ description: "", deadline: "", updates: "" });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-//     // Close on right swipe (swipe to dismiss)
-//     if (isRightSwipe) {
-//       handleClose();
-//     }
-//   };
+  const loadMilestones = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getActionMilestones(action.id, action.sub_id);
+      setMilestones(data);
+    } catch (err) {
+      console.error("Failed to load milestones:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [action.id, action.sub_id]);
 
-//   // Prevent body scroll when modal is open
-//   useEffect(() => {
-//     const originalOverflow = document.documentElement.style.overflow;
-//     document.documentElement.style.overflow = "hidden";
-//     return () => {
-//       document.documentElement.style.overflow = originalOverflow;
-//     };
-//   }, []);
+  useEffect(() => {
+    loadMilestones();
+  }, [loadMilestones]);
 
-//   // Handle click outside to close
-//   const handleBackdropClick = (e: React.MouseEvent) => {
-//     if (e.target === e.currentTarget) {
-//       handleClose();
-//     }
-//   };
+  const getMilestoneTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      first: "First Milestone",
+      second: "Second Milestone",
+      third: "Third Milestone",
+      upcoming: "Upcoming",
+      final: "Final",
+    };
+    return labels[type] || type;
+  };
 
-//   // Render header content based on state
-//   const renderHeader = () => {
-//     if (loading) {
-//       return (
-//         <div className="flex items-center gap-3 text-lg text-slate-500">
-//           Loading...
-//         </div>
-//       );
-//     }
+  const getStatusBadge = (status: string) => {
+    const styles: Record<string, string> = {
+      draft: "bg-slate-100 text-slate-600",
+      submitted: "bg-blue-100 text-blue-700",
+      under_review: "bg-amber-100 text-amber-700",
+      approved: "bg-green-100 text-green-700",
+      rejected: "bg-red-100 text-red-700",
+    };
+    return styles[status] || "bg-slate-100 text-slate-600";
+  };
 
-//     if (!action) {
-//       return (
-//         <div className="flex items-center justify-between gap-4">
-//           <p className="text-lg text-slate-500">Action not found</p>
-//           <button
-//             onClick={handleClose}
-//             className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-//           >
-//             <X size={24} />
-//           </button>
-//         </div>
-//       );
-//     }
+  const canEdit = (status: string) => status === "draft" || status === "rejected";
 
-//     // Merge leads + team, dedupe; then take first N for one line, rest in "+x more"
-//     const teamMembers =
-//       action.action_entities
-//         ?.split(";")
-//         .map((e) => normalizeTeamMemberForDisplay(e.trim()))
-//         .filter((e) => e && e.trim().length > 0) || [];
-//     const seen = new Set<string>();
-//     const allChips: { name: string; type: "lead" | "team" }[] = [];
-//     for (const n of action.action_leads || []) {
-//       if (!n?.trim() || seen.has(n)) continue;
-//       seen.add(n);
-//       allChips.push({ name: n, type: "lead" });
-//     }
-//     for (const n of teamMembers) {
-//       if (seen.has(n)) continue;
-//       seen.add(n);
-//       allChips.push({ name: n, type: "team" });
-//     }
-//     const displayedChips = showAllChips
-//       ? allChips
-//       : allChips.slice(0, CHIPS_PER_LINE);
-//     const hasMore = allChips.length > CHIPS_PER_LINE;
+  const startEditing = (milestone: ActionMilestone) => {
+    setEditingId(milestone.id);
+    setEditForm({
+      description: milestone.description || "",
+      deadline: milestone.deadline || "",
+      updates: milestone.updates || "",
+    });
+    setError(null);
+  };
 
-//     return (
-//       <div className="flex items-start justify-between gap-4">
-//         <div className="min-w-0 flex-1">
-//           {/* Breadcrumb */}
-//           <div className="mb-2 flex flex-wrap items-center gap-x-1 gap-y-1 sm:mb-3 sm:gap-x-1.5 sm:gap-y-0.5">
-//             <Link
-//               href={`/?ws=${action.report}`}
-//               onClick={handleClose}
-//               className={breadcrumbLinkClass}
-//             >
-//               {action.report}
-//             </Link>
-//             <ChevronRight className={chevronClass} />
-//             <Link
-//               href={`/?wp=${action.work_package_number}`}
-//               onClick={handleClose}
-//               className={breadcrumbLinkClass}
-//             >
-//               WORK PACKAGE {action.work_package_number}
-//             </Link>
-//             <ChevronRight className={chevronClass} />
-//             <Tooltip open={copied ? true : undefined}>
-//               <TooltipTrigger asChild>
-//                 <button
-//                   onClick={(e) => {
-//                     e.stopPropagation();
-//                     const url = `${window.location.origin}${window.location.pathname}?action=${action.action_number}`;
-//                     navigator.clipboard.writeText(url);
-//                     setCopied(true);
-//                     setTimeout(() => setCopied(false), 2000);
-//                   }}
-//                   className={`${breadcrumbActionClass} cursor-pointer`}
-//                 >
-//                   Action {action.action_number}
-//                 </button>
-//               </TooltipTrigger>
-//               <TooltipContent>
-//                 <p className="text-sm text-gray-600">
-//                   {copied ? "Copied!" : "Click to copy link"}
-//                 </p>
-//               </TooltipContent>
-//             </Tooltip>
-//           </div>
-//           <h2 className="text-base leading-snug font-semibold text-slate-900 sm:text-lg">
-//             {action.indicative_activity}
-//             {action.sub_action_details && (
-//               <>
-//                 {" "}
-//                 <span className="font-semibold text-slate-600">
-//                   – {action.sub_action_details}
-//                 </span>
-//               </>
-//             )}
-//           </h2>
-//           {/* Action Leads and Team Members - one line, rest in "+x more" */}
-//           {allChips.length > 0 && (
-//             <div className="mt-2 flex flex-wrap items-center gap-1">
-//               {displayedChips.map((c) =>
-//                 c.type === "lead" ? (
-//                   <ActionLeadsBadge key={c.name} leads={[c.name]} inline />
-//                 ) : (
-//                   <TeamBadge key={c.name} leads={[c.name]} inline />
-//                 ),
-//               )}
-//               {hasMore && (
-//                 <ShowMoreBadge
-//                   showAll={showAllChips}
-//                   hiddenCount={allChips.length - CHIPS_PER_LINE}
-//                   onClick={(e) => {
-//                     e.stopPropagation();
-//                     setShowAllChips((s) => !s);
-//                   }}
-//                 />
-//               )}
-//             </div>
-//           )}
-//         </div>
-//         <button
-//           onClick={handleClose}
-//           className="shrink-0 rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-//           aria-label="Close modal"
-//         >
-//           <X size={24} />
-//         </button>
-//       </div>
-//     );
-//   };
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditForm({ description: "", deadline: "", updates: "" });
+    setError(null);
+  };
 
-//   // Render body content based on state
-//   const renderBody = () => {
-//     if (loading) {
-//       return (
-//         <div className="flex items-center justify-center py-12">
-//           <div className="text-slate-500">Loading details...</div>
-//         </div>
-//       );
-//     }
+  const handleSave = async (milestoneId: string) => {
+    setSaving(true);
+    setError(null);
 
-//     if (!action) {
-//       return (
-//         <div className="py-12">
-//           <p className="text-slate-500">
-//             The requested action could not be found.
-//           </p>
-//         </div>
-//       );
-//     }
+    try {
+      const result = await updateMilestone(milestoneId, {
+        description: editForm.description || null,
+        deadline: editForm.deadline || null,
+        updates: editForm.updates || null,
+      });
 
-//     // Action content
-//     return (
-//       <div className="space-y-6">
-//         {/* Action Details Section */}
-//         <SectionCard title="Action Details">
-//           <div className="p-5">
-//             {/* Decision Status */}
-//             <div>
-//               <h3 className="mb-1.5 text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
-//                 Status
-//               </h3>
-//               <DecisionStatusBadge
-//                 status={
-//                   action.public_action_status ||
-//                   ACTION_STATUS.FURTHER_WORK_ONGOING
-//                 }
-//               />
-//             </div>
+      if (result.success) {
+        setEditingId(null);
+        await loadMilestones();
+      } else {
+        setError(result.error || "Failed to save milestone");
+      }
+    } catch (err) {
+      setError("Failed to save milestone");
+    } finally {
+      setSaving(false);
+    }
+  };
 
-//             {/* Upcoming Milestone */}
-//             {action.upcoming_milestone && (
-//               <>
-//                 <div className="my-3 border-t border-slate-200"></div>
-//                 <h3 className="mb-3 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
-//                   Upcoming Milestone
-//                   <HelpTooltip content="Steps which will be taken towards the delivery of the proposal concerned. Completed milestones are crossed out." />
-//                 </h3>
-//                 <div className="mt-2">
-//                   <MilestoneTimeline
-//                     milestones={[
-//                       {
-//                         label: action.upcoming_milestone,
-//                         deliveryDate: action.delivery_date ?? null,
-//                         isReached: false,
-//                       },
-//                     ]}
-//                   />
-//                 </div>
-//               </>
-//             )}
+  if (loading) return <LoadingState />;
 
-//             {/* Updates Section */}
-//             <div className="my-6 border-t border-slate-200"></div>
-//             <h3 className="mb-4 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
-//               Updates
-//               <HelpTooltip content="A summary of recent progress on the action." />
-//             </h3>
-//             <div className="text-xs leading-relaxed text-slate-600 sm:text-sm">
-//               {action.updates && action.updates.trim() ? (
-//                 <p className="whitespace-pre-wrap">{action.updates}</p>
-//               ) : (
-//                 <p className="text-slate-400 italic">Updates forthcoming</p>
-//               )}
-//             </div>
-//           </div>
-//         </SectionCard>
+  if (milestones.length === 0) {
+    return <EmptyState message="No milestones have been added yet." />;
+  }
 
-//         {/* Document Reference Section */}
-//         {(action.doc_text || action.document_paragraph) && (
-//           <SectionCard title="Document Reference">
-//             <div className="space-y-3 p-5">
-//               {/* Document Paragraph Number */}
-//               {action.document_paragraph &&
-//                 (() => {
-//                   const documentData = getDocumentReference({
-//                     workPackageNumber: action.work_package_number,
-//                     report: action.report,
-//                     documentParagraph: action.document_paragraph,
-//                   });
+  return (
+    <div className="space-y-3">
+      {milestones.map((milestone) => (
+        <div
+          key={milestone.id}
+          className="rounded-lg border border-slate-200 bg-white p-4"
+        >
+          {editingId === milestone.id ? (
+            // Edit Mode
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs">
+                  {getMilestoneTypeLabel(milestone.milestone_type)}
+                </Badge>
+                <Badge className={getStatusBadge(milestone.status)}>
+                  {milestone.status.replace("_", " ")}
+                </Badge>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600">Description</label>
+                <textarea
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-none"
+                  rows={2}
+                  disabled={saving}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-600">Deadline</label>
+                  <input
+                    type="date"
+                    value={editForm.deadline}
+                    onChange={(e) => setEditForm({ ...editForm, deadline: e.target.value })}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                    disabled={saving}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-600">Updates</label>
+                  <input
+                    type="text"
+                    value={editForm.updates}
+                    onChange={(e) => setEditForm({ ...editForm, updates: e.target.value })}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                    placeholder="Status update..."
+                    disabled={saving}
+                  />
+                </div>
+              </div>
+              {error && <p className="text-sm text-red-600">{error}</p>}
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={cancelEditing}
+                  disabled={saving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => handleSave(milestone.id)}
+                  disabled={saving}
+                  className="bg-un-blue hover:bg-un-blue/90"
+                >
+                  {saving ? (
+                    <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                  ) : (
+                    <Check className="mr-1 h-3 w-3" />
+                  )}
+                  Save
+                </Button>
+              </div>
+            </div>
+          ) : (
+            // View Mode
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-xs">
+                    {getMilestoneTypeLabel(milestone.milestone_type)}
+                  </Badge>
+                  <Badge className={getStatusBadge(milestone.status)}>
+                    {milestone.status.replace("_", " ")}
+                  </Badge>
+                </div>
+                {milestone.description && (
+                  <p className="text-sm text-slate-700">
+                    {milestone.description}
+                  </p>
+                )}
+                {milestone.updates && (
+                  <p className="text-sm text-slate-500 italic">
+                    {milestone.updates}
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {milestone.deadline && (
+                  <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                    <Calendar className="h-4 w-4" />
+                    {new Date(milestone.deadline).toLocaleDateString()}
+                  </div>
+                )}
+                {canEdit(milestone.status) && (
+                  <button
+                    onClick={() => startEditing(milestone)}
+                    className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                    title="Edit milestone"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
 
-//                   if (documentData) {
-//                     const documentUrl = getDocumentUrl(
-//                       documentData.documentNumber,
-//                     );
-//                     return (
-//                       <div className="flex flex-nowrap items-start gap-2">
-//                         <FileText className="h-4 w-4 shrink-0 text-slate-600" />
-//                         <a
-//                           href={documentUrl}
-//                           target="_blank"
-//                           rel="noopener noreferrer"
-//                           className="min-w-0 flex-1 font-mono text-sm leading-tight text-un-blue hover:underline"
-//                         >
-//                           {documentData.text}
-//                         </a>
-//                       </div>
-//                     );
-//                   }
-//                   return null;
-//                 })()}
+function QuestionsTab({ action }: { action: Action }) {
+  const [questions, setQuestions] = useState<ActionQuestion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newQuestion, setNewQuestion] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-//               {/* Document Text Quote */}
-//               {action.doc_text && (
-//                 <div className="border-l-2 border-slate-300 bg-white py-3 pr-3 pl-4">
-//                   <p className="text-xs leading-relaxed text-slate-700 sm:text-sm">
-//                     &ldquo;{action.doc_text}&rdquo;
-//                   </p>
-//                 </div>
-//               )}
-//             </div>
-//           </SectionCard>
-//         )}
+  const loadQuestions = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getActionQuestions(action.id, action.sub_id);
+      setQuestions(data);
+    } catch (err) {
+      console.error("Failed to load questions:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [action.id, action.sub_id]);
 
-//         {/* Work Package Reference Section */}
-//         <SectionCard title="Work Package Reference">
-//           <div className="p-5">
-//             <div className="text-sm leading-snug text-slate-900 sm:text-[15px]">
-//               <span className="font-semibold">
-//                 Work Package {action.work_package_number}
-//               </span>
-//               <span className="mx-2 text-slate-300">•</span>
-//               <span className="font-medium text-slate-600">
-//                 {action.work_package_name}
-//               </span>
-//             </div>
-//             {action.work_package_leads &&
-//               action.work_package_leads.length > 0 && (
-//                 <div className="mt-3">
-//                   <WPLeadsBadge leads={action.work_package_leads} />
-//                 </div>
-//               )}
-//           </div>
-//         </SectionCard>
-//       </div>
-//     );
-//   };
+  useEffect(() => {
+    loadQuestions();
+  }, [loadQuestions]);
 
-//   // Single modal wrapper with dynamic content
-//   return (
-//     <div
-//       className={`fixed inset-0 z-50 flex items-center justify-end bg-black/50 transition-all duration-300 ease-out ${
-//         isVisible && !isClosing ? "opacity-100" : "opacity-0"
-//       }`}
-//       onClick={handleBackdropClick}
-//     >
-//       <div
-//         ref={setModalRef}
-//         className={`h-full w-full overflow-y-auto bg-white shadow-2xl transition-transform duration-300 ease-out sm:w-4/5 md:w-3/4 lg:w-1/2 ${
-//           isVisible && !isClosing ? "translate-x-0" : "translate-x-full"
-//         }`}
-//         onClick={(e) => e.stopPropagation()}
-//         onTouchStart={onTouchStart}
-//         onTouchMove={onTouchMove}
-//         onTouchEnd={onTouchEnd}
-//       >
-//         <TooltipCollisionBoundaryProvider value={modalEl}>
-//           <div className="flex min-h-full flex-col">
-//             {/* Header */}
-//             <div className="border-b border-slate-200 bg-white px-4 pt-4 pb-3 shadow-sm sm:px-6 sm:pt-5 sm:pb-4 md:px-8 md:pt-6 md:pb-5">
-//               {renderHeader()}
-//             </div>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newQuestion.trim()) return;
 
-//             {/* Body */}
-//             <div className="flex-1 bg-slate-50 px-4 pt-6 pb-8 sm:px-6 sm:pt-8 sm:pb-12 md:px-8">
-//               {renderBody()}
-//             </div>
-//           </div>
-//         </TooltipCollisionBoundaryProvider>
-//       </div>
-//     </div>
-//   );
-// }
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const result = await createQuestion({
+        action_id: action.id,
+        action_sub_id: action.sub_id,
+        question: newQuestion.trim(),
+      });
+
+      if (result.success) {
+        setNewQuestion("");
+        await loadQuestions();
+      } else {
+        setError(result.error || "Failed to submit question");
+      }
+    } catch (err) {
+      setError("Failed to submit question");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Ask Question Form */}
+      <form onSubmit={handleSubmit} className="rounded-lg border border-slate-200 bg-white p-4">
+        <label className="mb-2 block text-sm font-medium text-slate-700">
+          Ask a question
+        </label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={newQuestion}
+            onChange={(e) => setNewQuestion(e.target.value)}
+            placeholder="Type your question..."
+            className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+            disabled={submitting}
+          />
+          <Button
+            type="submit"
+            disabled={submitting || !newQuestion.trim()}
+            className="bg-un-blue hover:bg-un-blue/90"
+          >
+            {submitting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+        {error && (
+          <p className="mt-2 text-sm text-red-600">{error}</p>
+        )}
+      </form>
+
+      {/* Questions List */}
+      {loading ? (
+        <LoadingState />
+      ) : questions.length === 0 ? (
+        <EmptyState message="No questions have been asked yet." />
+      ) : (
+        <div className="space-y-3">
+          {questions.map((q) => (
+            <div
+              key={q.id}
+              className="rounded-lg border border-slate-200 bg-white p-4"
+            >
+              <div className="space-y-3">
+                <div className="flex items-start gap-2">
+                  <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-un-blue" />
+                  <p className="text-sm font-medium text-slate-700">{q.question}</p>
+                </div>
+                {q.answer ? (
+                  <div className="ml-6 border-l-2 border-green-200 bg-green-50 py-2 pl-3 pr-2">
+                    <p className="text-sm text-slate-600">{q.answer}</p>
+                    {q.answered_at && (
+                      <p className="mt-1 text-xs text-slate-400">
+                        Answered on{" "}
+                        {new Date(q.answered_at).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="ml-6">
+                    <Badge className="bg-amber-100 text-amber-700 border border-amber-200">
+                      Awaiting answer
+                    </Badge>
+                  </div>
+                )}
+                <p className="text-xs text-slate-400">
+                  Asked on {new Date(q.created_at).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NotesTab({ action }: { action: Action }) {
+  const [notes, setNotes] = useState<ActionNote[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newNote, setNewNote] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadNotes = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getActionNotes(action.id, action.sub_id);
+      setNotes(data);
+    } catch (err) {
+      console.error("Failed to load notes:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [action.id, action.sub_id]);
+
+  useEffect(() => {
+    loadNotes();
+  }, [loadNotes]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newNote.trim()) return;
+
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const result = await createNote({
+        action_id: action.id,
+        action_sub_id: action.sub_id,
+        content: newNote.trim(),
+      });
+
+      if (result.success) {
+        setNewNote("");
+        await loadNotes();
+      } else {
+        setError(result.error || "Failed to add note");
+      }
+    } catch (err) {
+      setError("Failed to add note");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Add Note Form */}
+      <form onSubmit={handleSubmit} className="rounded-lg border border-slate-200 bg-white p-4">
+        <label className="mb-2 block text-sm font-medium text-slate-700">
+          Add a note
+        </label>
+        <textarea
+          value={newNote}
+          onChange={(e) => setNewNote(e.target.value)}
+          placeholder="Write your note..."
+          rows={3}
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-none"
+          disabled={submitting}
+        />
+        <div className="mt-2 flex justify-end">
+          <Button
+            type="submit"
+            disabled={submitting || !newNote.trim()}
+            className="bg-un-blue hover:bg-un-blue/90"
+          >
+            {submitting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Plus className="mr-2 h-4 w-4" />
+            )}
+            Add Note
+          </Button>
+        </div>
+        {error && (
+          <p className="mt-2 text-sm text-red-600">{error}</p>
+        )}
+      </form>
+
+      {/* Notes List */}
+      {loading ? (
+        <LoadingState />
+      ) : notes.length === 0 ? (
+        <EmptyState message="No notes have been added yet." />
+      ) : (
+        <div className="space-y-3">
+          {notes.map((note) => (
+            <div
+              key={note.id}
+              className="rounded-lg border border-slate-200 bg-white p-4"
+            >
+              <div className="flex items-start gap-2">
+                <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                <div className="flex-1">
+                  <p className="whitespace-pre-wrap text-sm text-slate-700">
+                    {note.content}
+                  </p>
+                  <p className="mt-2 text-xs text-slate-400">
+                    {new Date(note.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// =========================================================
+// MAIN MODAL COMPONENT
+// =========================================================
+
+interface ActionModalProps {
+  action: Action | null;
+  onClose: () => void;
+  loading: boolean;
+}
+
+export default function ActionModal({
+  action,
+  onClose,
+  loading,
+}: ActionModalProps) {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
+
+  // Reset tab when action changes
+  useEffect(() => {
+    setActiveTab("overview");
+  }, [action?.id, action?.sub_id]);
+
+  // Animation state management
+  useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), 10);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  }, [onClose]);
+
+  // Close modal on escape key
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        handleClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyPress);
+    return () => document.removeEventListener("keydown", handleKeyPress);
+  }, [handleClose]);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    const originalOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = originalOverflow;
+    };
+  }, []);
+
+  // Handle click outside to close
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      handleClose();
+    }
+  };
+
+  const handleCopyLink = () => {
+    if (!action) return;
+    const url = `${window.location.origin}${window.location.pathname}?action=${action.action_number}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Render loading state
+  if (loading) {
+    return (
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-opacity duration-300 ${
+          isVisible && !isClosing ? "opacity-100" : "opacity-0"
+        }`}
+        onClick={handleBackdropClick}
+      >
+        <div className="rounded-lg bg-white p-8">
+          <LoadingState />
+        </div>
+      </div>
+    );
+  }
+
+  // Render not found state
+  if (!action) {
+    return (
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-opacity duration-300 ${
+          isVisible && !isClosing ? "opacity-100" : "opacity-0"
+        }`}
+        onClick={handleBackdropClick}
+      >
+        <div className="rounded-lg bg-white p-8">
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-lg text-slate-500">Action not found</p>
+            <button
+              onClick={handleClose}
+              className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            >
+              <X size={24} />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`fixed inset-0 z-50 flex justify-end bg-black/50 transition-opacity duration-300 ${
+        isVisible && !isClosing ? "opacity-100" : "opacity-0"
+      }`}
+      onClick={handleBackdropClick}
+    >
+      {/* Slide-in panel */}
+      <div
+        className={`flex h-full w-full max-w-2xl flex-col bg-slate-50 shadow-xl transition-transform duration-300 ${
+          isVisible && !isClosing ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        {/* Header */}
+        <div className="shrink-0 border-b border-slate-200 bg-white px-6 py-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              {/* Breadcrumb */}
+              <div className="mb-2 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                <Link
+                  href={`/?ws=${action.report}`}
+                  onClick={handleClose}
+                  className={breadcrumbLinkClass}
+                >
+                  {action.report}
+                </Link>
+                <ChevronRight className={chevronClass} />
+                <Link
+                  href={`/?wp=${action.work_package_number}`}
+                  onClick={handleClose}
+                  className={breadcrumbLinkClass}
+                >
+                  WP {action.work_package_number}
+                </Link>
+                <ChevronRight className={chevronClass} />
+                <button
+                  onClick={handleCopyLink}
+                  className={`${breadcrumbActionClass} cursor-pointer`}
+                  title={copied ? "Copied!" : "Click to copy link"}
+                >
+                  Action {action.action_display_id}
+                  {copied && (
+                    <span className="ml-1.5 text-green-600">✓</span>
+                  )}
+                </button>
+              </div>
+              {/* Title */}
+              <h2 className="text-base font-semibold leading-snug text-slate-900 sm:text-lg">
+                {action.indicative_activity}
+                {action.sub_action_details && (
+                  <span className="font-normal text-slate-600">
+                    {" "}
+                    – {action.sub_action_details}
+                  </span>
+                )}
+              </h2>
+            </div>
+            <button
+              onClick={handleClose}
+              className="shrink-0 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+              aria-label="Close modal"
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="flex min-h-0 flex-1 flex-col"
+        >
+          <div className="shrink-0 border-b border-slate-200 bg-white px-6">
+            <TabsList variant="line" className="h-11">
+              <TabsTrigger value="overview" className="gap-1.5">
+                <Target className="h-4 w-4" />
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="milestones" className="gap-1.5">
+                <Calendar className="h-4 w-4" />
+                Milestones
+              </TabsTrigger>
+              <TabsTrigger value="questions" className="gap-1.5">
+                <MessageCircle className="h-4 w-4" />
+                Questions
+              </TabsTrigger>
+              <TabsTrigger value="notes" className="gap-1.5">
+                <StickyNote className="h-4 w-4" />
+                Notes
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          {/* Tab Content */}
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <div className="p-6">
+              <TabsContent value="overview" className="mt-0">
+                <OverviewTab action={action} />
+              </TabsContent>
+              <TabsContent value="milestones" className="mt-0">
+                <MilestonesTab action={action} />
+              </TabsContent>
+              <TabsContent value="questions" className="mt-0">
+                <QuestionsTab action={action} />
+              </TabsContent>
+              <TabsContent value="notes" className="mt-0">
+                <NotesTab action={action} />
+              </TabsContent>
+            </div>
+          </div>
+        </Tabs>
+      </div>
+    </div>
+  );
+}
