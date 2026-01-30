@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { getActionNotes } from "@/features/notes/queries";
 import { createNote } from "@/features/notes/commands";
 import type { Action, ActionNote } from "@/types";
+import { formatUNDateTime } from "@/lib/format-date";
 import { Loader2, Plus, StickyNote } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -131,7 +132,8 @@ export default function NotesTab({ action }: { action: Action }) {
                     {note.content}
                   </p>
                   <p className="mt-2 text-xs text-slate-400">
-                    {new Date(note.created_at).toLocaleDateString()}
+                    {formatUNDateTime(note.created_at)}
+                    {note.user_email && ` by ${note.user_email}`}
                   </p>
                 </div>
               </div>

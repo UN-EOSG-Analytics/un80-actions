@@ -124,6 +124,7 @@ export interface ActionNote {
   action_id: number;
   action_sub_id: string | null;
   user_id: string | null;
+  user_email: string | null;
   content: string;
   created_at: Date;
   updated_at: Date | null;
@@ -135,6 +136,7 @@ export interface ActionUpdate {
   action_id: number;
   action_sub_id: string | null;
   user_id: string | null;
+  user_email: string | null;
   content: string;
   created_at: Date;
   updated_at: Date | null;
@@ -146,9 +148,11 @@ export interface ActionQuestion {
   action_id: number;
   action_sub_id: string | null;
   user_id: string;
+  user_email: string;
   question: string;
   answer: string | null;
   answered_by: string | null;
+  answered_by_email: string | null;
   answered_at: Date | null;
   created_at: Date;
   updated_at: Date | null;

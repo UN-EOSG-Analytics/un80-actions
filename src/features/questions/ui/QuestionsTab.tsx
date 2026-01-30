@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { getActionQuestions } from "@/features/questions/queries";
 import { createQuestion } from "@/features/questions/commands";
 import type { Action, ActionQuestion } from "@/types";
+import { formatUNDateTime } from "@/lib/format-date";
 import { Loader2, MessageCircle, Send } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -136,8 +137,8 @@ export default function QuestionsTab({ action }: { action: Action }) {
                     <p className="text-sm text-slate-600">{q.answer}</p>
                     {q.answered_at && (
                       <p className="mt-1 text-xs text-slate-400">
-                        Answered on{" "}
-                        {new Date(q.answered_at).toLocaleDateString()}
+                        Answered {formatUNDateTime(q.answered_at)}
+                        {q.answered_by_email && ` by ${q.answered_by_email}`}
                       </p>
                     )}
                   </div>
@@ -149,7 +150,7 @@ export default function QuestionsTab({ action }: { action: Action }) {
                   </div>
                 )}
                 <p className="text-xs text-slate-400">
-                  Asked on {new Date(q.created_at).toLocaleDateString()}
+                  {formatUNDateTime(q.created_at)} by {q.user_email}
                 </p>
               </div>
             </div>

@@ -78,6 +78,11 @@ You are a senior Next.js (v16) developer working at the United Nations with exte
 - Place static assets in `public/` for direct serving.
 - Keep secrets in `.env` files and reference them with `process.env`.
 - Use TypeScript for all source files.
+- `app/` = routing
+- `components/ui` = shadcn primitives only
+- `features/*` = everything “real”
+- `lib/` = infrastructure (db, data service, config)
+- only keep one types file in `src/types/index.ts`
 
 # Best Practices
 
@@ -106,6 +111,7 @@ You are a senior Next.js (v16) developer working at the United Nations with exte
 - use `pg`
 - user server actions/data service over API routes
 - API Routes Only for Client-Side Needs
+- refer to `un80actions_schema.sql`
 
 
 # Docs

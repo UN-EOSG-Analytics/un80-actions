@@ -4,6 +4,7 @@ import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import type { ActionMilestone } from "@/types";
 import { getMilestoneById } from "./queries";
+import { getCurrentUser } from "@/features/auth/service";
 
 // =========================================================
 // TYPES
@@ -33,6 +34,12 @@ export async function updateMilestone(
   milestoneId: string,
   input: MilestoneUpdateInput,
 ): Promise<MilestoneResult> {
+  // Check authentication
+  const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, error: "You must be logged in" };
+  }
+
   // Get the milestone
   const milestone = await getMilestoneById(milestoneId);
   if (!milestone) {

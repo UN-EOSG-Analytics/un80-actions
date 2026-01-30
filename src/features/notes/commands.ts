@@ -4,6 +4,7 @@ import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import type { ActionNote } from "@/types";
 import { getNoteById } from "./queries";
+import { getCurrentUser } from "@/features/auth/service";
 
 // =========================================================
 // TYPES
@@ -33,6 +34,12 @@ export interface NoteResult {
  * Create a new note for an action.
  */
 export async function createNote(input: NoteCreateInput): Promise<NoteResult> {
+  // Check authentication
+  const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, error: "You must be logged in to add notes" };
+  }
+
   // Validate content
   if (!input.content || input.content.trim().length === 0) {
     return { success: false, error: "Note content cannot be empty" };
@@ -41,9 +48,14 @@ export async function createNote(input: NoteCreateInput): Promise<NoteResult> {
   const rows = await query<{ id: string }>(
     `INSERT INTO ${DB_SCHEMA}.action_notes 
      (action_id, action_sub_id, user_id, content)
-     VALUES ($1, $2, NULL, $3)
+     VALUES ($1, $2, $3, $4)
      RETURNING id`,
-    [input.action_id, input.action_sub_id ?? null, input.content.trim()],
+    [
+      input.action_id,
+      input.action_sub_id ?? null,
+      user.id,
+      input.content.trim(),
+    ],
   );
 
   const note = await getNoteById(rows[0].id);

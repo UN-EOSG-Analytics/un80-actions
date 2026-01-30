@@ -17,23 +17,25 @@ export async function getActionNotes(
 ): Promise<ActionNote[]> {
   const whereClause =
     subId !== undefined
-      ? "WHERE action_id = $1 AND (action_sub_id IS NOT DISTINCT FROM $2)"
-      : "WHERE action_id = $1";
+      ? "WHERE n.action_id = $1 AND (n.action_sub_id IS NOT DISTINCT FROM $2)"
+      : "WHERE n.action_id = $1";
 
   const params = subId !== undefined ? [actionId, subId] : [actionId];
 
   const rows = await query<ActionNote>(
     `SELECT
-      id,
-      action_id,
-      action_sub_id,
-      user_id,
-      content,
-      created_at,
-      updated_at
-    FROM ${DB_SCHEMA}.action_notes
+      n.id,
+      n.action_id,
+      n.action_sub_id,
+      n.user_id,
+      u.email as user_email,
+      n.content,
+      n.created_at,
+      n.updated_at
+    FROM ${DB_SCHEMA}.action_notes n
+    LEFT JOIN ${DB_SCHEMA}.users u ON n.user_id = u.id
     ${whereClause}
-    ORDER BY created_at DESC`,
+    ORDER BY n.created_at DESC`,
     params,
   );
 
@@ -46,15 +48,17 @@ export async function getActionNotes(
 export async function getNoteById(noteId: string): Promise<ActionNote | null> {
   const rows = await query<ActionNote>(
     `SELECT
-      id,
-      action_id,
-      action_sub_id,
-      user_id,
-      content,
-      created_at,
-      updated_at
-    FROM ${DB_SCHEMA}.action_notes
-    WHERE id = $1`,
+      n.id,
+      n.action_id,
+      n.action_sub_id,
+      n.user_id,
+      u.email as user_email,
+      n.content,
+      n.created_at,
+      n.updated_at
+    FROM ${DB_SCHEMA}.action_notes n
+    LEFT JOIN ${DB_SCHEMA}.users u ON n.user_id = u.id
+    WHERE n.id = $1`,
     [noteId],
   );
 

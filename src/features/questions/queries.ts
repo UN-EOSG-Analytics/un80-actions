@@ -17,26 +17,30 @@ export async function getActionQuestions(
 ): Promise<ActionQuestion[]> {
   const whereClause =
     subId !== undefined
-      ? "WHERE action_id = $1 AND (action_sub_id IS NOT DISTINCT FROM $2)"
-      : "WHERE action_id = $1";
+      ? "WHERE q.action_id = $1 AND (q.action_sub_id IS NOT DISTINCT FROM $2)"
+      : "WHERE q.action_id = $1";
 
   const params = subId !== undefined ? [actionId, subId] : [actionId];
 
   const rows = await query<ActionQuestion>(
     `SELECT
-      id,
-      action_id,
-      action_sub_id,
-      user_id,
-      question,
-      answer,
-      answered_by,
-      answered_at,
-      created_at,
-      updated_at
-    FROM ${DB_SCHEMA}.action_questions
+      q.id,
+      q.action_id,
+      q.action_sub_id,
+      q.user_id,
+      u.email as user_email,
+      q.question,
+      q.answer,
+      q.answered_by,
+      au.email as answered_by_email,
+      q.answered_at,
+      q.created_at,
+      q.updated_at
+    FROM ${DB_SCHEMA}.action_questions q
+    LEFT JOIN ${DB_SCHEMA}.users u ON q.user_id = u.id
+    LEFT JOIN ${DB_SCHEMA}.users au ON q.answered_by = au.id
     ${whereClause}
-    ORDER BY created_at DESC`,
+    ORDER BY q.created_at DESC`,
     params,
   );
 
@@ -52,26 +56,30 @@ export async function getUnansweredQuestions(
 ): Promise<ActionQuestion[]> {
   const whereClause =
     subId !== undefined
-      ? "WHERE action_id = $1 AND (action_sub_id IS NOT DISTINCT FROM $2) AND answer IS NULL"
-      : "WHERE action_id = $1 AND answer IS NULL";
+      ? "WHERE q.action_id = $1 AND (q.action_sub_id IS NOT DISTINCT FROM $2) AND q.answer IS NULL"
+      : "WHERE q.action_id = $1 AND q.answer IS NULL";
 
   const params = subId !== undefined ? [actionId, subId] : [actionId];
 
   const rows = await query<ActionQuestion>(
     `SELECT
-      id,
-      action_id,
-      action_sub_id,
-      user_id,
-      question,
-      answer,
-      answered_by,
-      answered_at,
-      created_at,
-      updated_at
-    FROM ${DB_SCHEMA}.action_questions
+      q.id,
+      q.action_id,
+      q.action_sub_id,
+      q.user_id,
+      u.email as user_email,
+      q.question,
+      q.answer,
+      q.answered_by,
+      au.email as answered_by_email,
+      q.answered_at,
+      q.created_at,
+      q.updated_at
+    FROM ${DB_SCHEMA}.action_questions q
+    LEFT JOIN ${DB_SCHEMA}.users u ON q.user_id = u.id
+    LEFT JOIN ${DB_SCHEMA}.users au ON q.answered_by = au.id
     ${whereClause}
-    ORDER BY created_at ASC`,
+    ORDER BY q.created_at ASC`,
     params,
   );
 
@@ -86,18 +94,22 @@ export async function getQuestionById(
 ): Promise<ActionQuestion | null> {
   const rows = await query<ActionQuestion>(
     `SELECT
-      id,
-      action_id,
-      action_sub_id,
-      user_id,
-      question,
-      answer,
-      answered_by,
-      answered_at,
-      created_at,
-      updated_at
-    FROM ${DB_SCHEMA}.action_questions
-    WHERE id = $1`,
+      q.id,
+      q.action_id,
+      q.action_sub_id,
+      q.user_id,
+      u.email as user_email,
+      q.question,
+      q.answer,
+      q.answered_by,
+      au.email as answered_by_email,
+      q.answered_at,
+      q.created_at,
+      q.updated_at
+    FROM ${DB_SCHEMA}.action_questions q
+    LEFT JOIN ${DB_SCHEMA}.users u ON q.user_id = u.id
+    LEFT JOIN ${DB_SCHEMA}.users au ON q.answered_by = au.id
+    WHERE q.id = $1`,
     [questionId],
   );
 
