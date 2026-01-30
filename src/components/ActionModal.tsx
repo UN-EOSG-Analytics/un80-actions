@@ -3,9 +3,18 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { getStatusStyles } from "@/constants/actionStatus";
-import { getActionMilestones, updateMilestone, getMilestoneVersions, type MilestoneVersion } from "@/lib/milestones";
+import {
+  getActionMilestones,
+  updateMilestone,
+  getMilestoneVersions,
+  type MilestoneVersion,
+} from "@/lib/milestones";
 import { createNote, getActionNotes } from "@/lib/notes";
 import { createQuestion, getActionQuestions } from "@/lib/questions";
 import type {
@@ -77,7 +86,7 @@ const InfoRow = ({
   children: ReactNode;
 }) => (
   <div className="flex flex-col gap-1">
-    <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
+    <span className="text-xs font-medium tracking-wide text-slate-500 uppercase">
       {label}
     </span>
     <div className="text-sm text-slate-700">{children}</div>
@@ -116,12 +125,12 @@ function OverviewTab({ action }: { action: Action }) {
             {statusStyles.label}
           </Badge>
           {action.is_big_ticket && (
-            <Badge className="bg-purple-100 text-purple-800 border border-purple-200">
+            <Badge className="border border-purple-200 bg-purple-100 text-purple-800">
               Big Ticket
             </Badge>
           )}
           {action.needs_member_state_engagement && (
-            <Badge className="bg-blue-100 text-blue-800 border border-blue-200">
+            <Badge className="border border-blue-200 bg-blue-100 text-blue-800">
               Member State Engagement
             </Badge>
           )}
@@ -137,21 +146,22 @@ function OverviewTab({ action }: { action: Action }) {
               <p className="whitespace-pre-wrap">{action.work_package_goal}</p>
             </InfoRow>
           )}
-          {action.work_package_leads && action.work_package_leads.length > 0 && (
-            <InfoRow label="Work Package Leads">
-              <div className="flex flex-wrap gap-1.5">
-                {action.work_package_leads.map((lead) => (
-                  <Badge
-                    key={lead}
-                    variant="outline"
-                    className="bg-slate-50 text-slate-700"
-                  >
-                    {lead}
-                  </Badge>
-                ))}
-              </div>
-            </InfoRow>
-          )}
+          {action.work_package_leads &&
+            action.work_package_leads.length > 0 && (
+              <InfoRow label="Work Package Leads">
+                <div className="flex flex-wrap gap-1.5">
+                  {action.work_package_leads.map((lead) => (
+                    <Badge
+                      key={lead}
+                      variant="outline"
+                      className="bg-slate-50 text-slate-700"
+                    >
+                      {lead}
+                    </Badge>
+                  ))}
+                </div>
+              </InfoRow>
+            )}
         </div>
       </SectionCard>
 
@@ -172,7 +182,7 @@ function OverviewTab({ action }: { action: Action }) {
                 {action.action_leads.map((lead) => (
                   <Badge
                     key={lead}
-                    className="bg-un-blue/10 text-un-blue border border-un-blue/20"
+                    className="border border-un-blue/20 bg-un-blue/10 text-un-blue"
                   >
                     {lead}
                   </Badge>
@@ -183,15 +193,18 @@ function OverviewTab({ action }: { action: Action }) {
           {action.action_entities && (
             <InfoRow label="Entities">
               <div className="flex flex-wrap gap-1.5">
-                {action.action_entities.split(";").filter(Boolean).map((entity) => (
-                  <Badge
-                    key={entity}
-                    variant="outline"
-                    className="bg-slate-50 text-slate-600"
-                  >
-                    {entity.trim()}
-                  </Badge>
-                ))}
+                {action.action_entities
+                  .split(";")
+                  .filter(Boolean)
+                  .map((entity) => (
+                    <Badge
+                      key={entity}
+                      variant="outline"
+                      className="bg-slate-50 text-slate-600"
+                    >
+                      {entity.trim()}
+                    </Badge>
+                  ))}
               </div>
             </InfoRow>
           )}
@@ -210,7 +223,7 @@ function OverviewTab({ action }: { action: Action }) {
               </InfoRow>
             )}
             {action.doc_text && (
-              <div className="border-l-2 border-slate-300 bg-slate-50 py-2 pl-3 pr-2">
+              <div className="border-l-2 border-slate-300 bg-slate-50 py-2 pr-2 pl-3">
                 <p className="text-sm leading-relaxed text-slate-600 italic">
                   &ldquo;{action.doc_text}&rdquo;
                 </p>
@@ -258,7 +271,7 @@ function OverviewTab({ action }: { action: Action }) {
       {/* Latest Update */}
       {action.updates && (
         <SectionCard title="Latest Update" icon={Clock}>
-          <p className="whitespace-pre-wrap text-sm text-slate-600">
+          <p className="text-sm whitespace-pre-wrap text-slate-600">
             {action.updates}
           </p>
         </SectionCard>
@@ -271,12 +284,20 @@ function MilestonesTab({ action }: { action: Action }) {
   const [milestones, setMilestones] = useState<ActionMilestone[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ description: "", deadline: "", updates: "" });
+  const [editForm, setEditForm] = useState({
+    description: "",
+    deadline: "",
+    updates: "",
+  });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [openMilestones, setOpenMilestones] = useState<Set<string>>(new Set());
-  const [versions, setVersions] = useState<Record<string, MilestoneVersion[]>>({});
-  const [loadingVersions, setLoadingVersions] = useState<Record<string, boolean>>({});
+  const [versions, setVersions] = useState<Record<string, MilestoneVersion[]>>(
+    {},
+  );
+  const [loadingVersions, setLoadingVersions] = useState<
+    Record<string, boolean>
+  >({});
 
   const loadMilestones = useCallback(async () => {
     setLoading(true);
@@ -316,7 +337,8 @@ function MilestonesTab({ action }: { action: Action }) {
     return styles[status] || "bg-slate-100 text-slate-600";
   };
 
-  const canEdit = (status: string) => status === "draft" || status === "rejected";
+  const canEdit = (status: string) =>
+    status === "draft" || status === "rejected";
 
   const startEditing = (milestone: ActionMilestone) => {
     setEditingId(milestone.id);
@@ -404,15 +426,17 @@ function MilestonesTab({ action }: { action: Action }) {
             {/* Collapsible Header - Always shows current version */}
             <div className="p-4">
               <CollapsibleTrigger className="w-full">
-                <div className="flex items-start justify-between gap-3 hover:bg-slate-50 transition-colors rounded p-2 -m-2">
-                  <div className="flex items-start gap-3 flex-1">
+                <div className="-m-2 flex items-start justify-between gap-3 rounded p-2 transition-colors hover:bg-slate-50">
+                  <div className="flex flex-1 items-start gap-3">
                     <ChevronDown
-                      className={`h-4 w-4 text-slate-400 transition-transform mt-0.5 shrink-0 ${
-                        openMilestones.has(milestone.id) ? "rotate-0" : "-rotate-90"
+                      className={`mt-0.5 h-4 w-4 shrink-0 text-slate-400 transition-transform ${
+                        openMilestones.has(milestone.id)
+                          ? "rotate-0"
+                          : "-rotate-90"
                       }`}
                     />
                     <div className="flex-1 space-y-2 text-left">
-                      <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="outline" className="text-xs">
                           {getMilestoneTypeLabel(milestone.milestone_type)}
                         </Badge>
@@ -437,7 +461,9 @@ function MilestonesTab({ action }: { action: Action }) {
                         </p>
                       )}
                       {!milestone.description && !milestone.updates && (
-                        <p className="text-sm text-slate-400 italic">No content yet</p>
+                        <p className="text-sm text-slate-400 italic">
+                          No content yet
+                        </p>
                       )}
                     </div>
                   </div>
@@ -447,7 +473,7 @@ function MilestonesTab({ action }: { action: Action }) {
                         e.stopPropagation();
                         startEditing(milestone);
                       }}
-                      className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 shrink-0"
+                      className="shrink-0 rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
                       title="Edit milestone"
                     >
                       <Pencil className="h-4 w-4" />
@@ -464,32 +490,53 @@ function MilestonesTab({ action }: { action: Action }) {
                   // Edit Mode
                   <div className="space-y-3">
                     <div>
-                      <label className="mb-1 block text-xs font-medium text-slate-600">Description</label>
+                      <label className="mb-1 block text-xs font-medium text-slate-600">
+                        Description
+                      </label>
                       <textarea
                         value={editForm.description}
-                        onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-none"
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm,
+                            description: e.target.value,
+                          })
+                        }
+                        className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
                         rows={3}
                         disabled={saving}
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="mb-1 block text-xs font-medium text-slate-600">Deadline</label>
+                        <label className="mb-1 block text-xs font-medium text-slate-600">
+                          Deadline
+                        </label>
                         <input
                           type="date"
                           value={editForm.deadline}
-                          onChange={(e) => setEditForm({ ...editForm, deadline: e.target.value })}
+                          onChange={(e) =>
+                            setEditForm({
+                              ...editForm,
+                              deadline: e.target.value,
+                            })
+                          }
                           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
                           disabled={saving}
                         />
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs font-medium text-slate-600">Updates</label>
+                        <label className="mb-1 block text-xs font-medium text-slate-600">
+                          Updates
+                        </label>
                         <input
                           type="text"
                           value={editForm.updates}
-                          onChange={(e) => setEditForm({ ...editForm, updates: e.target.value })}
+                          onChange={(e) =>
+                            setEditForm({
+                              ...editForm,
+                              updates: e.target.value,
+                            })
+                          }
                           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
                           placeholder="Status update..."
                           disabled={saving}
@@ -529,9 +576,10 @@ function MilestonesTab({ action }: { action: Action }) {
                       <div className="flex items-center justify-center py-4">
                         <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
                       </div>
-                    ) : versions[milestone.id] && versions[milestone.id].length > 0 ? (
+                    ) : versions[milestone.id] &&
+                      versions[milestone.id].length > 0 ? (
                       <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-slate-500 uppercase">
                           <History className="h-3.5 w-3.5" />
                           Version History
                         </div>
@@ -543,27 +591,41 @@ function MilestonesTab({ action }: { action: Action }) {
                             >
                               <div className="mb-2 flex items-center justify-between">
                                 <span className="font-medium text-slate-600">
-                                  {new Date(version.changed_at).toLocaleDateString(undefined, {
+                                  {new Date(
+                                    version.changed_at,
+                                  ).toLocaleDateString(undefined, {
                                     dateStyle: "medium",
                                   })}{" "}
                                   at{" "}
-                                  {new Date(version.changed_at).toLocaleTimeString(undefined, {
+                                  {new Date(
+                                    version.changed_at,
+                                  ).toLocaleTimeString(undefined, {
                                     timeStyle: "short",
                                   })}
                                 </span>
-                                <Badge variant="outline" className="text-[10px]">
+                                <Badge
+                                  variant="outline"
+                                  className="text-[10px]"
+                                >
                                   {version.change_type}
                                 </Badge>
                               </div>
                               {version.description && (
-                                <p className="text-slate-700 mb-1">{version.description}</p>
+                                <p className="mb-1 text-slate-700">
+                                  {version.description}
+                                </p>
                               )}
                               {version.updates && (
-                                <p className="text-slate-500 italic">{version.updates}</p>
+                                <p className="text-slate-500 italic">
+                                  {version.updates}
+                                </p>
                               )}
                               {version.deadline && (
-                                <p className="text-slate-500 mt-1">
-                                  Deadline: {new Date(version.deadline).toLocaleDateString()}
+                                <p className="mt-1 text-slate-500">
+                                  Deadline:{" "}
+                                  {new Date(
+                                    version.deadline,
+                                  ).toLocaleDateString()}
                                 </p>
                               )}
                             </div>
@@ -571,7 +633,9 @@ function MilestonesTab({ action }: { action: Action }) {
                         </div>
                       </div>
                     ) : (
-                      <p className="text-sm text-slate-400 italic text-center py-4">No version history yet</p>
+                      <p className="py-4 text-center text-sm text-slate-400 italic">
+                        No version history yet
+                      </p>
                     )}
                   </div>
                 )}
@@ -637,7 +701,10 @@ function QuestionsTab({ action }: { action: Action }) {
   return (
     <div className="space-y-4">
       {/* Ask Question Form */}
-      <form onSubmit={handleSubmit} className="rounded-lg border border-slate-200 bg-white p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="rounded-lg border border-slate-200 bg-white p-4"
+      >
         <label className="mb-2 block text-sm font-medium text-slate-700">
           Ask a question
         </label>
@@ -662,9 +729,7 @@ function QuestionsTab({ action }: { action: Action }) {
             )}
           </Button>
         </div>
-        {error && (
-          <p className="mt-2 text-sm text-red-600">{error}</p>
-        )}
+        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       </form>
 
       {/* Questions List */}
@@ -682,10 +747,12 @@ function QuestionsTab({ action }: { action: Action }) {
               <div className="space-y-3">
                 <div className="flex items-start gap-2">
                   <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-un-blue" />
-                  <p className="text-sm font-medium text-slate-700">{q.question}</p>
+                  <p className="text-sm font-medium text-slate-700">
+                    {q.question}
+                  </p>
                 </div>
                 {q.answer ? (
-                  <div className="ml-6 border-l-2 border-green-200 bg-green-50 py-2 pl-3 pr-2">
+                  <div className="ml-6 border-l-2 border-green-200 bg-green-50 py-2 pr-2 pl-3">
                     <p className="text-sm text-slate-600">{q.answer}</p>
                     {q.answered_at && (
                       <p className="mt-1 text-xs text-slate-400">
@@ -696,7 +763,7 @@ function QuestionsTab({ action }: { action: Action }) {
                   </div>
                 ) : (
                   <div className="ml-6">
-                    <Badge className="bg-amber-100 text-amber-700 border border-amber-200">
+                    <Badge className="border border-amber-200 bg-amber-100 text-amber-700">
                       Awaiting answer
                     </Badge>
                   </div>
@@ -766,7 +833,10 @@ function NotesTab({ action }: { action: Action }) {
   return (
     <div className="space-y-4">
       {/* Add Note Form */}
-      <form onSubmit={handleSubmit} className="rounded-lg border border-slate-200 bg-white p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="rounded-lg border border-slate-200 bg-white p-4"
+      >
         <label className="mb-2 block text-sm font-medium text-slate-700">
           Add a note
         </label>
@@ -775,7 +845,7 @@ function NotesTab({ action }: { action: Action }) {
           onChange={(e) => setNewNote(e.target.value)}
           placeholder="Write your note..."
           rows={3}
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-none"
+          className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
           disabled={submitting}
         />
         <div className="mt-2 flex justify-end">
@@ -792,9 +862,7 @@ function NotesTab({ action }: { action: Action }) {
             Add Note
           </Button>
         </div>
-        {error && (
-          <p className="mt-2 text-sm text-red-600">{error}</p>
-        )}
+        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       </form>
 
       {/* Notes List */}
@@ -812,7 +880,7 @@ function NotesTab({ action }: { action: Action }) {
               <div className="flex items-start gap-2">
                 <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
                 <div className="flex-1">
-                  <p className="whitespace-pre-wrap text-sm text-slate-700">
+                  <p className="text-sm whitespace-pre-wrap text-slate-700">
                     {note.content}
                   </p>
                   <p className="mt-2 text-xs text-slate-400">
@@ -983,13 +1051,11 @@ export default function ActionModal({
                   title={copied ? "Copied!" : "Click to copy link"}
                 >
                   Action {action.action_display_id}
-                  {copied && (
-                    <span className="ml-1.5 text-green-600">✓</span>
-                  )}
+                  {copied && <span className="ml-1.5 text-green-600">✓</span>}
                 </button>
               </div>
               {/* Title */}
-              <h2 className="text-base font-semibold leading-snug text-slate-900 sm:text-lg">
+              <h2 className="text-base leading-snug font-semibold text-slate-900 sm:text-lg">
                 {action.indicative_activity}
                 {action.sub_action_details && (
                   <span className="font-normal text-slate-600">

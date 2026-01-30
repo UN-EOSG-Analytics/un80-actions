@@ -24,7 +24,7 @@ interface StatusStyleConfig {
  * Returns colors, icon, and label for rendering status badges.
  */
 export function getStatusStyles(
-  status: string | null | undefined
+  status: string | null | undefined,
 ): StatusStyleConfig {
   const normalizedStatus = status?.toLowerCase().trim();
 

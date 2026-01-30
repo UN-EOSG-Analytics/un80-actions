@@ -79,4 +79,8 @@ export interface ActionsTableData {
   actionsWithQuestions: ActionWithQuestions[];
 }
 
-export type ActionsTableTab = "work_package" | "action_updates" | "notes" | "questions";
+export type ActionsTableTab =
+  | "work_package"
+  | "action_updates"
+  | "notes"
+  | "questions";

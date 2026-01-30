@@ -5,7 +5,9 @@ import { requestMagicLinkAction } from "@/lib/auth_actions";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "sent" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "sent" | "error">(
+    "idle",
+  );
   const [errorMsg, setErrorMsg] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
@@ -25,16 +27,28 @@ export function LoginForm() {
     <div className="w-full max-w-sm">
       <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
         <h2 className="mb-1 text-2xl font-bold text-gray-900">Sign In</h2>
-        <p className="mb-8 text-sm text-gray-500">Enter your UN entity email address to receive a sign-in link.</p>
+        <p className="mb-8 text-sm text-gray-500">
+          Enter your UN entity email address to receive a sign-in link.
+        </p>
         {status === "sent" ? (
           <div className="min-h-[105px] rounded-lg border border-green-200 bg-green-50 p-4">
-            <p className="font-medium text-green-900">Please check your email</p>
-            <p className="mt-2 text-sm text-green-800">We have sent a sign-in link to <span className="font-medium">{email}</span></p>
+            <p className="font-medium text-green-900">
+              Please check your email
+            </p>
+            <p className="mt-2 text-sm text-green-800">
+              We have sent a sign-in link to{" "}
+              <span className="font-medium">{email}</span>
+            </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-xs font-medium text-gray-700">Email address</label>
+              <label
+                htmlFor="email"
+                className="block text-xs font-medium text-gray-700"
+              >
+                Email address
+              </label>
               <input
                 id="email"
                 type="email"
@@ -55,7 +69,7 @@ export function LoginForm() {
             <button
               type="submit"
               disabled={status === "loading"}
-              className="w-full rounded-lg bg-un-blue px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-un-blue/90 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full rounded-lg bg-un-blue px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-un-blue/90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {status === "loading" ? "Sending..." : "Send sign-in link"}
             </button>

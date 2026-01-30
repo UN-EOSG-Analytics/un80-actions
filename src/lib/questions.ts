@@ -30,7 +30,7 @@ export interface QuestionResult {
  */
 export async function getActionQuestions(
   actionId: number,
-  subId?: string | null
+  subId?: string | null,
 ): Promise<ActionQuestion[]> {
   const whereClause =
     subId !== undefined
@@ -54,7 +54,7 @@ export async function getActionQuestions(
     FROM ${DB_SCHEMA}.action_questions
     ${whereClause}
     ORDER BY created_at DESC`,
-    params
+    params,
   );
 
   return rows;
@@ -65,7 +65,7 @@ export async function getActionQuestions(
  */
 export async function getUnansweredQuestions(
   actionId: number,
-  subId?: string | null
+  subId?: string | null,
 ): Promise<ActionQuestion[]> {
   const whereClause =
     subId !== undefined
@@ -89,7 +89,7 @@ export async function getUnansweredQuestions(
     FROM ${DB_SCHEMA}.action_questions
     ${whereClause}
     ORDER BY created_at ASC`,
-    params
+    params,
   );
 
   return rows;
@@ -99,7 +99,7 @@ export async function getUnansweredQuestions(
  * Fetch a single question by ID.
  */
 export async function getQuestionById(
-  questionId: string
+  questionId: string,
 ): Promise<ActionQuestion | null> {
   const rows = await query<ActionQuestion>(
     `SELECT
@@ -115,7 +115,7 @@ export async function getQuestionById(
       updated_at
     FROM ${DB_SCHEMA}.action_questions
     WHERE id = $1`,
-    [questionId]
+    [questionId],
   );
 
   return rows[0] || null;
@@ -141,12 +141,12 @@ async function canAskQuestion(): Promise<boolean> {
 async function canAnswerQuestion(
   userEmail: string,
   actionId: number,
-  actionSubId: string | null
+  actionSubId: string | null,
 ): Promise<boolean> {
   // Check if user is admin
   const adminCheck = await query<{ user_role: string }>(
     `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
-    [userEmail]
+    [userEmail],
   );
   if (adminCheck[0]?.user_role === "Admin") {
     return true;
@@ -165,7 +165,7 @@ async function canAnswerQuestion(
         AND (action_sub_id IS NOT DISTINCT FROM $2)
         AND user_email = $3
     ) AS permissions`,
-    [actionId, actionSubId, userEmail]
+    [actionId, actionSubId, userEmail],
   );
 
   return parseInt(permissionCheck[0]?.count || "0") > 0;
@@ -180,7 +180,7 @@ async function canAnswerQuestion(
  * Any authenticated user can ask questions.
  */
 export async function createQuestion(
-  input: QuestionCreateInput
+  input: QuestionCreateInput,
 ): Promise<QuestionResult> {
   const user = await getCurrentUser();
   if (!user) {
@@ -202,7 +202,7 @@ export async function createQuestion(
       input.action_sub_id ?? null,
       user.id,
       input.question.trim(),
-    ]
+    ],
   );
 
   const question = await getQuestionById(rows[0].id);
@@ -215,7 +215,7 @@ export async function createQuestion(
  */
 export async function updateQuestion(
   questionId: string,
-  newQuestion: string
+  newQuestion: string,
 ): Promise<QuestionResult> {
   const user = await getCurrentUser();
   if (!user) {
@@ -234,7 +234,10 @@ export async function updateQuestion(
 
   // Cannot edit after it's been answered
   if (question.answer) {
-    return { success: false, error: "Cannot edit a question that has been answered" };
+    return {
+      success: false,
+      error: "Cannot edit a question that has been answered",
+    };
   }
 
   // Validate
@@ -246,7 +249,7 @@ export async function updateQuestion(
     `UPDATE ${DB_SCHEMA}.action_questions
      SET question = $1, updated_at = NOW()
      WHERE id = $2`,
-    [newQuestion.trim(), questionId]
+    [newQuestion.trim(), questionId],
   );
 
   const updated = await getQuestionById(questionId);
@@ -259,7 +262,7 @@ export async function updateQuestion(
  */
 export async function answerQuestion(
   questionId: string,
-  answer: string
+  answer: string,
 ): Promise<QuestionResult> {
   const user = await getCurrentUser();
   if (!user) {
@@ -275,7 +278,7 @@ export async function answerQuestion(
   const canAnswer = await canAnswerQuestion(
     user.email,
     question.action_id,
-    question.action_sub_id
+    question.action_sub_id,
   );
   if (!canAnswer) {
     return { success: false, error: "Not authorized to answer this question" };
@@ -293,7 +296,7 @@ export async function answerQuestion(
          answered_at = NOW(),
          updated_at = NOW()
      WHERE id = $3`,
-    [answer.trim(), user.id, questionId]
+    [answer.trim(), user.id, questionId],
   );
 
   const updated = await getQuestionById(questionId);
@@ -306,7 +309,7 @@ export async function answerQuestion(
  */
 export async function updateAnswer(
   questionId: string,
-  newAnswer: string
+  newAnswer: string,
 ): Promise<QuestionResult> {
   const user = await getCurrentUser();
   if (!user) {
@@ -326,7 +329,7 @@ export async function updateAnswer(
   const isAnswerer = question.answered_by === user.id;
   const adminCheck = await query<{ user_role: string }>(
     `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
-    [user.email]
+    [user.email],
   );
   const isAdmin = adminCheck[0]?.user_role === "Admin";
 
@@ -343,7 +346,7 @@ export async function updateAnswer(
     `UPDATE ${DB_SCHEMA}.action_questions
      SET answer = $1, updated_at = NOW()
      WHERE id = $2`,
-    [newAnswer.trim(), questionId]
+    [newAnswer.trim(), questionId],
   );
 
   const updated = await getQuestionById(questionId);
@@ -354,7 +357,9 @@ export async function updateAnswer(
  * Delete a question.
  * Only the question author (if unanswered) or admin can delete.
  */
-export async function deleteQuestion(questionId: string): Promise<QuestionResult> {
+export async function deleteQuestion(
+  questionId: string,
+): Promise<QuestionResult> {
   const user = await getCurrentUser();
   if (!user) {
     return { success: false, error: "Not authenticated" };
@@ -368,7 +373,7 @@ export async function deleteQuestion(questionId: string): Promise<QuestionResult
   const isAuthor = question.user_id === user.id;
   const adminCheck = await query<{ user_role: string }>(
     `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
-    [user.email]
+    [user.email],
   );
   const isAdmin = adminCheck[0]?.user_role === "Admin";
 

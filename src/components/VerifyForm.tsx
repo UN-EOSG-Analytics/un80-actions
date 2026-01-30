@@ -30,7 +30,8 @@ export function VerifyForm() {
       });
   }, [token, router]);
 
-  if (!token) return <p className="text-red-600">Missing verification token.</p>;
+  if (!token)
+    return <p className="text-red-600">Missing verification token.</p>;
   if (error) return <p className="text-red-600">{error}</p>;
 
   return (

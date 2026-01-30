@@ -261,7 +261,7 @@ export async function updateMilestone(
      SELECT id, description, deadline, updates, status, $1, 'updated'
      FROM ${DB_SCHEMA}.action_milestones
      WHERE id = $2`,
-    [user.id, milestoneId]
+    [user.id, milestoneId],
   );
 
   await query(

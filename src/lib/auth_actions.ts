@@ -13,9 +13,13 @@ import {
 } from "./auth";
 import { sendMagicLink } from "./mail";
 
-type ActionResult<T = void> = { success: true; data?: T } | { success: false; error: string };
+type ActionResult<T = void> =
+  | { success: true; data?: T }
+  | { success: false; error: string };
 
-export async function requestMagicLinkAction(email: string): Promise<ActionResult> {
+export async function requestMagicLinkAction(
+  email: string,
+): Promise<ActionResult> {
   if (!email || typeof email !== "string" || !email.trim()) {
     return { success: false, error: "Email required" };
   }
@@ -24,7 +28,11 @@ export async function requestMagicLinkAction(email: string): Promise<ActionResul
     return { success: false, error: "Email not in approved users list" };
   }
   if (await recentTokenExists(trimmedEmail)) {
-    return { success: false, error: "A magic link was recently sent. Please check your email or wait a few minutes." };
+    return {
+      success: false,
+      error:
+        "A magic link was recently sent. Please check your email or wait a few minutes.",
+    };
   }
   try {
     const token = await createMagicToken(trimmedEmail);
@@ -46,7 +54,9 @@ export async function requestMagicLinkAction(email: string): Promise<ActionResul
   }
 }
 
-export async function verifyMagicTokenAction(token: string): Promise<ActionResult> {
+export async function verifyMagicTokenAction(
+  token: string,
+): Promise<ActionResult> {
   if (!token || typeof token !== "string") {
     return { success: false, error: "Missing token" };
   }

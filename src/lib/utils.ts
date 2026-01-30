@@ -13,7 +13,7 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function naturalSort(items: string[]): string[] {
   return [...items].sort((a, b) =>
-    a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" })
+    a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }),
   );
 }
 

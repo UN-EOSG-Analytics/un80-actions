@@ -28,7 +28,7 @@ export function ReportsTableShell({ data }: ReportsTableShellProps) {
         ...a,
         work_package_id: wp.id,
         work_package_title: wp.work_package_title,
-      }))
+      })),
     );
   }, [data.workPackages]);
 
@@ -56,7 +56,7 @@ export function ReportsTableShell({ data }: ReportsTableShellProps) {
       {/* Search */}
       <div className="flex items-center gap-3">
         <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="Search actions..."
@@ -68,22 +68,23 @@ export function ReportsTableShell({ data }: ReportsTableShellProps) {
             <button
               type="button"
               onClick={() => setSearchInput("")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
               <X className="h-3 w-3" />
             </button>
           )}
         </div>
         <p className="ml-auto text-sm text-gray-500">
-          {filteredActions.length} action{filteredActions.length !== 1 ? "s" : ""}
+          {filteredActions.length} action
+          {filteredActions.length !== 1 ? "s" : ""}
         </p>
       </div>
 
       {/* Simple Table */}
-      <div className="rounded-lg border border-gray-200 overflow-hidden bg-white">
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b bg-gray-50 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+            <tr className="border-b bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
               <th className="w-20 px-4 py-3">Action</th>
               <th className="w-24 px-4 py-3">WP</th>
               <th className="px-4 py-3">Indicative Activity</th>
@@ -93,7 +94,10 @@ export function ReportsTableShell({ data }: ReportsTableShellProps) {
           <tbody className="divide-y divide-gray-100">
             {filteredActions.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-4 py-12 text-center text-gray-400">
+                <td
+                  colSpan={4}
+                  className="px-4 py-12 text-center text-gray-400"
+                >
                   No actions found
                 </td>
               </tr>

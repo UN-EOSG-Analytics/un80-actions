@@ -12,7 +12,7 @@ function getConnectionConfig() {
 
   if (!host || !user || !password) {
     throw new Error(
-      "Missing required environment variables: AZURE_POSTGRES_HOST, AZURE_POSTGRES_USER, AZURE_POSTGRES_PASSWORD"
+      "Missing required environment variables: AZURE_POSTGRES_HOST, AZURE_POSTGRES_USER, AZURE_POSTGRES_PASSWORD",
     );
   }
 
@@ -34,7 +34,10 @@ export const pool = globalForDb.pool || new Pool(getConnectionConfig());
 
 if (process.env.NODE_ENV !== "production") globalForDb.pool = pool;
 
-export async function query<T = unknown>(text: string, params?: unknown[]): Promise<T[]> {
+export async function query<T = unknown>(
+  text: string,
+  params?: unknown[],
+): Promise<T[]> {
   const client = await pool.connect();
   try {
     const result = await client.query(text, params);

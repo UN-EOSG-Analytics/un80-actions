@@ -154,7 +154,11 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
     for (const r of wpRows) {
       let wp = workPackagesMap.get(r.wp_id);
       if (!wp) {
-        wp = { id: r.wp_id, work_package_title: r.work_package_title, actions: [] };
+        wp = {
+          id: r.wp_id,
+          work_package_title: r.work_package_title,
+          actions: [],
+        };
         workPackagesMap.set(r.wp_id, wp);
       }
       const key = actionKey(r.action_id, r.action_sub_id);
@@ -183,7 +187,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
     }
 
     const workPackages = Array.from(workPackagesMap.values()).sort(
-      (a, b) => a.id - b.id
+      (a, b) => a.id - b.id,
     );
 
     const updatesByAction = new Map<string, ActionWithUpdates>();
@@ -213,7 +217,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       (a, b) =>
         a.work_package_id - b.work_package_id ||
         a.action_id - b.action_id ||
-        (a.action_sub_id ?? "").localeCompare(b.action_sub_id ?? "")
+        (a.action_sub_id ?? "").localeCompare(b.action_sub_id ?? ""),
     );
 
     const notesByAction = new Map<string, ActionWithNotes>();
@@ -243,7 +247,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       (a, b) =>
         a.work_package_id - b.work_package_id ||
         a.action_id - b.action_id ||
-        (a.action_sub_id ?? "").localeCompare(b.action_sub_id ?? "")
+        (a.action_sub_id ?? "").localeCompare(b.action_sub_id ?? ""),
     );
 
     const questionsByAction = new Map<string, ActionWithQuestions>();
@@ -274,7 +278,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       (a, b) =>
         a.work_package_id - b.work_package_id ||
         a.action_id - b.action_id ||
-        (a.action_sub_id ?? "").localeCompare(b.action_sub_id ?? "")
+        (a.action_sub_id ?? "").localeCompare(b.action_sub_id ?? ""),
     );
 
     return {

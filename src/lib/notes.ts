@@ -34,7 +34,7 @@ export interface NoteResult {
  */
 export async function getActionNotes(
   actionId: number,
-  subId?: string | null
+  subId?: string | null,
 ): Promise<ActionNote[]> {
   const whereClause =
     subId !== undefined
@@ -55,7 +55,7 @@ export async function getActionNotes(
     FROM ${DB_SCHEMA}.action_notes
     ${whereClause}
     ORDER BY created_at DESC`,
-    params
+    params,
   );
 
   return rows;
@@ -76,7 +76,7 @@ export async function getNoteById(noteId: string): Promise<ActionNote | null> {
       updated_at
     FROM ${DB_SCHEMA}.action_notes
     WHERE id = $1`,
-    [noteId]
+    [noteId],
   );
 
   return rows[0] || null;
@@ -93,12 +93,12 @@ export async function getNoteById(noteId: string): Promise<ActionNote | null> {
 async function canAccessActionNotes(
   userEmail: string,
   actionId: number,
-  actionSubId: string | null
+  actionSubId: string | null,
 ): Promise<boolean> {
   // Check if user is admin
   const adminCheck = await query<{ user_role: string }>(
     `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
-    [userEmail]
+    [userEmail],
   );
   if (adminCheck[0]?.user_role === "Admin") {
     return true;
@@ -122,7 +122,7 @@ async function canAccessActionNotes(
         AND (action_sub_id IS NOT DISTINCT FROM $2)
         AND user_email = $3
     ) AS permissions`,
-    [actionId, actionSubId, userEmail]
+    [actionId, actionSubId, userEmail],
   );
 
   return parseInt(permissionCheck[0]?.count || "0") > 0;
@@ -145,10 +145,13 @@ export async function createNote(input: NoteCreateInput): Promise<NoteResult> {
   const canAccess = await canAccessActionNotes(
     user.email,
     input.action_id,
-    input.action_sub_id ?? null
+    input.action_sub_id ?? null,
   );
   if (!canAccess) {
-    return { success: false, error: "Not authorized to add notes to this action" };
+    return {
+      success: false,
+      error: "Not authorized to add notes to this action",
+    };
   }
 
   // Validate content
@@ -161,7 +164,12 @@ export async function createNote(input: NoteCreateInput): Promise<NoteResult> {
      (action_id, action_sub_id, user_id, content)
      VALUES ($1, $2, $3, $4)
      RETURNING id`,
-    [input.action_id, input.action_sub_id ?? null, user.id, input.content.trim()]
+    [
+      input.action_id,
+      input.action_sub_id ?? null,
+      user.id,
+      input.content.trim(),
+    ],
   );
 
   const note = await getNoteById(rows[0].id);
@@ -174,7 +182,7 @@ export async function createNote(input: NoteCreateInput): Promise<NoteResult> {
  */
 export async function updateNote(
   noteId: string,
-  input: NoteUpdateInput
+  input: NoteUpdateInput,
 ): Promise<NoteResult> {
   const user = await getCurrentUser();
   if (!user) {
@@ -191,7 +199,7 @@ export async function updateNote(
   const isAuthor = note.user_id === user.id;
   const adminCheck = await query<{ user_role: string }>(
     `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
-    [user.email]
+    [user.email],
   );
   const isAdmin = adminCheck[0]?.user_role === "Admin";
 
@@ -208,7 +216,7 @@ export async function updateNote(
     `UPDATE ${DB_SCHEMA}.action_notes
      SET content = $1, updated_at = NOW()
      WHERE id = $2`,
-    [input.content.trim(), noteId]
+    [input.content.trim(), noteId],
   );
 
   const updated = await getNoteById(noteId);
@@ -234,7 +242,7 @@ export async function deleteNote(noteId: string): Promise<NoteResult> {
   const isAuthor = note.user_id === user.id;
   const adminCheck = await query<{ user_role: string }>(
     `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
-    [user.email]
+    [user.email],
   );
   const isAdmin = adminCheck[0]?.user_role === "Admin";
 
