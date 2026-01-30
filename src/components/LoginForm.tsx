@@ -34,10 +34,12 @@ export function LoginForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="email"
+            name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="your.name@un.org"
             required
+            autoComplete="email"
             className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-un-blue focus:ring-1 focus:ring-un-blue focus:outline-none"
           />
           {status === "error" && <p className="text-sm text-red-600">{errorMsg}</p>}
