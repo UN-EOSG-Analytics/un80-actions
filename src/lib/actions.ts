@@ -1,6 +1,6 @@
 "use server";
 
-import { query } from "./db";
+import { query } from "./db/db";
 import { getActionMilestones } from "./milestones";
 import type {
   Action,

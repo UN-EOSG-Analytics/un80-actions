@@ -82,6 +82,7 @@ You are a senior Next.js (v16) developer working at the United Nations with exte
 - `components/ui` = shadcn primitives only
 - `features/*` = everything “real”
 - `lib/` = infrastructure (db, data service, config)
+- only keep one types file in `src/types/index.ts`
 
 # Best Practices
 

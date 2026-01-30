@@ -6,7 +6,7 @@ import { Header } from "@/components/HeaderBar";
 import { Footer } from "@/components/Footer";
 import ModalHandler from "@/components/ModalHandler";
 import { SITE_DESCRIPTION, SITE_TITLE } from "@/constants/site";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/features/auth/service";
 import "./globals.css";
 
 // https://fonts.google.com/specimen/Roboto

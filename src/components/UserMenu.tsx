@@ -1,6 +1,6 @@
 "use client";
 
-import { logoutAction } from "@/lib/auth_actions";
+import { logout } from "@/features/auth/commands";
 import { Badge } from "./ui/badge";
 import { LogOut } from "lucide-react";
 
@@ -11,7 +11,7 @@ interface Props {
 
 export function UserMenu({ email, entity }: Props) {
   async function handleLogout() {
-    await logoutAction();
+    await logout();
   }
 
   return (

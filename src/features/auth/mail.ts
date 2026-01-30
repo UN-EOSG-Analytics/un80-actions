@@ -1,5 +1,5 @@
-import nodemailer from "nodemailer";
 import { SITE_TITLE } from "@/constants/site";
+import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp.mailbox.org",

@@ -1,25 +1,23 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import {
-  isApprovedUser,
-  createMagicToken,
-  verifyMagicToken,
-  upsertUser,
-  createSession,
-  clearSession,
-  recentTokenExists,
-} from "./auth";
+import { redirect } from "next/navigation";
 import { sendMagicLink } from "./mail";
+import {
+    clearSession,
+    createMagicToken,
+    createSession,
+    isApprovedUser,
+    recentTokenExists,
+    upsertUser,
+    verifyMagicToken,
+} from "./service";
 
-type ActionResult<T = void> =
+type Result<T = void> =
   | { success: true; data?: T }
   | { success: false; error: string };
 
-export async function requestMagicLinkAction(
-  email: string,
-): Promise<ActionResult> {
+export async function requestMagicLink(email: string): Promise<Result> {
   if (!email || typeof email !== "string" || !email.trim()) {
     return { success: false, error: "Email required" };
   }
@@ -54,9 +52,7 @@ export async function requestMagicLinkAction(
   }
 }
 
-export async function verifyMagicTokenAction(
-  token: string,
-): Promise<ActionResult> {
+export async function verify(token: string): Promise<Result> {
   if (!token || typeof token !== "string") {
     return { success: false, error: "Missing token" };
   }
@@ -70,7 +66,7 @@ export async function verifyMagicTokenAction(
   return { success: true };
 }
 
-export async function logoutAction(): Promise<void> {
+export async function logout(): Promise<void> {
   await clearSession();
   redirect("/login");
 }

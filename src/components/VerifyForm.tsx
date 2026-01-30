@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { verifyMagicTokenAction } from "@/lib/auth_actions";
+import { verify } from "@/features/auth/commands";
 
 export function VerifyForm() {
   const searchParams = useSearchParams();
@@ -17,7 +17,7 @@ export function VerifyForm() {
     }
 
     // Auto-verify the token and sign in
-    verifyMagicTokenAction(token)
+    verify(token)
       .then((result) => {
         if (!result.success) {
           setError(result.error || "Failed to verify token");

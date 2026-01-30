@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { requestMagicLinkAction } from "@/lib/auth_actions";
+import { requestMagicLink } from "@/features/auth/commands";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -14,7 +14,7 @@ export function LoginForm() {
     e.preventDefault();
     setStatus("loading");
     setErrorMsg("");
-    const result = await requestMagicLinkAction(email);
+    const result = await requestMagicLink(email);
     if (result.success) {
       setStatus("sent");
     } else {

@@ -1,8 +1,8 @@
 "use server";
 
-import { query } from "./db";
-import { getCurrentUser } from "./auth";
-import { DB_SCHEMA } from "./config";
+import { query } from "./db/db";
+import { getCurrentUser } from "../features/auth/service";
+import { DB_SCHEMA } from "./db/config";
 import type { ActionQuestion } from "@/types";
 
 // =========================================================

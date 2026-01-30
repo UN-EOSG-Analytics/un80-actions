@@ -3,7 +3,7 @@
  * Reads directly from Postgres; no API. Use only in Server Components.
  */
 
-import { query } from "@/lib/db";
+import { query } from "@/lib/db/db";
 import type {
   ActionsTableData,
   ActionWithMilestones,
