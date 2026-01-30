@@ -21,6 +21,18 @@ export interface MilestoneResult {
   milestone?: ActionMilestone;
 }
 
+export interface MilestoneVersion {
+  id: string;
+  milestone_id: string;
+  description: string | null;
+  deadline: string | null;
+  updates: string | null;
+  status: MilestoneStatus;
+  changed_by: string | null;
+  changed_at: Date;
+  change_type: string;
+}
+
 // =========================================================
 // QUERIES
 // =========================================================
@@ -102,6 +114,32 @@ export async function getMilestoneById(
   );
 
   return rows[0] || null;
+}
+
+/**
+ * Fetch version history for a milestone.
+ */
+export async function getMilestoneVersions(
+  milestoneId: string,
+): Promise<MilestoneVersion[]> {
+  const rows = await query<MilestoneVersion>(
+    `SELECT
+      id,
+      milestone_id,
+      description,
+      deadline::text,
+      updates,
+      status,
+      changed_by,
+      changed_at,
+      change_type
+    FROM ${DB_SCHEMA}.milestone_versions
+    WHERE milestone_id = $1
+    ORDER BY changed_at DESC`,
+    [milestoneId],
+  );
+
+  return rows;
 }
 
 // =========================================================
@@ -215,6 +253,16 @@ export async function updateMilestone(
   }
 
   params.push(milestoneId);
+
+  // Save current version to history before updating
+  await query(
+    `INSERT INTO ${DB_SCHEMA}.milestone_versions 
+     (milestone_id, description, deadline, updates, status, changed_by, change_type)
+     SELECT id, description, deadline, updates, status, $1, 'updated'
+     FROM ${DB_SCHEMA}.action_milestones
+     WHERE id = $2`,
+    [user.id, milestoneId]
+  );
 
   await query(
     `UPDATE ${DB_SCHEMA}.action_milestones

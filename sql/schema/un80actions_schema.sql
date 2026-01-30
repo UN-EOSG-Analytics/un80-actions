@@ -150,6 +150,21 @@ create table action_milestones (
         foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade,
         constraint action_milestones_action_type_key unique (action_id, action_sub_id, milestone_type)
 );
+
+-- Milestone version history
+create table milestone_versions (
+    id uuid primary key default gen_random_uuid(),
+    milestone_id uuid not null references action_milestones(id) on delete cascade,
+    description text,
+    deadline date,
+    updates text,
+    status milestone_status not null,
+    changed_by uuid references users(id) on delete set null,
+    changed_at timestamp with time zone not null default now(),
+    change_type text not null -- 'created', 'updated', 'submitted', 'approved', 'rejected'
+);
+create index idx_milestone_versions_milestone_id on milestone_versions(milestone_id);
+create index idx_milestone_versions_changed_at on milestone_versions(changed_at desc);
 -- =========================================================
 -- RELATIONSHIP TABLES
 -- =========================================================
