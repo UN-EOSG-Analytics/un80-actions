@@ -1,10 +1,10 @@
 "use client";
 
+import { SITE_SUBTITLE, SITE_TITLE } from "@/constants/site";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserMenu } from "./UserMenu";
-import { SITE_SUBTITLE, SITE_TITLE } from "@/constants/site";
 
 interface Props {
   user?: { email: string; entity?: string | null } | null;
@@ -20,7 +20,9 @@ export function Header({ user, children, maxWidth = "7xl" }: Props) {
 
   return (
     <header className="border-b border-gray-200 bg-white">
-      <div className={`mx-auto flex ${widthClass} items-center justify-between px-3 py-4 sm:px-4`}>
+      <div
+        className={`mx-auto flex ${widthClass} items-center justify-between py-4`}
+      >
         <Link href="/" className="flex items-center gap-3 hover:opacity-90">
           <Image
             src="/images/un-logo-stacked-colour-english.svg"
@@ -40,7 +42,10 @@ export function Header({ user, children, maxWidth = "7xl" }: Props) {
           {isLoggedIn ? (
             <UserMenu email={user.email} entity={user.entity} />
           ) : !isLoginPage ? (
-            <Link href="/login" className="rounded-lg bg-un-blue px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-un-blue/90">
+            <Link
+              href="/login"
+              className="rounded-lg bg-un-blue px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-un-blue/90"
+            >
               Sign In
             </Link>
           ) : null}
