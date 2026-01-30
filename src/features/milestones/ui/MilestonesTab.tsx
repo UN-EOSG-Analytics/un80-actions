@@ -13,16 +13,30 @@ import {
   type MilestoneVersion,
 } from "@/features/milestones/queries";
 import { updateMilestone } from "@/features/milestones/commands";
-import type { Action, ActionMilestone } from "@/types";
+import {
+  canViewAttachments,
+  getMilestoneAttachments,
+  getMilestoneAttachmentCount,
+  uploadMilestoneAttachment,
+  deleteMilestoneAttachment,
+} from "@/features/milestones/attachments";
+import { approveMilestoneContent } from "@/features/milestones/commands";
+import { ReviewStatus } from "@/features/shared/ReviewStatus";
+import { TagSelector } from "@/features/shared/TagSelector";
+import type { Action, ActionMilestone, MilestoneAttachment } from "@/types";
 import {
   Calendar,
   Check,
   ChevronDown,
   History,
   Loader2,
+  Paperclip,
   Pencil,
+  Download,
+  Trash2,
 } from "lucide-react";
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 // =========================================================
 // HELPER COMPONENTS
@@ -44,7 +58,13 @@ const LoadingState = () => (
 // MILESTONES TAB
 // =========================================================
 
-export default function MilestonesTab({ action }: { action: Action }) {
+export default function MilestonesTab({
+  action,
+  isAdmin = false,
+}: {
+  action: Action;
+  isAdmin?: boolean;
+}) {
   const [milestones, setMilestones] = useState<ActionMilestone[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -62,6 +82,23 @@ export default function MilestonesTab({ action }: { action: Action }) {
   const [loadingVersions, setLoadingVersions] = useState<
     Record<string, boolean>
   >({});
+  const [canViewDocs, setCanViewDocs] = useState(false);
+  const [attachments, setAttachments] = useState<
+    Record<string, MilestoneAttachment[]>
+  >({});
+  const [attachmentCounts, setAttachmentCounts] = useState<
+    Record<string, number>
+  >({});
+  const [loadingAttachments, setLoadingAttachments] = useState(false);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    canViewAttachments().then(setCanViewDocs);
+  }, []);
+
 
   const loadMilestones = useCallback(async () => {
     setLoading(true);
@@ -137,7 +174,7 @@ export default function MilestonesTab({ action }: { action: Action }) {
         setError(result.error || "Failed to save milestone");
       }
     } catch (err) {
-      setError("Failed to save milestone");
+      setError(err instanceof Error ? err.message : "Failed to save milestone");
     } finally {
       setSaving(false);
     }
@@ -149,12 +186,90 @@ export default function MilestonesTab({ action }: { action: Action }) {
       newOpen.delete(milestoneId);
     } else {
       newOpen.add(milestoneId);
-      // Load versions when opening
       if (!versions[milestoneId]) {
         loadVersionsForMilestone(milestoneId);
       }
     }
     setOpenMilestones(newOpen);
+  };
+
+  const loadAllAttachments = useCallback(async () => {
+    if (milestones.length === 0) return;
+    setLoadingAttachments(true);
+    try {
+      const [canView, ...counts] = await Promise.all([
+        canViewAttachments(),
+        ...milestones.map((m) => getMilestoneAttachmentCount(m.id)),
+      ]);
+      setCanViewDocs((prev) => prev || canView);
+      const countsMap: Record<string, number> = {};
+      milestones.forEach((m, i) => {
+        countsMap[m.id] = counts[i] as number;
+      });
+      setAttachmentCounts(countsMap);
+      if (canView) {
+        const allData = await Promise.all(
+          milestones.map((m) => getMilestoneAttachments(m.id)),
+        );
+        const attachmentsMap: Record<string, MilestoneAttachment[]> = {};
+        milestones.forEach((m, i) => {
+          attachmentsMap[m.id] = allData[i] as MilestoneAttachment[];
+        });
+        setAttachments(attachmentsMap);
+      } else {
+        setAttachments(
+          Object.fromEntries(milestones.map((m) => [m.id, [] as MilestoneAttachment[]])),
+        );
+      }
+    } catch (err) {
+      console.error("Failed to load attachments:", err);
+    } finally {
+      setLoadingAttachments(false);
+    }
+  }, [milestones]);
+
+  useEffect(() => {
+    if (milestones.length > 0) {
+      loadAllAttachments();
+    }
+  }, [milestones, loadAllAttachments]);
+
+  const handleUpload = async (milestoneId: string, formData: FormData) => {
+    setUploadingId(milestoneId);
+    setUploadError(null);
+    try {
+      const result = await uploadMilestoneAttachment(milestoneId, formData);
+      if (result.success) {
+        await loadAllAttachments();
+      } else {
+        setUploadError(result.error || "Upload failed");
+      }
+    } catch {
+      setUploadError("Upload failed");
+    } finally {
+      setUploadingId(null);
+    }
+  };
+
+  const handleApproveMilestone = async (milestoneId: string) => {
+    setApprovingId(milestoneId);
+    try {
+      const result = await approveMilestoneContent(milestoneId);
+      if (result.success) {
+        await loadMilestones();
+        router.refresh();
+      }
+    } finally {
+      setApprovingId(null);
+    }
+  };
+
+  const handleDeleteAttachment = async (attachmentId: string) => {
+    if (!confirm("Delete this attachment?")) return;
+    const result = await deleteMilestoneAttachment(attachmentId);
+    if (result.success) {
+      await loadAllAttachments();
+    }
   };
 
   const loadVersionsForMilestone = async (milestoneId: string) => {
@@ -204,12 +319,37 @@ export default function MilestonesTab({ action }: { action: Action }) {
                         <Badge className={getStatusBadge(milestone.status)}>
                           {milestone.status.replace("_", " ")}
                         </Badge>
+                        <ReviewStatus
+                          status={
+                            (milestone as { content_review_status?: "approved" | "needs_review" })
+                              .content_review_status ?? "approved"
+                          }
+                          reviewedByEmail={
+                            (milestone as { content_reviewed_by_email?: string | null })
+                              .content_reviewed_by_email ?? null
+                          }
+                          reviewedAt={
+                            (milestone as { content_reviewed_at?: Date | null })
+                              .content_reviewed_at ?? null
+                          }
+                          isAdmin={isAdmin}
+                          onApprove={() => handleApproveMilestone(milestone.id)}
+                          approving={approvingId === milestone.id}
+                        />
                         {milestone.deadline && (
                           <div className="flex items-center gap-1.5 text-sm text-slate-500">
                             <Calendar className="h-4 w-4" />
                             {new Date(milestone.deadline).toLocaleDateString()}
                           </div>
                         )}
+                        <div onClick={(e) => e.stopPropagation()}>
+                          <TagSelector
+                            entityId={milestone.id}
+                            entityType="milestone"
+                            isAdmin={isAdmin}
+                            initialTags={[]}
+                          />
+                        </div>
                       </div>
                       {milestone.description && (
                         <p className="text-sm text-slate-700">
@@ -403,6 +543,141 @@ export default function MilestonesTab({ action }: { action: Action }) {
           </div>
         </Collapsible>
       ))}
+
+      {/* Attachments - single section below all milestones */}
+      <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4">
+        <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <Paperclip className="h-3.5 w-3.5" />
+          Attachments
+        </div>
+
+        {loadingAttachments ? (
+          <div className="flex items-center gap-2 py-2">
+            <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+            <span className="text-sm text-slate-500">Loading…</span>
+          </div>
+        ) : canViewDocs ? (
+          <div className="space-y-2">
+            {(() => {
+              const allAttachments = milestones.flatMap((m) =>
+                (attachments[m.id] || []).map((att) => ({
+                  ...att,
+                  _milestoneLabel: getMilestoneTypeLabel(m.milestone_type),
+                })),
+              );
+              return allAttachments.length > 0 ? (
+                <ul className="space-y-1.5">
+                  {allAttachments.map((att) => (
+                    <li
+                      key={att.id}
+                      className="flex items-center justify-between gap-2 rounded border border-slate-200 bg-slate-50 px-3 py-2 text-sm"
+                    >
+                      <div className="flex min-w-0 flex-1 items-center gap-2">
+                        <a
+                          href={`/api/milestone-attachments/${att.id}`}
+                          download={att.file_name}
+                          className="flex min-w-0 flex-1 items-center gap-2 truncate text-un-blue hover:underline"
+                        >
+                          <Download className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{att.file_name}</span>
+                          {att.file_size && (
+                            <span className="shrink-0 text-slate-400">
+                              ({(att.file_size / 1024).toFixed(1)} KB)
+                            </span>
+                          )}
+                        </a>
+                        <Badge variant="outline" className="shrink-0 text-[10px]">
+                          {att._milestoneLabel}
+                        </Badge>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteAttachment(att.id)}
+                        className="shrink-0 rounded p-1 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                        title="Delete"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-slate-400 italic">
+                  No attachments yet
+                </p>
+              );
+            })()}
+          </div>
+        ) : (
+          <p className="text-sm text-slate-500">
+            {Object.values(attachmentCounts).reduce((a, b) => a + b, 0) > 0
+              ? `${Object.values(attachmentCounts).reduce((a, b) => a + b, 0)} attachment(s). Viewing restricted to admins.`
+              : "You can attach documents. Viewing is restricted to admins."}
+          </p>
+        )}
+
+        <form
+          className="mt-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const form = e.currentTarget;
+            const fd = new FormData(form);
+            const milestoneId = form.querySelector<HTMLSelectElement>(
+              "[name=attach-to-milestone]",
+            )?.value;
+            if (!fd.get("file") || !milestoneId) return;
+            handleUpload(milestoneId, fd);
+            form.reset();
+          }}
+        >
+          <div className="flex flex-wrap items-end gap-2">
+            <div className="min-w-[140px]">
+              <label className="mb-1 block text-xs font-medium text-slate-600">
+                Attach to
+              </label>
+              <select
+                name="attach-to-milestone"
+                className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                disabled={!!uploadingId}
+              >
+                {milestones.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {getMilestoneTypeLabel(m.milestone_type)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <label className="flex-1 min-w-[120px]">
+              <span className="mb-1 block text-xs font-medium text-slate-600">
+                File
+              </span>
+              <input
+                type="file"
+                name="file"
+                accept=".pdf,.doc,.docx,image/*,.txt,.csv"
+                className="block w-full text-sm text-slate-600 file:mr-2 file:rounded file:border-0 file:bg-un-blue/10 file:px-3 file:py-1.5 file:text-sm file:text-un-blue file:hover:bg-un-blue/20"
+                disabled={!!uploadingId}
+              />
+            </label>
+            <Button
+              type="submit"
+              size="sm"
+              variant="outline"
+              disabled={!!uploadingId}
+              className="shrink-0"
+            >
+              {uploadingId ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Attach"
+              )}
+            </Button>
+          </div>
+          {uploadError && (
+            <p className="mt-1 text-sm text-red-600">{uploadError}</p>
+          )}
+        </form>
+      </div>
     </div>
   );
 }

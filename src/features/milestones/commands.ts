@@ -34,62 +34,131 @@ export async function updateMilestone(
   milestoneId: string,
   input: MilestoneUpdateInput,
 ): Promise<MilestoneResult> {
-  // Check authentication
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "You must be logged in" };
-  }
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "You must be logged in" };
+    }
 
-  // Get the milestone
-  const milestone = await getMilestoneById(milestoneId);
-  if (!milestone) {
-    return { success: false, error: "Milestone not found" };
-  }
+    const milestone = await getMilestoneById(milestoneId);
+    if (!milestone) {
+      return { success: false, error: "Milestone not found" };
+    }
 
-  // Build UPDATE query dynamically based on provided fields
-  const updates: string[] = [];
-  const params: (string | null)[] = [];
-  let paramIndex = 1;
+    const updates: string[] = [];
+    const params: (string | null)[] = [];
+    let paramIndex = 1;
 
-  if (input.description !== undefined) {
-    updates.push(`description = $${paramIndex++}`);
-    params.push(input.description);
-  }
-  if (input.deadline !== undefined) {
-    updates.push(`deadline = $${paramIndex++}`);
-    params.push(input.deadline);
-  }
-  if (input.updates !== undefined) {
-    updates.push(`updates = $${paramIndex++}`);
-    params.push(input.updates);
-  }
+    if (input.description !== undefined) {
+      updates.push(`description = $${paramIndex++}`);
+      params.push(input.description);
+    }
+    if (input.deadline !== undefined) {
+      updates.push(`deadline = $${paramIndex++}`);
+      params.push(input.deadline);
+    }
+    if (input.updates !== undefined) {
+      updates.push(`updates = $${paramIndex++}`);
+      params.push(input.updates);
+    }
 
-  if (updates.length === 0) {
-    return { success: false, error: "No fields to update" };
-  }
+    if (updates.length === 0) {
+      return { success: false, error: "No fields to update" };
+    }
 
-  params.push(milestoneId);
+    params.push(milestoneId);
 
-  // Save current version to history before updating
-  await query(
-    `INSERT INTO ${DB_SCHEMA}.milestone_versions 
+    await query(
+      `INSERT INTO ${DB_SCHEMA}.milestone_versions 
      (milestone_id, description, deadline, updates, status, changed_by, change_type)
      SELECT id, description, deadline, updates, status, $1, 'updated'
      FROM ${DB_SCHEMA}.action_milestones
      WHERE id = $2`,
-    [user.id, milestoneId],
-  );
+      [user.id, milestoneId],
+    );
 
-  await query(
-    `UPDATE ${DB_SCHEMA}.action_milestones
-     SET ${updates.join(", ")}
-     WHERE id = $${paramIndex}`,
-    params,
-  );
+    const updatesWithReview = [
+      ...updates,
+      `content_review_status = 'needs_review'`,
+      `content_reviewed_by = NULL`,
+      `content_reviewed_at = NULL`,
+    ];
 
-  // Return updated milestone
-  const updated = await getMilestoneById(milestoneId);
-  return { success: true, milestone: updated || undefined };
+    try {
+      await query(
+        `UPDATE ${DB_SCHEMA}.action_milestones
+       SET ${updatesWithReview.join(", ")}
+       WHERE id = $${paramIndex}`,
+        params,
+      );
+    } catch (e) {
+      const msg = String((e as Error).message ?? "");
+      if (msg.includes("content_review") || msg.includes("does not exist")) {
+        await query(
+          `UPDATE ${DB_SCHEMA}.action_milestones
+         SET ${updates.join(", ")}
+         WHERE id = $${paramIndex}`,
+          params,
+        );
+      } else {
+        throw e;
+      }
+    }
+
+    const updated = await getMilestoneById(milestoneId);
+    return { success: true, milestone: updated || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to save milestone",
+    };
+  }
+}
+
+/**
+ * Approve milestone content (admin only).
+ * Sets content_review_status to approved after an edit.
+ */
+export async function approveMilestoneContent(
+  milestoneId: string,
+): Promise<MilestoneResult> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const adminCheck = await query<{ user_role: string }>(
+      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
+      [user.email],
+    );
+    if (adminCheck[0]?.user_role !== "Admin") {
+      return { success: false, error: "Admin only" };
+    }
+
+    const milestone = await getMilestoneById(milestoneId);
+    if (!milestone) {
+      return { success: false, error: "Milestone not found" };
+    }
+
+    await query(
+      `UPDATE ${DB_SCHEMA}.action_milestones
+     SET content_review_status = 'approved',
+         content_reviewed_by = $1,
+         content_reviewed_at = NOW()
+     WHERE id = $2`,
+      [user.id, milestoneId],
+    );
+
+    const updated = await getMilestoneById(milestoneId);
+    return { success: true, milestone: updated || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error:
+        e instanceof Error ? e.message : "Failed to approve milestone content",
+    };
+  }
 }
 
 /**
@@ -99,34 +168,37 @@ export async function updateMilestone(
 export async function submitMilestone(
   milestoneId: string,
 ): Promise<MilestoneResult> {
-  // Get the milestone
-  const milestone = await getMilestoneById(milestoneId);
-  if (!milestone) {
-    return { success: false, error: "Milestone not found" };
-  }
+  try {
+    const milestone = await getMilestoneById(milestoneId);
+    if (!milestone) {
+      return { success: false, error: "Milestone not found" };
+    }
 
-  // Only allow submission from draft or rejected status
-  if (milestone.status !== "draft" && milestone.status !== "rejected") {
-    return {
-      success: false,
-      error: "Milestone has already been submitted",
-    };
-  }
+    if (milestone.status !== "draft" && milestone.status !== "rejected") {
+      return {
+        success: false,
+        error: "Milestone has already been submitted",
+      };
+    }
 
-  // Update milestone status
-  await query(
-    `UPDATE ${DB_SCHEMA}.action_milestones
+    await query(
+      `UPDATE ${DB_SCHEMA}.action_milestones
      SET status = 'submitted',
          submitted_by = NULL,
          submitted_by_entity = NULL,
          submitted_at = NOW()
      WHERE id = $1`,
-    [milestoneId],
-  );
+      [milestoneId],
+    );
 
-  // Return updated milestone
-  const updated = await getMilestoneById(milestoneId);
-  return { success: true, milestone: updated || undefined };
+    const updated = await getMilestoneById(milestoneId);
+    return { success: true, milestone: updated || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to submit milestone",
+    };
+  }
 }
 
 /**
@@ -157,26 +229,33 @@ export async function saveAndSubmitMilestone(
 export async function approveMilestone(
   milestoneId: string,
 ): Promise<MilestoneResult> {
-  const milestone = await getMilestoneById(milestoneId);
-  if (!milestone) {
-    return { success: false, error: "Milestone not found" };
-  }
+  try {
+    const milestone = await getMilestoneById(milestoneId);
+    if (!milestone) {
+      return { success: false, error: "Milestone not found" };
+    }
 
-  if (milestone.status !== "submitted" && milestone.status !== "under_review") {
-    return { success: false, error: "Milestone is not pending approval" };
-  }
+    if (milestone.status !== "submitted" && milestone.status !== "under_review") {
+      return { success: false, error: "Milestone is not pending approval" };
+    }
 
-  await query(
-    `UPDATE ${DB_SCHEMA}.action_milestones
+    await query(
+      `UPDATE ${DB_SCHEMA}.action_milestones
      SET status = 'approved',
          approved_by = NULL,
          approved_at = NOW()
      WHERE id = $1`,
-    [milestoneId],
-  );
+      [milestoneId],
+    );
 
-  const updated = await getMilestoneById(milestoneId);
-  return { success: true, milestone: updated || undefined };
+    const updated = await getMilestoneById(milestoneId);
+    return { success: true, milestone: updated || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to approve milestone",
+    };
+  }
 }
 
 /**
@@ -186,30 +265,36 @@ export async function rejectMilestone(
   milestoneId: string,
   feedback?: string,
 ): Promise<MilestoneResult> {
-  const milestone = await getMilestoneById(milestoneId);
-  if (!milestone) {
-    return { success: false, error: "Milestone not found" };
-  }
+  try {
+    const milestone = await getMilestoneById(milestoneId);
+    if (!milestone) {
+      return { success: false, error: "Milestone not found" };
+    }
 
-  if (milestone.status !== "submitted" && milestone.status !== "under_review") {
-    return { success: false, error: "Milestone is not pending approval" };
-  }
+    if (milestone.status !== "submitted" && milestone.status !== "under_review") {
+      return { success: false, error: "Milestone is not pending approval" };
+    }
 
-  // Append rejection feedback to updates field if provided
-  const updatedUpdates = feedback
-    ? `${milestone.updates || ""}\n\n[Rejected]: ${feedback}`.trim()
-    : milestone.updates;
+    const updatedUpdates = feedback
+      ? `${milestone.updates || ""}\n\n[Rejected]: ${feedback}`.trim()
+      : milestone.updates;
 
-  await query(
-    `UPDATE ${DB_SCHEMA}.action_milestones
+    await query(
+      `UPDATE ${DB_SCHEMA}.action_milestones
      SET status = 'rejected',
          updates = $1,
          reviewed_by = NULL,
          reviewed_at = NOW()
      WHERE id = $2`,
-    [updatedUpdates, milestoneId],
-  );
+      [updatedUpdates, milestoneId],
+    );
 
-  const updated = await getMilestoneById(milestoneId);
-  return { success: true, milestone: updated || undefined };
+    const updated = await getMilestoneById(milestoneId);
+    return { success: true, milestone: updated || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to reject milestone",
+    };
+  }
 }

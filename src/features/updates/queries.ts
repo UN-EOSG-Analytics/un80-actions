@@ -17,23 +17,30 @@ export async function getActionUpdates(
 ): Promise<ActionUpdate[]> {
   const whereClause =
     subId !== undefined
-      ? "WHERE action_id = $1 AND (action_sub_id IS NOT DISTINCT FROM $2)"
-      : "WHERE action_id = $1";
+      ? "WHERE u.action_id = $1 AND (u.action_sub_id IS NOT DISTINCT FROM $2)"
+      : "WHERE u.action_id = $1";
 
   const params = subId !== undefined ? [actionId, subId] : [actionId];
 
   const rows = await query<ActionUpdate>(
     `SELECT
-      id,
-      action_id,
-      action_sub_id,
-      user_id,
-      content,
-      created_at,
-      updated_at
-    FROM ${DB_SCHEMA}.action_updates
+      u.id,
+      u.action_id,
+      u.action_sub_id,
+      u.user_id,
+      us.email as user_email,
+      u.content,
+      u.created_at,
+      u.updated_at,
+      COALESCE(u.content_review_status, 'approved')::text as content_review_status,
+      u.content_reviewed_by,
+      ru.email as content_reviewed_by_email,
+      u.content_reviewed_at
+    FROM ${DB_SCHEMA}.action_updates u
+    LEFT JOIN ${DB_SCHEMA}.users us ON u.user_id = us.id
+    LEFT JOIN ${DB_SCHEMA}.users ru ON u.content_reviewed_by = ru.id
     ${whereClause}
-    ORDER BY created_at DESC`,
+    ORDER BY u.created_at DESC`,
     params,
   );
 
@@ -48,15 +55,22 @@ export async function getUpdateById(
 ): Promise<ActionUpdate | null> {
   const rows = await query<ActionUpdate>(
     `SELECT
-      id,
-      action_id,
-      action_sub_id,
-      user_id,
-      content,
-      created_at,
-      updated_at
-    FROM ${DB_SCHEMA}.action_updates
-    WHERE id = $1`,
+      u.id,
+      u.action_id,
+      u.action_sub_id,
+      u.user_id,
+      us.email as user_email,
+      u.content,
+      u.created_at,
+      u.updated_at,
+      COALESCE(u.content_review_status, 'approved')::text as content_review_status,
+      u.content_reviewed_by,
+      ru.email as content_reviewed_by_email,
+      u.content_reviewed_at
+    FROM ${DB_SCHEMA}.action_updates u
+    LEFT JOIN ${DB_SCHEMA}.users us ON u.user_id = us.id
+    LEFT JOIN ${DB_SCHEMA}.users ru ON u.content_reviewed_by = ru.id
+    WHERE u.id = $1`,
     [updateId],
   );
 

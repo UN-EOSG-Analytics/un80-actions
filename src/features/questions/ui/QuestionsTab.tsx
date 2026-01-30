@@ -3,10 +3,13 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getActionQuestions } from "@/features/questions/queries";
-import { createQuestion } from "@/features/questions/commands";
+import { createQuestion, approveQuestion } from "@/features/questions/commands";
+import { ReviewStatus } from "@/features/shared/ReviewStatus";
+import { TagSelector } from "@/features/shared/TagSelector";
 import type { Action, ActionQuestion } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
 import { Loader2, MessageCircle, Send } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 // =========================================================
@@ -29,12 +32,20 @@ const LoadingState = () => (
 // QUESTIONS TAB
 // =========================================================
 
-export default function QuestionsTab({ action }: { action: Action }) {
+export default function QuestionsTab({
+  action,
+  isAdmin = false,
+}: {
+  action: Action;
+  isAdmin?: boolean;
+}) {
+  const router = useRouter();
   const [questions, setQuestions] = useState<ActionQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [newQuestion, setNewQuestion] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
 
   const loadQuestions = useCallback(async () => {
     setLoading(true);
@@ -73,7 +84,7 @@ export default function QuestionsTab({ action }: { action: Action }) {
         setError(result.error || "Failed to submit question");
       }
     } catch (err) {
-      setError("Failed to submit question");
+      setError(err instanceof Error ? err.message : "Failed to submit question");
     } finally {
       setSubmitting(false);
     }
@@ -120,13 +131,14 @@ export default function QuestionsTab({ action }: { action: Action }) {
         <EmptyState message="No questions have been asked yet." />
       ) : (
         <div className="space-y-3">
-          {questions.map((q) => (
-            <div
-              key={q.id}
-              className="rounded-lg border border-slate-200 bg-white p-4"
-            >
-              <div className="space-y-3">
-                <div className="flex items-start gap-2">
+          {questions.map((q) => {
+            return (
+              <div
+                key={q.id}
+                className="rounded-lg border border-slate-200 bg-white p-4"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-start gap-2">
                   <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-un-blue" />
                   <p className="text-sm font-medium text-slate-700">
                     {q.question}
@@ -149,12 +161,40 @@ export default function QuestionsTab({ action }: { action: Action }) {
                     </Badge>
                   </div>
                 )}
-                <p className="text-xs text-slate-400">
-                  {formatUNDateTime(q.created_at)} by {q.user_email}
-                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-xs text-slate-400">
+                    {formatUNDateTime(q.created_at)} by {q.user_email}
+                  </p>
+                  <ReviewStatus
+                    status={q.content_review_status ?? "approved"}
+                    reviewedByEmail={q.content_reviewed_by_email}
+                    reviewedAt={q.content_reviewed_at}
+                    isAdmin={isAdmin}
+                    onApprove={async () => {
+                      setApprovingId(q.id);
+                      try {
+                        const result = await approveQuestion(q.id);
+                        if (result.success) {
+                          await loadQuestions();
+                          router.refresh();
+                        }
+                      } finally {
+                        setApprovingId(null);
+                      }
+                    }}
+                    approving={approvingId === q.id}
+                  />
+                  <TagSelector
+                    entityId={q.id}
+                    entityType="question"
+                    isAdmin={isAdmin}
+                    initialTags={[]}
+                  />
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

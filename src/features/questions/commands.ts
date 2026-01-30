@@ -33,32 +33,38 @@ export interface QuestionResult {
 export async function createQuestion(
   input: QuestionCreateInput,
 ): Promise<QuestionResult> {
-  // Check authentication
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "You must be logged in to ask questions" };
-  }
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "You must be logged in to ask questions" };
+    }
 
-  // Validate question
-  if (!input.question || input.question.trim().length === 0) {
-    return { success: false, error: "Question cannot be empty" };
-  }
+    if (!input.question || input.question.trim().length === 0) {
+      return { success: false, error: "Question cannot be empty" };
+    }
 
-  const rows = await query<{ id: string }>(
-    `INSERT INTO ${DB_SCHEMA}.action_questions 
-     (action_id, action_sub_id, user_id, question)
-     VALUES ($1, $2, $3, $4)
+    const rows = await query<{ id: string }>(
+      `INSERT INTO ${DB_SCHEMA}.action_questions 
+     (action_id, action_sub_id, user_id, question, content_review_status)
+     VALUES ($1, $2, $3, $4, 'needs_review')
      RETURNING id`,
-    [
-      input.action_id,
-      input.action_sub_id ?? null,
-      user.id,
-      input.question.trim(),
-    ],
-  );
+      [
+        input.action_id,
+        input.action_sub_id ?? null,
+        user.id,
+        input.question.trim(),
+      ],
+    );
 
-  const question = await getQuestionById(rows[0].id);
-  return { success: true, question: question || undefined };
+    const question = await getQuestionById(rows[0].id);
+    return { success: true, question: question || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error:
+        e instanceof Error ? e.message : "Failed to submit question",
+    };
+  }
 }
 
 /**
@@ -69,39 +75,46 @@ export async function updateQuestion(
   questionId: string,
   newQuestion: string,
 ): Promise<QuestionResult> {
-  // Check authentication
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "You must be logged in" };
-  }
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "You must be logged in" };
+    }
 
-  const question = await getQuestionById(questionId);
-  if (!question) {
-    return { success: false, error: "Question not found" };
-  }
+    const question = await getQuestionById(questionId);
+    if (!question) {
+      return { success: false, error: "Question not found" };
+    }
 
-  // Cannot edit after it's been answered
-  if (question.answer) {
+    if (question.answer) {
+      return {
+        success: false,
+        error: "Cannot edit a question that has been answered",
+      };
+    }
+
+    if (!newQuestion || newQuestion.trim().length === 0) {
+      return { success: false, error: "Question cannot be empty" };
+    }
+
+    await query(
+      `UPDATE ${DB_SCHEMA}.action_questions
+     SET question = $1, updated_at = NOW(),
+         content_review_status = 'needs_review',
+         content_reviewed_by = NULL,
+         content_reviewed_at = NULL
+     WHERE id = $2`,
+      [newQuestion.trim(), questionId],
+    );
+
+    const updated = await getQuestionById(questionId);
+    return { success: true, question: updated || undefined };
+  } catch (e) {
     return {
       success: false,
-      error: "Cannot edit a question that has been answered",
+      error: e instanceof Error ? e.message : "Failed to update question",
     };
   }
-
-  // Validate
-  if (!newQuestion || newQuestion.trim().length === 0) {
-    return { success: false, error: "Question cannot be empty" };
-  }
-
-  await query(
-    `UPDATE ${DB_SCHEMA}.action_questions
-     SET question = $1, updated_at = NOW()
-     WHERE id = $2`,
-    [newQuestion.trim(), questionId],
-  );
-
-  const updated = await getQuestionById(questionId);
-  return { success: true, question: updated || undefined };
 }
 
 /**
@@ -112,34 +125,42 @@ export async function answerQuestion(
   questionId: string,
   answer: string,
 ): Promise<QuestionResult> {
-  // Check authentication
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "You must be logged in" };
-  }
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "You must be logged in" };
+    }
 
-  const question = await getQuestionById(questionId);
-  if (!question) {
-    return { success: false, error: "Question not found" };
-  }
+    const question = await getQuestionById(questionId);
+    if (!question) {
+      return { success: false, error: "Question not found" };
+    }
 
-  // Validate answer
-  if (!answer || answer.trim().length === 0) {
-    return { success: false, error: "Answer cannot be empty" };
-  }
+    if (!answer || answer.trim().length === 0) {
+      return { success: false, error: "Answer cannot be empty" };
+    }
 
-  await query(
-    `UPDATE ${DB_SCHEMA}.action_questions
+    await query(
+      `UPDATE ${DB_SCHEMA}.action_questions
      SET answer = $1, 
          answered_by = $2, 
          answered_at = NOW(),
-         updated_at = NOW()
+         updated_at = NOW(),
+         content_review_status = 'needs_review',
+         content_reviewed_by = NULL,
+         content_reviewed_at = NULL
      WHERE id = $3`,
-    [answer.trim(), user.id, questionId],
-  );
+      [answer.trim(), user.id, questionId],
+    );
 
-  const updated = await getQuestionById(questionId);
-  return { success: true, question: updated || undefined };
+    const updated = await getQuestionById(questionId);
+    return { success: true, question: updated || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to save answer",
+    };
+  }
 }
 
 /**
@@ -150,35 +171,87 @@ export async function updateAnswer(
   questionId: string,
   newAnswer: string,
 ): Promise<QuestionResult> {
-  // Check authentication
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "You must be logged in" };
-  }
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "You must be logged in" };
+    }
 
-  const question = await getQuestionById(questionId);
-  if (!question) {
-    return { success: false, error: "Question not found" };
-  }
+    const question = await getQuestionById(questionId);
+    if (!question) {
+      return { success: false, error: "Question not found" };
+    }
 
-  if (!question.answer) {
-    return { success: false, error: "Question has not been answered yet" };
-  }
+    if (!question.answer) {
+      return { success: false, error: "Question has not been answered yet" };
+    }
 
-  // Validate answer
-  if (!newAnswer || newAnswer.trim().length === 0) {
-    return { success: false, error: "Answer cannot be empty" };
-  }
+    if (!newAnswer || newAnswer.trim().length === 0) {
+      return { success: false, error: "Answer cannot be empty" };
+    }
 
-  await query(
-    `UPDATE ${DB_SCHEMA}.action_questions
-     SET answer = $1, updated_at = NOW()
+    await query(
+      `UPDATE ${DB_SCHEMA}.action_questions
+     SET answer = $1, updated_at = NOW(),
+         content_review_status = 'needs_review',
+         content_reviewed_by = NULL,
+         content_reviewed_at = NULL
      WHERE id = $2`,
-    [newAnswer.trim(), questionId],
-  );
+      [newAnswer.trim(), questionId],
+    );
 
-  const updated = await getQuestionById(questionId);
-  return { success: true, question: updated || undefined };
+    const updated = await getQuestionById(questionId);
+    return { success: true, question: updated || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to update answer",
+    };
+  }
+}
+
+/**
+ * Approve a question's content (admin/reviewer only).
+ */
+export async function approveQuestion(
+  questionId: string,
+): Promise<QuestionResult> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const adminCheck = await query<{ user_role: string }>(
+      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
+      [user.email],
+    );
+    if (adminCheck[0]?.user_role !== "Admin") {
+      return { success: false, error: "Admin only" };
+    }
+
+    const question = await getQuestionById(questionId);
+    if (!question) {
+      return { success: false, error: "Question not found" };
+    }
+
+    await query(
+      `UPDATE ${DB_SCHEMA}.action_questions
+     SET content_review_status = 'approved',
+         content_reviewed_by = $1,
+         content_reviewed_at = NOW()
+     WHERE id = $2`,
+      [user.id, questionId],
+    );
+
+    const updated = await getQuestionById(questionId);
+    return { success: true, question: updated || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to approve question",
+    };
+  }
 }
 
 /**
@@ -188,38 +261,43 @@ export async function updateAnswer(
 export async function deleteQuestion(
   questionId: string,
 ): Promise<QuestionResult> {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const question = await getQuestionById(questionId);
+    if (!question) {
+      return { success: false, error: "Question not found" };
+    }
+
+    const isAuthor = question.user_id === user.id;
+    const adminCheck = await query<{ user_role: string }>(
+      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
+      [user.email],
+    );
+    const isAdmin = adminCheck[0]?.user_role === "Admin";
+
+    if (isAuthor && !question.answer) {
+      await query(`DELETE FROM ${DB_SCHEMA}.action_questions WHERE id = $1`, [
+        questionId,
+      ]);
+      return { success: true };
+    }
+
+    if (isAdmin) {
+      await query(`DELETE FROM ${DB_SCHEMA}.action_questions WHERE id = $1`, [
+        questionId,
+      ]);
+      return { success: true };
+    }
+
+    return { success: false, error: "Not authorized to delete this question" };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to delete question",
+    };
   }
-
-  const question = await getQuestionById(questionId);
-  if (!question) {
-    return { success: false, error: "Question not found" };
-  }
-
-  const isAuthor = question.user_id === user.id;
-  const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
-    [user.email],
-  );
-  const isAdmin = adminCheck[0]?.user_role === "Admin";
-
-  // Authors can only delete unanswered questions
-  if (isAuthor && !question.answer) {
-    await query(`DELETE FROM ${DB_SCHEMA}.action_questions WHERE id = $1`, [
-      questionId,
-    ]);
-    return { success: true };
-  }
-
-  // Admins can delete any question
-  if (isAdmin) {
-    await query(`DELETE FROM ${DB_SCHEMA}.action_questions WHERE id = $1`, [
-      questionId,
-    ]);
-    return { success: true };
-  }
-
-  return { success: false, error: "Not authorized to delete this question" };
 }

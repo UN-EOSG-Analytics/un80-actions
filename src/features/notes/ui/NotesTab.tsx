@@ -1,11 +1,15 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getActionNotes } from "@/features/notes/queries";
-import { createNote } from "@/features/notes/commands";
+import { createNote, approveNote } from "@/features/notes/commands";
+import { ReviewStatus } from "@/features/shared/ReviewStatus";
+import { TagSelector } from "@/features/shared/TagSelector";
 import type { Action, ActionNote } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
 import { Loader2, Plus, StickyNote } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 // =========================================================
@@ -28,12 +32,20 @@ const LoadingState = () => (
 // NOTES TAB
 // =========================================================
 
-export default function NotesTab({ action }: { action: Action }) {
+export default function NotesTab({
+  action,
+  isAdmin = false,
+}: {
+  action: Action;
+  isAdmin?: boolean;
+}) {
+  const router = useRouter();
   const [notes, setNotes] = useState<ActionNote[]>([]);
   const [loading, setLoading] = useState(true);
   const [newNote, setNewNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
 
   const loadNotes = useCallback(async () => {
     setLoading(true);
@@ -72,7 +84,7 @@ export default function NotesTab({ action }: { action: Action }) {
         setError(result.error || "Failed to add note");
       }
     } catch (err) {
-      setError("Failed to add note");
+      setError(err instanceof Error ? err.message : "Failed to add note");
     } finally {
       setSubmitting(false);
     }
@@ -131,10 +143,39 @@ export default function NotesTab({ action }: { action: Action }) {
                   <p className="text-sm whitespace-pre-wrap text-slate-700">
                     {note.content}
                   </p>
-                  <p className="mt-2 text-xs text-slate-400">
-                    {formatUNDateTime(note.created_at)}
-                    {note.user_email && ` by ${note.user_email}`}
-                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <p className="text-xs text-slate-400">
+                      {formatUNDateTime(note.created_at)}
+                      {note.user_email && ` by ${note.user_email}`}
+                    </p>
+                    <ReviewStatus
+                      status={
+                        note.content_review_status ?? "approved"
+                      }
+                      reviewedByEmail={note.content_reviewed_by_email}
+                      reviewedAt={note.content_reviewed_at}
+                      isAdmin={isAdmin}
+                      onApprove={async () => {
+                        setApprovingId(note.id);
+                        try {
+                          const result = await approveNote(note.id);
+                          if (result.success) {
+                            await loadNotes();
+                            router.refresh();
+                          }
+                        } finally {
+                          setApprovingId(null);
+                        }
+                      }}
+                      approving={approvingId === note.id}
+                    />
+                    <TagSelector
+                      entityId={note.id}
+                      entityType="note"
+                      isAdmin={isAdmin}
+                      initialTags={[]}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

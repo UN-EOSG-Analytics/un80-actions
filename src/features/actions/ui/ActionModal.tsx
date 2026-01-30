@@ -46,12 +46,14 @@ interface ActionModalProps {
   action: Action | null;
   onClose: () => void;
   loading: boolean;
+  isAdmin?: boolean;
 }
 
 export default function ActionModal({
   action,
   onClose,
   loading,
+  isAdmin = false,
 }: ActionModalProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -251,13 +253,13 @@ export default function ActionModal({
                 <OverviewTab action={action} />
               </TabsContent>
               <TabsContent value="milestones" className="mt-0">
-                <MilestonesTab action={action} />
+                <MilestonesTab action={action} isAdmin={isAdmin} />
               </TabsContent>
               <TabsContent value="questions" className="mt-0">
-                <QuestionsTab action={action} />
+                <QuestionsTab action={action} isAdmin={isAdmin} />
               </TabsContent>
               <TabsContent value="notes" className="mt-0">
-                <NotesTab action={action} />
+                <NotesTab action={action} isAdmin={isAdmin} />
               </TabsContent>
             </div>
           </div>

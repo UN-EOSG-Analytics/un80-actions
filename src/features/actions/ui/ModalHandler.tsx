@@ -10,7 +10,11 @@ import type { Action } from "@/types";
 // Session storage key for return URL (set by ActionCard before opening modal)
 const RETURN_URL_KEY = "actionModalReturnUrl";
 
-export default function ModalHandler() {
+export default function ModalHandler({
+  isAdmin = false,
+}: {
+  isAdmin?: boolean;
+}) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const actionParam = searchParams.get("action");
@@ -85,6 +89,7 @@ export default function ModalHandler() {
       action={error ? null : action}
       onClose={handleClose}
       loading={loading}
+      isAdmin={isAdmin}
     />
   );
 }

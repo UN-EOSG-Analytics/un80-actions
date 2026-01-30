@@ -29,6 +29,10 @@ export type UserRole =
 
 export type UserStatus = "Active" | "Inactive";
 
+export type RiskAssessment = "at_risk" | "medium_risk" | "low_risk";
+
+export type ContentReviewStatus = "approved" | "needs_review";
+
 // =========================================================
 // BASE ENTITY TYPES
 // =========================================================
@@ -99,6 +103,18 @@ export interface ActionBase {
   action_record_id: string | null;
 }
 
+/** Attachment attached to a milestone (view/download: Admin only) */
+export interface MilestoneAttachment {
+  id: string;
+  milestone_id: string;
+  file_name: string;
+  file_path: string;
+  content_type: string | null;
+  file_size: number | null;
+  uploaded_by: string | null;
+  uploaded_at: Date;
+}
+
 /** Milestone attached to an action */
 export interface ActionMilestone {
   id: string;
@@ -109,6 +125,10 @@ export interface ActionMilestone {
   deadline: string | null; // ISO date string
   updates: string | null;
   status: MilestoneStatus;
+  content_review_status: ContentReviewStatus;
+  content_reviewed_by: string | null;
+  content_reviewed_by_email: string | null;
+  content_reviewed_at: Date | null;
   submitted_by: string | null;
   submitted_by_entity: string | null;
   submitted_at: Date | null;
@@ -128,6 +148,10 @@ export interface ActionNote {
   content: string;
   created_at: Date;
   updated_at: Date | null;
+  content_review_status: ContentReviewStatus;
+  content_reviewed_by: string | null;
+  content_reviewed_by_email: string | null;
+  content_reviewed_at: Date | null;
 }
 
 /** Update attached to an action */
@@ -140,6 +164,10 @@ export interface ActionUpdate {
   content: string;
   created_at: Date;
   updated_at: Date | null;
+  content_review_status: ContentReviewStatus;
+  content_reviewed_by: string | null;
+  content_reviewed_by_email: string | null;
+  content_reviewed_at: Date | null;
 }
 
 /** Question attached to an action */
@@ -156,6 +184,10 @@ export interface ActionQuestion {
   answered_at: Date | null;
   created_at: Date;
   updated_at: Date | null;
+  content_review_status: ContentReviewStatus;
+  content_reviewed_by: string | null;
+  content_reviewed_by_email: string | null;
+  content_reviewed_at: Date | null;
 }
 
 // =========================================================
@@ -292,6 +324,7 @@ export interface ActionWithMilestones {
   indicative_action: string;
   tracking_status: string | null;
   is_big_ticket: boolean;
+  risk_assessment: RiskAssessment | null;
   milestones: MilestoneRow[];
 }
 

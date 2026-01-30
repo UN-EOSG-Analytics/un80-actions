@@ -14,8 +14,8 @@ const COOKIE_NAME = "auth_session";
 
 export async function isApprovedUser(email: string): Promise<boolean> {
   const rows = await query<{ count: string }>(
-    `SELECT COUNT(*) as count FROM ${tables.approved_users} WHERE email = $1`,
-    [email.toLowerCase()],
+    `SELECT COUNT(*) as count FROM ${tables.approved_users} WHERE LOWER(email) = LOWER($1)`,
+    [email],
   );
   return parseInt(rows[0]?.count || "0") > 0;
 }
@@ -124,10 +124,16 @@ export async function getCurrentUser() {
     id: string;
     email: string;
     entity: string | null;
+    user_role: string | null;
   }>(
-    `SELECT u.id, u.email, au.entity FROM ${tables.users} u LEFT JOIN ${tables.approved_users} au ON u.email = au.email WHERE u.id = $1`,
+    `SELECT u.id, u.email, au.entity, au.user_role FROM ${tables.users} u LEFT JOIN ${tables.approved_users} au ON LOWER(u.email) = LOWER(au.email) WHERE u.id = $1`,
     [session.userId],
   );
   if (!rows[0]) return null;
-  return { id: rows[0].id, email: rows[0].email, entity: rows[0].entity };
+  return {
+    id: rows[0].id,
+    email: rows[0].email,
+    entity: rows[0].entity,
+    user_role: rows[0].user_role,
+  };
 }

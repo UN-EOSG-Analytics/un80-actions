@@ -38,36 +38,86 @@ export async function getActionMilestones(
 
   const params = subId !== undefined ? [actionId, subId] : [actionId];
 
-  const rows = await query<ActionMilestone>(
-    `SELECT
-      id,
-      action_id,
-      action_sub_id,
-      milestone_type,
-      description,
-      deadline::text,
-      updates,
-      status,
-      submitted_by,
-      submitted_by_entity,
-      submitted_at,
-      reviewed_by,
-      reviewed_at,
-      approved_by,
-      approved_at
-    FROM ${DB_SCHEMA}.action_milestones
-    ${whereClause}
-    ORDER BY
-      CASE milestone_type
-        WHEN 'first' THEN 1
-        WHEN 'second' THEN 2
-        WHEN 'third' THEN 3
-        WHEN 'upcoming' THEN 4
-        WHEN 'final' THEN 5
-      END,
-      deadline ASC NULLS LAST`,
-    params,
-  );
+  let rows: (ActionMilestone & { content_reviewed_by_email?: string | null })[];
+  try {
+    rows = await query(
+      `SELECT
+        m.id,
+        m.action_id,
+        m.action_sub_id,
+        m.milestone_type,
+        m.description,
+        m.deadline::text,
+        m.updates,
+        m.status,
+        COALESCE(m.content_review_status, 'approved')::text as content_review_status,
+        m.content_reviewed_by,
+        ru.email as content_reviewed_by_email,
+        m.content_reviewed_at,
+        m.submitted_by,
+        m.submitted_by_entity,
+        m.submitted_at,
+        m.reviewed_by,
+        m.reviewed_at,
+        m.approved_by,
+        m.approved_at
+      FROM ${DB_SCHEMA}.action_milestones m
+      LEFT JOIN ${DB_SCHEMA}.users ru ON m.content_reviewed_by = ru.id
+      ${whereClause.replace("action_id", "m.action_id").replace("action_sub_id", "m.action_sub_id")}
+      ORDER BY
+        CASE m.milestone_type
+          WHEN 'first' THEN 1
+          WHEN 'second' THEN 2
+          WHEN 'third' THEN 3
+          WHEN 'upcoming' THEN 4
+          WHEN 'final' THEN 5
+        END,
+        m.deadline ASC NULLS LAST`,
+      params,
+    );
+  } catch (e) {
+    const msg = String((e as Error).message ?? "");
+    if (msg.includes("content_review") || msg.includes("does not exist")) {
+      rows = await query(
+        `SELECT
+          m.id,
+          m.action_id,
+          m.action_sub_id,
+          m.milestone_type,
+          m.description,
+          m.deadline::text,
+          m.updates,
+          m.status,
+          m.submitted_by,
+          m.submitted_by_entity,
+          m.submitted_at,
+          m.reviewed_by,
+          m.reviewed_at,
+          m.approved_by,
+          m.approved_at
+        FROM ${DB_SCHEMA}.action_milestones m
+        ${whereClause.replace("action_id", "m.action_id").replace("action_sub_id", "m.action_sub_id")}
+        ORDER BY
+          CASE m.milestone_type
+            WHEN 'first' THEN 1
+            WHEN 'second' THEN 2
+            WHEN 'third' THEN 3
+            WHEN 'upcoming' THEN 4
+            WHEN 'final' THEN 5
+          END,
+          m.deadline ASC NULLS LAST`,
+        params,
+      );
+      return rows.map((r) => ({
+        ...r,
+        content_review_status: "approved" as const,
+        content_reviewed_by: null,
+        content_reviewed_by_email: null,
+        content_reviewed_at: null,
+      }));
+    }
+    throw e;
+  }
 
   return rows;
 }
@@ -78,27 +128,71 @@ export async function getActionMilestones(
 export async function getMilestoneById(
   milestoneId: string,
 ): Promise<ActionMilestone | null> {
-  const rows = await query<ActionMilestone>(
-    `SELECT
-      id,
-      action_id,
-      action_sub_id,
-      milestone_type,
-      description,
-      deadline::text,
-      updates,
-      status,
-      submitted_by,
-      submitted_by_entity,
-      submitted_at,
-      reviewed_by,
-      reviewed_at,
-      approved_by,
-      approved_at
-    FROM ${DB_SCHEMA}.action_milestones
-    WHERE id = $1`,
-    [milestoneId],
-  );
+  let rows: (ActionMilestone & { content_reviewed_by_email?: string | null })[];
+  try {
+    rows = await query(
+      `SELECT
+        m.id,
+        m.action_id,
+        m.action_sub_id,
+        m.milestone_type,
+        m.description,
+        m.deadline::text,
+        m.updates,
+        m.status,
+        COALESCE(m.content_review_status, 'approved')::text as content_review_status,
+        m.content_reviewed_by,
+        ru.email as content_reviewed_by_email,
+        m.content_reviewed_at,
+        m.submitted_by,
+        m.submitted_by_entity,
+        m.submitted_at,
+        m.reviewed_by,
+        m.reviewed_at,
+        m.approved_by,
+        m.approved_at
+      FROM ${DB_SCHEMA}.action_milestones m
+      LEFT JOIN ${DB_SCHEMA}.users ru ON m.content_reviewed_by = ru.id
+      WHERE m.id = $1`,
+      [milestoneId],
+    );
+  } catch (e) {
+    const msg = String((e as Error).message ?? "");
+    if (msg.includes("content_review") || msg.includes("does not exist")) {
+      rows = await query(
+        `SELECT
+          m.id,
+          m.action_id,
+          m.action_sub_id,
+          m.milestone_type,
+          m.description,
+          m.deadline::text,
+          m.updates,
+          m.status,
+          m.submitted_by,
+          m.submitted_by_entity,
+          m.submitted_at,
+          m.reviewed_by,
+          m.reviewed_at,
+          m.approved_by,
+          m.approved_at
+        FROM ${DB_SCHEMA}.action_milestones m
+        WHERE m.id = $1`,
+        [milestoneId],
+      );
+      const r = rows[0];
+      return r
+        ? {
+            ...r,
+            content_review_status: "approved" as const,
+            content_reviewed_by: null,
+            content_reviewed_by_email: null,
+            content_reviewed_at: null,
+          }
+        : null;
+    }
+    throw e;
+  }
 
   return rows[0] || null;
 }

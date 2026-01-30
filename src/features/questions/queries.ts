@@ -35,10 +35,15 @@ export async function getActionQuestions(
       au.email as answered_by_email,
       q.answered_at,
       q.created_at,
-      q.updated_at
+      q.updated_at,
+      COALESCE(q.content_review_status, 'approved')::text as content_review_status,
+      q.content_reviewed_by,
+      ru.email as content_reviewed_by_email,
+      q.content_reviewed_at
     FROM ${DB_SCHEMA}.action_questions q
     LEFT JOIN ${DB_SCHEMA}.users u ON q.user_id = u.id
     LEFT JOIN ${DB_SCHEMA}.users au ON q.answered_by = au.id
+    LEFT JOIN ${DB_SCHEMA}.users ru ON q.content_reviewed_by = ru.id
     ${whereClause}
     ORDER BY q.created_at DESC`,
     params,
@@ -74,10 +79,15 @@ export async function getUnansweredQuestions(
       au.email as answered_by_email,
       q.answered_at,
       q.created_at,
-      q.updated_at
+      q.updated_at,
+      COALESCE(q.content_review_status, 'approved')::text as content_review_status,
+      q.content_reviewed_by,
+      ru.email as content_reviewed_by_email,
+      q.content_reviewed_at
     FROM ${DB_SCHEMA}.action_questions q
     LEFT JOIN ${DB_SCHEMA}.users u ON q.user_id = u.id
     LEFT JOIN ${DB_SCHEMA}.users au ON q.answered_by = au.id
+    LEFT JOIN ${DB_SCHEMA}.users ru ON q.content_reviewed_by = ru.id
     ${whereClause}
     ORDER BY q.created_at ASC`,
     params,
@@ -105,10 +115,15 @@ export async function getQuestionById(
       au.email as answered_by_email,
       q.answered_at,
       q.created_at,
-      q.updated_at
+      q.updated_at,
+      COALESCE(q.content_review_status, 'approved')::text as content_review_status,
+      q.content_reviewed_by,
+      ru.email as content_reviewed_by_email,
+      q.content_reviewed_at
     FROM ${DB_SCHEMA}.action_questions q
     LEFT JOIN ${DB_SCHEMA}.users u ON q.user_id = u.id
     LEFT JOIN ${DB_SCHEMA}.users au ON q.answered_by = au.id
+    LEFT JOIN ${DB_SCHEMA}.users ru ON q.content_reviewed_by = ru.id
     WHERE q.id = $1`,
     [questionId],
   );

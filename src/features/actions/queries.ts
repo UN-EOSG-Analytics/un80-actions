@@ -662,41 +662,83 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
     actionsWithQuestions: [],
   };
 
+  const wpSelectWithRisk = `
+    SELECT
+      wp.id AS wp_id,
+      wp.work_package_title,
+      a.id AS action_id,
+      a.sub_id AS action_sub_id,
+      a.indicative_action,
+      a.tracking_status,
+      a.is_big_ticket,
+      a.risk_assessment,
+      m.milestone_type,
+      m.description AS milestone_description,
+      m.deadline::text AS milestone_deadline,
+      m.updates AS milestone_updates,
+      m.status AS milestone_status
+    FROM work_packages wp
+    JOIN actions a ON a.work_package_id = wp.id
+    LEFT JOIN action_milestones m ON m.action_id = a.id
+      AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+    ORDER BY wp.id, a.id, a.sub_id, m.milestone_type
+  `;
+  const wpSelectWithoutRisk = `
+    SELECT
+      wp.id AS wp_id,
+      wp.work_package_title,
+      a.id AS action_id,
+      a.sub_id AS action_sub_id,
+      a.indicative_action,
+      a.tracking_status,
+      a.is_big_ticket,
+      m.milestone_type,
+      m.description AS milestone_description,
+      m.deadline::text AS milestone_deadline,
+      m.updates AS milestone_updates,
+      m.status AS milestone_status
+    FROM work_packages wp
+    JOIN actions a ON a.work_package_id = wp.id
+    LEFT JOIN action_milestones m ON m.action_id = a.id
+      AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+    ORDER BY wp.id, a.id, a.sub_id, m.milestone_type
+  `;
+
+  type WpRow = {
+    wp_id: number;
+    work_package_title: string;
+    action_id: number;
+    action_sub_id: string | null;
+    indicative_action: string;
+    tracking_status: string | null;
+    is_big_ticket: boolean;
+    risk_assessment?: string | null;
+    milestone_type: string | null;
+    milestone_description: string | null;
+    milestone_deadline: string | null;
+    milestone_updates: string | null;
+    milestone_status: string | null;
+  };
+
   try {
-    const [wpRows, updateRows, noteRows, questionRows] = await Promise.all([
-      query<{
-        wp_id: number;
-        work_package_title: string;
-        action_id: number;
-        action_sub_id: string | null;
-        indicative_action: string;
-        tracking_status: string | null;
-        is_big_ticket: boolean;
-        milestone_type: string | null;
-        milestone_description: string | null;
-        milestone_deadline: string | null;
-        milestone_updates: string | null;
-        milestone_status: string | null;
-      }>(`
-        SELECT
-          wp.id AS wp_id,
-          wp.work_package_title,
-          a.id AS action_id,
-          a.sub_id AS action_sub_id,
-          a.indicative_action,
-          a.tracking_status,
-          a.is_big_ticket,
-          m.milestone_type,
-          m.description AS milestone_description,
-          m.deadline::text AS milestone_deadline,
-          m.updates AS milestone_updates,
-          m.status AS milestone_status
-        FROM work_packages wp
-        JOIN actions a ON a.work_package_id = wp.id
-        LEFT JOIN action_milestones m ON m.action_id = a.id
-          AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-        ORDER BY wp.id, a.id, a.sub_id, m.milestone_type
-      `),
+    let wpRows: WpRow[];
+    try {
+      wpRows = await query<WpRow>(wpSelectWithRisk);
+    } catch (wpErr) {
+      const msg = String((wpErr as Error).message ?? "");
+      const code = (wpErr as { code?: string })?.code;
+      if (
+        code === "42703" ||
+        msg.includes("risk_assessment") ||
+        msg.includes("does not exist")
+      ) {
+        wpRows = await query<WpRow>(wpSelectWithoutRisk);
+      } else {
+        throw wpErr;
+      }
+    }
+
+    const [updateRows, noteRows, questionRows] = await Promise.all([
       query<{
         action_id: number;
         action_sub_id: string | null;
@@ -798,6 +840,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
           indicative_action: r.indicative_action,
           tracking_status: r.tracking_status,
           is_big_ticket: r.is_big_ticket,
+          risk_assessment: (r.risk_assessment ?? null) as ActionWithMilestones["risk_assessment"],
           milestones: [],
         };
         actionsMap.set(key, action);

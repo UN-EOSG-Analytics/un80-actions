@@ -31,9 +31,14 @@ export async function getActionNotes(
       u.email as user_email,
       n.content,
       n.created_at,
-      n.updated_at
+      n.updated_at,
+      COALESCE(n.content_review_status, 'approved')::text as content_review_status,
+      n.content_reviewed_by,
+      ru.email as content_reviewed_by_email,
+      n.content_reviewed_at
     FROM ${DB_SCHEMA}.action_notes n
     LEFT JOIN ${DB_SCHEMA}.users u ON n.user_id = u.id
+    LEFT JOIN ${DB_SCHEMA}.users ru ON n.content_reviewed_by = ru.id
     ${whereClause}
     ORDER BY n.created_at DESC`,
     params,
@@ -55,9 +60,14 @@ export async function getNoteById(noteId: string): Promise<ActionNote | null> {
       u.email as user_email,
       n.content,
       n.created_at,
-      n.updated_at
+      n.updated_at,
+      COALESCE(n.content_review_status, 'approved')::text as content_review_status,
+      n.content_reviewed_by,
+      ru.email as content_reviewed_by_email,
+      n.content_reviewed_at
     FROM ${DB_SCHEMA}.action_notes n
     LEFT JOIN ${DB_SCHEMA}.users u ON n.user_id = u.id
+    LEFT JOIN ${DB_SCHEMA}.users ru ON n.content_reviewed_by = ru.id
     WHERE n.id = $1`,
     [noteId],
   );

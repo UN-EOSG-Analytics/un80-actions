@@ -49,7 +49,7 @@ export default async function RootLayout({
           <Footer />
         </div>
         <Suspense fallback={null}>
-          <ModalHandler />
+          <ModalHandler isAdmin={user?.user_role === "Admin"} />
         </Suspense>
         <GoogleAnalytics gaId="G-XYZ" />
       </body>

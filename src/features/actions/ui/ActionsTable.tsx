@@ -2,9 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Search, X, ChevronRight, Star } from "lucide-react";
+import { Search, X, ChevronRight } from "lucide-react";
 import type { ActionsTableData } from "@/types";
-import { Badge } from "@/components/ui/badge";
 
 function actionLabel(actionId: number, subId: string | null): string {
   return subId ? `${actionId}${subId}` : String(actionId);
@@ -46,7 +45,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
   }, [allActions, hasSearch, search]);
 
   const handleActionClick = (actionId: number) => {
-    // Store current URL for return navigation
     sessionStorage.setItem("actionModalReturnUrl", window.location.href);
     router.push(`/?action=${actionId}`, { scroll: false });
   };
@@ -88,6 +86,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
               <th className="w-20 px-4 py-3">Action</th>
               <th className="w-24 px-4 py-3">WP</th>
               <th className="px-4 py-3">Indicative Activity</th>
+              <th className="w-32 px-4 py-3">Risk assessment</th>
               <th className="w-10 px-4 py-3"></th>
             </tr>
           </thead>
@@ -95,7 +94,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
             {filteredActions.length === 0 ? (
               <tr>
                 <td
-                  colSpan={4}
+                  colSpan={5}
                   className="px-4 py-12 text-center text-gray-400"
                 >
                   No actions found
@@ -117,6 +116,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
                   <td className="px-4 py-3 text-gray-700">
                     <span className="line-clamp-2">{a.indicative_action}</span>
                   </td>
+                  <td className="px-4 py-3 text-gray-400"></td>
                   <td className="px-4 py-3 text-gray-400">
                     <ChevronRight className="h-4 w-4" />
                   </td>

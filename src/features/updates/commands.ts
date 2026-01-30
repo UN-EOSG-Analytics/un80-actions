@@ -41,7 +41,7 @@ async function canAccessActionUpdates(
 ): Promise<boolean> {
   // Check if user is admin
   const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
+    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
     [userEmail],
   );
   if (adminCheck[0]?.user_role === "Admin") {
@@ -107,8 +107,8 @@ export async function createUpdate(
 
   const rows = await query<{ id: string }>(
     `INSERT INTO ${DB_SCHEMA}.action_updates 
-     (action_id, action_sub_id, user_id, content)
-     VALUES ($1, $2, $3, $4)
+     (action_id, action_sub_id, user_id, content, content_review_status)
+     VALUES ($1, $2, $3, $4, 'needs_review')
      RETURNING id`,
     [
       input.action_id,
@@ -144,7 +144,7 @@ export async function updateUpdate(
   // Check if user is the author or admin
   const isAuthor = update.user_id === user.id;
   const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
+    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
     [user.email],
   );
   const isAdmin = adminCheck[0]?.user_role === "Admin";
@@ -160,9 +160,49 @@ export async function updateUpdate(
 
   await query(
     `UPDATE ${DB_SCHEMA}.action_updates
-     SET content = $1, updated_at = NOW()
+     SET content = $1, updated_at = NOW(),
+         content_review_status = 'needs_review',
+         content_reviewed_by = NULL,
+         content_reviewed_at = NULL
      WHERE id = $2`,
     [input.content.trim(), updateId],
+  );
+
+  const updated = await getUpdateById(updateId);
+  return { success: true, update: updated || undefined };
+}
+
+/**
+ * Approve an update's content (admin/reviewer only).
+ */
+export async function approveUpdate(
+  updateId: string,
+): Promise<UpdateResult> {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, error: "Not authenticated" };
+  }
+
+  const adminCheck = await query<{ user_role: string }>(
+    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
+    [user.email],
+  );
+  if (adminCheck[0]?.user_role !== "Admin") {
+    return { success: false, error: "Admin only" };
+  }
+
+  const update = await getUpdateById(updateId);
+  if (!update) {
+    return { success: false, error: "Update not found" };
+  }
+
+  await query(
+    `UPDATE ${DB_SCHEMA}.action_updates
+     SET content_review_status = 'approved',
+         content_reviewed_by = $1,
+         content_reviewed_at = NOW()
+     WHERE id = $2`,
+    [user.id, updateId],
   );
 
   const updated = await getUpdateById(updateId);
@@ -187,7 +227,7 @@ export async function deleteUpdate(updateId: string): Promise<UpdateResult> {
   // Check if user is the author or admin
   const isAuthor = update.user_id === user.id;
   const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
+    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
     [user.email],
   );
   const isAdmin = adminCheck[0]?.user_role === "Admin";
