@@ -1,7 +1,6 @@
 "use server";
 
 import { query } from "@/lib/db/db";
-import { getCurrentUser } from "@/features/auth/service";
 import { DB_SCHEMA } from "@/lib/db/config";
 import type { ActionMilestone } from "@/types";
 import { getMilestoneById } from "./queries";
@@ -23,51 +22,6 @@ export interface MilestoneResult {
 }
 
 // =========================================================
-// PERMISSION CHECKS
-// =========================================================
-
-/**
- * Check if user can edit milestones for a given action.
- * User must be:
- * - A focal point for the action, OR
- * - A support person for the action, OR
- * - An admin
- */
-async function canEditMilestone(
-  userId: string,
-  userEmail: string,
-  actionId: number,
-  actionSubId: string | null,
-): Promise<boolean> {
-  // Check if user is admin
-  const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
-    [userEmail],
-  );
-  if (adminCheck[0]?.user_role === "Admin") {
-    return true;
-  }
-
-  // Check if user is focal point or support for this action
-  const permissionCheck = await query<{ count: string }>(
-    `SELECT COUNT(*) as count FROM (
-      SELECT 1 FROM ${DB_SCHEMA}.action_focal_points
-      WHERE action_id = $1
-        AND (action_sub_id IS NOT DISTINCT FROM $2)
-        AND user_email = $3
-      UNION ALL
-      SELECT 1 FROM ${DB_SCHEMA}.action_support_persons
-      WHERE action_id = $1
-        AND (action_sub_id IS NOT DISTINCT FROM $2)
-        AND user_email = $3
-    ) AS permissions`,
-    [actionId, actionSubId, userEmail],
-  );
-
-  return parseInt(permissionCheck[0]?.count || "0") > 0;
-}
-
-// =========================================================
 // MUTATIONS
 // =========================================================
 
@@ -79,35 +33,10 @@ export async function updateMilestone(
   milestoneId: string,
   input: MilestoneUpdateInput,
 ): Promise<MilestoneResult> {
-  // Get current user
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
-  }
-
-  // Get the milestone to check permissions
+  // Get the milestone
   const milestone = await getMilestoneById(milestoneId);
   if (!milestone) {
     return { success: false, error: "Milestone not found" };
-  }
-
-  // Check edit permission
-  const canEdit = await canEditMilestone(
-    user.id,
-    user.email,
-    milestone.action_id,
-    milestone.action_sub_id,
-  );
-  if (!canEdit) {
-    return { success: false, error: "Not authorized to edit this milestone" };
-  }
-
-  // Only allow edits if milestone is draft or rejected
-  if (milestone.status !== "draft" && milestone.status !== "rejected") {
-    return {
-      success: false,
-      error: "Cannot edit milestone that is already submitted or approved",
-    };
   }
 
   // Build UPDATE query dynamically based on provided fields
@@ -163,27 +92,10 @@ export async function updateMilestone(
 export async function submitMilestone(
   milestoneId: string,
 ): Promise<MilestoneResult> {
-  // Get current user
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
-  }
-
   // Get the milestone
   const milestone = await getMilestoneById(milestoneId);
   if (!milestone) {
     return { success: false, error: "Milestone not found" };
-  }
-
-  // Check edit permission
-  const canEdit = await canEditMilestone(
-    user.id,
-    user.email,
-    milestone.action_id,
-    milestone.action_sub_id,
-  );
-  if (!canEdit) {
-    return { success: false, error: "Not authorized to submit this milestone" };
   }
 
   // Only allow submission from draft or rejected status
@@ -194,22 +106,15 @@ export async function submitMilestone(
     };
   }
 
-  // Get user's entity for tracking
-  const userInfo = await query<{ entity: string | null }>(
-    `SELECT entity FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
-    [user.email],
-  );
-  const userEntity = userInfo[0]?.entity || null;
-
   // Update milestone status
   await query(
     `UPDATE ${DB_SCHEMA}.action_milestones
      SET status = 'submitted',
-         submitted_by = $1,
-         submitted_by_entity = $2,
+         submitted_by = NULL,
+         submitted_by_entity = NULL,
          submitted_at = NOW()
-     WHERE id = $3`,
-    [user.id, userEntity, milestoneId],
+     WHERE id = $1`,
+    [milestoneId],
   );
 
   // Return updated milestone
@@ -245,20 +150,6 @@ export async function saveAndSubmitMilestone(
 export async function approveMilestone(
   milestoneId: string,
 ): Promise<MilestoneResult> {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
-  }
-
-  // Check if user is admin
-  const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
-    [user.email],
-  );
-  if (adminCheck[0]?.user_role !== "Admin") {
-    return { success: false, error: "Not authorized - admin only" };
-  }
-
   const milestone = await getMilestoneById(milestoneId);
   if (!milestone) {
     return { success: false, error: "Milestone not found" };
@@ -271,10 +162,10 @@ export async function approveMilestone(
   await query(
     `UPDATE ${DB_SCHEMA}.action_milestones
      SET status = 'approved',
-         approved_by = $1,
+         approved_by = NULL,
          approved_at = NOW()
-     WHERE id = $2`,
-    [user.id, milestoneId],
+     WHERE id = $1`,
+    [milestoneId],
   );
 
   const updated = await getMilestoneById(milestoneId);
@@ -288,20 +179,6 @@ export async function rejectMilestone(
   milestoneId: string,
   feedback?: string,
 ): Promise<MilestoneResult> {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
-  }
-
-  // Check if user is admin
-  const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
-    [user.email],
-  );
-  if (adminCheck[0]?.user_role !== "Admin") {
-    return { success: false, error: "Not authorized - admin only" };
-  }
-
   const milestone = await getMilestoneById(milestoneId);
   if (!milestone) {
     return { success: false, error: "Milestone not found" };
@@ -320,10 +197,10 @@ export async function rejectMilestone(
     `UPDATE ${DB_SCHEMA}.action_milestones
      SET status = 'rejected',
          updates = $1,
-         reviewed_by = $2,
+         reviewed_by = NULL,
          reviewed_at = NOW()
-     WHERE id = $3`,
-    [updatedUpdates, user.id, milestoneId],
+     WHERE id = $2`,
+    [updatedUpdates, milestoneId],
   );
 
   const updated = await getMilestoneById(milestoneId);

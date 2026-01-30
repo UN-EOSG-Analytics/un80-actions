@@ -1,7 +1,6 @@
 "use server";
 
 import { query } from "@/lib/db/db";
-import { getCurrentUser } from "@/features/auth/service";
 import { DB_SCHEMA } from "@/lib/db/config";
 import type { ActionQuestion } from "@/types";
 import { getQuestionById } from "./queries";
@@ -23,47 +22,6 @@ export interface QuestionResult {
 }
 
 // =========================================================
-// PERMISSION CHECKS
-// =========================================================
-
-/**
- * Check if user can answer questions for a given action.
- * User must be focal point, support person, or admin.
- */
-async function canAnswerQuestion(
-  userEmail: string,
-  actionId: number,
-  actionSubId: string | null,
-): Promise<boolean> {
-  // Check if user is admin
-  const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
-    [userEmail],
-  );
-  if (adminCheck[0]?.user_role === "Admin") {
-    return true;
-  }
-
-  // Check if user is focal point or support for this action
-  const permissionCheck = await query<{ count: string }>(
-    `SELECT COUNT(*) as count FROM (
-      SELECT 1 FROM ${DB_SCHEMA}.action_focal_points
-      WHERE action_id = $1
-        AND (action_sub_id IS NOT DISTINCT FROM $2)
-        AND user_email = $3
-      UNION ALL
-      SELECT 1 FROM ${DB_SCHEMA}.action_support_persons
-      WHERE action_id = $1
-        AND (action_sub_id IS NOT DISTINCT FROM $2)
-        AND user_email = $3
-    ) AS permissions`,
-    [actionId, actionSubId, userEmail],
-  );
-
-  return parseInt(permissionCheck[0]?.count || "0") > 0;
-}
-
-// =========================================================
 // MUTATIONS
 // =========================================================
 
@@ -74,11 +32,6 @@ async function canAnswerQuestion(
 export async function createQuestion(
   input: QuestionCreateInput,
 ): Promise<QuestionResult> {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
-  }
-
   // Validate question
   if (!input.question || input.question.trim().length === 0) {
     return { success: false, error: "Question cannot be empty" };
@@ -87,14 +40,9 @@ export async function createQuestion(
   const rows = await query<{ id: string }>(
     `INSERT INTO ${DB_SCHEMA}.action_questions 
      (action_id, action_sub_id, user_id, question)
-     VALUES ($1, $2, $3, $4)
+     VALUES ($1, $2, NULL, $4)
      RETURNING id`,
-    [
-      input.action_id,
-      input.action_sub_id ?? null,
-      user.id,
-      input.question.trim(),
-    ],
+    [input.action_id, input.action_sub_id ?? null, input.question.trim()],
   );
 
   const question = await getQuestionById(rows[0].id);
@@ -109,11 +57,6 @@ export async function updateQuestion(
   questionId: string,
   newQuestion: string,
 ): Promise<QuestionResult> {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
-  }
-
   const question = await getQuestionById(questionId);
   if (!question) {
     return { success: false, error: "Question not found" };
@@ -156,24 +99,9 @@ export async function answerQuestion(
   questionId: string,
   answer: string,
 ): Promise<QuestionResult> {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
-  }
-
   const question = await getQuestionById(questionId);
   if (!question) {
     return { success: false, error: "Question not found" };
-  }
-
-  // Check permission to answer
-  const canAnswer = await canAnswerQuestion(
-    user.email,
-    question.action_id,
-    question.action_sub_id,
-  );
-  if (!canAnswer) {
-    return { success: false, error: "Not authorized to answer this question" };
   }
 
   // Validate answer
@@ -184,11 +112,11 @@ export async function answerQuestion(
   await query(
     `UPDATE ${DB_SCHEMA}.action_questions
      SET answer = $1, 
-         answered_by = $2, 
+         answered_by = NULL, 
          answered_at = NOW(),
          updated_at = NOW()
-     WHERE id = $3`,
-    [answer.trim(), user.id, questionId],
+     WHERE id = $2`,
+    [answer.trim(), questionId],
   );
 
   const updated = await getQuestionById(questionId);
@@ -203,11 +131,6 @@ export async function updateAnswer(
   questionId: string,
   newAnswer: string,
 ): Promise<QuestionResult> {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
-  }
-
   const question = await getQuestionById(questionId);
   if (!question) {
     return { success: false, error: "Question not found" };
@@ -215,18 +138,6 @@ export async function updateAnswer(
 
   if (!question.answer) {
     return { success: false, error: "Question has not been answered yet" };
-  }
-
-  // Check if user is the answerer or admin
-  const isAnswerer = question.answered_by === user.id;
-  const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
-    [user.email],
-  );
-  const isAdmin = adminCheck[0]?.user_role === "Admin";
-
-  if (!isAnswerer && !isAdmin) {
-    return { success: false, error: "Not authorized to update this answer" };
   }
 
   // Validate answer
