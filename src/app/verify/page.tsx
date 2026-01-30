@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { VerifyForm } from "@/components/VerifyForm";
+import { VerifyForm } from "@/features/auth/ui/VerifyForm";
 
 export const dynamic = "force-dynamic";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { logout } from "@/features/auth/commands";
-import { Badge } from "./ui/badge";
+import { Badge } from "../../../components/ui/badge";
 import { LogOut } from "lucide-react";
 
 interface Props {

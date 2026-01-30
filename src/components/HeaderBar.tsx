@@ -4,7 +4,7 @@ import { SITE_SUBTITLE, SITE_TITLE } from "@/constants/site";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserMenu } from "./UserMenu";
+import { UserMenu } from "../features/auth/ui/UserMenu";
 
 interface Props {
   user?: { email: string; entity?: string | null } | null;
