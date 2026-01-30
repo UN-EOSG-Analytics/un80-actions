@@ -39,7 +39,8 @@ create type user_status as enum ('Active', 'Inactive');
 create table approved_users (
     email text not null unique primary key,
     full_name text,
-    entity text references systemchart.entities(entity) on delete restrict,
+    entity text references systemchart.entities(entity) on delete restrict, 
+    --  should make this not null once input is completed
     user_status user_status,
     user_role user_roles,
     created_at timestamp with time zone not null default now()

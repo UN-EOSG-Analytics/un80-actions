@@ -111,10 +111,10 @@ export async function clearSession() {
 export async function getCurrentUser() {
   const session = await getSession();
   if (!session) return null;
-  const rows = await query<{ id: string; email: string }>(
-    `SELECT id, email FROM ${tables.users} WHERE id = $1`,
+  const rows = await query<{ id: string; email: string; entity: string | null }>(
+    `SELECT u.id, u.email, au.entity FROM ${tables.users} u LEFT JOIN ${tables.approved_users} au ON u.email = au.email WHERE u.id = $1`,
     [session.userId]
   );
   if (!rows[0]) return null;
-  return { id: rows[0].id, email: rows[0].email };
+  return { id: rows[0].id, email: rows[0].email, entity: rows[0].entity };
 }

@@ -64,6 +64,7 @@ export interface ApprovedUser {
 export interface User {
   id: string;
   email: string;
+  entity?: string | null;
   created_at: Date | null;
   updated_at: Date | null;
   last_login_at: Date | null;

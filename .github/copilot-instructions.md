@@ -106,6 +106,7 @@ You are a senior Next.js (v16) developer working at the United Nations with exte
 - use `pg`
 - user server actions/data service over API routes
 - API Routes Only for Client-Side Needs
+- refer to `un80actions_schema.sql`
 
 
 # Docs

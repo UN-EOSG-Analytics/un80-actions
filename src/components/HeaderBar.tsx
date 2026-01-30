@@ -1,16 +1,21 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { UserMenu } from "./UserMenu";
 import { SITE_SUBTITLE, SITE_TITLE } from "@/constants/site";
 
 interface Props {
-  user?: { email: string } | null;
+  user?: { email: string; entity?: string | null } | null;
   children?: React.ReactNode;
   maxWidth?: "6xl" | "7xl";
 }
 
 export function Header({ user, children, maxWidth = "7xl" }: Props) {
+  const pathname = usePathname();
   const isLoggedIn = !!user;
+  const isLoginPage = pathname === "/login";
   const widthClass = maxWidth === "6xl" ? "max-w-6xl" : "max-w-7xl";
 
   return (
@@ -33,12 +38,12 @@ export function Header({ user, children, maxWidth = "7xl" }: Props) {
         </Link>
         <div className="flex items-center gap-4">
           {isLoggedIn ? (
-            <UserMenu email={user.email} />
-          ) : (
+            <UserMenu email={user.email} entity={user.entity} />
+          ) : !isLoginPage ? (
             <Link href="/login" className="rounded-lg bg-un-blue px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-un-blue/90">
               Sign In
             </Link>
-          )}
+          ) : null}
           {children}
         </div>
       </div>
