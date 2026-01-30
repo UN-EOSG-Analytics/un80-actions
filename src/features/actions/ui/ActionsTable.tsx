@@ -10,11 +10,11 @@ function actionLabel(actionId: number, subId: string | null): string {
   return subId ? `${actionId}${subId}` : String(actionId);
 }
 
-interface ReportsTableShellProps {
+interface ActionsTableProps {
   data: ActionsTableData;
 }
 
-export function ReportsTableShell({ data }: ReportsTableShellProps) {
+export function ActionsTable({ data }: ActionsTableProps) {
   const router = useRouter();
   const [searchInput, setSearchInput] = useState("");
 

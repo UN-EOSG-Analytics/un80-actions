@@ -4,7 +4,7 @@ import { Roboto } from "next/font/google";
 import { Suspense } from "react";
 import { Header } from "@/components/HeaderBar";
 import { Footer } from "@/components/Footer";
-import ModalHandler from "@/components/ModalHandler";
+import ModalHandler from "@/features/actions/ui/ModalHandler";
 import { SITE_DESCRIPTION, SITE_TITLE } from "@/constants/site";
 import { getCurrentUser } from "@/features/auth/service";
 import "./globals.css";

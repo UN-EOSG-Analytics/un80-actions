@@ -2,8 +2,8 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import ActionModal from "./ActionModal";
-import { getActionByNumber } from "@/lib/actions";
+import ActionModal from "@/features/actions/ui/ActionModal";
+import { getActionByNumber } from "@/features/actions/queries";
 import { decodeUrlParam } from "@/lib/utils";
 import type { Action } from "@/types";
 

@@ -11,12 +11,14 @@ import {
 import { getStatusStyles } from "@/constants/actionStatus";
 import {
   getActionMilestones,
-  updateMilestone,
   getMilestoneVersions,
   type MilestoneVersion,
-} from "@/lib/milestones";
-import { createNote, getActionNotes } from "@/lib/notes";
-import { createQuestion, getActionQuestions } from "@/lib/questions";
+} from "@/features/milestones/queries";
+import { updateMilestone } from "@/features/milestones/commands";
+import { getActionNotes } from "@/features/notes/queries";
+import { createNote } from "@/features/notes/commands";
+import { getActionQuestions } from "@/features/questions/queries";
+import { createQuestion } from "@/features/questions/commands";
 import type {
   Action,
   ActionMilestone,

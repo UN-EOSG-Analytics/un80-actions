@@ -1,85 +1,29 @@
 "use server";
 
-import { query } from "./db/db";
-import { getCurrentUser } from "../features/auth/service";
-import { DB_SCHEMA } from "./db/config";
-import type { ActionNote } from "@/types";
+import { query } from "@/lib/db/db";
+import { getCurrentUser } from "@/features/auth/service";
+import { DB_SCHEMA } from "@/lib/db/config";
+import type { ActionUpdate } from "@/types";
+import { getUpdateById } from "./queries";
 
 // =========================================================
 // TYPES
 // =========================================================
 
-export interface NoteCreateInput {
+export interface UpdateCreateInput {
   action_id: number;
   action_sub_id?: string | null;
   content: string;
 }
 
-export interface NoteUpdateInput {
+export interface UpdateUpdateInput {
   content: string;
 }
 
-export interface NoteResult {
+export interface UpdateResult {
   success: boolean;
   error?: string;
-  note?: ActionNote;
-}
-
-// =========================================================
-// QUERIES
-// =========================================================
-
-/**
- * Fetch all notes for a specific action.
- */
-export async function getActionNotes(
-  actionId: number,
-  subId?: string | null,
-): Promise<ActionNote[]> {
-  const whereClause =
-    subId !== undefined
-      ? "WHERE action_id = $1 AND (action_sub_id IS NOT DISTINCT FROM $2)"
-      : "WHERE action_id = $1";
-
-  const params = subId !== undefined ? [actionId, subId] : [actionId];
-
-  const rows = await query<ActionNote>(
-    `SELECT
-      id,
-      action_id,
-      action_sub_id,
-      user_id,
-      content,
-      created_at,
-      updated_at
-    FROM ${DB_SCHEMA}.action_notes
-    ${whereClause}
-    ORDER BY created_at DESC`,
-    params,
-  );
-
-  return rows;
-}
-
-/**
- * Fetch a single note by ID.
- */
-export async function getNoteById(noteId: string): Promise<ActionNote | null> {
-  const rows = await query<ActionNote>(
-    `SELECT
-      id,
-      action_id,
-      action_sub_id,
-      user_id,
-      content,
-      created_at,
-      updated_at
-    FROM ${DB_SCHEMA}.action_notes
-    WHERE id = $1`,
-    [noteId],
-  );
-
-  return rows[0] || null;
+  update?: ActionUpdate;
 }
 
 // =========================================================
@@ -87,10 +31,10 @@ export async function getNoteById(noteId: string): Promise<ActionNote | null> {
 // =========================================================
 
 /**
- * Check if user can create/view notes for a given action.
- * Any authenticated user assigned to the action can add notes.
+ * Check if user can create/view updates for a given action.
+ * Any authenticated user assigned to the action can add updates.
  */
-async function canAccessActionNotes(
+async function canAccessActionUpdates(
   userEmail: string,
   actionId: number,
   actionSubId: string | null,
@@ -133,16 +77,18 @@ async function canAccessActionNotes(
 // =========================================================
 
 /**
- * Create a new note for an action.
+ * Create a new update for an action.
  */
-export async function createNote(input: NoteCreateInput): Promise<NoteResult> {
+export async function createUpdate(
+  input: UpdateCreateInput,
+): Promise<UpdateResult> {
   const user = await getCurrentUser();
   if (!user) {
     return { success: false, error: "Not authenticated" };
   }
 
-  // Check if user can add notes to this action
-  const canAccess = await canAccessActionNotes(
+  // Check if user can add updates to this action
+  const canAccess = await canAccessActionUpdates(
     user.email,
     input.action_id,
     input.action_sub_id ?? null,
@@ -150,17 +96,17 @@ export async function createNote(input: NoteCreateInput): Promise<NoteResult> {
   if (!canAccess) {
     return {
       success: false,
-      error: "Not authorized to add notes to this action",
+      error: "Not authorized to add updates to this action",
     };
   }
 
   // Validate content
   if (!input.content || input.content.trim().length === 0) {
-    return { success: false, error: "Note content cannot be empty" };
+    return { success: false, error: "Update content cannot be empty" };
   }
 
   const rows = await query<{ id: string }>(
-    `INSERT INTO ${DB_SCHEMA}.action_notes 
+    `INSERT INTO ${DB_SCHEMA}.action_updates 
      (action_id, action_sub_id, user_id, content)
      VALUES ($1, $2, $3, $4)
      RETURNING id`,
@@ -172,31 +118,31 @@ export async function createNote(input: NoteCreateInput): Promise<NoteResult> {
     ],
   );
 
-  const note = await getNoteById(rows[0].id);
-  return { success: true, note: note || undefined };
+  const update = await getUpdateById(rows[0].id);
+  return { success: true, update: update || undefined };
 }
 
 /**
- * Update an existing note.
- * Only the note author can edit their notes.
+ * Update an existing action update.
+ * Only the update author can edit their updates.
  */
-export async function updateNote(
-  noteId: string,
-  input: NoteUpdateInput,
-): Promise<NoteResult> {
+export async function updateUpdate(
+  updateId: string,
+  input: UpdateUpdateInput,
+): Promise<UpdateResult> {
   const user = await getCurrentUser();
   if (!user) {
     return { success: false, error: "Not authenticated" };
   }
 
-  // Get the note
-  const note = await getNoteById(noteId);
-  if (!note) {
-    return { success: false, error: "Note not found" };
+  // Get the update
+  const update = await getUpdateById(updateId);
+  if (!update) {
+    return { success: false, error: "Update not found" };
   }
 
   // Check if user is the author or admin
-  const isAuthor = note.user_id === user.id;
+  const isAuthor = update.user_id === user.id;
   const adminCheck = await query<{ user_role: string }>(
     `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
     [user.email],
@@ -204,42 +150,42 @@ export async function updateNote(
   const isAdmin = adminCheck[0]?.user_role === "Admin";
 
   if (!isAuthor && !isAdmin) {
-    return { success: false, error: "Not authorized to edit this note" };
+    return { success: false, error: "Not authorized to edit this update" };
   }
 
   // Validate content
   if (!input.content || input.content.trim().length === 0) {
-    return { success: false, error: "Note content cannot be empty" };
+    return { success: false, error: "Update content cannot be empty" };
   }
 
   await query(
-    `UPDATE ${DB_SCHEMA}.action_notes
+    `UPDATE ${DB_SCHEMA}.action_updates
      SET content = $1, updated_at = NOW()
      WHERE id = $2`,
-    [input.content.trim(), noteId],
+    [input.content.trim(), updateId],
   );
 
-  const updated = await getNoteById(noteId);
-  return { success: true, note: updated || undefined };
+  const updated = await getUpdateById(updateId);
+  return { success: true, update: updated || undefined };
 }
 
 /**
- * Delete a note.
- * Only the note author or admin can delete.
+ * Delete an update.
+ * Only the update author or admin can delete.
  */
-export async function deleteNote(noteId: string): Promise<NoteResult> {
+export async function deleteUpdate(updateId: string): Promise<UpdateResult> {
   const user = await getCurrentUser();
   if (!user) {
     return { success: false, error: "Not authenticated" };
   }
 
-  const note = await getNoteById(noteId);
-  if (!note) {
-    return { success: false, error: "Note not found" };
+  const update = await getUpdateById(updateId);
+  if (!update) {
+    return { success: false, error: "Update not found" };
   }
 
   // Check if user is the author or admin
-  const isAuthor = note.user_id === user.id;
+  const isAuthor = update.user_id === user.id;
   const adminCheck = await query<{ user_role: string }>(
     `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE email = $1`,
     [user.email],
@@ -247,10 +193,12 @@ export async function deleteNote(noteId: string): Promise<NoteResult> {
   const isAdmin = adminCheck[0]?.user_role === "Admin";
 
   if (!isAuthor && !isAdmin) {
-    return { success: false, error: "Not authorized to delete this note" };
+    return { success: false, error: "Not authorized to delete this update" };
   }
 
-  await query(`DELETE FROM ${DB_SCHEMA}.action_notes WHERE id = $1`, [noteId]);
+  await query(`DELETE FROM ${DB_SCHEMA}.action_updates WHERE id = $1`, [
+    updateId,
+  ]);
 
   return { success: true };
 }

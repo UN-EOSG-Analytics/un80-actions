@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { verifyMagicToken, upsertUser, createSession } from "@/features/auth/service";
+import {
+  verifyMagicToken,
+  upsertUser,
+  createSession,
+} from "@/features/auth/service";
 
 export async function POST(request: Request) {
   const { token } = await request.json();

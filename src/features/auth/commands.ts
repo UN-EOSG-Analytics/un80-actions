@@ -4,13 +4,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { sendMagicLink } from "./mail";
 import {
-    clearSession,
-    createMagicToken,
-    createSession,
-    isApprovedUser,
-    recentTokenExists,
-    upsertUser,
-    verifyMagicToken,
+  clearSession,
+  createMagicToken,
+  createSession,
+  isApprovedUser,
+  recentTokenExists,
+  upsertUser,
+  verifyMagicToken,
 } from "./service";
 
 type Result<T = void> =
