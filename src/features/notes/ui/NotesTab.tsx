@@ -6,6 +6,7 @@ import { getActionNotes } from "@/features/notes/queries";
 import { createNote, approveNote, deleteNote } from "@/features/notes/commands";
 import { ReviewStatus } from "@/features/shared/ReviewStatus";
 import { TagSelector } from "@/features/shared/TagSelector";
+import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionNote } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
@@ -36,9 +37,11 @@ const LoadingState = () => (
 export default function NotesTab({
   action,
   isAdmin = false,
+  exportProps,
 }: {
   action: Action;
   isAdmin?: boolean;
+  exportProps?: { onExport: (format: "word" | "pdf") => void; exporting: boolean };
 }) {
   const router = useRouter();
   const [notes, setNotes] = useState<ActionNote[]>([]);
@@ -142,6 +145,14 @@ export default function NotesTab({
         </div>
         {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       </form>
+
+      {exportProps && (
+        <VersionHistoryHeader
+          title="All notes"
+          onExport={exportProps.onExport}
+          exporting={exportProps.exporting}
+        />
+      )}
 
       {/* Notes List */}
       {loading ? (

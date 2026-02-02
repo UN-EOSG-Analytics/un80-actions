@@ -10,6 +10,7 @@ import {
 } from "@/features/questions/commands";
 import { ReviewStatus } from "@/features/shared/ReviewStatus";
 import { TagSelector } from "@/features/shared/TagSelector";
+import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionQuestion } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
@@ -40,9 +41,11 @@ const LoadingState = () => (
 export default function QuestionsTab({
   action,
   isAdmin = false,
+  exportProps,
 }: {
   action: Action;
   isAdmin?: boolean;
+  exportProps?: { onExport: (format: "word" | "pdf") => void; exporting: boolean };
 }) {
   const router = useRouter();
   const [questions, setQuestions] = useState<ActionQuestion[]>([]);
@@ -148,6 +151,14 @@ export default function QuestionsTab({
         </div>
         {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       </form>
+
+      {exportProps && (
+        <VersionHistoryHeader
+          title="All questions"
+          onExport={exportProps.onExport}
+          exporting={exportProps.exporting}
+        />
+      )}
 
       {/* Questions List */}
       {loading ? (

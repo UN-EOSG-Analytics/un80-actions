@@ -10,6 +10,7 @@ import {
 } from "@/features/legal-comments/commands";
 import { ReviewStatus } from "@/features/shared/ReviewStatus";
 import { TagSelector } from "@/features/shared/TagSelector";
+import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionLegalComment } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
@@ -41,9 +42,11 @@ const LoadingState = () => (
 export default function LegalTab({
   action,
   isAdmin = false,
+  exportProps,
 }: {
   action: Action;
   isAdmin?: boolean;
+  exportProps?: { onExport: (format: "word" | "pdf") => void; exporting: boolean };
 }) {
   const router = useRouter();
   const [comments, setComments] = useState<ActionLegalComment[]>([]);
@@ -149,6 +152,14 @@ export default function LegalTab({
         </div>
         {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       </form>
+
+      {exportProps && (
+        <VersionHistoryHeader
+          title="All comments"
+          onExport={exportProps.onExport}
+          exporting={exportProps.exporting}
+        />
+      )}
 
       {/* Comments List */}
       {loading ? (

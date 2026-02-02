@@ -6,6 +6,13 @@ import MilestonesTab from "@/features/milestones/ui/MilestonesTab";
 import NotesTab from "@/features/notes/ui/NotesTab";
 import QuestionsTab from "@/features/questions/ui/QuestionsTab";
 import LegalTab from "@/features/legal-comments/ui/LegalTab";
+import { getActionQuestions } from "@/features/questions/queries";
+import { getActionNotes } from "@/features/notes/queries";
+import { getActionLegalComments } from "@/features/legal-comments/queries";
+import {
+  exportActionToWord,
+  exportActionToPdf,
+} from "@/features/actions/lib/export-action-document";
 import type { Action } from "@/types";
 import {
   Calendar,
@@ -61,6 +68,7 @@ export default function ActionModal({
   const [isClosing, setIsClosing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const [exporting, setExporting] = useState(false);
 
   // Reset tab when action changes
   useEffect(() => {
@@ -115,6 +123,51 @@ export default function ActionModal({
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const handleExport = useCallback(
+    async (format: "word" | "pdf") => {
+      if (!action) return;
+      setExporting(true);
+      try {
+        const [questions, notes, legalComments] = await Promise.all([
+          getActionQuestions(action.id, action.sub_id),
+          getActionNotes(action.id, action.sub_id),
+          getActionLegalComments(action.id, action.sub_id),
+        ]);
+        const safeName = `Action-${action.action_display_id.replace(/[^a-zA-Z0-9-]/g, "-")}`;
+        if (format === "word") {
+          const blob = await exportActionToWord(
+            action,
+            questions,
+            notes,
+            legalComments,
+          );
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${safeName}-Questions-Notes-Comments.docx`;
+          a.click();
+          URL.revokeObjectURL(url);
+        } else {
+          const blob = exportActionToPdf(
+            action,
+            questions,
+            notes,
+            legalComments,
+          );
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${safeName}-Questions-Notes-Comments.pdf`;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      } finally {
+        setExporting(false);
+      }
+    },
+    [action],
+  );
 
   // Render loading state
   if (loading) {
@@ -262,13 +315,25 @@ export default function ActionModal({
                 <MilestonesTab action={action} isAdmin={isAdmin} />
               </TabsContent>
               <TabsContent value="questions" className="mt-0">
-                <QuestionsTab action={action} isAdmin={isAdmin} />
+                <QuestionsTab
+                  action={action}
+                  isAdmin={isAdmin}
+                  exportProps={{ onExport: handleExport, exporting }}
+                />
               </TabsContent>
               <TabsContent value="notes" className="mt-0">
-                <NotesTab action={action} isAdmin={isAdmin} />
+                <NotesTab
+                  action={action}
+                  isAdmin={isAdmin}
+                  exportProps={{ onExport: handleExport, exporting }}
+                />
               </TabsContent>
               <TabsContent value="legal" className="mt-0">
-                <LegalTab action={action} isAdmin={isAdmin} />
+                <LegalTab
+                  action={action}
+                  isAdmin={isAdmin}
+                  exportProps={{ onExport: handleExport, exporting }}
+                />
               </TabsContent>
             </div>
           </div>
