@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Search, X, ChevronRight } from "lucide-react";
+import { Search, X, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -13,6 +13,9 @@ import {
 import type { ActionsTableData } from "@/types";
 import type { RiskAssessment } from "@/types";
 import { updateRiskAssessment } from "@/features/actions/commands";
+
+type SortField = "work_package_id" | "action_id" | "indicative_action" | "risk_assessment";
+type SortDirection = "asc" | "desc";
 
 const RISK_OPTIONS: {
   value: RiskAssessment;
@@ -35,6 +38,10 @@ interface ActionsTableProps {
 export function ActionsTable({ data }: ActionsTableProps) {
   const router = useRouter();
   const [searchInput, setSearchInput] = useState("");
+  const [sortField, setSortField] = useState<SortField>("work_package_id");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [filterWorkPackageId, setFilterWorkPackageId] = useState<number | "">("");
+  const [filterRisk, setFilterRisk] = useState<RiskAssessment | "">("");
 
   const search = searchInput.trim().toLowerCase();
   const hasSearch = search.length > 0;
@@ -50,18 +57,77 @@ export function ActionsTable({ data }: ActionsTableProps) {
     );
   }, [data.workPackages]);
 
+  // Unique work packages for filter dropdown (id + title for display)
+  const workPackageOptions = useMemo(() => {
+    const seen = new Set<number>();
+    return data.workPackages
+      .filter((wp) => {
+        if (seen.has(wp.id)) return false;
+        seen.add(wp.id);
+        return true;
+      })
+      .map((wp) => ({ id: wp.id, title: wp.work_package_title }))
+      .sort((a, b) => a.id - b.id);
+  }, [data.workPackages]);
+
   const filteredActions = useMemo(() => {
-    if (!hasSearch) return allActions;
-    return allActions.filter((a) => {
+    let list = allActions;
+    if (hasSearch) {
       const matches = (s: string) => s.toLowerCase().includes(search);
-      return (
-        matches(a.work_package_title) ||
-        matches(String(a.work_package_id)) ||
-        matches(String(a.action_id)) ||
-        matches(a.indicative_action)
+      list = list.filter(
+        (a) =>
+          matches(a.work_package_title) ||
+          matches(String(a.work_package_id)) ||
+          matches(String(a.action_id)) ||
+          matches(a.indicative_action),
       );
+    }
+    if (filterWorkPackageId !== "") {
+      list = list.filter((a) => a.work_package_id === filterWorkPackageId);
+    }
+    if (filterRisk !== "") {
+      list = list.filter((a) => a.risk_assessment === filterRisk);
+    }
+    return list;
+  }, [allActions, hasSearch, search, filterWorkPackageId, filterRisk]);
+
+  const sortedActions = useMemo(() => {
+    const dir = sortDirection === "asc" ? 1 : -1;
+    return [...filteredActions].sort((a, b) => {
+      let cmp = 0;
+      if (sortField === "work_package_id") {
+        cmp = a.work_package_id - b.work_package_id;
+      } else if (sortField === "action_id") {
+        cmp = a.action_id - b.action_id || (a.action_sub_id ?? "").localeCompare(b.action_sub_id ?? "");
+      } else if (sortField === "indicative_action") {
+        cmp = a.indicative_action.localeCompare(b.indicative_action);
+      } else if (sortField === "risk_assessment") {
+        const order: Record<string, number> = { low_risk: 0, medium_risk: 1, at_risk: 2 };
+        const av = a.risk_assessment ?? "";
+        const bv = b.risk_assessment ?? "";
+        cmp = (order[av] ?? -1) - (order[bv] ?? -1);
+      }
+      return cmp * dir;
     });
-  }, [allActions, hasSearch, search]);
+  }, [filteredActions, sortField, sortDirection]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  const SortIcon = ({ column }: { column: SortField }) => {
+    if (sortField !== column) return <ArrowUpDown className="ml-1 h-3.5 w-3.5 text-gray-400" />;
+    return sortDirection === "asc" ? (
+      <ArrowUp className="ml-1 h-3.5 w-3.5 text-un-blue" />
+    ) : (
+      <ArrowDown className="ml-1 h-3.5 w-3.5 text-un-blue" />
+    );
+  };
 
   const handleActionClick = (actionId: number) => {
     sessionStorage.setItem("actionModalReturnUrl", window.location.href);
@@ -81,8 +147,8 @@ export function ActionsTable({ data }: ActionsTableProps) {
 
   return (
     <div className="space-y-4">
-      {/* Search */}
-      <div className="flex items-center gap-3">
+      {/* Search + Filters */}
+      <div className="flex flex-wrap items-center gap-3">
         <div className="relative">
           <Search className="absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
@@ -102,9 +168,44 @@ export function ActionsTable({ data }: ActionsTableProps) {
             </button>
           )}
         </div>
+        <Select
+          value={filterWorkPackageId === "" ? "all" : String(filterWorkPackageId)}
+          onValueChange={(v) => setFilterWorkPackageId(v === "all" ? "" : Number(v))}
+        >
+          <SelectTrigger className="h-9 w-44 border-gray-200 bg-white text-gray-700">
+            <SelectValue placeholder="Work package" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All work packages</SelectItem>
+            {workPackageOptions.map((wp) => (
+              <SelectItem key={wp.id} value={String(wp.id)}>
+                WP {wp.id} – {wp.title.length > 30 ? wp.title.slice(0, 30) + "…" : wp.title}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={filterRisk === "" ? "all" : filterRisk}
+          onValueChange={(v) => setFilterRisk((v === "all" ? "" : v) as RiskAssessment | "")}
+        >
+          <SelectTrigger className="h-9 w-40 border-gray-200 bg-white text-gray-700">
+            <SelectValue placeholder="Risk" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All risk levels</SelectItem>
+            {RISK_OPTIONS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                <span className="flex items-center gap-2">
+                  <span className={`h-2 w-2 rounded-full ${opt.indicatorClass}`} aria-hidden />
+                  {opt.label}
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <p className="ml-auto text-sm text-gray-500">
-          {filteredActions.length} action
-          {filteredActions.length !== 1 ? "s" : ""}
+          {sortedActions.length} action
+          {sortedActions.length !== 1 ? "s" : ""}
         </p>
       </div>
 
@@ -113,15 +214,51 @@ export function ActionsTable({ data }: ActionsTableProps) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-              <th className="w-24 px-4 py-3">Work package</th>
-              <th className="w-20 px-4 py-3">Action</th>
-              <th className="px-4 py-3">Indicative Action</th>
-              <th className="w-32 px-4 py-3">Risk assessment</th>
+              <th className="w-24 px-4 py-3">
+                <button
+                  type="button"
+                  onClick={() => handleSort("work_package_id")}
+                  className="inline-flex items-center hover:text-un-blue"
+                >
+                  Work package
+                  <SortIcon column="work_package_id" />
+                </button>
+              </th>
+              <th className="w-20 px-4 py-3">
+                <button
+                  type="button"
+                  onClick={() => handleSort("action_id")}
+                  className="inline-flex items-center hover:text-un-blue"
+                >
+                  Action
+                  <SortIcon column="action_id" />
+                </button>
+              </th>
+              <th className="px-4 py-3">
+                <button
+                  type="button"
+                  onClick={() => handleSort("indicative_action")}
+                  className="inline-flex items-center hover:text-un-blue"
+                >
+                  Indicative Action
+                  <SortIcon column="indicative_action" />
+                </button>
+              </th>
+              <th className="w-32 px-4 py-3">
+                <button
+                  type="button"
+                  onClick={() => handleSort("risk_assessment")}
+                  className="inline-flex items-center hover:text-un-blue"
+                >
+                  Risk assessment
+                  <SortIcon column="risk_assessment" />
+                </button>
+              </th>
               <th className="w-10 px-4 py-3"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {filteredActions.length === 0 ? (
+            {sortedActions.length === 0 ? (
               <tr>
                 <td
                   colSpan={5}
@@ -131,7 +268,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
                 </td>
               </tr>
             ) : (
-              filteredActions.map((a) => (
+              sortedActions.map((a) => (
                 <tr
                   key={`${a.action_id}-${a.action_sub_id ?? ""}`}
                   onClick={() => handleActionClick(a.action_id)}
