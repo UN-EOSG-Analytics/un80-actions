@@ -22,7 +22,7 @@ import {
   updateAttachmentMetadata,
 } from "@/features/attachments/commands";
 import { ReviewStatus } from "@/features/shared/ReviewStatus";
-import { TagSelector } from "@/features/shared/TagSelector";
+
 import type { Action, ActionMilestone, ActionAttachment } from "@/types";
 import {
   Calendar,
@@ -181,6 +181,8 @@ export default function MilestonesTab({
       updates: milestone.updates || "",
     });
     setError(null);
+    // Ensure the collapsible is open so the edit form is visible
+    setOpenMilestones(prev => new Set([...prev, milestone.id]));
   };
 
   const cancelEditing = () => {
@@ -429,14 +431,6 @@ export default function MilestonesTab({
                             {new Date(milestone.deadline).toLocaleDateString()}
                           </div>
                         )}
-                        <div onClick={(e) => e.stopPropagation()}>
-                          <TagSelector
-                            entityId={milestone.id}
-                            entityType="milestone"
-                            isAdmin={isAdmin}
-                            initialTags={[]}
-                          />
-                        </div>
                       </div>
                       {milestone.description && (
                         <p className="text-sm text-slate-700">

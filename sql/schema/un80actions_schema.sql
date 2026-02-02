@@ -283,16 +283,11 @@ create table action_questions (
     content_reviewed_at timestamp with time zone,
     foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
 );
--- Shared tags (reusable across milestones, notes, questions)
+-- Shared tags (reusable across notes and questions)
 create table tags (
     id uuid primary key default gen_random_uuid(),
     name text not null unique,
     created_at timestamp with time zone not null default now()
-);
-create table milestone_tags (
-    milestone_id uuid not null references action_milestones(id) on delete cascade,
-    tag_id uuid not null references tags(id) on delete cascade,
-    primary key (milestone_id, tag_id)
 );
 create table note_tags (
     note_id uuid not null references action_notes(id) on delete cascade,
@@ -304,8 +299,6 @@ create table question_tags (
     tag_id uuid not null references tags(id) on delete cascade,
     primary key (question_id, tag_id)
 );
-create index idx_milestone_tags_milestone_id on milestone_tags(milestone_id);
-create index idx_milestone_tags_tag_id on milestone_tags(tag_id);
 create index idx_note_tags_note_id on note_tags(note_id);
 create index idx_note_tags_tag_id on note_tags(tag_id);
 create index idx_question_tags_question_id on question_tags(question_id);
@@ -380,16 +373,11 @@ ALTER TABLE action_updates ADD COLUMN IF NOT EXISTS content_review_status conten
 ALTER TABLE action_updates ADD COLUMN IF NOT EXISTS content_reviewed_by uuid REFERENCES users(id) ON DELETE SET NULL;
 ALTER TABLE action_updates ADD COLUMN IF NOT EXISTS content_reviewed_at timestamp with time zone;
 
--- Tags (reusable across milestones, notes, questions)
+-- Tags (reusable across notes and questions)
 CREATE TABLE IF NOT EXISTS tags (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     name text NOT NULL UNIQUE,
     created_at timestamp with time zone NOT NULL DEFAULT now()
-);
-CREATE TABLE IF NOT EXISTS milestone_tags (
-    milestone_id uuid NOT NULL REFERENCES action_milestones(id) ON DELETE CASCADE,
-    tag_id uuid NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
-    PRIMARY KEY (milestone_id, tag_id)
 );
 CREATE TABLE IF NOT EXISTS note_tags (
     note_id uuid NOT NULL REFERENCES action_notes(id) ON DELETE CASCADE,
@@ -401,8 +389,6 @@ CREATE TABLE IF NOT EXISTS question_tags (
     tag_id uuid NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
     PRIMARY KEY (question_id, tag_id)
 );
-CREATE INDEX IF NOT EXISTS idx_milestone_tags_milestone_id ON milestone_tags(milestone_id);
-CREATE INDEX IF NOT EXISTS idx_milestone_tags_tag_id ON milestone_tags(tag_id);
 CREATE INDEX IF NOT EXISTS idx_note_tags_note_id ON note_tags(note_id);
 CREATE INDEX IF NOT EXISTS idx_note_tags_tag_id ON note_tags(tag_id);
 CREATE INDEX IF NOT EXISTS idx_question_tags_question_id ON question_tags(question_id);
