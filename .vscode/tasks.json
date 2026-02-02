@@ -4,7 +4,7 @@
 		{
 			"type": "npm",
 			"script": "dev",
-			"label": "npm run dev",
+			"label": "dev [npm]",
 			"detail": "next dev",
 			"problemMatcher": [],
 			"isBackground": true
@@ -12,14 +12,14 @@
 		{
 			"type": "npm",
 			"script": "build",
-			"label": "npm run build",
+			"label": "build [npm]",
 			"detail": "next build",
 			"problemMatcher": []
 		},
 		{
 			"type": "npm",
 			"script": "install",
-			"label": "npm install",
+			"label": "install [npm]",
 			"detail": "npm install",
 			"problemMatcher": [],
 			"isBackground": true
@@ -27,7 +27,7 @@
 		{
 			"type": "npm",
 			"script": "start",
-			"label": "npm run start",
+			"label": "start [npm]",
 			"detail": "next start",
 			"problemMatcher": [],
 			"isBackground": true
@@ -35,7 +35,7 @@
 		{
 			"type": "npm",
 			"script": "lint",
-			"label": "npm run lint",
+			"label": "lint [npm]",
 			"detail": "eslint",
 			"problemMatcher": [
 				"$eslint-stylish"
@@ -44,7 +44,7 @@
 		{
 			"type": "npm",
 			"script": "typecheck",
-			"label": "npm run typecheck",
+			"label": "typecheck [npm]",
 			"detail": "tsc --noEmit",
 			"problemMatcher": [
 				"$tsc"
@@ -53,7 +53,7 @@
 		{
 			"type": "npm",
 			"script": "format",
-			"label": "npm run format",
+			"label": "format [npm]",
 			"detail": "prettier --write",
 			"problemMatcher": []
 		},
