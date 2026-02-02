@@ -1,0 +1,45 @@
+/**
+ * API Route: Download attachment
+ * GET /api/attachments/[id]/download
+ * Streams file directly without exposing storage URL
+ */
+
+import { NextRequest, NextResponse } from "next/server";
+import { getAttachmentById } from "@/features/attachments/queries";
+import { downloadBlob } from "@/lib/blob-storage";
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params;
+
+    // Get attachment metadata
+    const attachment = await getAttachmentById(id);
+    if (!attachment) {
+      return NextResponse.json(
+        { error: "Attachment not found" },
+        { status: 404 },
+      );
+    }
+
+    // Download blob content server-side
+    const { content, contentType } = await downloadBlob(attachment.blob_name);
+
+    // Stream to client with download headers (no URL exposure)
+    return new NextResponse(content, {
+      headers: {
+        "Content-Type": contentType,
+        "Content-Disposition": `attachment; filename="${attachment.original_filename}"`,
+        "Content-Length": content.length.toString(),
+      },
+    });
+  } catch (error) {
+    console.error("Download API error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
+}

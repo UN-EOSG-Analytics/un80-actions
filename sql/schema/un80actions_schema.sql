@@ -174,18 +174,27 @@ create table milestone_versions (
 create index idx_milestone_versions_milestone_id on milestone_versions(milestone_id);
 create index idx_milestone_versions_changed_at on milestone_versions(changed_at desc);
 
--- Milestone attachments (documents; view/download restricted to Admin/superusers)
-create table milestone_attachments (
+-- Action attachments (documents stored in Azure Blob Storage)
+-- Can be linked to a specific milestone or be general to the action
+-- All attachments are tied to an action; milestone_id is optional
+create table action_attachments (
     id uuid primary key default gen_random_uuid(),
-    milestone_id uuid not null references action_milestones(id) on delete cascade,
-    file_name text not null,
-    file_path text not null,
-    content_type text,
-    file_size int,
-    uploaded_by uuid references users(id) on delete set null,
-    uploaded_at timestamp with time zone not null default now()
+    action_id int not null,
+    action_sub_id text,
+    milestone_id uuid references action_milestones(id) on delete set null, -- NULL = general attachment
+    title text, -- optional user-friendly title
+    description text, -- optional description
+    filename text not null,
+    original_filename text not null,
+    blob_name text not null unique, -- unique blob storage reference
+    content_type text not null,
+    file_size bigint not null,
+    uploaded_by uuid references users(id) on delete set null, -- TODO: make NOT NULL when auth is ready
+    uploaded_at timestamp with time zone not null default now(),
+    foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
 );
-create index idx_milestone_attachments_milestone_id on milestone_attachments(milestone_id);
+create index idx_action_attachments_action on action_attachments(action_id, action_sub_id);
+create index idx_action_attachments_milestone on action_attachments(milestone_id) where milestone_id is not null;
 
 -- =========================================================
 -- RELATIONSHIP TABLES

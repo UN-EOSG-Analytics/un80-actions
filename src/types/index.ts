@@ -103,15 +103,21 @@ export interface ActionBase {
   action_record_id: string | null;
 }
 
-/** Attachment attached to a milestone (view/download: Admin only) */
-export interface MilestoneAttachment {
+/** Attachment linked to an action, optionally to a specific milestone */
+export interface ActionAttachment {
   id: string;
-  milestone_id: string;
-  file_name: string;
-  file_path: string;
-  content_type: string | null;
-  file_size: number | null;
+  action_id: number;
+  action_sub_id: string | null;
+  milestone_id: string | null; // NULL = general to action
+  title: string | null;
+  description: string | null;
+  filename: string;
+  original_filename: string;
+  blob_name: string;
+  content_type: string;
+  file_size: number;
   uploaded_by: string | null;
+  uploaded_by_email: string | null;
   uploaded_at: Date;
 }
 
