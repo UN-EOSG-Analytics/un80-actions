@@ -10,6 +10,7 @@ import type { ActionNote } from "@/types";
 
 /**
  * Fetch all notes for a specific action.
+ * Returns every note from every user so all users see the full history.
  */
 export async function getActionNotes(
   actionId: number,

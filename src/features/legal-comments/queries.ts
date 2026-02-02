@@ -10,6 +10,7 @@ import type { ActionLegalComment } from "@/types";
 
 /**
  * Fetch all legal comments for a specific action.
+ * Returns every comment from every user so all users see the full history.
  */
 export async function getActionLegalComments(
   actionId: number,

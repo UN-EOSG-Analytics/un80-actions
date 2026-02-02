@@ -10,6 +10,7 @@ import type { ActionQuestion } from "@/types";
 
 /**
  * Fetch all questions for a specific action.
+ * Returns every question from every user so all users see the full history.
  */
 export async function getActionQuestions(
   actionId: number,

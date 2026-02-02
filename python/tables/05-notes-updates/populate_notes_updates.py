@@ -51,10 +51,12 @@ print(f"Prepared {len(notes)} notes and {len(updates)} updates")
 # Insert into database
 with get_conn() as conn:
     with conn.cursor() as cur:
-        # Clear existing seed data (notes/updates without user_id)
+        # Clear ONLY seed data (notes/updates with user_id IS NULL from Airtable).
+        # Never delete user-created content (user_id IS NOT NULL) so all users
+        # always see all notes/updates from everyone.
         cur.execute("DELETE FROM un80actions.action_notes WHERE user_id IS NULL")
         cur.execute("DELETE FROM un80actions.action_updates WHERE user_id IS NULL")
-        print("Cleared existing seed notes and updates")
+        print("Cleared existing seed notes and updates (user-created content preserved)")
         
         # Insert notes
         if notes:
