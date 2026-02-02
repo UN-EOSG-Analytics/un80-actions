@@ -304,6 +304,28 @@ create index idx_note_tags_tag_id on note_tags(tag_id);
 create index idx_question_tags_question_id on question_tags(question_id);
 create index idx_question_tags_tag_id on question_tags(tag_id);
 
+create table action_legal_comments (
+    id uuid primary key default gen_random_uuid(),
+    action_id int not null,
+    action_sub_id text,
+    user_id uuid references users(id) on delete cascade,
+    content text not null,
+    created_at timestamp with time zone not null default now(),
+    updated_at timestamp with time zone,
+    content_review_status content_review_status not null default 'approved',
+    content_reviewed_by uuid references users(id) on delete set null,
+    content_reviewed_at timestamp with time zone,
+    foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
+);
+create index idx_action_legal_comments_action on action_legal_comments(action_id, action_sub_id);
+create table legal_comment_tags (
+    legal_comment_id uuid not null references action_legal_comments(id) on delete cascade,
+    tag_id uuid not null references tags(id) on delete cascade,
+    primary key (legal_comment_id, tag_id)
+);
+create index idx_legal_comment_tags_comment_id on legal_comment_tags(legal_comment_id);
+create index idx_legal_comment_tags_tag_id on legal_comment_tags(tag_id);
+
 create table action_updates (
     id uuid primary key default gen_random_uuid(),
     action_id int not null,
@@ -408,3 +430,27 @@ CREATE TABLE IF NOT EXISTS milestone_versions (
 );
 CREATE INDEX IF NOT EXISTS idx_milestone_versions_milestone_id ON milestone_versions(milestone_id);
 CREATE INDEX IF NOT EXISTS idx_milestone_versions_changed_at ON milestone_versions(changed_at DESC);
+
+-- Legal comments (same structure as action_notes: comment input, approve, tag)
+CREATE TABLE IF NOT EXISTS action_legal_comments (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    action_id int NOT NULL,
+    action_sub_id text,
+    user_id uuid REFERENCES users(id) ON DELETE CASCADE,
+    content text NOT NULL,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    updated_at timestamp with time zone,
+    content_review_status content_review_status NOT NULL DEFAULT 'approved',
+    content_reviewed_by uuid REFERENCES users(id) ON DELETE SET NULL,
+    content_reviewed_at timestamp with time zone,
+    FOREIGN KEY (action_id, action_sub_id) REFERENCES actions(id, sub_id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_action_legal_comments_action ON action_legal_comments(action_id, action_sub_id);
+
+CREATE TABLE IF NOT EXISTS legal_comment_tags (
+    legal_comment_id uuid NOT NULL REFERENCES action_legal_comments(id) ON DELETE CASCADE,
+    tag_id uuid NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+    PRIMARY KEY (legal_comment_id, tag_id)
+);
+CREATE INDEX IF NOT EXISTS idx_legal_comment_tags_comment_id ON legal_comment_tags(legal_comment_id);
+CREATE INDEX IF NOT EXISTS idx_legal_comment_tags_tag_id ON legal_comment_tags(tag_id);

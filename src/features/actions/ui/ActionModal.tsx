@@ -5,11 +5,13 @@ import OverviewTab from "@/features/actions/ui/OverviewTab";
 import MilestonesTab from "@/features/milestones/ui/MilestonesTab";
 import NotesTab from "@/features/notes/ui/NotesTab";
 import QuestionsTab from "@/features/questions/ui/QuestionsTab";
+import LegalTab from "@/features/legal-comments/ui/LegalTab";
 import type { Action } from "@/types";
 import {
   Calendar,
   ChevronRight,
   MessageCircle,
+  Scale,
   StickyNote,
   Target,
   X,
@@ -243,6 +245,10 @@ export default function ActionModal({
                 <StickyNote className="h-4 w-4" />
                 Notes
               </TabsTrigger>
+              <TabsTrigger value="legal" className="gap-1.5">
+                <Scale className="h-4 w-4" />
+                Legal
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -260,6 +266,9 @@ export default function ActionModal({
               </TabsContent>
               <TabsContent value="notes" className="mt-0">
                 <NotesTab action={action} isAdmin={isAdmin} />
+              </TabsContent>
+              <TabsContent value="legal" className="mt-0">
+                <LegalTab action={action} isAdmin={isAdmin} />
               </TabsContent>
             </div>
           </div>

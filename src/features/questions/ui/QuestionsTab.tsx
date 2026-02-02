@@ -10,6 +10,7 @@ import {
 } from "@/features/questions/commands";
 import { ReviewStatus } from "@/features/shared/ReviewStatus";
 import { TagSelector } from "@/features/shared/TagSelector";
+import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionQuestion } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
 import { Loader2, MessageCircle, Send, Trash2 } from "lucide-react";
@@ -51,6 +52,9 @@ export default function QuestionsTab({
   const [error, setError] = useState<string | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [tagsByQuestionId, setTagsByQuestionId] = useState<
+    Record<string, Tag[]>
+  >({});
 
   const loadQuestions = useCallback(async () => {
     setLoading(true);
@@ -158,74 +162,92 @@ export default function QuestionsTab({
                 key={q.id}
                 className="rounded-lg border border-slate-200 bg-white p-4"
               >
-                <div className="space-y-3">
-                  <div className="flex items-start gap-2">
-                  <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-un-blue" />
-                  <p className="text-sm font-medium text-slate-700">
-                    {q.question}
-                  </p>
-                </div>
-                {q.answer ? (
-                  <div className="ml-6 border-l-2 border-green-200 bg-green-50 py-2 pr-2 pl-3">
-                    <p className="text-sm text-slate-600">{q.answer}</p>
-                    {q.answered_at && (
-                      <p className="mt-1 text-xs text-slate-400">
-                        Answered {formatUNDateTime(q.answered_at)}
-                        {q.answered_by_email && ` by ${q.answered_by_email}`}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1 space-y-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-un-blue" />
+                      <p className="text-sm font-medium text-slate-700">
+                        {q.question}
                       </p>
+                      {(tagsByQuestionId[q.id] ?? []).length > 0 && (
+                        <span className="flex flex-wrap gap-1.5">
+                          {(tagsByQuestionId[q.id] ?? []).map((t) => (
+                            <Badge
+                              key={t.id}
+                              variant="outline"
+                              className="bg-slate-50 text-slate-600"
+                            >
+                              {t.name}
+                            </Badge>
+                          ))}
+                        </span>
+                      )}
+                    </div>
+                    {q.answer && (
+                      <div className="ml-6 border-l-2 border-green-200 bg-green-50 py-2 pr-2 pl-3">
+                        <p className="text-sm text-slate-600">{q.answer}</p>
+                        {q.answered_at && (
+                          <p className="mt-1 text-xs text-slate-400">
+                            Answered {formatUNDateTime(q.answered_at)}
+                            {q.answered_by_email && ` by ${q.answered_by_email}`}
+                          </p>
+                        )}
+                      </div>
                     )}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-xs text-slate-400">
+                        {formatUNDateTime(q.created_at)} by {q.user_email}
+                      </p>
+                      <ReviewStatus
+                        status={q.content_review_status ?? "approved"}
+                        reviewedByEmail={q.content_reviewed_by_email}
+                        reviewedAt={q.content_reviewed_at}
+                        isAdmin={isAdmin}
+                        onApprove={async () => {
+                          setApprovingId(q.id);
+                          try {
+                            const result = await approveQuestion(q.id);
+                            if (result.success) {
+                              await loadQuestions();
+                              router.refresh();
+                            }
+                          } finally {
+                            setApprovingId(null);
+                          }
+                        }}
+                        approving={approvingId === q.id}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-slate-400 hover:text-red-600"
+                        onClick={() => handleDelete(q.id)}
+                        disabled={deletingId === q.id}
+                        aria-label="Delete question"
+                      >
+                        {deletingId === q.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
                   </div>
-                ) : (
-                  <div className="ml-6">
-                    <Badge className="border border-amber-200 bg-amber-100 text-amber-700">
-                      Awaiting answer
-                    </Badge>
-                  </div>
-                )}
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-xs text-slate-400">
-                    {formatUNDateTime(q.created_at)} by {q.user_email}
-                  </p>
-                  <ReviewStatus
-                    status={q.content_review_status ?? "approved"}
-                    reviewedByEmail={q.content_reviewed_by_email}
-                    reviewedAt={q.content_reviewed_at}
-                    isAdmin={isAdmin}
-                    onApprove={async () => {
-                      setApprovingId(q.id);
-                      try {
-                        const result = await approveQuestion(q.id);
-                        if (result.success) {
-                          await loadQuestions();
-                          router.refresh();
-                        }
-                      } finally {
-                        setApprovingId(null);
+                  <div className="shrink-0">
+                    <TagSelector
+                      entityId={q.id}
+                      entityType="question"
+                      isAdmin={isAdmin}
+                      initialTags={[]}
+                      onTagsChange={(tags) =>
+                        setTagsByQuestionId((prev) => ({
+                          ...prev,
+                          [q.id]: tags,
+                        }))
                       }
-                    }}
-                    approving={approvingId === q.id}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-slate-400 hover:text-red-600"
-                    onClick={() => handleDelete(q.id)}
-                    disabled={deletingId === q.id}
-                    aria-label="Delete question"
-                  >
-                    {deletingId === q.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <TagSelector
-                    entityId={q.id}
-                    entityType="question"
-                    isAdmin={isAdmin}
-                    initialTags={[]}
-                  />
+                      hideInlineTags
+                    />
                   </div>
                 </div>
               </div>

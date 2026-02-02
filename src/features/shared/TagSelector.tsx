@@ -11,21 +11,24 @@ import {
   addTagToMilestone,
   addTagToNote,
   addTagToQuestion,
+  addTagToLegalComment,
   removeTagFromMilestone,
   removeTagFromNote,
   removeTagFromQuestion,
+  removeTagFromLegalComment,
 } from "@/features/tags/commands";
 import {
   getAllTags,
   getTagsForMilestone,
   getTagsForNote,
   getTagsForQuestion,
+  getTagsForLegalComment,
   type Tag,
 } from "@/features/tags/queries";
 import { Tags, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
-type TagEntityType = "milestone" | "note" | "question";
+type TagEntityType = "milestone" | "note" | "question" | "legal_comment";
 
 interface TagSelectorProps {
   entityId: string;
@@ -34,6 +37,8 @@ interface TagSelectorProps {
   initialTags: Tag[];
   onTagsChange?: (tags: Tag[]) => void;
   className?: string;
+  /** When true, do not render tags inline (parent shows them next to title/name). */
+  hideInlineTags?: boolean;
 }
 
 export function TagSelector({
@@ -43,6 +48,7 @@ export function TagSelector({
   initialTags,
   onTagsChange,
   className = "",
+  hideInlineTags = false,
 }: TagSelectorProps) {
   const [open, setOpen] = useState(false);
   const [tags, setTags] = useState<Tag[]>(initialTags);
@@ -57,6 +63,9 @@ export function TagSelector({
     }
     if (entityType === "note") {
       return getTagsForNote(entityId);
+    }
+    if (entityType === "legal_comment") {
+      return getTagsForLegalComment(entityId);
     }
     return getTagsForQuestion(entityId);
   }, [entityId, entityType]);
@@ -102,6 +111,8 @@ export function TagSelector({
         result = await addTagToMilestone(entityId, trimmed);
       } else if (entityType === "note") {
         result = await addTagToNote(entityId, trimmed);
+      } else if (entityType === "legal_comment") {
+        result = await addTagToLegalComment(entityId, trimmed);
       } else {
         result = await addTagToQuestion(entityId, trimmed);
       }
@@ -132,6 +143,8 @@ export function TagSelector({
         result = await removeTagFromMilestone(entityId, tagId);
       } else if (entityType === "note") {
         result = await removeTagFromNote(entityId, tagId);
+      } else if (entityType === "legal_comment") {
+        result = await removeTagFromLegalComment(entityId, tagId);
       } else {
         result = await removeTagFromQuestion(entityId, tagId);
       }
@@ -161,6 +174,7 @@ export function TagSelector({
   );
 
   if (!isAdmin) {
+    if (hideInlineTags) return null;
     return (
       <div className={`flex flex-wrap gap-1.5 ${className}`}>
         {tags.map((t) => (
@@ -269,7 +283,7 @@ export function TagSelector({
           </div>
         </PopoverContent>
       </Popover>
-      {tags.length > 0 && (
+      {!hideInlineTags && tags.length > 0 && (
         <div className="mt-1.5 flex flex-wrap gap-1.5">
           {tags.map((t) => (
             <Badge

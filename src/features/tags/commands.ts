@@ -5,7 +5,7 @@ import { DB_SCHEMA } from "@/lib/db/config";
 import { getCurrentUser } from "@/features/auth/service";
 import type { Tag } from "./queries";
 
-export type TagEntityType = "milestone" | "note" | "question";
+export type TagEntityType = "milestone" | "note" | "question" | "legal_comment";
 
 export interface TagResult {
   success: boolean;
@@ -146,6 +146,38 @@ export async function addTagToQuestion(
 }
 
 /**
+ * Add a tag to a legal comment. Admin only.
+ */
+export async function addTagToLegalComment(
+  legalCommentId: string,
+  tagName: string,
+): Promise<TagResult> {
+  if (!(await ensureAdmin())) {
+    return { success: false, error: "Admin only" };
+  }
+  const tagId = await getOrCreateTag(tagName);
+  if (!tagId) return { success: false, error: "Invalid tag name" };
+
+  try {
+    await query(
+      `INSERT INTO ${DB_SCHEMA}.legal_comment_tags (legal_comment_id, tag_id)
+       VALUES ($1, $2)
+       ON CONFLICT (legal_comment_id, tag_id) DO NOTHING`,
+      [legalCommentId, tagId],
+    );
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to add tag",
+    };
+  }
+
+  const { getTagsForLegalComment } = await import("./queries");
+  const tags = await getTagsForLegalComment(legalCommentId);
+  return { success: true, tags };
+}
+
+/**
  * Remove a tag from a milestone. Admin only.
  */
 export async function removeTagFromMilestone(
@@ -217,6 +249,33 @@ export async function removeTagFromQuestion(
     );
     const { getTagsForQuestion } = await import("./queries");
     const tags = await getTagsForQuestion(questionId);
+    return { success: true, tags };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to remove tag",
+    };
+  }
+}
+
+/**
+ * Remove a tag from a legal comment. Admin only.
+ */
+export async function removeTagFromLegalComment(
+  legalCommentId: string,
+  tagId: string,
+): Promise<TagResult> {
+  try {
+    if (!(await ensureAdmin())) {
+      return { success: false, error: "Admin only" };
+    }
+    await query(
+      `DELETE FROM ${DB_SCHEMA}.legal_comment_tags
+       WHERE legal_comment_id = $1 AND tag_id = $2`,
+      [legalCommentId, tagId],
+    );
+    const { getTagsForLegalComment } = await import("./queries");
+    const tags = await getTagsForLegalComment(legalCommentId);
     return { success: true, tags };
   } catch (e) {
     return {

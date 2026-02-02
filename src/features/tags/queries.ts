@@ -83,3 +83,24 @@ export async function getTagsForQuestion(
     return [];
   }
 }
+
+/**
+ * Fetch tags for a legal comment.
+ */
+export async function getTagsForLegalComment(
+  legalCommentId: string,
+): Promise<Tag[]> {
+  try {
+    const rows = await query<Tag>(
+      `SELECT t.id, t.name
+       FROM ${DB_SCHEMA}.tags t
+       JOIN ${DB_SCHEMA}.legal_comment_tags lct ON t.id = lct.tag_id
+       WHERE lct.legal_comment_id = $1
+       ORDER BY t.name ASC`,
+      [legalCommentId],
+    );
+    return rows;
+  } catch {
+    return [];
+  }
+}

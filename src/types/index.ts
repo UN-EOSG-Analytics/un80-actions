@@ -160,6 +160,22 @@ export interface ActionNote {
   content_reviewed_at: Date | null;
 }
 
+/** Legal comment attached to an action (approve/processed = strikethrough) */
+export interface ActionLegalComment {
+  id: string;
+  action_id: number;
+  action_sub_id: string | null;
+  user_id: string | null;
+  user_email: string | null;
+  content: string;
+  created_at: Date;
+  updated_at: Date | null;
+  content_review_status: ContentReviewStatus;
+  content_reviewed_by: string | null;
+  content_reviewed_by_email: string | null;
+  content_reviewed_at: Date | null;
+}
+
 /** Update attached to an action */
 export interface ActionUpdate {
   id: string;

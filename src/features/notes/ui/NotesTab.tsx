@@ -6,6 +6,7 @@ import { getActionNotes } from "@/features/notes/queries";
 import { createNote, approveNote, deleteNote } from "@/features/notes/commands";
 import { ReviewStatus } from "@/features/shared/ReviewStatus";
 import { TagSelector } from "@/features/shared/TagSelector";
+import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionNote } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
 import { Loader2, Plus, StickyNote, Trash2 } from "lucide-react";
@@ -47,6 +48,7 @@ export default function NotesTab({
   const [error, setError] = useState<string | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [tagsByNoteId, setTagsByNoteId] = useState<Record<string, Tag[]>>({});
 
   const loadNotes = useCallback(async () => {
     setLoading(true);
@@ -153,60 +155,83 @@ export default function NotesTab({
               key={note.id}
               className="rounded-lg border border-slate-200 bg-white p-4"
             >
-              <div className="flex items-start gap-2">
-                <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-                <div className="flex-1">
-                  <p className="text-sm whitespace-pre-wrap text-slate-700">
-                    {note.content}
-                  </p>
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <p className="text-xs text-slate-400">
-                      {formatUNDateTime(note.created_at)}
-                      {note.user_email && ` by ${note.user_email}`}
-                    </p>
-                    <ReviewStatus
-                      status={
-                        note.content_review_status ?? "approved"
-                      }
-                      reviewedByEmail={note.content_reviewed_by_email}
-                      reviewedAt={note.content_reviewed_at}
-                      isAdmin={isAdmin}
-                      onApprove={async () => {
-                        setApprovingId(note.id);
-                        try {
-                          const result = await approveNote(note.id);
-                          if (result.success) {
-                            await loadNotes();
-                            router.refresh();
-                          }
-                        } finally {
-                          setApprovingId(null);
-                        }
-                      }}
-                      approving={approvingId === note.id}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-slate-400 hover:text-red-600"
-                      onClick={() => handleDelete(note.id)}
-                      disabled={deletingId === note.id}
-                      aria-label="Delete note"
-                    >
-                      {deletingId === note.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex min-w-0 flex-1 items-start gap-2">
+                  <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {(tagsByNoteId[note.id] ?? []).length > 0 && (
+                        <span className="flex flex-wrap gap-1.5">
+                          {(tagsByNoteId[note.id] ?? []).map((t) => (
+                            <Badge
+                              key={t.id}
+                              variant="outline"
+                              className="bg-slate-50 text-slate-600"
+                            >
+                              {t.name}
+                            </Badge>
+                          ))}
+                        </span>
                       )}
-                    </Button>
-                    <TagSelector
-                      entityId={note.id}
-                      entityType="note"
-                      isAdmin={isAdmin}
-                      initialTags={[]}
-                    />
+                      <p className="text-sm whitespace-pre-wrap text-slate-700">
+                        {note.content}
+                      </p>
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <p className="text-xs text-slate-400">
+                        {formatUNDateTime(note.created_at)}
+                        {note.user_email && ` by ${note.user_email}`}
+                      </p>
+                      <ReviewStatus
+                        status={
+                          note.content_review_status ?? "approved"
+                        }
+                        reviewedByEmail={note.content_reviewed_by_email}
+                        reviewedAt={note.content_reviewed_at}
+                        isAdmin={isAdmin}
+                        onApprove={async () => {
+                          setApprovingId(note.id);
+                          try {
+                            const result = await approveNote(note.id);
+                            if (result.success) {
+                              await loadNotes();
+                              router.refresh();
+                            }
+                          } finally {
+                            setApprovingId(null);
+                          }
+                        }}
+                        approving={approvingId === note.id}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-slate-400 hover:text-red-600"
+                        onClick={() => handleDelete(note.id)}
+                        disabled={deletingId === note.id}
+                        aria-label="Delete note"
+                      >
+                        {deletingId === note.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
                   </div>
+                </div>
+                <div className="shrink-0">
+                  <TagSelector
+                    entityId={note.id}
+                    entityType="note"
+                    isAdmin={isAdmin}
+                    initialTags={[]}
+                    onTagsChange={(tags) =>
+                      setTagsByNoteId((prev) => ({ ...prev, [note.id]: tags }))
+                    }
+                    hideInlineTags
+                  />
                 </div>
               </div>
             </div>
