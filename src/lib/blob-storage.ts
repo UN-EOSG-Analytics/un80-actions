@@ -10,25 +10,30 @@ import {
   BlobSASPermissions,
 } from "@azure/storage-blob";
 
-const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME!;
-const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY!;
-const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME!;
+let _containerClient: ReturnType<BlobServiceClient["getContainerClient"]> | null =
+  null;
+let _sharedKeyCredential: StorageSharedKeyCredential | null = null;
+let _containerName: string | null = null;
 
-if (!accountName || !accountKey || !containerName) {
-  throw new Error("Azure Storage credentials not configured");
+function getClients() {
+  if (_containerClient && _sharedKeyCredential && _containerName) {
+    return { containerClient: _containerClient, sharedKeyCredential: _sharedKeyCredential, containerName: _containerName };
+  }
+  const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+  const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
+  const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME;
+  if (!accountName || !accountKey || !containerName) {
+    throw new Error("Azure Storage credentials not configured");
+  }
+  _sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net`,
+    _sharedKeyCredential,
+  );
+  _containerClient = blobServiceClient.getContainerClient(containerName);
+  _containerName = containerName;
+  return { containerClient: _containerClient, sharedKeyCredential: _sharedKeyCredential, containerName };
 }
-
-const sharedKeyCredential = new StorageSharedKeyCredential(
-  accountName,
-  accountKey,
-);
-
-const blobServiceClient = new BlobServiceClient(
-  `https://${accountName}.blob.core.windows.net`,
-  sharedKeyCredential,
-);
-
-const containerClient = blobServiceClient.getContainerClient(containerName);
 
 /**
  * Generate a unique blob name with timestamp and random suffix
@@ -48,6 +53,7 @@ export async function uploadBlob(
   content: Buffer | Blob,
   contentType: string,
 ): Promise<void> {
+  const { containerClient } = getClients();
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   if (content instanceof Buffer) {
@@ -68,6 +74,7 @@ export async function uploadBlob(
  * Delete a file from blob storage
  */
 export async function deleteBlob(blobName: string): Promise<void> {
+  const { containerClient } = getClients();
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
   await blockBlobClient.deleteIfExists();
 }
@@ -79,6 +86,7 @@ export async function generateDownloadUrl(
   blobName: string,
   expiryMinutes: number = 60,
 ): Promise<string> {
+  const { containerClient, sharedKeyCredential, containerName } = getClients();
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   const sasToken = generateBlobSASQueryParameters(
@@ -99,6 +107,7 @@ export async function generateDownloadUrl(
  * Check if a blob exists
  */
 export async function blobExists(blobName: string): Promise<boolean> {
+  const { containerClient } = getClients();
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
   return await blockBlobClient.exists();
 }
@@ -107,6 +116,7 @@ export async function blobExists(blobName: string): Promise<boolean> {
  * Get blob properties (size, content-type, etc.)
  */
 export async function getBlobProperties(blobName: string) {
+  const { containerClient } = getClients();
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
   return await blockBlobClient.getProperties();
 }
@@ -119,6 +129,7 @@ export async function downloadBlob(blobName: string): Promise<{
   contentType: string;
   contentLength: number;
 }> {
+  const { containerClient } = getClients();
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
   const downloadResponse = await blockBlobClient.download(0);
 

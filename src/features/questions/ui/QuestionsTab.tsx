@@ -3,12 +3,16 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getActionQuestions } from "@/features/questions/queries";
-import { createQuestion, approveQuestion } from "@/features/questions/commands";
+import {
+  createQuestion,
+  approveQuestion,
+  deleteQuestion,
+} from "@/features/questions/commands";
 import { ReviewStatus } from "@/features/shared/ReviewStatus";
 import { TagSelector } from "@/features/shared/TagSelector";
 import type { Action, ActionQuestion } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
-import { Loader2, MessageCircle, Send } from "lucide-react";
+import { Loader2, MessageCircle, Send, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -46,6 +50,7 @@ export default function QuestionsTab({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const loadQuestions = useCallback(async () => {
     setLoading(true);
@@ -87,6 +92,22 @@ export default function QuestionsTab({
       setError(err instanceof Error ? err.message : "Failed to submit question");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (questionId: string) => {
+    setDeletingId(questionId);
+    setError(null);
+    try {
+      const result = await deleteQuestion(questionId);
+      if (result.success) {
+        await loadQuestions();
+        router.refresh();
+      } else {
+        setError(result.error ?? "Failed to delete question");
+      }
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -184,6 +205,21 @@ export default function QuestionsTab({
                     }}
                     approving={approvingId === q.id}
                   />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-slate-400 hover:text-red-600"
+                    onClick={() => handleDelete(q.id)}
+                    disabled={deletingId === q.id}
+                    aria-label="Delete question"
+                  >
+                    {deletingId === q.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </Button>
                   <TagSelector
                     entityId={q.id}
                     entityType="question"

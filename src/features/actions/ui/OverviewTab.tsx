@@ -106,7 +106,7 @@ export default function OverviewTab({ action }: { action: Action }) {
       {/* Action Details */}
       <SectionCard title="Action Details" icon={Lightbulb}>
         <div className="space-y-3">
-          <InfoRow label="Indicative Activity">
+          <InfoRow label="Indicative Action">
             <p className="whitespace-pre-wrap">{action.indicative_activity}</p>
           </InfoRow>
           {action.sub_action_details && (

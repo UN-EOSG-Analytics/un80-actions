@@ -3,12 +3,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getActionNotes } from "@/features/notes/queries";
-import { createNote, approveNote } from "@/features/notes/commands";
+import { createNote, approveNote, deleteNote } from "@/features/notes/commands";
 import { ReviewStatus } from "@/features/shared/ReviewStatus";
 import { TagSelector } from "@/features/shared/TagSelector";
 import type { Action, ActionNote } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
-import { Loader2, Plus, StickyNote } from "lucide-react";
+import { Loader2, Plus, StickyNote, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -46,6 +46,7 @@ export default function NotesTab({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const loadNotes = useCallback(async () => {
     setLoading(true);
@@ -87,6 +88,21 @@ export default function NotesTab({
       setError(err instanceof Error ? err.message : "Failed to add note");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (noteId: string) => {
+    setDeletingId(noteId);
+    try {
+      const result = await deleteNote(noteId);
+      if (result.success) {
+        await loadNotes();
+        router.refresh();
+      } else {
+        setError(result.error ?? "Failed to delete note");
+      }
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -169,6 +185,21 @@ export default function NotesTab({
                       }}
                       approving={approvingId === note.id}
                     />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-slate-400 hover:text-red-600"
+                      onClick={() => handleDelete(note.id)}
+                      disabled={deletingId === note.id}
+                      aria-label="Delete note"
+                    >
+                      {deletingId === note.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                    </Button>
                     <TagSelector
                       entityId={note.id}
                       entityType="note"

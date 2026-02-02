@@ -28,7 +28,8 @@ export async function GET(
     const { content, contentType } = await downloadBlob(attachment.blob_name);
 
     // Stream to client with download headers (no URL exposure)
-    return new NextResponse(content, {
+    // NextResponse expects BodyInit; Buffer → Uint8Array for type compatibility
+    return new NextResponse(new Uint8Array(content), {
       headers: {
         "Content-Type": contentType,
         "Content-Disposition": `attachment; filename="${attachment.original_filename}"`,
