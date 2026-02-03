@@ -11,7 +11,8 @@ import {
   getMilestoneVersions,
   type MilestoneVersion,
 } from "@/features/milestones/queries";
-import { updateMilestone, approveMilestoneContent, createMilestone } from "@/features/milestones/commands";
+import { updateMilestone, createMilestone } from "@/features/milestones/commands";
+import { MilestoneCard } from "./MilestoneCard";
 import {
   getMilestoneUpdates,
   type MilestoneUpdate,
@@ -29,14 +30,11 @@ import {
   deleteActionAttachment,
   updateAttachmentMetadata,
 } from "@/features/attachments/commands";
-import { ReviewStatus } from "@/features/shared/ReviewStatus";
 
 import type { Action, ActionMilestone, ActionAttachment, MilestoneType } from "@/types";
 import {
-  Calendar,
   Check,
   CheckCircle2,
-  Clock,
   CornerDownRight,
   History,
   Loader2,
@@ -50,7 +48,6 @@ import {
   ImageIcon,
   User,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 // =========================================================
@@ -117,11 +114,9 @@ export default function MilestonesTab({
   const [loadingAttachments, setLoadingAttachments] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [approvingId, setApprovingId] = useState<string | null>(null);
   const [editingAttachment, setEditingAttachment] = useState<string | null>(null);
   const [attachmentForm, setAttachmentForm] = useState({ title: "", description: "" });
   const [fileSelected, setFileSelected] = useState(false);
-  const router = useRouter();
 
   const getFileIcon = (contentType: string, filename: string) => {
     if (contentType.startsWith("image/")) {
@@ -210,17 +205,6 @@ export default function MilestonesTab({
     const allTypes: MilestoneType[] = ["first", "second", "third", "final"];
     const existingTypes = milestones.map(m => m.milestone_type);
     return allTypes.filter(type => !existingTypes.includes(type));
-  };
-
-  const getStatusBadge = (status: string) => {
-    const styles: Record<string, string> = {
-      draft: "bg-slate-100 text-slate-600",
-      submitted: "bg-blue-100 text-blue-700",
-      under_review: "bg-amber-100 text-amber-700",
-      approved: "bg-green-100 text-green-700",
-      rejected: "bg-red-100 text-red-700",
-    };
-    return styles[status] || "bg-slate-100 text-slate-600";
   };
 
   const startEditing = (milestone: ActionMilestone) => {
@@ -389,13 +373,6 @@ export default function MilestonesTab({
     }
   };
 
-  const toggleMilestone = (milestoneId: string) => {
-    // Load updates if not already loaded
-    if (!milestoneUpdates[milestoneId]) {
-      loadMilestoneUpdates(milestoneId);
-    }
-  };
-
   const toggleVersionHistory = (milestoneId: string) => {
     if (showVersionHistoryId === milestoneId) {
       setShowVersionHistoryId(null);
@@ -484,19 +461,6 @@ export default function MilestonesTab({
     setFileSelected(!!e.target.files && e.target.files.length > 0);
   };
 
-  const handleApproveMilestone = async (milestoneId: string) => {
-    setApprovingId(milestoneId);
-    try {
-      const result = await approveMilestoneContent(milestoneId);
-      if (result.success) {
-        await loadMilestones();
-        router.refresh();
-      }
-    } finally {
-      setApprovingId(null);
-    }
-  };
-
   const handleDeleteAttachment = async (attachmentId: string) => {
     if (!confirm("Delete this attachment?")) return;
     try {
@@ -563,98 +527,17 @@ export default function MilestonesTab({
           key={milestone.id}
           open={editingId === milestone.id || addingCommentId === milestone.id || showVersionHistoryId === milestone.id}
         >
-          <div className="rounded-lg border border-slate-200 bg-white">
-            {/* Collapsible Header - Always shows current version */}
-            <div className="p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 space-y-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge variant="outline" className="text-xs">
-                        {getMilestoneTypeLabel(milestone.milestone_type)}
-                      </Badge>
-                      <Badge className={getStatusBadge(milestone.status)}>
-                        {milestone.status.replace("_", " ")}
-                      </Badge>
-                      <ReviewStatus
-                        status={
-                          (milestone as { content_review_status?: "approved" | "needs_review" })
-                            .content_review_status ?? "approved"
-                        }
-                        reviewedByEmail={
-                          (milestone as { content_reviewed_by_email?: string | null })
-                            .content_reviewed_by_email ?? null
-                        }
-                        reviewedAt={
-                          (milestone as { content_reviewed_at?: Date | null })
-                            .content_reviewed_at ?? null
-                        }
-                        isAdmin={isAdmin}
-                        onApprove={() => handleApproveMilestone(milestone.id)}
-                        approving={approvingId === milestone.id}
-                      />
-                      {milestone.deadline && (
-                        <div className="flex items-center gap-1.5 text-sm text-slate-500">
-                          <Calendar className="h-4 w-4" />
-                          {new Date(milestone.deadline).toLocaleDateString()}
-                        </div>
-                      )}
-                    </div>
-                    {milestone.description && (
-                      <p className="text-sm text-slate-700">
-                        {milestone.description}
-                      </p>
-                    )}
-                    {!milestone.description && (
-                      <p className="text-sm text-slate-400 italic">
-                        No description yet
-                      </p>
-                    )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleVersionHistory(milestone.id);
-                    }}
-                    className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50"
-                    title="Version history"
-                  >
-                    <Clock className="h-3.5 w-3.5" />
-                    History
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      startAddingComment(milestone.id);
-                    }}
-                    className="flex items-center gap-1.5 rounded-md border border-un-blue/20 bg-un-blue/5 px-2.5 py-1.5 text-xs font-medium text-un-blue transition-colors hover:bg-un-blue/10"
-                    title="Add comment"
-                  >
-                    <MessageSquare className="h-3.5 w-3.5" />
-                    Comment
-                    {updates.length > 0 && (
-                      <span className="ml-0.5 rounded-full bg-un-blue/20 px-1.5 py-0.5 text-[10px] font-semibold">
-                        {updates.length}
-                      </span>
-                    )}
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      startEditing(milestone);
-                    }}
-                    className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50"
-                    title="Edit milestone"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                    Edit
-                  </button>
-                </div>
-              </div>
-            </div>
+          {/* Milestone Card - Collapsed State */}
+          <MilestoneCard
+            milestone={milestone}
+            updates={updates}
+            onEdit={() => startEditing(milestone)}
+            onComment={() => startAddingComment(milestone.id)}
+            onShowHistory={() => toggleVersionHistory(milestone.id)}
+          />
 
-            {/* Collapsible Content */}
-            <CollapsibleContent>
+          {/* Collapsible Content */}
+          <CollapsibleContent>
               <div className="border-t border-slate-200 p-4">
                 {editingId === milestone.id ? (
                   // Edit Mode
@@ -1018,7 +901,6 @@ export default function MilestonesTab({
                 
               </div>
             </CollapsibleContent>
-          </div>
         </Collapsible>
     );
   };
