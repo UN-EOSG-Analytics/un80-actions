@@ -40,7 +40,7 @@ export default function NotesTab({
 }: {
   action: Action;
   isAdmin?: boolean;
-  exportProps?: { onExport: (format: "word" | "pdf") => void; exporting: boolean };
+  exportProps?: { onExport: (format: "word" | "pdf" | "markdown") => void; exporting: boolean };
 }) {
   const [notes, setNotes] = useState<ActionNote[]>([]);
   const [loading, setLoading] = useState(true);
@@ -149,6 +149,7 @@ export default function NotesTab({
           title="All notes"
           onExport={exportProps.onExport}
           exporting={exportProps.exporting}
+          hasData={notes.length > 0}
         />
       )}
 

@@ -44,7 +44,7 @@ export default function QuestionsTab({
 }: {
   action: Action;
   isAdmin?: boolean;
-  exportProps?: { onExport: (format: "word" | "pdf") => void; exporting: boolean };
+  exportProps?: { onExport: (format: "word" | "pdf" | "markdown") => void; exporting: boolean };
 }) {
   const [questions, setQuestions] = useState<ActionQuestion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -155,6 +155,7 @@ export default function QuestionsTab({
           title="All questions"
           onExport={exportProps.onExport}
           exporting={exportProps.exporting}
+          hasData={questions.length > 0}
         />
       )}
 

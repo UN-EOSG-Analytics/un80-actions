@@ -12,6 +12,9 @@ import { getActionLegalComments } from "@/features/legal-comments/queries";
 import {
   exportActionToWord,
   exportActionToPdf,
+  exportActionToMarkdown,
+  type ExportTab,
+  type ExportFormat,
 } from "@/features/actions/lib/export-action-document";
 import type { Action } from "@/types";
 import {
@@ -125,19 +128,37 @@ export default function ActionModal({
   };
 
   const handleExport = useCallback(
-    async (format: "word" | "pdf") => {
+    async (format: ExportFormat) => {
       if (!action) return;
       setExporting(true);
       try {
-        const [questions, notes, legalComments] = await Promise.all([
-          getActionQuestions(action.id, action.sub_id),
-          getActionNotes(action.id, action.sub_id),
-          getActionLegalComments(action.id, action.sub_id),
-        ]);
+        // Determine which tab we're exporting from
+        let exportTab: ExportTab = "all";
+        if (activeTab === "questions") exportTab = "questions";
+        else if (activeTab === "notes") exportTab = "notes";
+        else if (activeTab === "legal") exportTab = "legal";
+
+        // Only fetch data for the active tab
+        const questions =
+          exportTab === "questions" || exportTab === "all"
+            ? await getActionQuestions(action.id, action.sub_id)
+            : [];
+        const notes =
+          exportTab === "notes" || exportTab === "all"
+            ? await getActionNotes(action.id, action.sub_id)
+            : [];
+        const legalComments =
+          exportTab === "legal" || exportTab === "all"
+            ? await getActionLegalComments(action.id, action.sub_id)
+            : [];
+
         const safeName = `Action-${action.action_display_id.replace(/[^a-zA-Z0-9-]/g, "-")}`;
+        const tabSuffix = exportTab === "all" ? "All" : exportTab.charAt(0).toUpperCase() + exportTab.slice(1);
+
         if (format === "word") {
           const blob = await exportActionToWord(
             action,
+            exportTab,
             questions,
             notes,
             legalComments,
@@ -145,12 +166,13 @@ export default function ActionModal({
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${safeName}-Questions-Notes-Comments.docx`;
+          a.download = `${safeName}-${tabSuffix}.docx`;
           a.click();
           URL.revokeObjectURL(url);
-        } else {
+        } else if (format === "pdf") {
           const blob = exportActionToPdf(
             action,
+            exportTab,
             questions,
             notes,
             legalComments,
@@ -158,7 +180,22 @@ export default function ActionModal({
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${safeName}-Questions-Notes-Comments.pdf`;
+          a.download = `${safeName}-${tabSuffix}.pdf`;
+          a.click();
+          URL.revokeObjectURL(url);
+        } else if (format === "markdown") {
+          const markdown = exportActionToMarkdown(
+            action,
+            exportTab,
+            questions,
+            notes,
+            legalComments,
+          );
+          const blob = new Blob([markdown], { type: "text/markdown" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${safeName}-${tabSuffix}.md`;
           a.click();
           URL.revokeObjectURL(url);
         }
@@ -166,7 +203,7 @@ export default function ActionModal({
         setExporting(false);
       }
     },
-    [action],
+    [action, activeTab],
   );
 
   // Render loading state

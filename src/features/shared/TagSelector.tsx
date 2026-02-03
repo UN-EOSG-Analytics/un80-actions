@@ -56,6 +56,14 @@ export function TagSelector({
   const [newTagInput, setNewTagInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Ref to avoid dependency issues in effects
+  const onTagsChangeRef = useRef(onTagsChange);
+  
+  // Keep ref up to date
+  useEffect(() => {
+    onTagsChangeRef.current = onTagsChange;
+  }, [onTagsChange]);
 
   const loadTagsForEntity = useCallback(async () => {
     if (entityType === "milestone") {

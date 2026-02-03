@@ -45,7 +45,7 @@ export default function LegalTab({
 }: {
   action: Action;
   isAdmin?: boolean;
-  exportProps?: { onExport: (format: "word" | "pdf") => void; exporting: boolean };
+  exportProps?: { onExport: (format: "word" | "pdf" | "markdown") => void; exporting: boolean };
 }) {
   const [comments, setComments] = useState<ActionLegalComment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,6 +156,7 @@ export default function LegalTab({
           title="All comments"
           onExport={exportProps.onExport}
           exporting={exportProps.exporting}
+          hasData={comments.length > 0}
         />
       )}
 

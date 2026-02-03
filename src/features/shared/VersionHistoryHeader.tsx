@@ -11,14 +11,16 @@ import { ChevronDown, FileDown, Loader2 } from "lucide-react";
 
 export interface VersionHistoryHeaderProps {
   title: string;
-  onExport: (format: "word" | "pdf") => void;
+  onExport: (format: "word" | "pdf" | "markdown") => void;
   exporting: boolean;
+  hasData?: boolean;
 }
 
 export function VersionHistoryHeader({
   title,
   onExport,
   exporting,
+  hasData = true,
 }: VersionHistoryHeaderProps) {
   return (
     <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-3">
@@ -29,7 +31,7 @@ export function VersionHistoryHeader({
             variant="outline"
             size="sm"
             className="gap-1.5 text-slate-600"
-            disabled={exporting}
+            disabled={exporting || !hasData}
           >
             {exporting ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -52,6 +54,12 @@ export function VersionHistoryHeader({
             disabled={exporting}
           >
             PDF
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => onExport("markdown")}
+            disabled={exporting}
+          >
+            Markdown (.md)
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
