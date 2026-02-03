@@ -7,12 +7,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAttachmentById } from "@/features/attachments/queries";
 import { downloadBlob } from "@/lib/blob-storage";
+import { getCurrentUser } from "@/features/auth/service";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    // Require authentication
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
     const { id } = await params;
 
     // Get attachment metadata

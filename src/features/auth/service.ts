@@ -5,10 +5,10 @@ import { query } from "../../lib/db/db";
 
 const getSecret = () => {
   const secret = process.env.AUTH_SECRET;
-  if (!secret && process.env.NODE_ENV === "production") {
-    throw new Error("AUTH_SECRET must be set in production");
+  if (!secret) {
+    throw new Error("AUTH_SECRET must be set in environment variables. Generate one with: openssl rand -base64 32");
   }
-  return secret || "dev-secret-change-me";
+  return secret;
 };
 const COOKIE_NAME = "auth_session";
 

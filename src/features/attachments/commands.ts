@@ -43,10 +43,13 @@ export async function uploadActionAttachment(
   formData: FormData,
 ): Promise<UploadResult> {
   try {
-    // Try to get current user for tracking, but don't block if not authenticated
+    // Require authentication
     const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
     
-    console.log("Upload - Current user:", user ? { id: user.id, email: user.email } : "No user found");
+    console.log("Upload - Current user:", { id: user.id, email: user.email });
 
     const file = formData.get("file") as File;
     if (!file) {
@@ -67,9 +70,8 @@ export async function uploadActionAttachment(
     const buffer = Buffer.from(arrayBuffer);
     await uploadBlob(blobName, buffer, file.type);
 
-    // Store metadata in database with user ID if available
-    const userId = user?.id ?? null;
-    console.log("Storing uploaded_by:", userId);
+    // Store metadata in database
+    console.log("Storing uploaded_by:", user.id);
     
     const result = await query<{ id: string }>(
       `INSERT INTO un80actions.action_attachments (
@@ -97,7 +99,7 @@ export async function uploadActionAttachment(
         blobName,
         file.type,
         file.size,
-        userId,
+        user.id,
       ],
     );
 
@@ -124,6 +126,12 @@ export async function deleteActionAttachment(
   attachmentId: string,
 ): Promise<DeleteResult> {
   try {
+    // Require authentication
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
     // Get attachment details
     const rows = await query<{
       blob_name: string;
@@ -170,6 +178,12 @@ export async function updateAttachmentMetadata(
   description: string | null,
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    // Require authentication
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
     await query(
       `UPDATE un80actions.action_attachments 
        SET title = $1, description = $2

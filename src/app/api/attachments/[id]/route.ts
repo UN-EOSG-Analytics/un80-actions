@@ -5,12 +5,22 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { deleteActionAttachment } from "@/features/attachments/commands";
+import { getCurrentUser } from "@/features/auth/service";
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    // Require authentication
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
     const { id } = await params;
 
     const result = await deleteActionAttachment(id);

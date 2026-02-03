@@ -1,7 +1,15 @@
+import { redirect } from "next/navigation";
 import { ActionsTable } from "@/features/actions/ui/ActionsTable";
 import { getActionsTableData } from "@/features/actions/queries";
+import { getCurrentUser } from "@/features/auth/service";
 
 export default async function Home() {
+  const user = await getCurrentUser();
+  
+  if (!user) {
+    redirect("/login");
+  }
+
   const data = await getActionsTableData();
 
   return (

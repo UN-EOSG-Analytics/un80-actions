@@ -5,9 +5,19 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { uploadActionAttachment } from "@/features/attachments/commands";
+import { getCurrentUser } from "@/features/auth/service";
 
 export async function POST(request: NextRequest) {
   try {
+    // Require authentication
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
     const formData = await request.formData();
 
     const actionId = formData.get("action_id");
