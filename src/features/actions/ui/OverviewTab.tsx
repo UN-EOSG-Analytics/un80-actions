@@ -67,11 +67,6 @@ export default function OverviewTab({ action }: { action: Action }) {
               Big Ticket
             </Badge>
           )}
-          {action.needs_member_state_engagement && (
-            <Badge className="border border-blue-200 bg-blue-100 text-blue-800">
-              Member State Engagement
-            </Badge>
-          )}
         </div>
       </SectionCard>
 
