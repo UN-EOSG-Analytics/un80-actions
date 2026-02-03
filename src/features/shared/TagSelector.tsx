@@ -26,7 +26,7 @@ import {
   type Tag,
 } from "@/features/tags/queries";
 import { Tags, X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type TagEntityType = "milestone" | "note" | "question" | "legal_comment";
 
@@ -79,19 +79,21 @@ export function TagSelector({
     ]);
     setTags(entityTags);
     setAllTags(globalTags);
-    onTagsChange?.(entityTags);
-  }, [loadTagsForEntity, loadAllTags, onTagsChange]);
+    onTagsChangeRef.current?.(entityTags);
+  }, [loadTagsForEntity, loadAllTags]);
 
+  // Sync from parent only when entity changes (avoid loop from new initialTags ref every render)
   useEffect(() => {
     setTags(initialTags);
-  }, [initialTags]);
+  }, [entityId, entityType]);
 
+  // Load tags when entity changes; use ref for callback so deps stay stable
   useEffect(() => {
     loadTagsForEntity().then((t) => {
       setTags(t);
-      onTagsChange?.(t);
+      onTagsChangeRef.current?.(t);
     });
-  }, [entityId, entityType, loadTagsForEntity, onTagsChange]);
+  }, [entityId, entityType, loadTagsForEntity]);
 
   useEffect(() => {
     if (open) {
@@ -119,7 +121,7 @@ export function TagSelector({
 
       if (result.success && result.tags) {
         setTags(result.tags);
-        onTagsChange?.(result.tags);
+        onTagsChangeRef.current?.(result.tags);
         setNewTagInput("");
         await refresh();
       } else {
@@ -151,7 +153,7 @@ export function TagSelector({
 
       if (result.success && result.tags) {
         setTags(result.tags);
-        onTagsChange?.(result.tags);
+        onTagsChangeRef.current?.(result.tags);
         setError(null);
       } else {
         setError(result?.error || "Failed to remove tag");
