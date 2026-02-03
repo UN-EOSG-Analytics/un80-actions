@@ -2,29 +2,9 @@
 
 import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
-import type { ActionNote } from "@/types";
 import { getNoteById } from "./queries";
 import { getCurrentUser } from "@/features/auth/service";
-
-// =========================================================
-// TYPES
-// =========================================================
-
-export interface NoteCreateInput {
-  action_id: number;
-  action_sub_id?: string | null;
-  content: string;
-}
-
-export interface NoteUpdateInput {
-  content: string;
-}
-
-export interface NoteResult {
-  success: boolean;
-  error?: string;
-  note?: ActionNote;
-}
+import type { NoteCreateInput, NoteUpdateInput, NoteResult } from "./types";
 
 // =========================================================
 // MUTATIONS

@@ -15,8 +15,7 @@ import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionLegalComment } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
 import { Loader2, Plus, Scale, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 // =========================================================
@@ -48,7 +47,6 @@ export default function LegalTab({
   isAdmin?: boolean;
   exportProps?: { onExport: (format: "word" | "pdf") => void; exporting: boolean };
 }) {
-  const router = useRouter();
   const [comments, setComments] = useState<ActionLegalComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [newComment, setNewComment] = useState("");
@@ -58,7 +56,7 @@ export default function LegalTab({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [tagsByCommentId, setTagsByCommentId] = useState<Record<string, Tag[]>>({});
 
-  const loadComments = useCallback(async () => {
+  const loadComments = async () => {
     setLoading(true);
     try {
       const data = await getActionLegalComments(action.id, action.sub_id);
@@ -68,11 +66,12 @@ export default function LegalTab({
     } finally {
       setLoading(false);
     }
-  }, [action.id, action.sub_id]);
+  };
 
   useEffect(() => {
     loadComments();
-  }, [loadComments]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,7 +108,6 @@ export default function LegalTab({
       const result = await deleteLegalComment(commentId);
       if (result.success) {
         await loadComments();
-        router.refresh();
       } else {
         setError(result.error ?? "Failed to delete comment");
       }
@@ -233,7 +231,7 @@ export default function LegalTab({
                               );
                               if (result.success) {
                                 await loadComments();
-                                router.refresh();
+
                               }
                             } finally {
                               setApprovingId(null);

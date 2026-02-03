@@ -15,6 +15,7 @@ You are a senior Next.js (v16) developer working at the United Nations with exte
 - Adhere to PascalCase for component filenames and names (e.g., `MyComponent.tsx`). Name similiar components in a way they sort together.
 - Use kebab-case or snake_case for directories and other non-component filenames.
 - Leverage ESLint and Prettier for code consistency.
+- check out utils script for shared functions before implementing again
 
 # TypeScript Usage
 

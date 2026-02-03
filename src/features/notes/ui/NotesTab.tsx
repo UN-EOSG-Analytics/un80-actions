@@ -11,8 +11,7 @@ import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionNote } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
 import { Loader2, Plus, StickyNote, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 // =========================================================
 // HELPER COMPONENTS
@@ -43,7 +42,6 @@ export default function NotesTab({
   isAdmin?: boolean;
   exportProps?: { onExport: (format: "word" | "pdf") => void; exporting: boolean };
 }) {
-  const router = useRouter();
   const [notes, setNotes] = useState<ActionNote[]>([]);
   const [loading, setLoading] = useState(true);
   const [newNote, setNewNote] = useState("");
@@ -53,7 +51,7 @@ export default function NotesTab({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [tagsByNoteId, setTagsByNoteId] = useState<Record<string, Tag[]>>({});
 
-  const loadNotes = useCallback(async () => {
+  const loadNotes = async () => {
     setLoading(true);
     try {
       const data = await getActionNotes(action.id, action.sub_id);
@@ -63,11 +61,12 @@ export default function NotesTab({
     } finally {
       setLoading(false);
     }
-  }, [action.id, action.sub_id]);
+  };
 
   useEffect(() => {
     loadNotes();
-  }, [loadNotes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,7 +101,6 @@ export default function NotesTab({
       const result = await deleteNote(noteId);
       if (result.success) {
         await loadNotes();
-        router.refresh();
       } else {
         setError(result.error ?? "Failed to delete note");
       }
@@ -206,7 +204,7 @@ export default function NotesTab({
                             const result = await approveNote(note.id);
                             if (result.success) {
                               await loadNotes();
-                              router.refresh();
+
                             }
                           } finally {
                             setApprovingId(null);

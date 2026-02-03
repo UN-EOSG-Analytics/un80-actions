@@ -15,8 +15,7 @@ import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionQuestion } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
 import { Loader2, MessageCircle, Send, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 // =========================================================
 // HELPER COMPONENTS
@@ -47,7 +46,6 @@ export default function QuestionsTab({
   isAdmin?: boolean;
   exportProps?: { onExport: (format: "word" | "pdf") => void; exporting: boolean };
 }) {
-  const router = useRouter();
   const [questions, setQuestions] = useState<ActionQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [newQuestion, setNewQuestion] = useState("");
@@ -59,7 +57,7 @@ export default function QuestionsTab({
     Record<string, Tag[]>
   >({});
 
-  const loadQuestions = useCallback(async () => {
+  const loadQuestions = async () => {
     setLoading(true);
     try {
       const data = await getActionQuestions(action.id, action.sub_id);
@@ -69,11 +67,12 @@ export default function QuestionsTab({
     } finally {
       setLoading(false);
     }
-  }, [action.id, action.sub_id]);
+  };
 
   useEffect(() => {
     loadQuestions();
-  }, [loadQuestions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,7 +108,6 @@ export default function QuestionsTab({
       const result = await deleteQuestion(questionId);
       if (result.success) {
         await loadQuestions();
-        router.refresh();
       } else {
         setError(result.error ?? "Failed to delete question");
       }
@@ -220,7 +218,6 @@ export default function QuestionsTab({
                             const result = await approveQuestion(q.id);
                             if (result.success) {
                               await loadQuestions();
-                              router.refresh();
                             }
                           } finally {
                             setApprovingId(null);

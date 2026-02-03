@@ -2,25 +2,9 @@
 
 import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
-import type { ActionQuestion } from "@/types";
 import { getQuestionById } from "./queries";
 import { getCurrentUser } from "@/features/auth/service";
-
-// =========================================================
-// TYPES
-// =========================================================
-
-export interface QuestionCreateInput {
-  action_id: number;
-  action_sub_id?: string | null;
-  question: string;
-}
-
-export interface QuestionResult {
-  success: boolean;
-  error?: string;
-  question?: ActionQuestion;
-}
+import type { QuestionCreateInput, QuestionResult } from "./types";
 
 // =========================================================
 // MUTATIONS

@@ -2,25 +2,9 @@
 
 import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
-import type { ActionLegalComment } from "@/types";
 import { getLegalCommentById } from "./queries";
 import { getCurrentUser } from "@/features/auth/service";
-
-// =========================================================
-// TYPES
-// =========================================================
-
-export interface LegalCommentCreateInput {
-  action_id: number;
-  action_sub_id?: string | null;
-  content: string;
-}
-
-export interface LegalCommentResult {
-  success: boolean;
-  error?: string;
-  comment?: ActionLegalComment;
-}
+import type { LegalCommentCreateInput, LegalCommentResult } from "./types";
 
 // =========================================================
 // MUTATIONS
