@@ -126,6 +126,7 @@ export interface ActionMilestone {
   id: string;
   action_id: number;
   action_sub_id: string | null;
+  serial_number: number;
   milestone_type: MilestoneType;
   is_public: boolean;
   is_draft: boolean;

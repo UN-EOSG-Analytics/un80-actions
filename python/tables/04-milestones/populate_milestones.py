@@ -29,74 +29,114 @@ df_actions = pd.read_parquet(parquet_path)
 
 print(f"Loaded {len(df_actions)} actions from Parquet")
 
-# Prepare milestone data
-milestones = []
+# Prepare milestone data with serial numbers
+milestones_raw = []
 
 for _, row in df_actions.iterrows():
     action_id = int(row["id"])
     action_sub_id = str(row["sub_id"]) if pd.notna(row["sub_id"]) and row["sub_id"] else None
+    action_key = (action_id, action_sub_id)
     
     # Milestone 1 (type='first')
     if pd.notna(row.get("milestone_1")) or pd.notna(row.get("milestone_1_deadline")):
-        milestones.append((
-            action_id,
-            action_sub_id,
-            'first',
-            False,  # is_public
-            row.get("milestone_1") if pd.notna(row.get("milestone_1")) else None,
-            pd.to_datetime(row["milestone_1_deadline"]).date() if pd.notna(row.get("milestone_1_deadline")) else None,
-            'draft'
-        ))
+        deadline = pd.to_datetime(row["milestone_1_deadline"]).date() if pd.notna(row.get("milestone_1_deadline")) else None
+        milestones_raw.append({
+            'action_key': action_key,
+            'action_id': action_id,
+            'action_sub_id': action_sub_id,
+            'milestone_type': 'first',
+            'is_public': False,
+            'description': row.get("milestone_1") if pd.notna(row.get("milestone_1")) else None,
+            'deadline': deadline,
+            'status': 'draft'
+        })
     
     # Milestone 2 (type='second')
     if pd.notna(row.get("milestone_2")) or pd.notna(row.get("milestone_2_deadline")):
-        milestones.append((
-            action_id,
-            action_sub_id,
-            'second',
-            False,  # is_public
-            row.get("milestone_2") if pd.notna(row.get("milestone_2")) else None,
-            pd.to_datetime(row["milestone_2_deadline"]).date() if pd.notna(row.get("milestone_2_deadline")) else None,
-            'draft'
-        ))
+        deadline = pd.to_datetime(row["milestone_2_deadline"]).date() if pd.notna(row.get("milestone_2_deadline")) else None
+        milestones_raw.append({
+            'action_key': action_key,
+            'action_id': action_id,
+            'action_sub_id': action_sub_id,
+            'milestone_type': 'second',
+            'is_public': False,
+            'description': row.get("milestone_2") if pd.notna(row.get("milestone_2")) else None,
+            'deadline': deadline,
+            'status': 'draft'
+        })
     
     # Milestone 3 (type='third')
     if pd.notna(row.get("milestone_3")) or pd.notna(row.get("milestone_3_deadline")):
-        milestones.append((
-            action_id,
-            action_sub_id,
-            'third',
-            False,  # is_public
-            row.get("milestone_3") if pd.notna(row.get("milestone_3")) else None,
-            pd.to_datetime(row["milestone_3_deadline"]).date() if pd.notna(row.get("milestone_3_deadline")) else None,
-            'draft'
-        ))
+        deadline = pd.to_datetime(row["milestone_3_deadline"]).date() if pd.notna(row.get("milestone_3_deadline")) else None
+        milestones_raw.append({
+            'action_key': action_key,
+            'action_id': action_id,
+            'action_sub_id': action_sub_id,
+            'milestone_type': 'third',
+            'is_public': False,
+            'description': row.get("milestone_3") if pd.notna(row.get("milestone_3")) else None,
+            'deadline': deadline,
+            'status': 'draft'
+        })
     
     # Milestone upcoming (type='upcoming')
     if pd.notna(row.get("milestone_upcoming")) or pd.notna(row.get("milestone_upcoming_deadline")):
-        milestones.append((
-            action_id,
-            action_sub_id,
-            'upcoming',
-            True,  # is_public - upcoming milestones are public
-            row.get("milestone_upcoming") if pd.notna(row.get("milestone_upcoming")) else None,
-            pd.to_datetime(row["milestone_upcoming_deadline"]).date() if pd.notna(row.get("milestone_upcoming_deadline")) else None,
-            'draft'
-        ))
+        deadline = pd.to_datetime(row["milestone_upcoming_deadline"]).date() if pd.notna(row.get("milestone_upcoming_deadline")) else None
+        milestones_raw.append({
+            'action_key': action_key,
+            'action_id': action_id,
+            'action_sub_id': action_sub_id,
+            'milestone_type': 'upcoming',
+            'is_public': True,  # upcoming milestones are public
+            'description': row.get("milestone_upcoming") if pd.notna(row.get("milestone_upcoming")) else None,
+            'deadline': deadline,
+            'status': 'draft'
+        })
     
     # Milestone final (type='final')
     if pd.notna(row.get("milestone_final")) or pd.notna(row.get("milestone_final_deadline")):
-        milestones.append((
-            action_id,
-            action_sub_id,
-            'final',
-            False,  # is_public
-            row.get("milestone_final") if pd.notna(row.get("milestone_final")) else None,
-            pd.to_datetime(row["milestone_final_deadline"]).date() if pd.notna(row.get("milestone_final_deadline")) else None,
-            'draft'
-        ))
+        deadline = pd.to_datetime(row["milestone_final_deadline"]).date() if pd.notna(row.get("milestone_final_deadline")) else None
+        milestones_raw.append({
+            'action_key': action_key,
+            'action_id': action_id,
+            'action_sub_id': action_sub_id,
+            'milestone_type': 'final',
+            'is_public': False,
+            'description': row.get("milestone_final") if pd.notna(row.get("milestone_final")) else None,
+            'deadline': deadline,
+            'status': 'draft'
+        })
 
-print(f"Prepared {len(milestones)} milestones")
+print(f"Prepared {len(milestones_raw)} milestones")
+
+# Assign serial numbers based on deadline ordering within each action
+milestones_df = pd.DataFrame(milestones_raw)
+if not milestones_df.empty:
+    # Sort by action, then by deadline (nulls last), then by milestone type as fallback
+    milestones_df['deadline_sort'] = milestones_df['deadline'].fillna(pd.Timestamp.max.date())
+    milestones_df = milestones_df.sort_values(['action_id', 'action_sub_id', 'deadline_sort', 'milestone_type'])
+    
+    # Assign serial numbers sequentially per action
+    milestones_df['serial_number'] = milestones_df.groupby('action_key').cumcount() + 1
+    
+    # Convert to tuples for insertion (handle NaN -> None conversion)
+    milestones = [
+        (
+            int(row['action_id']),
+            row['action_sub_id'] if pd.notna(row['action_sub_id']) else None,
+            int(row['serial_number']),
+            row['milestone_type'],
+            bool(row['is_public']),
+            row['description'] if pd.notna(row['description']) else None,
+            row['deadline'] if pd.notna(row['deadline']) and row['deadline'] != pd.Timestamp.max.date() else None,
+            row['status']
+        )
+        for _, row in milestones_df.iterrows()
+    ]
+else:
+    milestones = []
+
+print(f"Assigned serial numbers to {len(milestones)} milestones")
 
 # Upsert into database
 with get_conn() as conn:
@@ -109,11 +149,11 @@ with get_conn() as conn:
         if milestones:
             INSERT_MILESTONE_SQL = """
             INSERT INTO un80actions.action_milestones 
-            (action_id, action_sub_id, milestone_type, is_public, description, deadline, status)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            (action_id, action_sub_id, serial_number, milestone_type, is_public, description, deadline, status)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """
             cur.executemany(INSERT_MILESTONE_SQL, milestones)
-            print(f"✓ Created {len(milestones)} milestones")
+            print(f"✓ Created {len(milestones)} milestones with serial numbers")
         
         conn.commit()
         

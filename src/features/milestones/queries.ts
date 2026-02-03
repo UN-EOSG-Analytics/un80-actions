@@ -45,6 +45,7 @@ export async function getActionMilestones(
         m.id,
         m.action_id,
         m.action_sub_id,
+        m.serial_number,
         m.milestone_type,
         m.is_public,
         m.is_draft,
@@ -87,6 +88,7 @@ export async function getActionMilestones(
           m.id,
           m.action_id,
           m.action_sub_id,
+          m.serial_number,
           m.milestone_type,
           m.is_public,
           m.is_draft,
@@ -143,6 +145,7 @@ export async function getMilestoneById(
         m.id,
         m.action_id,
         m.action_sub_id,
+        m.serial_number,
         m.milestone_type,
         m.is_public,
         m.is_draft,
@@ -176,6 +179,7 @@ export async function getMilestoneById(
           m.id,
           m.action_id,
           m.action_sub_id,
+          m.serial_number,
           m.milestone_type,
           m.is_public,
           m.is_draft,
@@ -221,18 +225,19 @@ export async function getMilestoneVersions(
 ): Promise<MilestoneVersion[]> {
   const rows = await query<MilestoneVersion>(
     `SELECT
-      id,
-      milestone_id,
-      description,
-      deadline::text,
-      updates,
-      status,
-      changed_by,
-      changed_at,
-      change_type
-    FROM ${DB_SCHEMA}.milestone_versions
-    WHERE milestone_id = $1
-    ORDER BY changed_at DESC`,
+      mv.id,
+      mv.milestone_id,
+      mv.description,
+      mv.deadline::text,
+      mv.updates,
+      mv.status,
+      u.email as changed_by,
+      mv.changed_at,
+      mv.change_type
+    FROM ${DB_SCHEMA}.milestone_versions mv
+    LEFT JOIN ${DB_SCHEMA}.users u ON mv.changed_by = u.id
+    WHERE mv.milestone_id = $1
+    ORDER BY mv.changed_at DESC`,
     [milestoneId],
   );
 

@@ -7,11 +7,19 @@ import {
   CollapsibleContent,
 } from "@/components/ui/collapsible";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   getActionMilestones,
   getMilestoneVersions,
   type MilestoneVersion,
 } from "@/features/milestones/queries";
-import { updateMilestone, createMilestone } from "@/features/milestones/commands";
+import { updateMilestone, createMilestone, approveMilestoneContent, requestMilestoneChanges, setMilestoneToDraft } from "@/features/milestones/commands";
 import { MilestoneCard } from "./MilestoneCard";
 import {
   getMilestoneUpdates,
@@ -117,6 +125,11 @@ export default function MilestonesTab({
   const [editingAttachment, setEditingAttachment] = useState<string | null>(null);
   const [attachmentForm, setAttachmentForm] = useState({ title: "", description: "" });
   const [fileSelected, setFileSelected] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    milestoneId: string | null;
+    status: "draft" | "approved" | "needs_attention" | null;
+  }>({ open: false, milestoneId: null, status: null });
 
   const getFileIcon = (contentType: string, filename: string) => {
     if (contentType.startsWith("image/")) {
@@ -156,6 +169,13 @@ export default function MilestonesTab({
     return new Date(date).toLocaleDateString(undefined, { dateStyle: "medium" });
   };
 
+  const formatMilestoneId = (milestone: ActionMilestone) => {
+    const actionId = milestone.action_sub_id 
+      ? `${milestone.action_id}${milestone.action_sub_id}` 
+      : `${milestone.action_id}`;
+    return `${actionId}.${milestone.serial_number}`;
+  };
+
   const loadMilestones = useCallback(async () => {
     setLoading(true);
     try {
@@ -171,17 +191,6 @@ export default function MilestonesTab({
   useEffect(() => {
     loadMilestones();
   }, [loadMilestones]);
-
-  const getMilestoneTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      first: "First Milestone",
-      second: "Second Milestone",
-      third: "Third Milestone",
-      upcoming: "Public",
-      final: "Final",
-    };
-    return labels[type] || type;
-  };
 
   // Separate public and private milestones
   const publicMilestones = milestones.filter((m) => m.is_public);
@@ -296,6 +305,44 @@ export default function MilestonesTab({
     }
   };
 
+  const handleStatusChange = (milestoneId: string, status: "draft" | "approved" | "needs_attention") => {
+    setConfirmDialog({ open: true, milestoneId, status });
+  };
+
+  const confirmStatusChange = async () => {
+    if (!confirmDialog.milestoneId || !confirmDialog.status) return;
+
+    const { milestoneId, status } = confirmDialog;
+    setConfirmDialog({ open: false, milestoneId: null, status: null });
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      let result;
+      
+      if (status === "approved") {
+        result = await approveMilestoneContent(milestoneId);
+      } else if (status === "needs_attention") {
+        result = await requestMilestoneChanges(milestoneId);
+      } else {
+        result = await setMilestoneToDraft(milestoneId);
+      }
+
+      if (result.success) {
+        await loadMilestones();
+        // Reload versions for this milestone
+        await loadVersionsForMilestone(milestoneId);
+      } else {
+        setError(result.error || "Failed to change status");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to change status");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleCreateMilestone = async () => {
     // Validate required fields
     if (!newMilestoneForm.description?.trim()) {
@@ -354,7 +401,6 @@ export default function MilestonesTab({
 
       if (result.success) {
         setCommentText("");
-        setAddingCommentId(null);
         setReplyingToId(null);
         await loadMilestoneUpdates(milestoneId);
       } else {
@@ -554,6 +600,8 @@ export default function MilestonesTab({
             onEdit={() => startEditing(milestone)}
             onComment={() => startAddingComment(milestone.id)}
             onShowHistory={() => toggleVersionHistory(milestone.id)}
+            onStatusChange={isAdmin ? (status) => handleStatusChange(milestone.id, status) : undefined}
+            isAdmin={isAdmin}
           />
 
           {/* Collapsible Content */}
@@ -644,20 +692,27 @@ export default function MilestonesTab({
                               key={version.id}
                               className="rounded border border-slate-200 bg-white p-3 text-xs"
                             >
-                              <div className="mb-2 flex items-center justify-between">
-                                <span className="font-medium text-slate-600">
-                                  {new Date(
-                                    version.changed_at,
-                                  ).toLocaleDateString(undefined, {
-                                    dateStyle: "medium",
-                                  })}{" "}
-                                  at{" "}
-                                  {new Date(
-                                    version.changed_at,
-                                  ).toLocaleTimeString(undefined, {
-                                    timeStyle: "short",
-                                  })}
-                                </span>
+                              <div className="mb-2 flex items-center justify-between gap-2">
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="font-medium text-slate-600">
+                                    {new Date(
+                                      version.changed_at,
+                                    ).toLocaleDateString(undefined, {
+                                      dateStyle: "medium",
+                                    })}{" "}
+                                    at{" "}
+                                    {new Date(
+                                      version.changed_at,
+                                    ).toLocaleTimeString(undefined, {
+                                      timeStyle: "short",
+                                    })}
+                                  </span>
+                                  {version.changed_by && (
+                                    <span className="text-[11px] text-slate-500">
+                                      by {version.changed_by}
+                                    </span>
+                                  )}
+                                </div>
                                 <Badge
                                   variant="outline"
                                   className="text-[10px]"
@@ -1306,7 +1361,7 @@ export default function MilestonesTab({
                           <span className="text-slate-300">•</span>
                           {milestone ? (
                             <Badge variant="outline" className="text-[10px]">
-                              {getMilestoneTypeLabel(milestone.milestone_type)}
+                              Milestone {formatMilestoneId(milestone)}
                             </Badge>
                           ) : (
                             <Badge variant="outline" className="text-[10px]">
@@ -1341,7 +1396,7 @@ export default function MilestonesTab({
                     <option value="">General</option>
                     {milestones.map((m) => (
                       <option key={m.id} value={m.id}>
-                        {getMilestoneTypeLabel(m.milestone_type)}
+                        Milestone {formatMilestoneId(m)}
                       </option>
                     ))}
                   </select>
@@ -1421,6 +1476,34 @@ export default function MilestonesTab({
         </form>
         </div>
       </section>
+
+      {/* Status Change Confirmation Dialog */}
+      <Dialog open={confirmDialog.open} onOpenChange={(open) => !open && setConfirmDialog({ open: false, milestoneId: null, status: null })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change Milestone Status</DialogTitle>
+            <DialogDescription>
+              {confirmDialog.status === "draft" && "Change this milestone to Draft? It will no longer be approved."}
+              {confirmDialog.status === "approved" && "Approve this milestone? This will mark it as approved and no longer a draft."}
+              {confirmDialog.status === "needs_attention" && "Mark this milestone as needing attention? This will notify the team to make changes."}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmDialog({ open: false, milestoneId: null, status: null })}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmStatusChange}
+              className="bg-un-blue hover:bg-un-blue/90"
+            >
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

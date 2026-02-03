@@ -275,6 +275,53 @@ export async function requestMilestoneChanges(
 }
 
 /**
+ * Set milestone to draft status.
+ * Marks the milestone as draft and clears approval/needs attention flags.
+ */
+export async function setMilestoneToDraft(
+  milestoneId: string,
+): Promise<MilestoneResult> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const adminCheck = await query<{ user_role: string }>(
+      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
+      [user.email],
+    );
+    if (adminCheck[0]?.user_role !== "Admin") {
+      return { success: false, error: "Admin only" };
+    }
+
+    const milestone = await getMilestoneById(milestoneId);
+    if (!milestone) {
+      return { success: false, error: "Milestone not found" };
+    }
+
+    await query(
+      `UPDATE ${DB_SCHEMA}.action_milestones
+     SET is_draft = TRUE,
+         is_approved = FALSE,
+         needs_attention = FALSE,
+         content_review_status = 'needs_review'
+     WHERE id = $1`,
+      [milestoneId],
+    );
+
+    const updated = await getMilestoneById(milestoneId);
+    return { success: true, milestone: updated || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error:
+        e instanceof Error ? e.message : "Failed to set milestone to draft",
+    };
+  }
+}
+
+/**
  * Submit a milestone for review.
  * Changes status from 'draft' to 'submitted' and records submission metadata.
  */
