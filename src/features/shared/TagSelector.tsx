@@ -186,12 +186,12 @@ export function TagSelector({
   if (!isAdmin) {
     if (hideInlineTags) return null;
     return (
-      <div className={`flex flex-wrap gap-1.5 ${className}`}>
+      <div className={`flex flex-wrap justify-end gap-1.5 ${className}`}>
         {tags.map((t) => (
           <Badge
             key={t.id}
             variant="outline"
-            className="bg-slate-50 text-slate-600"
+            className="border-slate-400 bg-slate-100 text-slate-700"
           >
             {t.name}
           </Badge>
@@ -224,7 +224,7 @@ export function TagSelector({
                   <Badge
                     key={t.id}
                     variant="outline"
-                    className="gap-1 bg-slate-50 pr-1"
+                    className="gap-1 border-slate-400 bg-slate-100 pr-1 text-slate-700"
                   >
                     {t.name}
                     <button
@@ -294,12 +294,12 @@ export function TagSelector({
         </PopoverContent>
       </Popover>
       {!hideInlineTags && tags.length > 0 && (
-        <div className="mt-1.5 flex flex-wrap gap-1.5">
+        <div className="mt-1.5 flex flex-wrap justify-end gap-1.5">
           {tags.map((t) => (
             <Badge
               key={t.id}
               variant="outline"
-              className="bg-slate-50 text-slate-600"
+              className="border-slate-400 bg-slate-100 text-slate-700"
             >
               {t.name}
             </Badge>

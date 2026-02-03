@@ -165,24 +165,11 @@ export default function NotesTab({
               key={note.id}
               className="rounded-lg border border-slate-200 bg-white p-4"
             >
-              <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start justify-between gap-4">
                 <div className="flex min-w-0 flex-1 items-start gap-2">
                   <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      {(tagsByNoteId[note.id] ?? []).length > 0 && (
-                        <span className="flex flex-wrap gap-1.5">
-                          {(tagsByNoteId[note.id] ?? []).map((t) => (
-                            <Badge
-                              key={t.id}
-                              variant="outline"
-                              className="bg-slate-50 text-slate-600"
-                            >
-                              {t.name}
-                            </Badge>
-                          ))}
-                        </span>
-                      )}
                       <p className="text-sm whitespace-pre-wrap text-slate-700">
                         {note.content}
                       </p>
@@ -231,7 +218,20 @@ export default function NotesTab({
                     </div>
                   </div>
                 </div>
-                <div className="shrink-0">
+                <div className="flex shrink-0 flex-col items-end gap-1.5">
+                  {(tagsByNoteId[note.id] ?? []).length > 0 && (
+                    <span className="flex flex-wrap justify-end gap-1.5">
+                      {(tagsByNoteId[note.id] ?? []).map((t) => (
+                        <Badge
+                          key={t.id}
+                          variant="outline"
+                          className="border-slate-400 bg-slate-100 text-slate-700"
+                        >
+                          {t.name}
+                        </Badge>
+                      ))}
+                    </span>
+                  )}
                   <TagSelector
                     entityId={note.id}
                     entityType="note"

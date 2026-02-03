@@ -175,27 +175,11 @@ export default function LegalTab({
                 key={comment.id}
                 className="rounded-lg border border-slate-200 bg-white p-4"
               >
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start justify-between gap-4">
                   <div className="flex min-w-0 flex-1 items-start gap-2">
                     <Scale className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        {(tagsByCommentId[comment.id] ?? []).length > 0 && (
-                          <span className="flex flex-wrap gap-1.5">
-                            {(tagsByCommentId[comment.id] ?? []).map((t) => (
-                              <Badge
-                                key={t.id}
-                                variant="outline"
-                                className={cn(
-                                  "bg-slate-50 text-slate-600",
-                                  isApproved && "line-through opacity-70",
-                                )}
-                              >
-                                {t.name}
-                              </Badge>
-                            ))}
-                          </span>
-                        )}
                         <p
                           className={cn(
                             "text-sm whitespace-pre-wrap text-slate-700",
@@ -258,7 +242,23 @@ export default function LegalTab({
                       </div>
                     </div>
                   </div>
-                  <div className="shrink-0">
+                  <div className="flex shrink-0 flex-col items-end gap-1.5">
+                    {(tagsByCommentId[comment.id] ?? []).length > 0 && (
+                      <span className="flex flex-wrap justify-end gap-1.5">
+                        {(tagsByCommentId[comment.id] ?? []).map((t) => (
+                          <Badge
+                            key={t.id}
+                            variant="outline"
+                            className={cn(
+                              "border-slate-400 bg-slate-100 text-slate-700",
+                              isApproved && "line-through opacity-70",
+                            )}
+                          >
+                            {t.name}
+                          </Badge>
+                        ))}
+                      </span>
+                    )}
                     <TagSelector
                       entityId={comment.id}
                       entityType="legal_comment"
