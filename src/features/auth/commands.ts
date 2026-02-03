@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getBaseUrl } from "@/lib/get-base-url";
 import { sendMagicLink } from "./mail";
 import {
   clearSession,
@@ -34,7 +35,8 @@ export async function requestMagicLink(email: string): Promise<Result> {
   }
   try {
     const token = await createMagicToken(trimmedEmail);
-    await sendMagicLink(trimmedEmail, token);
+    const baseUrl = getBaseUrl();
+    await sendMagicLink(trimmedEmail, token, baseUrl);
     return { success: true };
   } catch (error) {
     console.error("Error sending magic link:", error);

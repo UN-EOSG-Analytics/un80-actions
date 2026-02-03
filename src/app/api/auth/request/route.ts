@@ -5,6 +5,7 @@ import {
   recentTokenExists,
 } from "@/features/auth/service";
 import { sendMagicLink } from "@/features/auth/mail";
+import { getBaseUrl } from "@/lib/get-base-url";
 
 export async function POST(request: Request) {
   let email: unknown;
@@ -26,6 +27,7 @@ export async function POST(request: Request) {
       { status: 429 },
     );
   const token = await createMagicToken(email);
-  await sendMagicLink(email, token);
+  const baseUrl = getBaseUrl();
+  await sendMagicLink(email, token, baseUrl);
   return NextResponse.json({ ok: true });
 }
