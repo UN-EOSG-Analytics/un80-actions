@@ -27,6 +27,7 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 // =========================================================
@@ -67,16 +68,24 @@ export default function ActionModal({
   loading,
   isAdmin = false,
 }: ActionModalProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [exporting, setExporting] = useState(false);
 
-  // Reset tab when action changes
+  // Initialize tab from URL or default to overview
   useEffect(() => {
-    setActiveTab("overview");
-  }, [action?.id, action?.sub_id]);
+    const tabParam = searchParams.get("tab");
+    const validTabs = ["overview", "milestones", "questions", "notes", "legal"];
+    if (tabParam && validTabs.includes(tabParam)) {
+      setActiveTab(tabParam);
+    } else {
+      setActiveTab("overview");
+    }
+  }, [action?.id, action?.sub_id, searchParams]);
 
   // Animation state management
   useEffect(() => {
@@ -121,10 +130,24 @@ export default function ActionModal({
 
   const handleCopyLink = () => {
     if (!action) return;
-    const url = `${window.location.origin}${window.location.pathname}?action=${action.action_number}`;
+    const url = `${window.location.origin}${window.location.pathname}?action=${action.action_number}${activeTab !== "overview" ? `&tab=${activeTab}` : ""}`;
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleTabChange = (newTab: string) => {
+    setActiveTab(newTab);
+    
+    // Update URL with the new tab
+    const params = new URLSearchParams(searchParams);
+    if (newTab !== "overview") {
+      params.set("tab", newTab);
+    } else {
+      params.delete("tab");
+    }
+    
+    router.replace(`/?${params.toString()}`, { scroll: false });
   };
 
   const handleExport = useCallback(
@@ -314,7 +337,7 @@ export default function ActionModal({
         {/* Tabs */}
         <Tabs
           value={activeTab}
-          onValueChange={setActiveTab}
+          onValueChange={handleTabChange}
           className="flex min-h-0 flex-1 flex-col"
         >
           <div className="shrink-0 border-b border-slate-200 bg-white px-6">
