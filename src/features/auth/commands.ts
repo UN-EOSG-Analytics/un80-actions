@@ -44,6 +44,13 @@ export async function requestMagicLink(email: string): Promise<Result> {
       error instanceof Error && error.message
         ? error.message
         : "Failed to send email. Please try again.";
+    
+    // Always log the actual error server-side for debugging
+    console.error("Full error details:", {
+      message: msg,
+      error: error instanceof Error ? error.stack : error,
+    });
+    
     return {
       success: false,
       error:
