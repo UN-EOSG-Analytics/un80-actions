@@ -10,6 +10,14 @@ import { getCurrentUser } from "@/features/auth/service";
 // TYPES
 // =========================================================
 
+export interface MilestoneCreateInput {
+  action_id: number;
+  action_sub_id?: string | null;
+  milestone_type: string;
+  description?: string | null;
+  deadline?: string | null;
+}
+
 export interface MilestoneUpdateInput {
   description?: string | null;
   deadline?: string | null; // ISO date string (YYYY-MM-DD)
@@ -25,6 +33,58 @@ export interface MilestoneResult {
 // =========================================================
 // MUTATIONS
 // =========================================================
+
+/**
+ * Create a new milestone for an action.
+ */
+export async function createMilestone(
+  input: MilestoneCreateInput,
+): Promise<MilestoneResult> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "You must be logged in" };
+    }
+
+    const rows = await query<ActionMilestone>(
+      `INSERT INTO ${DB_SCHEMA}.action_milestones 
+       (action_id, action_sub_id, milestone_type, description, deadline, status, submitted_by, submitted_by_entity)
+       VALUES ($1, $2, $3, $4, $5, 'draft', $6, $7)
+       RETURNING *`,
+      [
+        input.action_id,
+        input.action_sub_id || null,
+        input.milestone_type,
+        input.description || null,
+        input.deadline || null,
+        user.id,
+        user.entity,
+      ],
+    );
+
+    // Create initial version history entry
+    await query(
+      `INSERT INTO ${DB_SCHEMA}.milestone_versions 
+       (milestone_id, description, deadline, updates, status, changed_by, change_type)
+       VALUES ($1, $2, $3, NULL, 'draft', $4, 'created')`,
+      [rows[0].id, input.description || null, input.deadline || null, user.id],
+    );
+
+    return { success: true, milestone: rows[0] };
+  } catch (e) {
+    const msg = String((e as Error).message ?? "");
+    if (msg.includes("unique") || msg.includes("duplicate")) {
+      return { 
+        success: false, 
+        error: "A milestone of this type already exists for this action" 
+      };
+    }
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to create milestone",
+    };
+  }
+}
 
 /**
  * Update milestone content (description, deadline, updates).

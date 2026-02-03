@@ -41,7 +41,7 @@ create type content_review_status as enum ('approved', 'needs_review');
 create table approved_users (
     email text not null unique primary key,
     full_name text,
-    entity text references systemchart.entities(entity) on delete restrict, 
+    entity text references systemchart.entities(entity) on delete restrict,
     --  should make this not null once input is completed
     user_status user_status,
     user_role user_roles,
@@ -145,10 +145,11 @@ create table action_milestones (
     updates text,
     status milestone_status not null default 'draft',
     content_review_status content_review_status not null default 'approved',
-    content_reviewed_by uuid references users(id) on delete set null,
-    content_reviewed_at timestamp with time zone,
-    submitted_by uuid references users(id) on delete cascade,
-    submitted_by_entity text references systemchart.entities(entity) on delete
+    content_reviewed_by uuid references users(id) on delete
+    set null,
+        content_reviewed_at timestamp with time zone,
+        submitted_by uuid references users(id) on delete cascade,
+        submitted_by_entity text references systemchart.entities(entity) on delete
     set null,
         submitted_at timestamp with time zone,
         reviewed_by uuid references users(id) on delete cascade,
@@ -158,7 +159,6 @@ create table action_milestones (
         foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade,
         constraint action_milestones_action_type_key unique (action_id, action_sub_id, milestone_type)
 );
-
 -- Milestone version history
 create table milestone_versions (
     id uuid primary key default gen_random_uuid(),
@@ -167,13 +167,13 @@ create table milestone_versions (
     deadline date,
     updates text,
     status milestone_status not null,
-    changed_by uuid references users(id) on delete set null,
-    changed_at timestamp with time zone not null default now(),
-    change_type text not null -- 'created', 'updated', 'submitted', 'approved', 'rejected'
+    changed_by uuid references users(id) on delete
+    set null,
+        changed_at timestamp with time zone not null default now(),
+        change_type text not null -- 'created', 'updated', 'submitted', 'approved', 'rejected'
 );
 create index idx_milestone_versions_milestone_id on milestone_versions(milestone_id);
 create index idx_milestone_versions_changed_at on milestone_versions(changed_at desc);
-
 -- Action attachments (documents stored in Azure Blob Storage)
 -- Can be linked to a specific milestone or be general to the action
 -- All attachments are tied to an action; milestone_id is optional
@@ -181,21 +181,28 @@ create table action_attachments (
     id uuid primary key default gen_random_uuid(),
     action_id int not null,
     action_sub_id text,
-    milestone_id uuid references action_milestones(id) on delete set null, -- NULL = general attachment
-    title text, -- optional user-friendly title
-    description text, -- optional description
-    filename text not null,
-    original_filename text not null,
-    blob_name text not null unique, -- unique blob storage reference
-    content_type text not null,
-    file_size bigint not null,
-    uploaded_by uuid references users(id) on delete set null, -- TODO: make NOT NULL when auth is ready
-    uploaded_at timestamp with time zone not null default now(),
-    foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
+    milestone_id uuid references action_milestones(id) on delete
+    set null,
+        -- NULL = general attachment
+        title text,
+        -- optional user-friendly title
+        description text,
+        -- optional description
+        filename text not null,
+        original_filename text not null,
+        blob_name text not null unique,
+        -- unique blob storage reference
+        content_type text not null,
+        file_size bigint not null,
+        uploaded_by uuid references users(id) on delete
+    set null,
+        -- TODO: make NOT NULL when auth is ready
+        uploaded_at timestamp with time zone not null default now(),
+        foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
 );
 create index idx_action_attachments_action on action_attachments(action_id, action_sub_id);
-create index idx_action_attachments_milestone on action_attachments(milestone_id) where milestone_id is not null;
-
+create index idx_action_attachments_milestone on action_attachments(milestone_id)
+where milestone_id is not null;
 -- =========================================================
 -- RELATIONSHIP TABLES
 -- =========================================================
@@ -263,9 +270,10 @@ create table action_notes (
     created_at timestamp with time zone not null default now(),
     updated_at timestamp with time zone,
     content_review_status content_review_status not null default 'approved',
-    content_reviewed_by uuid references users(id) on delete set null,
-    content_reviewed_at timestamp with time zone,
-    foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
+    content_reviewed_by uuid references users(id) on delete
+    set null,
+        content_reviewed_at timestamp with time zone,
+        foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
 );
 create table action_questions (
     id uuid primary key default gen_random_uuid(),
@@ -274,14 +282,16 @@ create table action_questions (
     user_id uuid not null references users(id) on delete cascade,
     question text not null,
     answer text,
-    answered_by uuid references users(id) on delete set null,
-    answered_at timestamp with time zone,
-    created_at timestamp with time zone not null default now(),
-    updated_at timestamp with time zone,
-    content_review_status content_review_status not null default 'approved',
-    content_reviewed_by uuid references users(id) on delete set null,
-    content_reviewed_at timestamp with time zone,
-    foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
+    answered_by uuid references users(id) on delete
+    set null,
+        answered_at timestamp with time zone,
+        created_at timestamp with time zone not null default now(),
+        updated_at timestamp with time zone,
+        content_review_status content_review_status not null default 'approved',
+        content_reviewed_by uuid references users(id) on delete
+    set null,
+        content_reviewed_at timestamp with time zone,
+        foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
 );
 -- Shared tags (reusable across notes and questions)
 create table tags (
@@ -303,7 +313,6 @@ create index idx_note_tags_note_id on note_tags(note_id);
 create index idx_note_tags_tag_id on note_tags(tag_id);
 create index idx_question_tags_question_id on question_tags(question_id);
 create index idx_question_tags_tag_id on question_tags(tag_id);
-
 create table action_legal_comments (
     id uuid primary key default gen_random_uuid(),
     action_id int not null,
@@ -313,9 +322,10 @@ create table action_legal_comments (
     created_at timestamp with time zone not null default now(),
     updated_at timestamp with time zone,
     content_review_status content_review_status not null default 'approved',
-    content_reviewed_by uuid references users(id) on delete set null,
-    content_reviewed_at timestamp with time zone,
-    foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
+    content_reviewed_by uuid references users(id) on delete
+    set null,
+        content_reviewed_at timestamp with time zone,
+        foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
 );
 create index idx_action_legal_comments_action on action_legal_comments(action_id, action_sub_id);
 create table legal_comment_tags (
@@ -325,7 +335,6 @@ create table legal_comment_tags (
 );
 create index idx_legal_comment_tags_comment_id on legal_comment_tags(legal_comment_id);
 create index idx_legal_comment_tags_tag_id on legal_comment_tags(tag_id);
-
 create table action_updates (
     id uuid primary key default gen_random_uuid(),
     action_id int not null,
@@ -335,11 +344,31 @@ create table action_updates (
     created_at timestamp with time zone not null default now(),
     updated_at timestamp with time zone,
     content_review_status content_review_status not null default 'approved',
-    content_reviewed_by uuid references users(id) on delete set null,
-    content_reviewed_at timestamp with time zone,
-    foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
+    content_reviewed_by uuid references users(id) on delete
+    set null,
+        content_reviewed_at timestamp with time zone,
+        foreign key (action_id, action_sub_id) references actions(id, sub_id) on delete cascade
 );
-
+-- Milestone updates (comments/discussion thread for each milestone)
+CREATE TABLE milestone_updates (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    milestone_id uuid NOT NULL REFERENCES action_milestones(id) ON DELETE CASCADE,
+    user_id uuid REFERENCES users(id) ON DELETE
+    SET NULL,
+        content text NOT NULL,
+        reply_to uuid REFERENCES milestone_updates(id) ON DELETE CASCADE,
+        is_resolved boolean NOT NULL DEFAULT false,
+        created_at timestamp with time zone NOT NULL DEFAULT now(),
+        updated_at timestamp with time zone,
+        content_review_status content_review_status NOT NULL DEFAULT 'approved',
+        content_reviewed_by uuid REFERENCES users(id) ON DELETE
+    SET NULL,
+        content_reviewed_at timestamp with time zone
+);
+create index idx_milestone_updates_milestone_id on milestone_updates(milestone_id);
+create index idx_milestone_updates_created_at on milestone_updates(created_at desc);
+create index idx_milestone_updates_reply_to on milestone_updates(reply_to)
+where reply_to is not null;
 -- =========================================================
 -- INCREMENTAL MIGRATIONS (for existing databases)
 -- Run only the block below if you have an existing un80actions
@@ -347,19 +376,18 @@ create table action_updates (
 -- without dropping and recreating the schema.
 -- Usage: SET search_path TO un80actions; then run the block.
 -- =========================================================
-
 -- Add risk_assessment column to actions table (admin-only field)
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type t
-    JOIN pg_namespace n ON t.typnamespace = n.oid
-    WHERE t.typname = 'risk_assessment' AND n.nspname = 'un80actions') THEN
-    CREATE TYPE risk_assessment AS ENUM ('at_risk', 'medium_risk', 'low_risk');
-  END IF;
-END
-$$;
-ALTER TABLE actions ADD COLUMN IF NOT EXISTS risk_assessment risk_assessment;
-
+DO $$ BEGIN IF NOT EXISTS (
+    SELECT 1
+    FROM pg_type t
+        JOIN pg_namespace n ON t.typnamespace = n.oid
+    WHERE t.typname = 'risk_assessment'
+        AND n.nspname = 'un80actions'
+) THEN CREATE TYPE risk_assessment AS ENUM ('at_risk', 'medium_risk', 'low_risk');
+END IF;
+END $$;
+ALTER TABLE actions
+ADD COLUMN IF NOT EXISTS risk_assessment risk_assessment;
 -- Add milestone_attachments table
 CREATE TABLE IF NOT EXISTS milestone_attachments (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -368,33 +396,65 @@ CREATE TABLE IF NOT EXISTS milestone_attachments (
     file_path text NOT NULL,
     content_type text,
     file_size int,
-    uploaded_by uuid REFERENCES users(id) ON DELETE SET NULL,
-    uploaded_at timestamp with time zone NOT NULL DEFAULT now()
+    uploaded_by uuid REFERENCES users(id) ON DELETE
+    SET NULL,
+        uploaded_at timestamp with time zone NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_milestone_attachments_milestone_id ON milestone_attachments(milestone_id);
-
 -- Add content review fields (needs_review / approved with reviewer)
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid
-    WHERE t.typname = 'content_review_status' AND n.nspname = 'un80actions') THEN
-    CREATE TYPE content_review_status AS ENUM ('approved', 'needs_review');
-  END IF;
-END
-$$;
-ALTER TABLE action_milestones ADD COLUMN IF NOT EXISTS content_review_status content_review_status NOT NULL DEFAULT 'approved';
-ALTER TABLE action_milestones ADD COLUMN IF NOT EXISTS content_reviewed_by uuid REFERENCES users(id) ON DELETE SET NULL;
-ALTER TABLE action_milestones ADD COLUMN IF NOT EXISTS content_reviewed_at timestamp with time zone;
-ALTER TABLE action_notes ADD COLUMN IF NOT EXISTS content_review_status content_review_status NOT NULL DEFAULT 'approved';
-ALTER TABLE action_notes ADD COLUMN IF NOT EXISTS content_reviewed_by uuid REFERENCES users(id) ON DELETE SET NULL;
-ALTER TABLE action_notes ADD COLUMN IF NOT EXISTS content_reviewed_at timestamp with time zone;
-ALTER TABLE action_questions ADD COLUMN IF NOT EXISTS content_review_status content_review_status NOT NULL DEFAULT 'approved';
-ALTER TABLE action_questions ADD COLUMN IF NOT EXISTS content_reviewed_by uuid REFERENCES users(id) ON DELETE SET NULL;
-ALTER TABLE action_questions ADD COLUMN IF NOT EXISTS content_reviewed_at timestamp with time zone;
-ALTER TABLE action_updates ADD COLUMN IF NOT EXISTS content_review_status content_review_status NOT NULL DEFAULT 'approved';
-ALTER TABLE action_updates ADD COLUMN IF NOT EXISTS content_reviewed_by uuid REFERENCES users(id) ON DELETE SET NULL;
-ALTER TABLE action_updates ADD COLUMN IF NOT EXISTS content_reviewed_at timestamp with time zone;
-
+DO $$ BEGIN IF NOT EXISTS (
+    SELECT 1
+    FROM pg_type t
+        JOIN pg_namespace n ON t.typnamespace = n.oid
+    WHERE t.typname = 'content_review_status'
+        AND n.nspname = 'un80actions'
+) THEN CREATE TYPE content_review_status AS ENUM ('approved', 'needs_review');
+END IF;
+END $$;
+ALTER TABLE action_milestones
+ADD COLUMN IF NOT EXISTS content_review_status content_review_status NOT NULL DEFAULT 'approved';
+ALTER TABLE action_milestones
+ADD COLUMN IF NOT EXISTS content_reviewed_by uuid REFERENCES users(id) ON DELETE
+SET NULL;
+ALTER TABLE action_milestones
+ADD COLUMN IF NOT EXISTS content_reviewed_at timestamp with time zone;
+ALTER TABLE action_notes
+ADD COLUMN IF NOT EXISTS content_review_status content_review_status NOT NULL DEFAULT 'approved';
+ALTER TABLE action_notes
+ADD COLUMN IF NOT EXISTS content_reviewed_by uuid REFERENCES users(id) ON DELETE
+SET NULL;
+ALTER TABLE action_notes
+ADD COLUMN IF NOT EXISTS content_reviewed_at timestamp with time zone;
+ALTER TABLE action_questions
+ADD COLUMN IF NOT EXISTS content_review_status content_review_status NOT NULL DEFAULT 'approved';
+ALTER TABLE action_questions
+ADD COLUMN IF NOT EXISTS content_reviewed_by uuid REFERENCES users(id) ON DELETE
+SET NULL;
+ALTER TABLE action_questions
+ADD COLUMN IF NOT EXISTS content_reviewed_at timestamp with time zone;
+ALTER TABLE action_updates
+ADD COLUMN IF NOT EXISTS content_review_status content_review_status NOT NULL DEFAULT 'approved';
+ALTER TABLE action_updates
+ADD COLUMN IF NOT EXISTS content_reviewed_by uuid REFERENCES users(id) ON DELETE
+SET NULL;
+ALTER TABLE action_updates
+ADD COLUMN IF NOT EXISTS content_reviewed_at timestamp with time zone;
+-- Milestone updates (comments/discussion thread for each milestone)
+CREATE TABLE IF NOT EXISTS milestone_updates (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    milestone_id uuid NOT NULL REFERENCES action_milestones(id) ON DELETE CASCADE,
+    user_id uuid REFERENCES users(id) ON DELETE
+    SET NULL,
+        content text NOT NULL,
+        created_at timestamp with time zone NOT NULL DEFAULT now(),
+        updated_at timestamp with time zone,
+        content_review_status content_review_status NOT NULL DEFAULT 'approved',
+        content_reviewed_by uuid REFERENCES users(id) ON DELETE
+    SET NULL,
+        content_reviewed_at timestamp with time zone
+);
+CREATE INDEX IF NOT EXISTS idx_milestone_updates_milestone_id ON milestone_updates(milestone_id);
+CREATE INDEX IF NOT EXISTS idx_milestone_updates_created_at ON milestone_updates(created_at DESC);
 -- Tags (reusable across notes and questions)
 CREATE TABLE IF NOT EXISTS tags (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -415,7 +475,6 @@ CREATE INDEX IF NOT EXISTS idx_note_tags_note_id ON note_tags(note_id);
 CREATE INDEX IF NOT EXISTS idx_note_tags_tag_id ON note_tags(tag_id);
 CREATE INDEX IF NOT EXISTS idx_question_tags_question_id ON question_tags(question_id);
 CREATE INDEX IF NOT EXISTS idx_question_tags_tag_id ON question_tags(tag_id);
-
 -- Milestone version history (ensure table exists for existing DBs that may not have it)
 CREATE TABLE IF NOT EXISTS milestone_versions (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -424,13 +483,13 @@ CREATE TABLE IF NOT EXISTS milestone_versions (
     deadline date,
     updates text,
     status milestone_status NOT NULL,
-    changed_by uuid REFERENCES users(id) ON DELETE SET NULL,
-    changed_at timestamp with time zone NOT NULL DEFAULT now(),
-    change_type text NOT NULL
+    changed_by uuid REFERENCES users(id) ON DELETE
+    SET NULL,
+        changed_at timestamp with time zone NOT NULL DEFAULT now(),
+        change_type text NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_milestone_versions_milestone_id ON milestone_versions(milestone_id);
 CREATE INDEX IF NOT EXISTS idx_milestone_versions_changed_at ON milestone_versions(changed_at DESC);
-
 -- Legal comments (same structure as action_notes: comment input, approve, tag)
 CREATE TABLE IF NOT EXISTS action_legal_comments (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -441,12 +500,12 @@ CREATE TABLE IF NOT EXISTS action_legal_comments (
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone,
     content_review_status content_review_status NOT NULL DEFAULT 'approved',
-    content_reviewed_by uuid REFERENCES users(id) ON DELETE SET NULL,
-    content_reviewed_at timestamp with time zone,
-    FOREIGN KEY (action_id, action_sub_id) REFERENCES actions(id, sub_id) ON DELETE CASCADE
+    content_reviewed_by uuid REFERENCES users(id) ON DELETE
+    SET NULL,
+        content_reviewed_at timestamp with time zone,
+        FOREIGN KEY (action_id, action_sub_id) REFERENCES actions(id, sub_id) ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS idx_action_legal_comments_action ON action_legal_comments(action_id, action_sub_id);
-
 CREATE TABLE IF NOT EXISTS legal_comment_tags (
     legal_comment_id uuid NOT NULL REFERENCES action_legal_comments(id) ON DELETE CASCADE,
     tag_id uuid NOT NULL REFERENCES tags(id) ON DELETE CASCADE,

@@ -5,14 +5,22 @@ import { Button } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
   getActionMilestones,
   getMilestoneVersions,
   type MilestoneVersion,
 } from "@/features/milestones/queries";
-import { updateMilestone, approveMilestoneContent } from "@/features/milestones/commands";
+import { updateMilestone, approveMilestoneContent, createMilestone } from "@/features/milestones/commands";
+import {
+  getMilestoneUpdates,
+  type MilestoneUpdate,
+} from "@/features/milestones/updates-queries";
+import {
+  createMilestoneUpdate,
+  deleteMilestoneUpdate,
+  toggleMilestoneUpdateResolved,
+} from "@/features/milestones/updates-commands";
 import {
   getActionAttachments,
   getActionAttachmentCount,
@@ -23,20 +31,23 @@ import {
 } from "@/features/attachments/commands";
 import { ReviewStatus } from "@/features/shared/ReviewStatus";
 
-import type { Action, ActionMilestone, ActionAttachment } from "@/types";
+import type { Action, ActionMilestone, ActionAttachment, MilestoneType } from "@/types";
 import {
   Calendar,
   Check,
-  ChevronDown,
+  CheckCircle2,
+  Clock,
+  CornerDownRight,
   History,
   Loader2,
+  MessageSquare,
   Paperclip,
   Pencil,
+  Plus,
   Download,
   Trash2,
   FileText,
   ImageIcon,
-  File,
   User,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -72,14 +83,23 @@ export default function MilestonesTab({
   const [milestones, setMilestones] = useState<ActionMilestone[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [creatingNew, setCreatingNew] = useState(false);
   const [editForm, setEditForm] = useState({
     description: "",
     deadline: "",
-    updates: "",
   });
+  const [newMilestoneForm, setNewMilestoneForm] = useState({
+    milestone_type: "upcoming" as const,
+    description: "",
+    deadline: "",
+  });
+  const [milestoneUpdates, setMilestoneUpdates] = useState<Record<string, MilestoneUpdate[]>>({});
+  const [addingCommentId, setAddingCommentId] = useState<string | null>(null);
+  const [replyingToId, setReplyingToId] = useState<string | null>(null);
+  const [showVersionHistoryId, setShowVersionHistoryId] = useState<string | null>(null);
+  const [commentText, setCommentText] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [openMilestones, setOpenMilestones] = useState<Set<string>>(new Set());
   const [versions, setVersions] = useState<Record<string, MilestoneVersion[]>>(
     {},
   );
@@ -162,6 +182,12 @@ export default function MilestonesTab({
     return labels[type] || type;
   };
 
+  const getAvailableMilestoneTypes = () => {
+    const allTypes: MilestoneType[] = ["first", "second", "third", "upcoming", "final"];
+    const existingTypes = milestones.map(m => m.milestone_type);
+    return allTypes.filter(type => !existingTypes.includes(type));
+  };
+
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
       draft: "bg-slate-100 text-slate-600",
@@ -178,16 +204,52 @@ export default function MilestonesTab({
     setEditForm({
       description: milestone.description || "",
       deadline: milestone.deadline || "",
-      updates: milestone.updates || "",
     });
     setError(null);
-    // Ensure the collapsible is open so the edit form is visible
-    setOpenMilestones(prev => new Set([...prev, milestone.id]));
+    // Load updates for this milestone
+    loadMilestoneUpdates(milestone.id);
+  };
+
+  const startAddingComment = (milestoneId: string) => {
+    setAddingCommentId(milestoneId);
+    setReplyingToId(null);
+    setCommentText("");
+    setError(null);
+    // Load updates if not already loaded
+    if (!milestoneUpdates[milestoneId]) {
+      loadMilestoneUpdates(milestoneId);
+    }
+  };
+
+  const startReply = (milestoneId: string, updateId: string) => {
+    setAddingCommentId(milestoneId);
+    setReplyingToId(updateId);
+    setCommentText("");
+    setError(null);
+  };
+
+  const cancelAddingComment = () => {
+    setAddingCommentId(null);
+    setReplyingToId(null);
+    setCommentText("");
+    setError(null);
+  };
+
+  const loadMilestoneUpdates = async (milestoneId: string) => {
+    try {
+      const updates = await getMilestoneUpdates(milestoneId);
+      setMilestoneUpdates(prev => ({ ...prev, [milestoneId]: updates }));
+    } catch (err) {
+      console.error("Failed to load milestone updates:", err);
+    }
   };
 
   const cancelEditing = () => {
     setEditingId(null);
-    setEditForm({ description: "", deadline: "", updates: "" });
+    setEditForm({ description: "", deadline: "" });
+    setAddingCommentId(null);
+    setReplyingToId(null);
+    setCommentText("");
     setError(null);
   };
 
@@ -199,7 +261,6 @@ export default function MilestonesTab({
       const result = await updateMilestone(milestoneId, {
         description: editForm.description || null,
         deadline: editForm.deadline || null,
-        updates: editForm.updates || null,
       });
 
       if (result.success) {
@@ -217,17 +278,107 @@ export default function MilestonesTab({
     }
   };
 
+  const handleCreateMilestone = async () => {
+    setSaving(true);
+    setError(null);
+
+    try {
+      const result = await createMilestone({
+        action_id: action.id,
+        action_sub_id: action.sub_id,
+        milestone_type: newMilestoneForm.milestone_type,
+        description: newMilestoneForm.description || null,
+        deadline: newMilestoneForm.deadline || null,
+      });
+
+      if (result.success) {
+        setCreatingNew(false);
+        setNewMilestoneForm({
+          milestone_type: "upcoming",
+          description: "",
+          deadline: "",
+        });
+        await loadMilestones();
+      } else {
+        setError(result.error || "Failed to create milestone");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create milestone");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAddComment = async (milestoneId: string) => {
+    if (!commentText.trim()) return;
+    
+    setSaving(true);
+    setError(null);
+
+    try {
+      const result = await createMilestoneUpdate({
+        milestone_id: milestoneId,
+        content: commentText.trim(),
+        reply_to: replyingToId,
+      });
+
+      if (result.success) {
+        setCommentText("");
+        setAddingCommentId(null);
+        setReplyingToId(null);
+        await loadMilestoneUpdates(milestoneId);
+      } else {
+        setError(result.error || "Failed to add comment");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to add comment");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleToggleResolved = async (milestoneId: string, updateId: string) => {
+    try {
+      const result = await toggleMilestoneUpdateResolved(updateId);
+      if (result.success) {
+        await loadMilestoneUpdates(milestoneId);
+      } else {
+        setError(result.error || "Failed to toggle resolved status");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to toggle resolved");
+    }
+  };
+
+  const handleDeleteComment = async (milestoneId: string, updateId: string) => {
+    try {
+      const result = await deleteMilestoneUpdate(updateId);
+      if (result.success) {
+        await loadMilestoneUpdates(milestoneId);
+      } else {
+        setError(result.error || "Failed to delete comment");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete comment");
+    }
+  };
+
   const toggleMilestone = (milestoneId: string) => {
-    const newOpen = new Set(openMilestones);
-    if (newOpen.has(milestoneId)) {
-      newOpen.delete(milestoneId);
+    // Load updates if not already loaded
+    if (!milestoneUpdates[milestoneId]) {
+      loadMilestoneUpdates(milestoneId);
+    }
+  };
+
+  const toggleVersionHistory = (milestoneId: string) => {
+    if (showVersionHistoryId === milestoneId) {
+      setShowVersionHistoryId(null);
     } else {
-      newOpen.add(milestoneId);
+      setShowVersionHistoryId(milestoneId);
       if (!versions[milestoneId]) {
         loadVersionsForMilestone(milestoneId);
       }
     }
-    setOpenMilestones(newOpen);
   };
 
   const loadAttachments = useCallback(async () => {
@@ -381,86 +532,104 @@ export default function MilestonesTab({
 
   return (
     <div className="space-y-3">
-      {milestones.map((milestone) => (
+      {/* Existing Milestones */}
+      {milestones.map((milestone) => {
+        const updates = milestoneUpdates[milestone.id] || [];
+        const hasComments = updates.length > 0;
+        
+        return (
         <Collapsible
           key={milestone.id}
-          open={openMilestones.has(milestone.id)}
-          onOpenChange={() => toggleMilestone(milestone.id)}
+          open={editingId === milestone.id || addingCommentId === milestone.id || showVersionHistoryId === milestone.id}
         >
           <div className="rounded-lg border border-slate-200 bg-white">
             {/* Collapsible Header - Always shows current version */}
             <div className="p-4">
-              <CollapsibleTrigger className="w-full">
-                <div className="-m-2 flex items-start justify-between gap-3 rounded p-2 transition-colors hover:bg-slate-50">
-                  <div className="flex flex-1 items-start gap-3">
-                    <ChevronDown
-                      className={`mt-0.5 h-4 w-4 shrink-0 text-slate-400 transition-transform ${
-                        openMilestones.has(milestone.id)
-                          ? "rotate-0"
-                          : "-rotate-90"
-                      }`}
-                    />
-                    <div className="flex-1 space-y-2 text-left">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="outline" className="text-xs">
-                          {getMilestoneTypeLabel(milestone.milestone_type)}
-                        </Badge>
-                        <Badge className={getStatusBadge(milestone.status)}>
-                          {milestone.status.replace("_", " ")}
-                        </Badge>
-                        <ReviewStatus
-                          status={
-                            (milestone as { content_review_status?: "approved" | "needs_review" })
-                              .content_review_status ?? "approved"
-                          }
-                          reviewedByEmail={
-                            (milestone as { content_reviewed_by_email?: string | null })
-                              .content_reviewed_by_email ?? null
-                          }
-                          reviewedAt={
-                            (milestone as { content_reviewed_at?: Date | null })
-                              .content_reviewed_at ?? null
-                          }
-                          isAdmin={isAdmin}
-                          onApprove={() => handleApproveMilestone(milestone.id)}
-                          approving={approvingId === milestone.id}
-                        />
-                        {milestone.deadline && (
-                          <div className="flex items-center gap-1.5 text-sm text-slate-500">
-                            <Calendar className="h-4 w-4" />
-                            {new Date(milestone.deadline).toLocaleDateString()}
-                          </div>
-                        )}
-                      </div>
-                      {milestone.description && (
-                        <p className="text-sm text-slate-700">
-                          {milestone.description}
-                        </p>
-                      )}
-                      {milestone.updates && (
-                        <p className="text-sm text-slate-500 italic">
-                          {milestone.updates}
-                        </p>
-                      )}
-                      {!milestone.description && !milestone.updates && (
-                        <p className="text-sm text-slate-400 italic">
-                          No content yet
-                        </p>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="outline" className="text-xs">
+                        {getMilestoneTypeLabel(milestone.milestone_type)}
+                      </Badge>
+                      <Badge className={getStatusBadge(milestone.status)}>
+                        {milestone.status.replace("_", " ")}
+                      </Badge>
+                      <ReviewStatus
+                        status={
+                          (milestone as { content_review_status?: "approved" | "needs_review" })
+                            .content_review_status ?? "approved"
+                        }
+                        reviewedByEmail={
+                          (milestone as { content_reviewed_by_email?: string | null })
+                            .content_reviewed_by_email ?? null
+                        }
+                        reviewedAt={
+                          (milestone as { content_reviewed_at?: Date | null })
+                            .content_reviewed_at ?? null
+                        }
+                        isAdmin={isAdmin}
+                        onApprove={() => handleApproveMilestone(milestone.id)}
+                        approving={approvingId === milestone.id}
+                      />
+                      {milestone.deadline && (
+                        <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                          <Calendar className="h-4 w-4" />
+                          {new Date(milestone.deadline).toLocaleDateString()}
+                        </div>
                       )}
                     </div>
-                  </div>
+                    {milestone.description && (
+                      <p className="text-sm text-slate-700">
+                        {milestone.description}
+                      </p>
+                    )}
+                    {!milestone.description && (
+                      <p className="text-sm text-slate-400 italic">
+                        No description yet
+                      </p>
+                    )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleVersionHistory(milestone.id);
+                    }}
+                    className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50"
+                    title="Version history"
+                  >
+                    <Clock className="h-3.5 w-3.5" />
+                    History
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      startAddingComment(milestone.id);
+                    }}
+                    className="flex items-center gap-1.5 rounded-md border border-un-blue/20 bg-un-blue/5 px-2.5 py-1.5 text-xs font-medium text-un-blue transition-colors hover:bg-un-blue/10"
+                    title="Add comment"
+                  >
+                    <MessageSquare className="h-3.5 w-3.5" />
+                    Comment
+                    {updates.length > 0 && (
+                      <span className="ml-0.5 rounded-full bg-un-blue/20 px-1.5 py-0.5 text-[10px] font-semibold">
+                        {updates.length}
+                      </span>
+                    )}
+                  </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       startEditing(milestone);
                     }}
-                    className="shrink-0 rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                    className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50"
                     title="Edit milestone"
                   >
-                    <Pencil className="h-4 w-4" />
+                    <Pencil className="h-3.5 w-3.5" />
+                    Edit
                   </button>
                 </div>
-              </CollapsibleTrigger>
+              </div>
             </div>
 
             {/* Collapsible Content */}
@@ -486,42 +655,22 @@ export default function MilestonesTab({
                         disabled={saving}
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="mb-1 block text-xs font-medium text-slate-600">
-                          Deadline
-                        </label>
-                        <input
-                          type="date"
-                          value={editForm.deadline}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              deadline: e.target.value,
-                            })
-                          }
-                          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
-                          disabled={saving}
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-medium text-slate-600">
-                          Updates
-                        </label>
-                        <input
-                          type="text"
-                          value={editForm.updates}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              updates: e.target.value,
-                            })
-                          }
-                          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
-                          placeholder="Status update..."
-                          disabled={saving}
-                        />
-                      </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-600">
+                        Deadline
+                      </label>
+                      <input
+                        type="date"
+                        value={editForm.deadline}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm,
+                            deadline: e.target.value,
+                          })
+                        }
+                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                        disabled={saving}
+                      />
                     </div>
                     {error && <p className="text-sm text-red-600">{error}</p>}
                     <div className="flex justify-end gap-2">
@@ -548,9 +697,15 @@ export default function MilestonesTab({
                       </Button>
                     </div>
                   </div>
-                ) : (
-                  // View Mode - Version History Only (current version shown above)
+                ) : showVersionHistoryId === milestone.id ? (
+                  // Version History Mode
                   <div>
+                    <div className="mb-3 flex items-center gap-2">
+                      <History className="h-3.5 w-3.5 text-slate-400" />
+                      <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Version History
+                      </span>
+                    </div>
                     {/* Version History */}
                     {loadingVersions[milestone.id] ? (
                       <div className="flex items-center justify-center py-4">
@@ -559,10 +714,6 @@ export default function MilestonesTab({
                     ) : versions[milestone.id] &&
                       versions[milestone.id].length > 0 ? (
                       <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-slate-500 uppercase">
-                          <History className="h-3.5 w-3.5" />
-                          Version History
-                        </div>
                         <div className="space-y-2 rounded-md bg-slate-50 p-3">
                           {versions[milestone.id].map((version) => (
                             <div
@@ -618,12 +769,355 @@ export default function MilestonesTab({
                       </p>
                     )}
                   </div>
+                ) : (
+                  // Comments Thread Mode
+                  <div className="space-y-3">
+                    {/* Header */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <MessageSquare className="h-3.5 w-3.5" />
+                        Updates & Comments
+                        {updates.length > 0 && (
+                          <span className="ml-1 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold">
+                            {updates.length}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Comments List */}
+                    {updates.length > 0 ? (
+                      <div className="space-y-2">
+                        {updates.filter(u => !u.reply_to).map((update) => {
+                          const replies = updates.filter(r => r.reply_to === update.id);
+                          const replyingTo = replyingToId === update.id;
+                          
+                          return (
+                            <div key={update.id} className="space-y-2">
+                              {/* Main Comment */}
+                              <div className={`group relative rounded-lg border transition-all ${
+                                update.is_resolved 
+                                  ? 'border-green-200 bg-green-50/30' 
+                                  : 'border-slate-200 bg-white hover:border-un-blue/30 hover:shadow-sm'
+                              }`}>
+                                <div className="p-3">
+                                  {/* Header */}
+                                  <div className="mb-2 flex items-start justify-between gap-2">
+                                    <div className="flex items-center gap-2">
+                                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-un-blue/10 text-[10px] font-semibold text-un-blue">
+                                        {(update.user_email?.[0] || 'U').toUpperCase()}
+                                      </div>
+                                      <div className="flex flex-col">
+                                        <span className="text-xs font-medium text-slate-700">
+                                          {update.user_email?.split('@')[0] || "Unknown"}
+                                        </span>
+                                        <span className="text-[10px] text-slate-400">
+                                          {new Date(update.created_at).toLocaleDateString()} at {new Date(update.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                      </div>
+                                      {update.is_resolved && (
+                                        <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700">
+                                          <CheckCircle2 className="h-3 w-3" />
+                                          Resolved
+                                        </span>
+                                      )}
+                                    </div>
+                                    
+                                    {/* Actions */}
+                                    <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                                      <button
+                                        onClick={() => startReply(milestone.id, update.id)}
+                                        className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-un-blue"
+                                        title="Reply"
+                                      >
+                                        <CornerDownRight className="h-3 w-3" />
+                                      </button>
+                                      {isAdmin && (
+                                        <>
+                                          <button
+                                            onClick={() => handleToggleResolved(milestone.id, update.id)}
+                                            className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-green-600"
+                                            title={update.is_resolved ? "Mark as unresolved" : "Mark as resolved"}
+                                          >
+                                            <CheckCircle2 className="h-3 w-3" />
+                                          </button>
+                                          <button
+                                            onClick={() => handleDeleteComment(milestone.id, update.id)}
+                                            className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600"
+                                            title="Delete"
+                                          >
+                                            <Trash2 className="h-3 w-3" />
+                                          </button>
+                                        </>
+                                      )}
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Content */}
+                                  <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">
+                                    {update.content}
+                                  </p>
+                                </div>
+
+                                {/* Replies */}
+                                {replies.length > 0 && (
+                                  <div className="border-t border-slate-200 bg-slate-50/50 px-3 py-2">
+                                    <div className="space-y-2">
+                                      {replies.map((reply) => (
+                                        <div key={reply.id} className="group/reply relative flex gap-2 rounded-md bg-white p-2 hover:bg-slate-50">
+                                          <CornerDownRight className="mt-1 h-3 w-3 shrink-0 text-slate-300" />
+                                          <div className="min-w-0 flex-1">
+                                            <div className="mb-1 flex items-center justify-between gap-2">
+                                              <div className="flex items-center gap-2">
+                                                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-[9px] font-semibold text-slate-600">
+                                                  {(reply.user_email?.[0] || 'U').toUpperCase()}
+                                                </div>
+                                                <span className="text-xs font-medium text-slate-600">
+                                                  {reply.user_email?.split('@')[0] || "Unknown"}
+                                                </span>
+                                                <span className="text-[10px] text-slate-400">
+                                                  {new Date(reply.created_at).toLocaleDateString()} at {new Date(reply.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                              </div>
+                                              {isAdmin && (
+                                                <button
+                                                  onClick={() => handleDeleteComment(milestone.id, reply.id)}
+                                                  className="shrink-0 rounded p-1 text-slate-400 opacity-0 transition-all hover:bg-slate-100 hover:text-red-600 group-hover/reply:opacity-100"
+                                                  title="Delete reply"
+                                                >
+                                                  <Trash2 className="h-3 w-3" />
+                                                </button>
+                                              )}
+                                            </div>
+                                            <p className="text-sm text-slate-700 whitespace-pre-wrap">
+                                              {reply.content}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Reply Form */}
+                                {replyingTo && (
+                                  <div className="border-t border-slate-200 bg-slate-50/50 p-3">
+                                    <div className="flex gap-2">
+                                      <CornerDownRight className="mt-2 h-3 w-3 shrink-0 text-slate-400" />
+                                      <div className="flex-1 space-y-2">
+                                        <textarea
+                                          value={commentText}
+                                          onChange={(e) => setCommentText(e.target.value)}
+                                          className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                                          rows={2}
+                                          placeholder="Write a reply..."
+                                          disabled={saving}
+                                          autoFocus
+                                        />
+                                        <div className="flex justify-end gap-2">
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={cancelAddingComment}
+                                            disabled={saving}
+                                          >
+                                            Cancel
+                                          </Button>
+                                          <Button
+                                            size="sm"
+                                            onClick={() => handleAddComment(milestone.id)}
+                                            disabled={saving || !commentText.trim()}
+                                            className="bg-un-blue hover:bg-un-blue/90"
+                                          >
+                                            {saving ? (
+                                              <Loader2 className="h-3 w-3 animate-spin" />
+                                            ) : (
+                                              <CornerDownRight className="h-3 w-3" />
+                                            )}
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50/50 py-8 text-center">
+                        <MessageSquare className="mx-auto mb-2 h-8 w-8 text-slate-300" />
+                        <p className="text-sm text-slate-400">No comments yet</p>
+                      </div>
+                    )}
+
+                    {/* Add New Comment Form */}
+                    {addingCommentId === milestone.id && !replyingToId && (
+                      <div className="rounded-lg border border-un-blue/20 bg-un-blue/5 p-3">
+                        <div className="space-y-2">
+                          <textarea
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
+                            className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                            rows={3}
+                            placeholder="Add a status update or comment..."
+                            disabled={saving}
+                            autoFocus
+                          />
+                          {error && <p className="text-sm text-red-600">{error}</p>}
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={cancelAddingComment}
+                              disabled={saving}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => handleAddComment(milestone.id)}
+                              disabled={saving || !commentText.trim()}
+                              className="bg-un-blue hover:bg-un-blue/90"
+                            >
+                              {saving ? (
+                                <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                              ) : (
+                                <MessageSquare className="mr-1 h-3 w-3" />
+                              )}
+                              Post
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )}
+                
               </div>
             </CollapsibleContent>
           </div>
         </Collapsible>
-      ))}
+      )})}
+
+      {/* Create New Milestone Form */}
+      {creatingNew && (
+        <div className="rounded-lg border border-un-blue/20 bg-white p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-slate-700">Create New Milestone</h3>
+            <button
+              onClick={() => {
+                setCreatingNew(false);
+                setError(null);
+              }}
+              className="text-sm text-slate-500 hover:text-slate-700"
+            >
+              Cancel
+            </button>
+          </div>
+          <div className="space-y-3">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-600">
+                Milestone Type
+              </label>
+              <select
+                value={newMilestoneForm.milestone_type}
+                onChange={(e) =>
+                  setNewMilestoneForm({
+                    ...newMilestoneForm,
+                    milestone_type: e.target.value as any,
+                  })
+                }
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                disabled={saving}
+              >
+                {getAvailableMilestoneTypes().map((type) => (
+                  <option key={type} value={type}>
+                    {getMilestoneTypeLabel(type)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-600">
+                Description
+              </label>
+              <textarea
+                value={newMilestoneForm.description}
+                onChange={(e) =>
+                  setNewMilestoneForm({
+                    ...newMilestoneForm,
+                    description: e.target.value,
+                  })
+                }
+                className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                rows={3}
+                placeholder="Describe this milestone..."
+                disabled={saving}
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-600">
+                Deadline
+              </label>
+              <input
+                type="date"
+                value={newMilestoneForm.deadline}
+                onChange={(e) =>
+                  setNewMilestoneForm({
+                    ...newMilestoneForm,
+                    deadline: e.target.value,
+                  })
+                }
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                disabled={saving}
+              />
+            </div>
+            {error && <p className="text-sm text-red-600">{error}</p>}
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setCreatingNew(false);
+                  setError(null);
+                }}
+                disabled={saving}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleCreateMilestone}
+                disabled={saving}
+                className="bg-un-blue hover:bg-un-blue/90"
+              >
+                {saving ? (
+                  <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                ) : (
+                  <Plus className="mr-1 h-3 w-3" />
+                )}
+                Create Milestone
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add New Milestone Button */}
+      {!creatingNew && getAvailableMilestoneTypes().length > 0 && (
+        <button
+          onClick={() => setCreatingNew(true)}
+          className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50/50 px-4 py-3 text-sm font-medium text-slate-600 transition-colors hover:border-un-blue hover:bg-un-blue/5 hover:text-un-blue"
+        >
+          <Plus className="h-4 w-4" />
+          Add New Milestone
+        </button>
+      )}
+
+      {/* Divider */}
+      <div className="border-t-2 border-slate-200" />
 
       {/* Attachments - single section below all milestones */}
       <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4">

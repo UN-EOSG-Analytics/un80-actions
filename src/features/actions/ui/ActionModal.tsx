@@ -306,8 +306,8 @@ export default function ActionModal({
           </div>
 
           {/* Tab Content */}
-          <div className="min-h-0 flex-1 overflow-y-auto">
-            <div className="p-6">
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <div className="h-full overflow-y-auto p-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               <TabsContent value="overview" className="mt-0">
                 <OverviewTab action={action} />
               </TabsContent>
