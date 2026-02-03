@@ -176,11 +176,21 @@ export default function MilestonesTab({
       first: "First Milestone",
       second: "Second Milestone",
       third: "Third Milestone",
-      upcoming: "Upcoming",
+      upcoming: "Public",
       final: "Final",
     };
     return labels[type] || type;
   };
+
+  // Public (upcoming) first, then first/second/third/final in order
+  const milestoneOrder: MilestoneType[] = ["upcoming", "first", "second", "third", "final"];
+  const sortedMilestones = [...milestones].sort(
+    (a, b) =>
+      milestoneOrder.indexOf(a.milestone_type as MilestoneType) -
+      milestoneOrder.indexOf(b.milestone_type as MilestoneType),
+  );
+  const publicMilestones = sortedMilestones.filter((m) => m.milestone_type === "upcoming");
+  const otherMilestones = sortedMilestones.filter((m) => m.milestone_type !== "upcoming");
 
   const getAvailableMilestoneTypes = () => {
     const allTypes: MilestoneType[] = ["first", "second", "third", "upcoming", "final"];
@@ -530,14 +540,9 @@ export default function MilestonesTab({
     return <EmptyState message="No milestones have been added yet." />;
   }
 
-  return (
-    <div className="space-y-3">
-      {/* Existing Milestones */}
-      {milestones.map((milestone) => {
-        const updates = milestoneUpdates[milestone.id] || [];
-        const hasComments = updates.length > 0;
-        
-        return (
+  const renderMilestone = (milestone: ActionMilestone) => {
+    const updates = milestoneUpdates[milestone.id] || [];
+    return (
         <Collapsible
           key={milestone.id}
           open={editingId === milestone.id || addingCommentId === milestone.id || showVersionHistoryId === milestone.id}
@@ -999,7 +1004,21 @@ export default function MilestonesTab({
             </CollapsibleContent>
           </div>
         </Collapsible>
-      )})}
+    );
+  };
+
+  return (
+    <div className="space-y-3">
+      {/* Public (upcoming) milestone(s) at top */}
+      {publicMilestones.map((milestone) => renderMilestone(milestone))}
+
+      {/* Thin line between public and rest to indicate hierarchy */}
+      {publicMilestones.length > 0 && otherMilestones.length > 0 && (
+        <div className="my-2 border-t border-slate-300" aria-hidden />
+      )}
+
+      {/* Other milestones (first, second, third, final) */}
+      {otherMilestones.map((milestone) => renderMilestone(milestone))}
 
       {/* Create New Milestone Form */}
       {creatingNew && (
