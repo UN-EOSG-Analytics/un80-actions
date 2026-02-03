@@ -172,6 +172,8 @@ export interface ActionLegalComment {
   user_id: string | null;
   user_email: string | null;
   content: string;
+  /** When set, this comment is a reply to another comment (threaded conversation). */
+  reply_to?: string | null;
   created_at: Date;
   updated_at: Date | null;
   content_review_status: ContentReviewStatus;

@@ -28,14 +28,15 @@ export async function createLegalComment(
 
     const rows = await query<{ id: string }>(
       `INSERT INTO ${DB_SCHEMA}.action_legal_comments 
-     (action_id, action_sub_id, user_id, content, content_review_status)
-     VALUES ($1, $2, $3, $4, 'needs_review')
+     (action_id, action_sub_id, user_id, content, reply_to, content_review_status)
+     VALUES ($1, $2, $3, $4, $5, 'needs_review')
      RETURNING id`,
       [
         input.action_id,
         input.action_sub_id ?? null,
         user.id,
         input.content.trim(),
+        input.reply_to ?? null,
       ],
     );
 

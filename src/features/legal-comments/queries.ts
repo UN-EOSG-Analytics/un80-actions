@@ -31,6 +31,7 @@ export async function getActionLegalComments(
       c.user_id,
       u.email as user_email,
       c.content,
+      c.reply_to,
       c.created_at,
       c.updated_at,
       COALESCE(c.content_review_status, 'approved')::text as content_review_status,
@@ -41,7 +42,7 @@ export async function getActionLegalComments(
     LEFT JOIN ${DB_SCHEMA}.users u ON c.user_id = u.id
     LEFT JOIN ${DB_SCHEMA}.users ru ON c.content_reviewed_by = ru.id
     ${whereClause}
-    ORDER BY c.created_at DESC`,
+    ORDER BY c.created_at ASC`,
     params,
   );
 
@@ -62,6 +63,7 @@ export async function getLegalCommentById(
       c.user_id,
       u.email as user_email,
       c.content,
+      c.reply_to,
       c.created_at,
       c.updated_at,
       COALESCE(c.content_review_status, 'approved')::text as content_review_status,

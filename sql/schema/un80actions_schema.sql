@@ -266,6 +266,7 @@ create table action_legal_comments (
     action_sub_id text,
     user_id uuid references users on delete cascade,
     content text not null,
+    reply_to uuid references action_legal_comments (id) on delete cascade,
     created_at timestamp with time zone default now() not null,
     updated_at timestamp with time zone,
     content_review_status un80actions.content_review_status default 'approved'::un80actions.content_review_status not null,
@@ -275,6 +276,7 @@ create table action_legal_comments (
         foreign key (action_id, action_sub_id) references actions (id, sub_id) on delete cascade
 );
 create index idx_action_legal_comments_action on action_legal_comments (action_id, action_sub_id);
+create index idx_action_legal_comments_reply_to on action_legal_comments (reply_to) where (reply_to is not null);
 
 -- Legal comment tags - references the same shared tags pool
 create table legal_comment_tags (
