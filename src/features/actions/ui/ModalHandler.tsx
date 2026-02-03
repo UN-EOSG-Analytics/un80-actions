@@ -32,18 +32,21 @@ export default function ModalHandler({
       return;
     }
 
-    // Parse action number from query param
-    const actionNumber = parseInt(actionParam, 10);
-    const firstMilestone = milestoneParam
-      ? decodeUrlParam(milestoneParam)
-      : null;
-
-    // If invalid action number, show error
-    if (isNaN(actionNumber)) {
-      setError("Invalid action number");
+    // Parse action number from query param (e.g., "94" or "94(a)")
+    // Extract id and optional sub_id using regex
+    const actionMatch = actionParam.match(/^(\d+)(\([a-z]\))?$/i);
+    
+    if (!actionMatch) {
+      setError("Invalid action format");
       setLoading(false);
       return;
     }
+
+    const actionId = parseInt(actionMatch[1], 10);
+    const actionSubId = actionMatch[2] || null;
+    const firstMilestone = milestoneParam
+      ? decodeUrlParam(milestoneParam)
+      : null;
 
     // Load action data
     const loadAction = async () => {
@@ -52,7 +55,8 @@ export default function ModalHandler({
 
       try {
         const foundAction = await getActionByNumber(
-          actionNumber,
+          actionId,
+          actionSubId,
           firstMilestone,
         );
         if (!foundAction) {

@@ -14,7 +14,7 @@ import type { ActionsTableData } from "@/types";
 import type { RiskAssessment } from "@/types";
 import { updateRiskAssessment } from "@/features/actions/commands";
 
-type SortField = "work_package_id" | "action_id" | "indicative_action" | "risk_assessment";
+type SortField = "work_package_id" | "action_id" | "work_package_title" | "indicative_action" | "tracking_status" | "public_action_status" | "risk_assessment";
 type SortDirection = "asc" | "desc";
 
 const RISK_OPTIONS: {
@@ -38,7 +38,7 @@ interface ActionsTableProps {
 export function ActionsTable({ data }: ActionsTableProps) {
   const router = useRouter();
   const [searchInput, setSearchInput] = useState("");
-  const [sortField, setSortField] = useState<SortField>("work_package_id");
+  const [sortField, setSortField] = useState<SortField>("action_id");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [filterWorkPackageId, setFilterWorkPackageId] = useState<number | "">("");
   const [filterRisk, setFilterRisk] = useState<RiskAssessment | "">("");
@@ -99,8 +99,18 @@ export function ActionsTable({ data }: ActionsTableProps) {
         cmp = a.work_package_id - b.work_package_id;
       } else if (sortField === "action_id") {
         cmp = a.action_id - b.action_id || (a.action_sub_id ?? "").localeCompare(b.action_sub_id ?? "");
+      } else if (sortField === "work_package_title") {
+        cmp = a.work_package_title.localeCompare(b.work_package_title);
       } else if (sortField === "indicative_action") {
         cmp = a.indicative_action.localeCompare(b.indicative_action);
+      } else if (sortField === "tracking_status") {
+        const av = a.tracking_status ?? "";
+        const bv = b.tracking_status ?? "";
+        cmp = av.localeCompare(bv);
+      } else if (sortField === "public_action_status") {
+        const av = a.public_action_status ?? "";
+        const bv = b.public_action_status ?? "";
+        cmp = av.localeCompare(bv);
       } else if (sortField === "risk_assessment") {
         const order: Record<string, number> = { low_risk: 0, medium_risk: 1, at_risk: 2 };
         const av = a.risk_assessment ?? "";
@@ -129,9 +139,10 @@ export function ActionsTable({ data }: ActionsTableProps) {
     );
   };
 
-  const handleActionClick = (actionId: number) => {
+  const handleActionClick = (actionId: number, actionSubId: string | null) => {
     sessionStorage.setItem("actionModalReturnUrl", window.location.href);
-    router.push(`/?action=${actionId}`, { scroll: false });
+    const actionParam = actionSubId ? `${actionId}${actionSubId}` : `${actionId}`;
+    router.push(`/?action=${actionParam}`, { scroll: false });
   };
 
   const handleRiskChange = async (
@@ -210,50 +221,81 @@ export function ActionsTable({ data }: ActionsTableProps) {
       </div>
 
       {/* Simple Table */}
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <div className="overflow-x-auto overflow-hidden rounded-lg border border-gray-200 bg-white">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-              <th className="w-24 px-4 py-3">
+              <th className="px-4 py-3 whitespace-nowrap">
                 <button
                   type="button"
                   onClick={() => handleSort("work_package_id")}
                   className="inline-flex items-center hover:text-un-blue"
                 >
-                  Work package
+                  WP
                   <SortIcon column="work_package_id" />
                 </button>
               </th>
-              <th className="w-20 px-4 py-3">
+              <th className="px-4 py-3 whitespace-nowrap">
                 <button
                   type="button"
                   onClick={() => handleSort("action_id")}
                   className="inline-flex items-center hover:text-un-blue"
                 >
-                  Action
+                  ACTION
                   <SortIcon column="action_id" />
                 </button>
               </th>
-              <th className="px-4 py-3">
+              <th className="px-4 py-3 whitespace-nowrap">
+                <button
+                  type="button"
+                  onClick={() => handleSort("work_package_title")}
+                  className="inline-flex items-center hover:text-un-blue"
+                >
+                  WP TITLE
+                  <SortIcon column="work_package_title" />
+                </button>
+              </th>
+              <th className="px-4 py-3 whitespace-nowrap">
                 <button
                   type="button"
                   onClick={() => handleSort("indicative_action")}
                   className="inline-flex items-center hover:text-un-blue"
                 >
-                  Indicative Action
+                  INDICATIVE ACTION
                   <SortIcon column="indicative_action" />
                 </button>
               </th>
-              <th className="w-32 px-4 py-3">
+              <th className="px-4 py-3 whitespace-nowrap">
+                <button
+                  type="button"
+                  onClick={() => handleSort("tracking_status")}
+                  className="inline-flex items-center hover:text-un-blue"
+                >
+                  TRACKING
+                  <SortIcon column="tracking_status" />
+                </button>
+              </th>
+              <th className="px-4 py-3 whitespace-nowrap">
+                <button
+                  type="button"
+                  onClick={() => handleSort("public_action_status")}
+                  className="inline-flex items-center hover:text-un-blue"
+                >
+                  PUBLIC STATUS
+                  <SortIcon column="public_action_status" />
+                </button>
+              </th>
+              <th className="px-4 py-3 whitespace-nowrap">
                 <button
                   type="button"
                   onClick={() => handleSort("risk_assessment")}
                   className="inline-flex items-center hover:text-un-blue"
                 >
-                  Risk assessment
+                  RISK
                   <SortIcon column="risk_assessment" />
                 </button>
               </th>
+              <th className="px-4 py-3 whitespace-nowrap">BIG TICKET</th>
               <th className="w-10 px-4 py-3"></th>
             </tr>
           </thead>
@@ -261,7 +303,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
             {sortedActions.length === 0 ? (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={9}
                   className="px-4 py-12 text-center text-gray-400"
                 >
                   No actions found
@@ -271,17 +313,26 @@ export function ActionsTable({ data }: ActionsTableProps) {
               sortedActions.map((a) => (
                 <tr
                   key={`${a.action_id}-${a.action_sub_id ?? ""}`}
-                  onClick={() => handleActionClick(a.action_id)}
+                  onClick={() => handleActionClick(a.action_id, a.action_sub_id)}
                   className="cursor-pointer transition-colors hover:bg-gray-50"
                 >
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
                     {a.work_package_id}
                   </td>
-                  <td className="px-4 py-3 font-medium text-un-blue">
+                  <td className="px-4 py-3 font-medium text-un-blue whitespace-nowrap">
                     {actionLabel(a.action_id, a.action_sub_id)}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600">
+                    <span className="line-clamp-2">{a.work_package_title}</span>
                   </td>
                   <td className="px-4 py-3 text-gray-700">
                     <span className="line-clamp-2">{a.indicative_action}</span>
+                  </td>
+                  <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
+                    <span className="text-xs">{a.tracking_status ?? "–"}</span>
+                  </td>
+                  <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
+                    <span className="text-xs">{a.public_action_status ?? "–"}</span>
                   </td>
                   <td
                     className="px-4 py-3 text-gray-400"
@@ -318,6 +369,11 @@ export function ActionsTable({ data }: ActionsTableProps) {
                         ))}
                       </SelectContent>
                     </Select>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {a.is_big_ticket && (
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-un-blue text-white text-xs font-bold">!</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-gray-400">
                     <ChevronRight className="h-4 w-4" />

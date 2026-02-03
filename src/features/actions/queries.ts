@@ -364,18 +364,19 @@ export async function getActionById(
  * Optionally filter by first milestone for deep linking.
  */
 export async function getActionByNumber(
-  actionNumber: number,
+  actionId: number,
+  actionSubId?: string | null,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   firstMilestone?: string | null,
 ): Promise<Action | null> {
-  // First try to find exact match (no sub_id), then fall back to any with that ID
+  // Match exact action by id and sub_id (or null)
   // TODO: Use firstMilestone to filter or highlight specific milestone
   const rows = await query<ActionRow>(
     `${ACTION_SELECT}
      WHERE a.id = $1
-     ORDER BY a.sub_id ASC NULLS FIRST
+       AND (a.sub_id IS NOT DISTINCT FROM $2)
      LIMIT 1`,
-    [actionNumber],
+    [actionId, actionSubId ?? null],
   );
 
   if (rows.length === 0) return null;
@@ -670,6 +671,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       a.sub_id AS action_sub_id,
       a.indicative_action,
       a.tracking_status,
+      a.public_action_status,
       a.is_big_ticket,
       a.risk_assessment,
       m.milestone_type,
@@ -691,6 +693,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       a.sub_id AS action_sub_id,
       a.indicative_action,
       a.tracking_status,
+      a.public_action_status,
       a.is_big_ticket,
       m.milestone_type,
       m.description AS milestone_description,
@@ -711,6 +714,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
     action_sub_id: string | null;
     indicative_action: string;
     tracking_status: string | null;
+    public_action_status: string | null;
     is_big_ticket: boolean;
     risk_assessment?: string | null;
     milestone_type: string | null;
@@ -838,7 +842,8 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
           action_id: r.action_id,
           action_sub_id: r.action_sub_id,
           indicative_action: r.indicative_action,
-          tracking_status: r.tracking_status,
+          tracking_status: r.tracking_status as ActionWithMilestones["tracking_status"],
+          public_action_status: r.public_action_status as ActionWithMilestones["public_action_status"],
           is_big_ticket: r.is_big_ticket,
           risk_assessment: (r.risk_assessment ?? null) as ActionWithMilestones["risk_assessment"],
           milestones: [],

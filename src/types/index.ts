@@ -344,7 +344,8 @@ export interface ActionWithMilestones {
   action_id: number;
   action_sub_id: string | null;
   indicative_action: string;
-  tracking_status: string | null;
+  tracking_status: ActionTrackingStatus | null;
+  public_action_status: PublicActionStatus | null;
   is_big_ticket: boolean;
   risk_assessment: RiskAssessment | null;
   milestones: MilestoneRow[];
