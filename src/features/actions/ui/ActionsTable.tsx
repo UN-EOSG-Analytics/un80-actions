@@ -238,21 +238,21 @@ export function ActionsTable({ data }: ActionsTableProps) {
               <th className="px-4 py-3 whitespace-nowrap">
                 <button
                   type="button"
-                  onClick={() => handleSort("action_id")}
-                  className="inline-flex items-center hover:text-un-blue"
-                >
-                  ACTION
-                  <SortIcon column="action_id" />
-                </button>
-              </th>
-              <th className="px-4 py-3 whitespace-nowrap">
-                <button
-                  type="button"
                   onClick={() => handleSort("work_package_title")}
                   className="inline-flex items-center hover:text-un-blue"
                 >
                   WP TITLE
                   <SortIcon column="work_package_title" />
+                </button>
+              </th>
+              <th className="px-4 py-3 whitespace-nowrap">
+                <button
+                  type="button"
+                  onClick={() => handleSort("action_id")}
+                  className="inline-flex items-center hover:text-un-blue"
+                >
+                  ACTION
+                  <SortIcon column="action_id" />
                 </button>
               </th>
               <th className="px-4 py-3 whitespace-nowrap">
@@ -319,11 +319,11 @@ export function ActionsTable({ data }: ActionsTableProps) {
                   <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
                     {a.work_package_id}
                   </td>
-                  <td className="px-4 py-3 font-medium text-un-blue whitespace-nowrap">
-                    {actionLabel(a.action_id, a.action_sub_id)}
-                  </td>
                   <td className="px-4 py-3 text-gray-600">
                     <span className="line-clamp-2">{a.work_package_title}</span>
+                  </td>
+                  <td className="px-4 py-3 font-medium text-un-blue whitespace-nowrap">
+                    {actionLabel(a.action_id, a.action_sub_id)}
                   </td>
                   <td className="px-4 py-3 text-gray-700">
                     <span className="line-clamp-2">{a.indicative_action}</span>

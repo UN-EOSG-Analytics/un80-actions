@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { getStatusStyles } from "@/constants/actionStatus";
 import type { Action } from "@/types";
-import { Clock, FileText, Lightbulb, Target, Users } from "lucide-react";
+import { Clock, FileText, Lightbulb, Target } from "lucide-react";
 import { type ReactNode } from "react";
 
 // =========================================================
@@ -166,41 +166,6 @@ export default function OverviewTab({ action }: { action: Action }) {
                   &ldquo;{action.doc_text}&rdquo;
                 </p>
               </div>
-            )}
-          </div>
-        </SectionCard>
-      )}
-
-      {/* Implementation Details */}
-      {(action.scope_definition ||
-        action.legal_considerations ||
-        action.proposal_advancement_scenario ||
-        action.un_budgets) && (
-        <SectionCard title="Implementation Details" icon={Users}>
-          <div className="space-y-3">
-            {action.scope_definition && (
-              <InfoRow label="Scope Definition">
-                <p className="whitespace-pre-wrap">{action.scope_definition}</p>
-              </InfoRow>
-            )}
-            {action.legal_considerations && (
-              <InfoRow label="Legal Considerations">
-                <p className="whitespace-pre-wrap">
-                  {action.legal_considerations}
-                </p>
-              </InfoRow>
-            )}
-            {action.proposal_advancement_scenario && (
-              <InfoRow label="Proposal Advancement Scenario">
-                <p className="whitespace-pre-wrap">
-                  {action.proposal_advancement_scenario}
-                </p>
-              </InfoRow>
-            )}
-            {action.un_budgets && (
-              <InfoRow label="UN Budgets">
-                <p className="whitespace-pre-wrap">{action.un_budgets}</p>
-              </InfoRow>
             )}
           </div>
         </SectionCard>

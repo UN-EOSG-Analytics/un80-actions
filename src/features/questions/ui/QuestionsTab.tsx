@@ -172,26 +172,13 @@ export default function QuestionsTab({
                 key={q.id}
                 className="rounded-lg border border-slate-200 bg-white p-4"
               >
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 flex-1 space-y-3">
                     <div className="flex flex-wrap items-center gap-2">
                       <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-un-blue" />
                       <p className="text-sm font-medium text-slate-700">
                         {q.question}
                       </p>
-                      {(tagsByQuestionId[q.id] ?? []).length > 0 && (
-                        <span className="flex flex-wrap gap-1.5">
-                          {(tagsByQuestionId[q.id] ?? []).map((t) => (
-                            <Badge
-                              key={t.id}
-                              variant="outline"
-                              className="bg-slate-50 text-slate-600"
-                            >
-                              {t.name}
-                            </Badge>
-                          ))}
-                        </span>
-                      )}
                     </div>
                     {q.answer && (
                       <div className="ml-6 border-l-2 border-green-200 bg-green-50 py-2 pr-2 pl-3">
@@ -243,7 +230,20 @@ export default function QuestionsTab({
                       </Button>
                     </div>
                   </div>
-                  <div className="shrink-0">
+                  <div className="flex shrink-0 flex-col items-end gap-1.5">
+                    {(tagsByQuestionId[q.id] ?? []).length > 0 && (
+                      <span className="flex flex-wrap justify-end gap-1.5">
+                        {(tagsByQuestionId[q.id] ?? []).map((t) => (
+                          <Badge
+                            key={t.id}
+                            variant="outline"
+                            className="border-slate-400 bg-slate-100 text-slate-700"
+                          >
+                            {t.name}
+                          </Badge>
+                        ))}
+                      </span>
+                    )}
                     <TagSelector
                       entityId={q.id}
                       entityType="question"
