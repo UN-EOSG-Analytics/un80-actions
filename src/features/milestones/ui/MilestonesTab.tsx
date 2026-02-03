@@ -88,8 +88,14 @@ export default function MilestonesTab({
     description: "",
     deadline: "",
   });
-  const [newMilestoneForm, setNewMilestoneForm] = useState({
-    milestone_type: "upcoming" as const,
+  const [newMilestoneForm, setNewMilestoneForm] = useState<{
+    milestone_type: MilestoneType;
+    is_public: boolean;
+    description: string;
+    deadline: string;
+  }>({
+    milestone_type: "first",
+    is_public: false,
     description: "",
     deadline: "",
   });
@@ -182,18 +188,26 @@ export default function MilestonesTab({
     return labels[type] || type;
   };
 
-  // Public (upcoming) first, then first/second/third/final in order
+  // Separate public and private milestones
+  const publicMilestones = milestones.filter((m) => m.is_public);
+  const privateMilestones = milestones.filter((m) => !m.is_public);
+  
+  // Sort each bucket by milestone order
   const milestoneOrder: MilestoneType[] = ["upcoming", "first", "second", "third", "final"];
-  const sortedMilestones = [...milestones].sort(
+  const sortedPublicMilestones = [...publicMilestones].sort(
     (a, b) =>
       milestoneOrder.indexOf(a.milestone_type as MilestoneType) -
       milestoneOrder.indexOf(b.milestone_type as MilestoneType),
   );
-  const publicMilestones = sortedMilestones.filter((m) => m.milestone_type === "upcoming");
-  const otherMilestones = sortedMilestones.filter((m) => m.milestone_type !== "upcoming");
+  const sortedPrivateMilestones = [...privateMilestones].sort(
+    (a, b) =>
+      milestoneOrder.indexOf(a.milestone_type as MilestoneType) -
+      milestoneOrder.indexOf(b.milestone_type as MilestoneType),
+  );
 
   const getAvailableMilestoneTypes = () => {
-    const allTypes: MilestoneType[] = ["first", "second", "third", "upcoming", "final"];
+    // Exclude 'upcoming' - use is_public flag instead
+    const allTypes: MilestoneType[] = ["first", "second", "third", "final"];
     const existingTypes = milestones.map(m => m.milestone_type);
     return allTypes.filter(type => !existingTypes.includes(type));
   };
@@ -297,6 +311,7 @@ export default function MilestonesTab({
         action_id: action.id,
         action_sub_id: action.sub_id,
         milestone_type: newMilestoneForm.milestone_type,
+        is_public: newMilestoneForm.is_public,
         description: newMilestoneForm.description || null,
         deadline: newMilestoneForm.deadline || null,
       });
@@ -304,7 +319,8 @@ export default function MilestonesTab({
       if (result.success) {
         setCreatingNew(false);
         setNewMilestoneForm({
-          milestone_type: "upcoming",
+          milestone_type: "first",
+          is_public: false,
           description: "",
           deadline: "",
         });
@@ -1009,55 +1025,50 @@ export default function MilestonesTab({
 
   return (
     <div className="space-y-3">
-      {/* Public (upcoming) milestone(s) at top */}
-      {publicMilestones.map((milestone) => renderMilestone(milestone))}
-
-      {/* Thin line between public and rest to indicate hierarchy */}
-      {publicMilestones.length > 0 && otherMilestones.length > 0 && (
-        <div className="my-2 border-t border-slate-300" aria-hidden />
-      )}
-
-      {/* Other milestones (first, second, third, final) */}
-      {otherMilestones.map((milestone) => renderMilestone(milestone))}
-
-      {/* Create New Milestone Form */}
-      {creatingNew && (
-        <div className="rounded-lg border border-un-blue/20 bg-white p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-700">Create New Milestone</h3>
-            <button
-              onClick={() => {
-                setCreatingNew(false);
-                setError(null);
-              }}
-              className="text-sm text-slate-500 hover:text-slate-700"
-            >
-              Cancel
-            </button>
-          </div>
-          <div className="space-y-3">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">
-                Milestone Type
-              </label>
-              <select
-                value={newMilestoneForm.milestone_type}
-                onChange={(e) =>
-                  setNewMilestoneForm({
-                    ...newMilestoneForm,
-                    milestone_type: e.target.value as any,
-                  })
-                }
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
-                disabled={saving}
+      {/* Public milestones section - always visible */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-slate-700">Public Milestones</h3>
+        {sortedPublicMilestones.length === 0 && !creatingNew && (
+          <p className="text-sm text-slate-400 italic">No public milestones yet</p>
+        )}
+        {sortedPublicMilestones.map((milestone) => renderMilestone(milestone))}
+        
+        {/* Add Public Milestone Button / Form */}
+        {!creatingNew && getAvailableMilestoneTypes().length > 0 && (
+          <button
+            onClick={() => {
+              const availableTypes = getAvailableMilestoneTypes();
+              setNewMilestoneForm({
+                milestone_type: availableTypes[0] || "first",
+                is_public: true,
+                description: "",
+                deadline: "",
+              });
+              setCreatingNew(true);
+            }}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50/50 px-4 py-3 text-sm font-medium text-slate-600 transition-colors hover:border-un-blue hover:bg-un-blue/5 hover:text-un-blue"
+          >
+            <Plus className="h-4 w-4" />
+            Add Public Milestone
+          </button>
+        )}
+        
+        {/* Create Public Milestone Form */}
+        {creatingNew && newMilestoneForm.is_public && (
+          <div className="rounded-lg border border-un-blue/20 bg-white p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-slate-700">Create New Public Milestone</h3>
+              <button
+                onClick={() => {
+                  setCreatingNew(false);
+                  setError(null);
+                }}
+                className="text-sm text-slate-500 hover:text-slate-700"
               >
-                {getAvailableMilestoneTypes().map((type) => (
-                  <option key={type} value={type}>
-                    {getMilestoneTypeLabel(type)}
-                  </option>
-                ))}
-              </select>
+                Cancel
+              </button>
             </div>
+          <div className="space-y-3">
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-600">
                 Description
@@ -1122,18 +1133,122 @@ export default function MilestonesTab({
             </div>
           </div>
         </div>
-      )}
+        )}
+      </div>
 
-      {/* Add New Milestone Button */}
-      {!creatingNew && getAvailableMilestoneTypes().length > 0 && (
-        <button
-          onClick={() => setCreatingNew(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50/50 px-4 py-3 text-sm font-medium text-slate-600 transition-colors hover:border-un-blue hover:bg-un-blue/5 hover:text-un-blue"
-        >
-          <Plus className="h-4 w-4" />
-          Add New Milestone
-        </button>
-      )}
+      {/* Separator between sections */}
+      <div className="my-4 border-t border-slate-300" aria-hidden />
+
+      {/* Internal milestones section - always visible */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-slate-700">Internal Milestones</h3>
+        {sortedPrivateMilestones.length === 0 && !creatingNew && (
+          <p className="text-sm text-slate-400 italic">No internal milestones yet</p>
+        )}
+        {sortedPrivateMilestones.map((milestone) => renderMilestone(milestone))}
+        
+        {/* Add Internal Milestone Button / Form */}
+        {!creatingNew && getAvailableMilestoneTypes().length > 0 && (
+          <button
+            onClick={() => {
+              const availableTypes = getAvailableMilestoneTypes();
+              setNewMilestoneForm({
+                milestone_type: availableTypes[0] || "first",
+                is_public: false,
+                description: "",
+                deadline: "",
+              });
+              setCreatingNew(true);
+            }}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50/50 px-4 py-3 text-sm font-medium text-slate-600 transition-colors hover:border-slate-600 hover:bg-slate-100 hover:text-slate-700"
+          >
+            <Plus className="h-4 w-4" />
+            Add Internal Milestone
+          </button>
+        )}
+        
+        {/* Create Internal Milestone Form */}
+        {creatingNew && !newMilestoneForm.is_public && (
+          <div className="rounded-lg border border-slate-300 bg-white p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-slate-700">Create New Internal Milestone</h3>
+              <button
+                onClick={() => {
+                  setCreatingNew(false);
+                  setError(null);
+                }}
+                className="text-sm text-slate-500 hover:text-slate-700"
+              >
+                Cancel
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600">
+                  Description
+                </label>
+                <textarea
+                  value={newMilestoneForm.description}
+                  onChange={(e) =>
+                    setNewMilestoneForm({
+                      ...newMilestoneForm,
+                      description: e.target.value,
+                    })
+                  }
+                  className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                  rows={3}
+                  placeholder="Describe this milestone..."
+                  disabled={saving}
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600">
+                  Deadline
+                </label>
+                <input
+                  type="date"
+                  value={newMilestoneForm.deadline}
+                  onChange={(e) =>
+                    setNewMilestoneForm({
+                      ...newMilestoneForm,
+                      deadline: e.target.value,
+                    })
+                  }
+                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                  disabled={saving}
+                />
+              </div>
+              {error && <p className="text-sm text-red-600">{error}</p>}
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setCreatingNew(false);
+                    setError(null);
+                  }}
+                  disabled={saving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleCreateMilestone}
+                  disabled={saving}
+                  className="bg-un-blue hover:bg-un-blue/90"
+                >
+                  {saving ? (
+                    <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                  ) : (
+                    <Plus className="mr-1 h-3 w-3" />
+                  )}
+                  Create Milestone
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Divider */}
       <div className="border-t-2 border-slate-200" />

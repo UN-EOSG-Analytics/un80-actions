@@ -5,11 +5,13 @@ This script reads milestone columns from the CSV (which has more milestone data 
 the simplified actions table in the database) and creates separate milestone records.
 
 Mapping:
-- milestone_1 + milestone_1_deadline -> type='first'
-- milestone_2 + milestone_2_deadline -> type='second'
-- milestone_3 + milestone_3_deadline -> type='third'
-- milestone_upcoming + milestone_upcoming_deadline -> type='upcoming'
-- milestone_final + milestone_final_deadline -> type='final'
+- milestone_1 + milestone_1_deadline -> type='first', is_public=False
+- milestone_2 + milestone_2_deadline -> type='second', is_public=False
+- milestone_3 + milestone_3_deadline -> type='third', is_public=False
+- milestone_upcoming + milestone_upcoming_deadline -> type='upcoming', is_public=True
+- milestone_final + milestone_final_deadline -> type='final', is_public=False
+
+Note: 'upcoming' milestones are marked as public (visible to external stakeholders).
 
 Usage:
     uv run python python/tables/04-milestones/populate_milestones.py
@@ -40,6 +42,7 @@ for _, row in df_actions.iterrows():
             action_id,
             action_sub_id,
             'first',
+            False,  # is_public
             row.get("milestone_1") if pd.notna(row.get("milestone_1")) else None,
             pd.to_datetime(row["milestone_1_deadline"]).date() if pd.notna(row.get("milestone_1_deadline")) else None,
             'draft'
@@ -51,6 +54,7 @@ for _, row in df_actions.iterrows():
             action_id,
             action_sub_id,
             'second',
+            False,  # is_public
             row.get("milestone_2") if pd.notna(row.get("milestone_2")) else None,
             pd.to_datetime(row["milestone_2_deadline"]).date() if pd.notna(row.get("milestone_2_deadline")) else None,
             'draft'
@@ -62,6 +66,7 @@ for _, row in df_actions.iterrows():
             action_id,
             action_sub_id,
             'third',
+            False,  # is_public
             row.get("milestone_3") if pd.notna(row.get("milestone_3")) else None,
             pd.to_datetime(row["milestone_3_deadline"]).date() if pd.notna(row.get("milestone_3_deadline")) else None,
             'draft'
@@ -73,6 +78,7 @@ for _, row in df_actions.iterrows():
             action_id,
             action_sub_id,
             'upcoming',
+            True,  # is_public - upcoming milestones are public
             row.get("milestone_upcoming") if pd.notna(row.get("milestone_upcoming")) else None,
             pd.to_datetime(row["milestone_upcoming_deadline"]).date() if pd.notna(row.get("milestone_upcoming_deadline")) else None,
             'draft'
@@ -84,6 +90,7 @@ for _, row in df_actions.iterrows():
             action_id,
             action_sub_id,
             'final',
+            False,  # is_public
             row.get("milestone_final") if pd.notna(row.get("milestone_final")) else None,
             pd.to_datetime(row["milestone_final_deadline"]).date() if pd.notna(row.get("milestone_final_deadline")) else None,
             'draft'
@@ -102,8 +109,8 @@ with get_conn() as conn:
         if milestones:
             INSERT_MILESTONE_SQL = """
             INSERT INTO un80actions.action_milestones 
-            (action_id, action_sub_id, milestone_type, description, deadline, status)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            (action_id, action_sub_id, milestone_type, is_public, description, deadline, status)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             """
             cur.executemany(INSERT_MILESTONE_SQL, milestones)
             print(f"✓ Created {len(milestones)} milestones")

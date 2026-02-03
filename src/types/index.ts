@@ -127,6 +127,10 @@ export interface ActionMilestone {
   action_id: number;
   action_sub_id: string | null;
   milestone_type: MilestoneType;
+  is_public: boolean;
+  is_draft: boolean;
+  is_approved: boolean;
+  needs_attention: boolean;
   description: string | null;
   deadline: string | null; // ISO date string
   updates: string | null;

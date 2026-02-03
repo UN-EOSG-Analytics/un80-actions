@@ -14,6 +14,7 @@ export interface MilestoneCreateInput {
   action_id: number;
   action_sub_id?: string | null;
   milestone_type: string;
+  is_public?: boolean;
   description?: string | null;
   deadline?: string | null;
 }
@@ -48,13 +49,14 @@ export async function createMilestone(
 
     const rows = await query<ActionMilestone>(
       `INSERT INTO ${DB_SCHEMA}.action_milestones 
-       (action_id, action_sub_id, milestone_type, description, deadline, status, submitted_by, submitted_by_entity)
-       VALUES ($1, $2, $3, $4, $5, 'draft', $6, $7)
+       (action_id, action_sub_id, milestone_type, is_public, description, deadline, status, submitted_by, submitted_by_entity)
+       VALUES ($1, $2, $3, $4, $5, $6, 'draft', $7, $8)
        RETURNING *`,
       [
         input.action_id,
         input.action_sub_id || null,
         input.milestone_type,
+        input.is_public ?? false,
         input.description || null,
         input.deadline || null,
         user.id,
@@ -205,7 +207,10 @@ export async function approveMilestoneContent(
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET content_review_status = 'approved',
          content_reviewed_by = $1,
-         content_reviewed_at = NOW()
+         content_reviewed_at = NOW(),
+         is_approved = TRUE,
+         is_draft = FALSE,
+         needs_attention = FALSE
      WHERE id = $2`,
       [user.id, milestoneId],
     );
@@ -217,6 +222,54 @@ export async function approveMilestoneContent(
       success: false,
       error:
         e instanceof Error ? e.message : "Failed to approve milestone content",
+    };
+  }
+}
+
+/**
+ * Request changes to a milestone (reject approval).
+ * Sets needs_attention flag to indicate milestone requires revision.
+ */
+export async function requestMilestoneChanges(
+  milestoneId: string,
+): Promise<MilestoneResult> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const adminCheck = await query<{ user_role: string }>(
+      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
+      [user.email],
+    );
+    if (adminCheck[0]?.user_role !== "Admin") {
+      return { success: false, error: "Admin only" };
+    }
+
+    const milestone = await getMilestoneById(milestoneId);
+    if (!milestone) {
+      return { success: false, error: "Milestone not found" };
+    }
+
+    await query(
+      `UPDATE ${DB_SCHEMA}.action_milestones
+     SET needs_attention = TRUE,
+         is_approved = FALSE,
+         content_review_status = 'needs_review',
+         content_reviewed_by = $1,
+         content_reviewed_at = NOW()
+     WHERE id = $2`,
+      [user.id, milestoneId],
+    );
+
+    const updated = await getMilestoneById(milestoneId);
+    return { success: true, milestone: updated || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error:
+        e instanceof Error ? e.message : "Failed to request milestone changes",
     };
   }
 }
