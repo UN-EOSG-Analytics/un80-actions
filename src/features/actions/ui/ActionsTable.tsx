@@ -18,6 +18,7 @@ import {
 import type { ActionsTableData } from "@/types";
 import type { RiskAssessment } from "@/types";
 import { updateRiskAssessment } from "@/features/actions/commands";
+import { ActivityFeed } from "@/features/activity/ui/ActivityFeed";
 
 type SortField = "work_package_id" | "action_id" | "work_package_title" | "indicative_action" | "tracking_status" | "public_action_status" | "risk_assessment";
 type SortDirection = "asc" | "desc";
@@ -384,10 +385,9 @@ export function ActionsTable({ data }: ActionsTableProps) {
             Clear all filters
           </button>
         )}
-        <p className={`text-sm text-gray-500 ${hasActiveFilters ? "" : "ml-auto"}`}>
-          {sortedActions.length} action
-          {sortedActions.length !== 1 ? "s" : ""}
-        </p>
+        <div className="ml-auto flex items-center gap-3">
+          <ActivityFeed />
+        </div>
       </div>
 
       {/* Simple Table */}

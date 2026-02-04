@@ -148,10 +148,12 @@ export default function QuestionsTab({
 
   const startEditing = (q: ActionQuestion) => {
     setEditingId(q.id);
+    // Ensure content starts with bullet point if it doesn't already
+    const question = q.question.trim().startsWith("•") ? q.question : "• " + q.question;
     setEditingQuestion({
       header: q.header || "",
       question_date: q.question_date || "",
-      question: q.question,
+      question: question,
     });
     setError(null);
   };
@@ -248,6 +250,28 @@ export default function QuestionsTab({
           <textarea
             value={newQuestion.question}
             onChange={(e) => setNewQuestion({ ...newQuestion, question: e.target.value })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                const textarea = e.currentTarget;
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const value = textarea.value;
+                
+                // Insert bullet point at the start of the new line
+                const beforeCursor = value.substring(0, start);
+                const afterCursor = value.substring(end);
+                const newValue = beforeCursor + "\n• " + afterCursor;
+                
+                setNewQuestion({ ...newQuestion, question: newValue });
+                
+                // Set cursor position after the bullet point
+                setTimeout(() => {
+                  textarea.selectionStart = textarea.selectionEnd = start + 3; // 3 = "\n• ".length
+                }, 0);
+                
+                e.preventDefault();
+              }
+            }}
             placeholder="• "
             rows={3}
             className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-none"
