@@ -52,9 +52,11 @@ export function ActivityFeed() {
     setLoading(true);
     try {
       const data = await getRecentActivity(30);
+      console.log("Loaded activities:", data.length, data);
       setActivities(data);
     } catch (error) {
       console.error("Failed to load activities:", error);
+      setActivities([]);
     } finally {
       setLoading(false);
     }

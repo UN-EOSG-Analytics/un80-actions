@@ -22,7 +22,7 @@ export interface ActivityItem {
 export async function getRecentActivity(limit: number = 50): Promise<ActivityItem[]> {
   const activities: ActivityItem[] = [];
 
-  // Recent notes (created or updated)
+  // Recent notes (created or updated) - only user-created notes
   const notes = await query<{
     id: string;
     action_id: number;
@@ -45,11 +45,13 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
     WHERE n.user_id IS NOT NULL
     ORDER BY GREATEST(n.created_at, COALESCE(n.updated_at, n.created_at)) DESC
     LIMIT $1`,
-    [limit],
+    [limit * 2], // Get more to account for filtering
   );
 
   for (const note of notes) {
-    const isUpdated = note.updated_at && note.updated_at > note.created_at;
+    const createdDate = note.created_at instanceof Date ? note.created_at : new Date(note.created_at);
+    const updatedDate = note.updated_at ? (note.updated_at instanceof Date ? note.updated_at : new Date(note.updated_at)) : null;
+    const isUpdated = updatedDate && updatedDate.getTime() > createdDate.getTime();
     activities.push({
       id: `note-${note.id}`,
       type: "note",
@@ -58,7 +60,7 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
       title: note.header || "Note",
       description: isUpdated ? "Note updated" : "Note added",
       user_email: note.user_email,
-      timestamp: isUpdated ? note.updated_at! : note.created_at,
+      timestamp: isUpdated ? updatedDate! : createdDate,
       change_type: isUpdated ? "updated" : "created",
     });
   }
@@ -85,11 +87,13 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
     LEFT JOIN ${DB_SCHEMA}.users u ON q.user_id = u.id
     ORDER BY GREATEST(q.created_at, COALESCE(q.updated_at, q.created_at)) DESC
     LIMIT $1`,
-    [limit],
+    [limit * 2], // Get more to account for filtering
   );
 
   for (const question of questions) {
-    const isUpdated = question.updated_at && question.updated_at > question.created_at;
+    const createdDate = question.created_at instanceof Date ? question.created_at : new Date(question.created_at);
+    const updatedDate = question.updated_at ? (question.updated_at instanceof Date ? question.updated_at : new Date(question.updated_at)) : null;
+    const isUpdated = updatedDate && updatedDate.getTime() > createdDate.getTime();
     activities.push({
       id: `question-${question.id}`,
       type: "question",
@@ -98,7 +102,7 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
       title: question.header || "Question",
       description: isUpdated ? "Question updated" : "Question added",
       user_email: question.user_email,
-      timestamp: isUpdated ? question.updated_at! : question.created_at,
+      timestamp: isUpdated ? updatedDate! : createdDate,
       change_type: isUpdated ? "updated" : "created",
     });
   }
@@ -138,7 +142,7 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
       COALESCE(m.approved_at, '1970-01-01'::timestamp)
     ) DESC
     LIMIT $1`,
-    [limit],
+    [limit * 2], // Get more to account for filtering
   );
 
   for (const milestone of milestones) {
@@ -146,11 +150,16 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
       { time: milestone.approved_at, type: "approved", email: milestone.approved_by_email },
       { time: milestone.reviewed_at, type: "reviewed", email: milestone.reviewed_by_email },
       { time: milestone.submitted_at, type: "submitted", email: milestone.submitted_by_email },
-    ].filter((t) => t.time !== null);
+    ]
+      .filter((t) => t.time !== null)
+      .map((t) => ({
+        ...t,
+        time: t.time instanceof Date ? t.time : new Date(t.time!),
+      }));
 
     if (timestamps.length > 0) {
       const latest = timestamps.reduce((prev, curr) =>
-        curr.time! > prev.time! ? curr : prev,
+        curr.time.getTime() > prev.time.getTime() ? curr : prev,
       );
       activities.push({
         id: `milestone-${milestone.id}-${latest.type}`,
@@ -160,7 +169,7 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
         title: `${milestone.milestone_type} milestone`,
         description: `Milestone ${latest.type}`,
         user_email: latest.email,
-        timestamp: latest.time!,
+        timestamp: latest.time,
         change_type: latest.type === "submitted" ? "created" : "updated",
       });
     }
@@ -189,11 +198,13 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
     LEFT JOIN ${DB_SCHEMA}.users u ON mu.user_id = u.id
     ORDER BY GREATEST(mu.created_at, COALESCE(mu.updated_at, mu.created_at)) DESC
     LIMIT $1`,
-    [limit],
+    [limit * 2], // Get more to account for filtering
   );
 
   for (const update of milestoneUpdates) {
-    const isUpdated = update.updated_at && update.updated_at > update.created_at;
+    const createdDate = update.created_at instanceof Date ? update.created_at : new Date(update.created_at);
+    const updatedDate = update.updated_at ? (update.updated_at instanceof Date ? update.updated_at : new Date(update.updated_at)) : null;
+    const isUpdated = updatedDate && updatedDate.getTime() > createdDate.getTime();
     activities.push({
       id: `milestone-update-${update.id}`,
       type: "milestone_update",
@@ -202,7 +213,7 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
       title: "Milestone update",
       description: isUpdated ? "Milestone update modified" : "Milestone update added",
       user_email: update.user_email,
-      timestamp: isUpdated ? update.updated_at! : update.created_at,
+      timestamp: isUpdated ? updatedDate! : createdDate,
       change_type: isUpdated ? "updated" : "created",
     });
   }
@@ -217,10 +228,11 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
     FROM ${DB_SCHEMA}.tags
     ORDER BY created_at DESC
     LIMIT $1`,
-    [limit],
+    [limit * 2], // Get more to account for filtering
   );
 
   for (const tag of tags) {
+    const createdDate = tag.created_at instanceof Date ? tag.created_at : new Date(tag.created_at);
     activities.push({
       id: `tag-${tag.id}`,
       type: "tag",
@@ -229,7 +241,7 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
       title: tag.name,
       description: "Tag created",
       user_email: null,
-      timestamp: tag.created_at,
+      timestamp: createdDate,
       change_type: "created",
     });
   }
