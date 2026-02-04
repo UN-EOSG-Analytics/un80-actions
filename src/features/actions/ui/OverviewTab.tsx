@@ -19,7 +19,7 @@ const SectionCard = ({
   icon?: typeof FileText;
   children: ReactNode;
 }) => (
-  <div className="rounded-lg border border-slate-200 bg-white">
+  <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
     <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-3">
       {Icon && <Icon className="h-4 w-4 text-slate-500" />}
       <h3 className="text-sm font-semibold text-slate-700">{title}</h3>
