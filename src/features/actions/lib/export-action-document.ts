@@ -200,7 +200,7 @@ function buildWordDocument(
   }
 
   // Section: Legal Comments
-  if (tab === "legal" || tab === "all") {
+  if (tab === "all") {
     children.push(
       new Paragraph({
         text: "Legal Comments",
@@ -350,7 +350,7 @@ export function exportActionToPdf(
   }
 
   // Legal Comments
-  if (tab === "legal" || tab === "all") {
+  if (tab === "all") {
     addText("Legal Comments", PDF_HEADING, true);
     addSpace(4);
     if (legalComments.length === 0) {
@@ -422,7 +422,7 @@ export function exportActionToMarkdown(
   }
 
   // Legal Comments
-  if (tab === "legal" || tab === "all") {
+  if (tab === "all") {
     markdown += `## Legal Comments\n\n`;
     if (legalComments.length === 0) {
       markdown += `_No legal comments recorded._\n\n`;
