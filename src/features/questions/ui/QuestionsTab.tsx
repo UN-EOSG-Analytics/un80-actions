@@ -22,7 +22,7 @@ import { TagSelector } from "@/features/shared/TagSelector";
 import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionQuestion, ActionMilestone } from "@/types";
-import { formatUNDateTime } from "@/lib/format-date";
+import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
 import { Loader2, MessageCircle, Send, Trash2, Pencil, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -501,7 +501,7 @@ export default function QuestionsTab({
                           )}
                           {q.question_date && (
                             <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                              {q.question_date}
+                              {formatUNDate(q.question_date)}
                             </span>
                           )}
                           {q.milestone_id && (() => {

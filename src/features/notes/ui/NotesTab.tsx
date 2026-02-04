@@ -16,7 +16,7 @@ import { TagSelector } from "@/features/shared/TagSelector";
 import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionNote } from "@/types";
-import { formatUNDateTime } from "@/lib/format-date";
+import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
 import { Loader2, Plus, StickyNote, Trash2, Pencil, X, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { updateNote } from "@/features/notes/commands";
@@ -438,7 +438,7 @@ export default function NotesTab({
                           )}
                           {note.note_date && (
                             <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                              {note.note_date}
+                              {formatUNDate(note.note_date)}
                             </span>
                           )}
                         </div>
