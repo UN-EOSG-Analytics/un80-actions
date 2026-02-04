@@ -56,7 +56,7 @@ export default function NotesTab({
   const [newNote, setNewNote] = useState({
     header: "",
     note_date: "",
-    content: "",
+    content: "• ",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -111,7 +111,7 @@ export default function NotesTab({
         setNewNote({
           header: "",
           note_date: "",
-          content: "",
+          content: "• ",
         });
         await loadNotes();
       } else {
@@ -140,10 +140,12 @@ export default function NotesTab({
 
   const startEditing = (note: ActionNote) => {
     setEditingId(note.id);
+    // Ensure content starts with bullet point if it doesn't already
+    const content = note.content.trim().startsWith("•") ? note.content : "• " + note.content;
     setEditingNote({
       header: note.header || "",
       note_date: note.note_date || "",
-      content: note.content,
+      content: content,
     });
     setError(null);
   };
@@ -153,7 +155,7 @@ export default function NotesTab({
     setEditingNote({
       header: "",
       note_date: "",
-      content: "",
+      content: "• ",
     });
     setError(null);
   };
@@ -245,7 +247,29 @@ export default function NotesTab({
           <textarea
             value={newNote.content}
             onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
-            placeholder="Write your note..."
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                const textarea = e.currentTarget;
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const value = textarea.value;
+                
+                // Insert bullet point at the start of the new line
+                const beforeCursor = value.substring(0, start);
+                const afterCursor = value.substring(end);
+                const newValue = beforeCursor + "\n• " + afterCursor;
+                
+                setNewNote({ ...newNote, content: newValue });
+                
+                // Set cursor position after the bullet point
+                setTimeout(() => {
+                  textarea.selectionStart = textarea.selectionEnd = start + 3; // 3 = "\n• ".length
+                }, 0);
+                
+                e.preventDefault();
+              }
+            }}
+            placeholder="• "
             rows={3}
             className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
             disabled={submitting}
@@ -336,6 +360,29 @@ export default function NotesTab({
                       <textarea
                         value={editingNote.content}
                         onChange={(e) => setEditingNote({ ...editingNote, content: e.target.value })}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            const textarea = e.currentTarget;
+                            const start = textarea.selectionStart;
+                            const end = textarea.selectionEnd;
+                            const value = textarea.value;
+                            
+                            // Insert bullet point at the start of the new line
+                            const beforeCursor = value.substring(0, start);
+                            const afterCursor = value.substring(end);
+                            const newValue = beforeCursor + "\n• " + afterCursor;
+                            
+                            setEditingNote({ ...editingNote, content: newValue });
+                            
+                            // Set cursor position after the bullet point
+                            setTimeout(() => {
+                              textarea.selectionStart = textarea.selectionEnd = start + 3; // 3 = "\n• ".length
+                            }, 0);
+                            
+                            e.preventDefault();
+                          }
+                        }}
+                        placeholder="• "
                         rows={4}
                         className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-none"
                         disabled={saving}
