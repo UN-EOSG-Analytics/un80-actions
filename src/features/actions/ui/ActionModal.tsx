@@ -18,6 +18,7 @@ import {
 import type { Action } from "@/types";
 import {
   Calendar,
+  Check,
   ChevronRight,
   MessageCircle,
   StickyNote,
@@ -307,7 +308,7 @@ export default function ActionModal({
                   title={copied ? "Copied!" : "Click to copy link"}
                 >
                   Action {action.action_display_id}
-                  {copied && <span className="ml-1.5 text-green-600">✓</span>}
+                  {copied && <Check className="inline ml-1.5 h-4 w-4 text-un-blue" />}
                 </button>
               </div>
               {/* Title */}
