@@ -32,6 +32,7 @@ create type user_roles as enum (
 );
 create type user_status as enum ('Active', 'Inactive');
 create type content_review_status as enum ('approved', 'needs_review');
+-- Tables 
 create table approved_users (
     email text not null primary key,
     full_name text,
@@ -120,6 +121,7 @@ create table action_milestones (
         reviewed_at timestamp with time zone,
         approved_by uuid references users on delete cascade,
         approved_at timestamp with time zone,
+        serial_number integer not null,
         constraint action_milestones_action_type_key unique (action_id, action_sub_id, milestone_type),
         foreign key (action_id, action_sub_id) references actions (id, sub_id) on delete cascade
 );
@@ -240,16 +242,11 @@ create table action_questions (
         content_reviewed_at timestamp with time zone,
         foreign key (action_id, action_sub_id) references actions (id, sub_id) on delete cascade
 );
--- Shared tags pool - single source of truth for all tags across the system
--- Tags created here can be applied to notes, questions, legal comments, etc.
--- This prevents tag duplication and ensures consistency across content types
 create table tags (
     id uuid default gen_random_uuid() not null primary key,
     name text not null unique,
     created_at timestamp with time zone default now() not null
 );
-
--- Tag relationships - all junction tables reference the same tags pool above
 create table note_tags (
     note_id uuid not null references action_notes on delete cascade,
     tag_id uuid not null references tags on delete cascade,
@@ -257,7 +254,6 @@ create table note_tags (
 );
 create index idx_note_tags_note_id on note_tags (note_id);
 create index idx_note_tags_tag_id on note_tags (tag_id);
-
 create table question_tags (
     question_id uuid not null references action_questions on delete cascade,
     tag_id uuid not null references tags on delete cascade,
@@ -271,7 +267,7 @@ create table action_legal_comments (
     action_sub_id text,
     user_id uuid references users on delete cascade,
     content text not null,
-    reply_to uuid references action_legal_comments (id) on delete cascade,
+    reply_to uuid references action_legal_comments on delete cascade,
     created_at timestamp with time zone default now() not null,
     updated_at timestamp with time zone,
     content_review_status un80actions.content_review_status default 'approved'::un80actions.content_review_status not null,
@@ -281,9 +277,8 @@ create table action_legal_comments (
         foreign key (action_id, action_sub_id) references actions (id, sub_id) on delete cascade
 );
 create index idx_action_legal_comments_action on action_legal_comments (action_id, action_sub_id);
-create index idx_action_legal_comments_reply_to on action_legal_comments (reply_to) where (reply_to is not null);
-
--- Legal comment tags - references the same shared tags pool
+create index idx_action_legal_comments_reply_to on action_legal_comments (reply_to)
+where (reply_to IS NOT NULL);
 create table legal_comment_tags (
     legal_comment_id uuid not null references action_legal_comments on delete cascade,
     tag_id uuid not null references tags on delete cascade,
