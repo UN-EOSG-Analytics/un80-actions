@@ -12,6 +12,7 @@ import { CheckCircle2 } from "lucide-react";
 import {
   buildCleanQueryString,
   normalizeTeamMemberForDisplay,
+  encodeUrlParam,
 } from "@/lib/utils";
 import { isDecisionTaken } from "@/constants/actionStatus";
 import type { WorkPackageAction } from "@/types";
@@ -98,8 +99,13 @@ export function ActionItem({ action, searchQuery = "" }: ActionItemProps) {
     // Mark that modal is open (for useFilters to freeze state)
     sessionStorage.setItem("actionModalOpen", "true");
 
-    // Navigate to clean URL with only action param
-    const cleanUrl = `?action=${action.actionNumber}`;
+    // Build URL with action number and milestone (for subactions)
+    // If this is a subaction (has subActionDetails), include firstMilestone to distinguish it
+    let cleanUrl = `?action=${action.actionNumber}`;
+    if (action.subActionDetails && action.firstMilestone) {
+      cleanUrl += `&milestone=${encodeUrlParam(action.firstMilestone)}`;
+    }
+
     window.history.pushState({}, "", cleanUrl);
     // Trigger a popstate event to notify ModalHandler
     window.dispatchEvent(new PopStateEvent("popstate"));

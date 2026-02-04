@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { ACTION_STATUS } from "@/constants/actionStatus";
 import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
-import { normalizeTeamMemberForDisplay } from "@/lib/utils";
+import { normalizeTeamMemberForDisplay, encodeUrlParam } from "@/lib/utils";
 import type { Action } from "@/types";
 import { ChevronRight, FileText, X } from "lucide-react";
 import Link from "next/link";
@@ -228,7 +228,11 @@ export default function ActionModal({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    const url = `${window.location.origin}${window.location.pathname}?action=${action.action_number}`;
+                    // Build URL with action number and milestone (for subactions)
+                    let url = `${window.location.origin}${window.location.pathname}?action=${action.action_number}`;
+                    if (action.sub_action_details && action.first_milestone) {
+                      url += `&milestone=${encodeUrlParam(action.first_milestone)}`;
+                    }
                     navigator.clipboard.writeText(url);
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
