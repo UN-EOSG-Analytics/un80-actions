@@ -22,7 +22,7 @@ import { formatUNDateTime } from "@/lib/format-date";
 // TYPES
 // =========================================================
 
-export type ExportTab = "questions" | "notes" | "legal" | "all";
+export type ExportTab = "questions" | "notes" | "all";
 export type ExportFormat = "word" | "pdf" | "markdown";
 
 // =========================================================

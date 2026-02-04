@@ -5,7 +5,6 @@ import OverviewTab from "@/features/actions/ui/OverviewTab";
 import MilestonesTab from "@/features/milestones/ui/MilestonesTab";
 import NotesTab from "@/features/notes/ui/NotesTab";
 import QuestionsTab from "@/features/questions/ui/QuestionsTab";
-import LegalTab from "@/features/legal-comments/ui/LegalTab";
 import { getActionQuestions } from "@/features/questions/queries";
 import { getActionNotes } from "@/features/notes/queries";
 import { getActionLegalComments } from "@/features/legal-comments/queries";
@@ -21,7 +20,6 @@ import {
   Calendar,
   ChevronRight,
   MessageCircle,
-  Scale,
   StickyNote,
   Target,
   X,
@@ -79,7 +77,7 @@ export default function ActionModal({
   // Initialize tab from URL or default to overview
   useEffect(() => {
     const tabParam = searchParams.get("tab");
-    const validTabs = ["overview", "milestones", "questions", "notes", "legal"];
+    const validTabs = ["overview", "milestones", "questions", "notes"];
     if (tabParam && validTabs.includes(tabParam)) {
       setActiveTab(tabParam);
     } else {
@@ -159,7 +157,6 @@ export default function ActionModal({
         let exportTab: ExportTab = "all";
         if (activeTab === "questions") exportTab = "questions";
         else if (activeTab === "notes") exportTab = "notes";
-        else if (activeTab === "legal") exportTab = "legal";
 
         // Only fetch data for the active tab
         const questions =
@@ -171,7 +168,7 @@ export default function ActionModal({
             ? await getActionNotes(action.id, action.sub_id)
             : [];
         const legalComments =
-          exportTab === "legal" || exportTab === "all"
+          exportTab === "all"
             ? await getActionLegalComments(action.id, action.sub_id)
             : [];
 
@@ -358,10 +355,6 @@ export default function ActionModal({
                 <StickyNote className="h-4 w-4" />
                 Notes
               </TabsTrigger>
-              <TabsTrigger value="legal" className="gap-1.5">
-                <Scale className="h-4 w-4" />
-                Legal
-              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -383,13 +376,6 @@ export default function ActionModal({
               </TabsContent>
               <TabsContent value="notes" className="mt-0">
                 <NotesTab
-                  action={action}
-                  isAdmin={isAdmin}
-                  exportProps={{ onExport: handleExport, exporting }}
-                />
-              </TabsContent>
-              <TabsContent value="legal" className="mt-0">
-                <LegalTab
                   action={action}
                   isAdmin={isAdmin}
                   exportProps={{ onExport: handleExport, exporting }}

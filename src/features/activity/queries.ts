@@ -2,10 +2,11 @@
 
 import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
+import { getCurrentUser } from "@/features/auth/service";
 
 export interface ActivityItem {
   id: string;
-  type: "note" | "question" | "milestone" | "tag" | "milestone_update";
+  type: "note" | "question" | "milestone" | "milestone_status" | "tag" | "milestone_update";
   action_id: number;
   action_sub_id: string | null;
   title: string;
@@ -13,14 +14,18 @@ export interface ActivityItem {
   user_email: string | null;
   timestamp: Date;
   change_type?: "created" | "updated" | "tagged";
+  /** When the current user marked this as read/processed */
+  read_at?: Date | null;
 }
 
 /**
  * Fetch recent activity across the platform
- * Returns changes from notes, questions, milestones, tags, and milestone updates
+ * Returns changes from notes, questions, milestones, milestone status changes, tags, and milestone updates.
+ * If user is logged in, includes read_at for each item.
  */
 export async function getRecentActivity(limit: number = 50): Promise<ActivityItem[]> {
   const activities: ActivityItem[] = [];
+  const currentUser = await getCurrentUser();
 
   // Recent notes (created or updated)
   const notes = await query<{
@@ -234,8 +239,70 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
     });
   }
 
+  // Milestone status changes (from activity_entries)
+  try {
+    const entries = await query<{
+      id: string;
+      action_id: number;
+      action_sub_id: string | null;
+      title: string;
+      description: string;
+      user_email: string | null;
+      created_at: Date;
+    }>(
+      `SELECT 
+        e.id,
+        e.action_id,
+        e.action_sub_id,
+        e.title,
+        e.description,
+        u.email as user_email,
+        e.created_at
+      FROM ${DB_SCHEMA}.activity_entries e
+      LEFT JOIN ${DB_SCHEMA}.users u ON e.user_id = u.id
+      WHERE e.type = 'milestone_status'
+      ORDER BY e.created_at DESC
+      LIMIT $1`,
+      [limit],
+    );
+    for (const e of entries) {
+      activities.push({
+        id: e.id,
+        type: "milestone_status",
+        action_id: e.action_id,
+        action_sub_id: e.action_sub_id,
+        title: e.title,
+        description: e.description,
+        user_email: e.user_email,
+        timestamp: e.created_at,
+        change_type: "updated",
+      });
+    }
+  } catch {
+    // activity_entries table may not exist yet
+  }
+
   // Sort all activities by timestamp (most recent first) and limit
-  return activities
+  const sorted = activities
     .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
     .slice(0, limit);
+
+  // Attach read_at for current user
+  if (currentUser) {
+    try {
+      const readRows = await query<{ activity_id: string; read_at: Date }>(
+        `SELECT activity_id, read_at FROM ${DB_SCHEMA}.activity_read WHERE user_id = $1`,
+        [currentUser.id],
+      );
+      const readMap = new Map(readRows.map((r) => [r.activity_id, r.read_at]));
+      return sorted.map((a) => ({
+        ...a,
+        read_at: readMap.get(a.id) ?? null,
+      }));
+    } catch {
+      // activity_read table may not exist yet
+    }
+  }
+
+  return sorted;
 }

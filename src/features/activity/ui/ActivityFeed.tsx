@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, X, MessageSquare, HelpCircle, Flag, Tag, FileText } from "lucide-react";
+import { Bell, X, MessageSquare, HelpCircle, Flag, Tag, FileText, CheckSquare, Square } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { getRecentActivity, type ActivityItem } from "../queries";
+import { markActivityRead, markActivityUnread } from "../commands";
 import { formatUNDateTime } from "@/lib/format-date";
 import { useRouter } from "next/navigation";
 
@@ -15,6 +16,7 @@ const getActivityIcon = (type: ActivityItem["type"]) => {
     case "question":
       return <HelpCircle className="h-4 w-4" />;
     case "milestone":
+    case "milestone_status":
       return <Flag className="h-4 w-4" />;
     case "milestone_update":
       return <FileText className="h-4 w-4" />;
@@ -32,6 +34,7 @@ const getActivityColor = (type: ActivityItem["type"]) => {
     case "question":
       return "text-un-blue";
     case "milestone":
+    case "milestone_status":
       return "text-green-600";
     case "milestone_update":
       return "text-blue-600";
@@ -80,6 +83,18 @@ export function ActivityFeed() {
     }
   };
 
+  const handleReadToggle = async (e: React.MouseEvent, activity: ActivityItem) => {
+    e.stopPropagation();
+    const isRead = !!activity.read_at;
+    if (isRead) {
+      const res = await markActivityUnread(activity.id);
+      if (res.success) await loadActivities();
+    } else {
+      const res = await markActivityRead(activity.id);
+      if (res.success) await loadActivities();
+    }
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -121,48 +136,73 @@ export function ActivityFeed() {
           ) : (
             <div className="divide-y divide-gray-100">
               {activities.map((activity) => (
-                <button
+                <div
                   key={activity.id}
-                  type="button"
-                  onClick={() => handleActivityClick(activity)}
-                  className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
-                    activity.action_id > 0 ? "cursor-pointer" : "cursor-default"
+                  className={`flex items-start gap-2 px-4 py-3 hover:bg-gray-50 transition-colors ${
+                    activity.read_at ? "opacity-75" : ""
                   }`}
-                  disabled={activity.action_id === 0}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className={`mt-0.5 shrink-0 ${getActivityColor(activity.type)}`}>
-                      {getActivityIcon(activity.type)}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium text-gray-900">{activity.title}</p>
-                        {activity.change_type && (
-                          <span className="text-xs text-gray-500 capitalize">
-                            {activity.change_type}
-                          </span>
-                        )}
+                  <button
+                    type="button"
+                    onClick={(e) => handleReadToggle(e, activity)}
+                    className="mt-1 shrink-0 rounded p-0.5 text-gray-400 hover:bg-gray-200 hover:text-un-blue"
+                    title={activity.read_at ? "Mark as unread" : "Mark as read/processed"}
+                    aria-label={activity.read_at ? "Mark as unread" : "Mark as read"}
+                  >
+                    {activity.read_at ? (
+                      <CheckSquare className="h-4 w-4 text-un-blue" />
+                    ) : (
+                      <Square className="h-4 w-4" />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleActivityClick(activity)}
+                    className={`min-w-0 flex-1 text-left ${
+                      activity.action_id > 0 ? "cursor-pointer" : "cursor-default"
+                    }`}
+                    disabled={activity.action_id === 0}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-0.5 shrink-0 ${getActivityColor(activity.type)}`}>
+                        {getActivityIcon(activity.type)}
                       </div>
-                      <p className="mt-0.5 text-xs text-gray-600">{activity.description}</p>
-                      <div className="mt-1 flex items-center gap-2 text-xs text-gray-400">
-                        {activity.user_email && (
-                          <span>{activity.user_email}</span>
-                        )}
-                        <span>•</span>
-                        <span>{formatUNDateTime(activity.timestamp)}</span>
-                        {activity.action_id > 0 && (
-                          <>
-                            <span>•</span>
-                            <span>Action {activity.action_id}</span>
-                            {activity.action_sub_id && (
-                              <span> ({activity.action_sub_id})</span>
-                            )}
-                          </>
-                        )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium text-gray-900">{activity.title}</p>
+                          {activity.change_type && (
+                            <span className="text-xs text-gray-500 capitalize">
+                              {activity.change_type}
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-0.5 text-xs text-gray-600">{activity.description}</p>
+                        <div className="mt-1 flex items-center gap-2 text-xs text-gray-400">
+                          {activity.user_email && (
+                            <span>{activity.user_email}</span>
+                          )}
+                          <span>•</span>
+                          <span>{formatUNDateTime(activity.timestamp)}</span>
+                          {activity.action_id > 0 && (
+                            <>
+                              <span>•</span>
+                              <span>Action {activity.action_id}</span>
+                              {activity.action_sub_id && (
+                                <span> ({activity.action_sub_id})</span>
+                              )}
+                            </>
+                          )}
+                          {activity.read_at && (
+                            <>
+                              <span>•</span>
+                              <span className="text-green-600">Read</span>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </button>
+                  </button>
+                </div>
               ))}
             </div>
           )}

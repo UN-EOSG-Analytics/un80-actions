@@ -5,6 +5,15 @@ import { DB_SCHEMA } from "@/lib/db/config";
 import type { ActionMilestone } from "@/types";
 import { getMilestoneById } from "./queries";
 import { getCurrentUser } from "@/features/auth/service";
+import { insertActivityEntry } from "@/features/activity/commands";
+
+function getMilestoneStatusLabel(m: ActionMilestone): string {
+  if (m.is_draft) return "Draft";
+  if (m.is_approved) return "Approved";
+  if (m.needs_attention) return "Needs Attention";
+  if (m.needs_ola_review) return "Needs OLA review";
+  return "In Review";
+}
 
 // =========================================================
 // TYPES
@@ -37,6 +46,7 @@ export interface MilestoneResult {
 
 /**
  * Create a new milestone for an action.
+ * Assigns the next serial_number for this action (by deadline order).
  */
 export async function createMilestone(
   input: MilestoneCreateInput,
@@ -47,14 +57,24 @@ export async function createMilestone(
       return { success: false, error: "You must be logged in" };
     }
 
+    // Get next serial_number for this action (max + 1, or 1 if none exist)
+    const nextSerial = await query<{ next_serial: number }>(
+      `SELECT COALESCE(MAX(serial_number), 0) + 1 AS next_serial
+       FROM ${DB_SCHEMA}.action_milestones
+       WHERE action_id = $1 AND (action_sub_id IS NOT DISTINCT FROM $2)`,
+      [input.action_id, input.action_sub_id ?? null],
+    );
+    const serial_number = nextSerial[0]?.next_serial ?? 1;
+
     const rows = await query<ActionMilestone>(
       `INSERT INTO ${DB_SCHEMA}.action_milestones 
-       (action_id, action_sub_id, milestone_type, is_public, description, deadline, status, submitted_by, submitted_by_entity)
-       VALUES ($1, $2, $3, $4, $5, $6, 'draft', $7, $8)
+       (action_id, action_sub_id, serial_number, milestone_type, is_public, description, deadline, status, submitted_by, submitted_by_entity)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'draft', $8, $9)
        RETURNING *`,
       [
         input.action_id,
         input.action_sub_id || null,
+        serial_number,
         input.milestone_type,
         input.is_public ?? false,
         input.description || null,
@@ -203,6 +223,8 @@ export async function approveMilestoneContent(
       return { success: false, error: "Milestone not found" };
     }
 
+    const previousStatus = getMilestoneStatusLabel(milestone);
+
     await query(
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET content_review_status = 'approved',
@@ -210,10 +232,21 @@ export async function approveMilestoneContent(
          content_reviewed_at = NOW(),
          is_approved = TRUE,
          is_draft = FALSE,
-         needs_attention = FALSE
+         needs_attention = FALSE,
+         needs_ola_review = FALSE
      WHERE id = $2`,
       [user.id, milestoneId],
     );
+
+    await insertActivityEntry({
+      type: "milestone_status",
+      action_id: milestone.action_id,
+      action_sub_id: milestone.action_sub_id,
+      milestone_id: milestoneId,
+      title: "Milestone status changed",
+      description: `${previousStatus} → Approved`,
+      user_id: user.id,
+    });
 
     const updated = await getMilestoneById(milestoneId);
     return { success: true, milestone: updated || undefined };
@@ -252,16 +285,29 @@ export async function requestMilestoneChanges(
       return { success: false, error: "Milestone not found" };
     }
 
+    const previousStatus = getMilestoneStatusLabel(milestone);
+
     await query(
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET needs_attention = TRUE,
          is_approved = FALSE,
+         needs_ola_review = FALSE,
          content_review_status = 'needs_review',
          content_reviewed_by = $1,
          content_reviewed_at = NOW()
      WHERE id = $2`,
       [user.id, milestoneId],
     );
+
+    await insertActivityEntry({
+      type: "milestone_status",
+      action_id: milestone.action_id,
+      action_sub_id: milestone.action_sub_id,
+      milestone_id: milestoneId,
+      title: "Milestone status changed",
+      description: `${previousStatus} → Needs Attention`,
+      user_id: user.id,
+    });
 
     const updated = await getMilestoneById(milestoneId);
     return { success: true, milestone: updated || undefined };
@@ -300,15 +346,28 @@ export async function setMilestoneToDraft(
       return { success: false, error: "Milestone not found" };
     }
 
+    const previousStatus = getMilestoneStatusLabel(milestone);
+
     await query(
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET is_draft = TRUE,
          is_approved = FALSE,
          needs_attention = FALSE,
+         needs_ola_review = FALSE,
          content_review_status = 'needs_review'
      WHERE id = $1`,
       [milestoneId],
     );
+
+    await insertActivityEntry({
+      type: "milestone_status",
+      action_id: milestone.action_id,
+      action_sub_id: milestone.action_sub_id,
+      milestone_id: milestoneId,
+      title: "Milestone status changed",
+      description: `${previousStatus} → Draft`,
+      user_id: user.id,
+    });
 
     const updated = await getMilestoneById(milestoneId);
     return { success: true, milestone: updated || undefined };
@@ -317,6 +376,66 @@ export async function setMilestoneToDraft(
       success: false,
       error:
         e instanceof Error ? e.message : "Failed to set milestone to draft",
+    };
+  }
+}
+
+/**
+ * Set milestone to "Needs OLA review" (Office of Legal Affairs).
+ * Admin only. Clears approved/draft/needs_attention.
+ */
+export async function setMilestoneNeedsOlaReview(
+  milestoneId: string,
+): Promise<MilestoneResult> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const adminCheck = await query<{ user_role: string }>(
+      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
+      [user.email],
+    );
+    if (adminCheck[0]?.user_role !== "Admin") {
+      return { success: false, error: "Admin only" };
+    }
+
+    const milestone = await getMilestoneById(milestoneId);
+    if (!milestone) {
+      return { success: false, error: "Milestone not found" };
+    }
+
+    const previousStatus = getMilestoneStatusLabel(milestone);
+
+    await query(
+      `UPDATE ${DB_SCHEMA}.action_milestones
+     SET needs_ola_review = TRUE,
+         is_draft = FALSE,
+         is_approved = FALSE,
+         needs_attention = FALSE,
+         content_review_status = 'needs_review'
+     WHERE id = $1`,
+      [milestoneId],
+    );
+
+    await insertActivityEntry({
+      type: "milestone_status",
+      action_id: milestone.action_id,
+      action_sub_id: milestone.action_sub_id,
+      milestone_id: milestoneId,
+      title: "Milestone status changed",
+      description: `${previousStatus} → Needs OLA review`,
+      user_id: user.id,
+    });
+
+    const updated = await getMilestoneById(milestoneId);
+    return { success: true, milestone: updated || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error:
+        e instanceof Error ? e.message : "Failed to set Needs OLA review",
     };
   }
 }

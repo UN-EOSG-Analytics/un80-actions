@@ -51,6 +51,7 @@ export async function getActionMilestones(
         m.is_draft,
         m.is_approved,
         m.needs_attention,
+        m.needs_ola_review,
         m.description,
         m.deadline::text,
         m.updates,
@@ -120,6 +121,7 @@ export async function getActionMilestones(
       );
       return rows.map((r) => ({
         ...r,
+        needs_ola_review: (r as ActionMilestone).needs_ola_review ?? false,
         content_review_status: "approved" as const,
         content_reviewed_by: null,
         content_reviewed_by_email: null,
@@ -151,6 +153,7 @@ export async function getMilestoneById(
         m.is_draft,
         m.is_approved,
         m.needs_attention,
+        m.needs_ola_review,
         m.description,
         m.deadline::text,
         m.updates,
@@ -204,6 +207,7 @@ export async function getMilestoneById(
       return r
         ? {
             ...r,
+            needs_ola_review: (r as ActionMilestone).needs_ola_review ?? false,
             content_review_status: "approved" as const,
             content_reviewed_by: null,
             content_reviewed_by_email: null,

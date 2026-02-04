@@ -19,7 +19,7 @@ import {
   getMilestoneVersions,
   type MilestoneVersion,
 } from "@/features/milestones/queries";
-import { updateMilestone, createMilestone, approveMilestoneContent, requestMilestoneChanges, setMilestoneToDraft } from "@/features/milestones/commands";
+import { updateMilestone, createMilestone, approveMilestoneContent, requestMilestoneChanges, setMilestoneToDraft, setMilestoneNeedsOlaReview } from "@/features/milestones/commands";
 import { MilestoneCard } from "./MilestoneCard";
 import {
   getMilestoneUpdates,
@@ -128,7 +128,7 @@ export default function MilestonesTab({
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     milestoneId: string | null;
-    status: "draft" | "approved" | "needs_attention" | null;
+    status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | null;
   }>({ open: false, milestoneId: null, status: null });
 
   const getFileIcon = (contentType: string, filename: string) => {
@@ -305,7 +305,7 @@ export default function MilestonesTab({
     }
   };
 
-  const handleStatusChange = (milestoneId: string, status: "draft" | "approved" | "needs_attention") => {
+  const handleStatusChange = (milestoneId: string, status: "draft" | "approved" | "needs_attention" | "needs_ola_review") => {
     setConfirmDialog({ open: true, milestoneId, status });
   };
 
@@ -325,7 +325,9 @@ export default function MilestonesTab({
         result = await approveMilestoneContent(milestoneId);
       } else if (status === "needs_attention") {
         result = await requestMilestoneChanges(milestoneId);
-    } else {
+      } else if (status === "needs_ola_review") {
+        result = await setMilestoneNeedsOlaReview(milestoneId);
+      } else {
         result = await setMilestoneToDraft(milestoneId);
       }
 
@@ -1485,6 +1487,7 @@ export default function MilestonesTab({
               {confirmDialog.status === "draft" && "Change this milestone to Draft? It will no longer be approved."}
               {confirmDialog.status === "approved" && "Approve this milestone? This will mark it as approved and no longer a draft."}
               {confirmDialog.status === "needs_attention" && "Mark this milestone as needing attention? This will notify the team to make changes."}
+              {confirmDialog.status === "needs_ola_review" && "Mark this milestone as needing OLA (Office of Legal Affairs) review?"}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

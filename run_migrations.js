@@ -82,6 +82,12 @@ async function runAllMigrations() {
     // Run migration 007
     await runMigration(7, 'add_milestone_id_to_questions');
     
+    // Run migration 008
+    await runMigration(8, 'add_needs_ola_review_to_milestones');
+    
+    // Run migration 009
+    await runMigration(9, 'add_activity_entries_and_read');
+    
     console.log('\n✅ All migrations completed successfully!');
   } catch (error) {
     console.error('\n❌ Migration failed:', error.message);

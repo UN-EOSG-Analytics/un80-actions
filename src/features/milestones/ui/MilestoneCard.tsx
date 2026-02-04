@@ -17,7 +17,7 @@ interface MilestoneCardProps {
   onEdit: () => void;
   onComment: () => void;
   onShowHistory: () => void;
-  onStatusChange?: (status: "draft" | "approved" | "needs_attention") => void;
+  onStatusChange?: (status: "draft" | "approved" | "needs_attention" | "needs_ola_review") => void;
   isAdmin?: boolean;
 }
 
@@ -41,16 +41,20 @@ export function MilestoneCard({
     if (milestone.needs_attention) {
       return { label: "Needs Attention", className: "bg-amber-100 text-amber-700" };
     }
+    if (milestone.needs_ola_review) {
+      return { label: "Needs OLA review", className: "bg-violet-100 text-violet-700" };
+    }
     return { label: "In Review", className: "bg-blue-100 text-blue-700" };
   };
 
   const status = getDisplayStatus();
 
   // Determine current status (mutually exclusive)
-  const getCurrentStatus = (): "draft" | "approved" | "needs_attention" | "in_review" => {
+  const getCurrentStatus = (): "draft" | "approved" | "needs_attention" | "needs_ola_review" | "in_review" => {
     if (milestone.is_draft) return "draft";
     if (milestone.is_approved) return "approved";
     if (milestone.needs_attention) return "needs_attention";
+    if (milestone.needs_ola_review) return "needs_ola_review";
     return "in_review";
   };
 
@@ -112,6 +116,15 @@ export function MilestoneCard({
                         <span className="flex w-full items-center justify-between">
                           Needs Attention
                           {currentStatus === "needs_attention" && <Check className="h-3 w-3" />}
+                        </span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => onStatusChange("needs_ola_review")}
+                        disabled={currentStatus === "needs_ola_review"}
+                      >
+                        <span className="flex w-full items-center justify-between">
+                          Needs OLA review
+                          {currentStatus === "needs_ola_review" && <Check className="h-3 w-3" />}
                         </span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
