@@ -200,13 +200,13 @@ export default function NotesTab({
       {/* Add Note Form */}
       <form
         onSubmit={handleSubmit}
-        className="rounded-lg border border-slate-200 bg-white p-4 space-y-3"
+        className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-4"
       >
-        <label className="block text-sm font-medium text-slate-700">
+        <label className="block text-base font-semibold text-slate-800">
           Add a note
         </label>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
+          <label className="mb-1.5 block text-xs font-medium text-slate-600">
             Header *
           </label>
           <Select
@@ -228,7 +228,7 @@ export default function NotesTab({
           </Select>
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
+          <label className="mb-1.5 block text-xs font-medium text-slate-600">
             Date *
           </label>
           <input
@@ -241,7 +241,7 @@ export default function NotesTab({
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
+          <label className="mb-1.5 block text-xs font-medium text-slate-600">
             Note *
           </label>
           <textarea
@@ -308,18 +308,18 @@ export default function NotesTab({
       ) : notes.length === 0 ? (
         <EmptyState message="No notes have been added yet." />
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {notes.map((note) => {
             const isEditing = editingId === note.id;
             return (
               <div
                 key={note.id}
-                className="rounded-lg border border-slate-200 bg-white p-4"
+                className="rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md"
               >
                 {isEditing ? (
-                  <div className="space-y-3">
+                  <div className="space-y-4 p-5">
                     <div>
-                      <label className="mb-1 block text-xs font-medium text-slate-600">
+                      <label className="mb-1.5 block text-xs font-medium text-slate-600">
                         Header *
                       </label>
                       <Select
@@ -341,7 +341,7 @@ export default function NotesTab({
                       </Select>
                     </div>
                     <div>
-                      <label className="mb-1 block text-xs font-medium text-slate-600">
+                      <label className="mb-1.5 block text-xs font-medium text-slate-600">
                         Date *
                       </label>
                       <input
@@ -354,7 +354,7 @@ export default function NotesTab({
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-xs font-medium text-slate-600">
+                      <label className="mb-1.5 block text-xs font-medium text-slate-600">
                         Note *
                       </label>
                       <textarea
@@ -422,90 +422,94 @@ export default function NotesTab({
                   </div>
                 ) : (
                   <>
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex min-w-0 flex-1 items-start gap-2">
-                        <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-                        <div className="min-w-0 flex-1">
-                          {(note.header || note.note_date) && (
-                            <div className="mb-2 space-y-1">
-                              {note.header && (
-                                <h4 className="text-sm font-semibold text-slate-800">
-                                  {note.header}
-                                </h4>
-                              )}
-                              {note.note_date && (
-                                <p className={`text-xs text-slate-500 ${note.header ? "" : ""}`}>
-                                  Date: {note.note_date}
-                                </p>
-                              )}
+                    <div className="flex items-start justify-between gap-4 p-5">
+                      <div className="min-w-0 flex-1 space-y-4">
+                        {/* Header: category + date */}
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                          {note.header && (
+                            <div className="flex items-center gap-2">
+                              <span className="flex h-8 items-center justify-center rounded-lg bg-amber-100 px-2.5">
+                                <StickyNote className="h-4 w-4 text-amber-600" />
+                              </span>
+                              <h4 className="text-base font-semibold tracking-tight text-slate-800">
+                                {note.header}
+                              </h4>
                             </div>
                           )}
-                          <div className="flex flex-wrap items-center gap-2">
-                            <p className="text-sm whitespace-pre-wrap text-slate-700">
-                              {note.content}
-                            </p>
-                          </div>
-                          <div className="mt-2 flex flex-wrap items-center gap-2">
-                            <p className="text-xs text-slate-400">
-                              {formatUNDateTime(note.created_at)}
-                              {note.user_email && ` by ${note.user_email}`}
-                            </p>
-                            <ReviewStatus
-                              status={
-                                note.content_review_status ?? "approved"
-                              }
-                              reviewedByEmail={note.content_reviewed_by_email}
-                              reviewedAt={note.content_reviewed_at}
-                              isAdmin={isAdmin}
-                              onApprove={async () => {
-                                setApprovingId(note.id);
-                                try {
-                                  const result = await approveNote(note.id);
-                                  if (result.success) {
-                                    await loadNotes();
-                                  }
-                                } finally {
-                                  setApprovingId(null);
+                          {note.note_date && (
+                            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                              {note.note_date}
+                            </span>
+                          )}
+                        </div>
+                        {/* Note body */}
+                        <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-4 py-3">
+                          <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-slate-700">
+                            {note.content}
+                          </p>
+                        </div>
+                        {/* Footer: meta + actions */}
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-slate-100 pt-3">
+                          <p className="text-xs text-slate-500">
+                            <span className="font-medium text-slate-600">{formatUNDateTime(note.created_at)}</span>
+                            <span className="mx-1.5">·</span>
+                            <span>{note.user_email}</span>
+                          </p>
+                          <ReviewStatus
+                            status={note.content_review_status ?? "approved"}
+                            reviewedByEmail={note.content_reviewed_by_email}
+                            reviewedAt={note.content_reviewed_at}
+                            isAdmin={isAdmin}
+                            onApprove={async () => {
+                              setApprovingId(note.id);
+                              try {
+                                const result = await approveNote(note.id);
+                                if (result.success) {
+                                  await loadNotes();
                                 }
-                              }}
-                              approving={approvingId === note.id}
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-slate-400 hover:text-un-blue"
-                              onClick={() => startEditing(note)}
-                              aria-label="Edit note"
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-slate-400 hover:text-red-600"
-                              onClick={() => handleDelete(note.id)}
-                              disabled={deletingId === note.id}
-                              aria-label="Delete note"
-                            >
-                              {deletingId === note.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <Trash2 className="h-4 w-4" />
-                              )}
-                            </Button>
-                          </div>
+                              } finally {
+                                setApprovingId(null);
+                              }
+                            }}
+                            approving={approvingId === note.id}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 gap-1.5 text-slate-500 hover:bg-slate-100 hover:text-un-blue"
+                            onClick={() => startEditing(note)}
+                            aria-label="Edit note"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                            Edit
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 gap-1.5 text-slate-500 hover:bg-red-50 hover:text-red-600"
+                            onClick={() => handleDelete(note.id)}
+                            disabled={deletingId === note.id}
+                            aria-label="Delete note"
+                          >
+                            {deletingId === note.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-3.5 w-3.5" />
+                            )}
+                            Delete
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex shrink-0 flex-col items-end gap-1.5">
+                      <div className="flex shrink-0 flex-col items-end gap-2">
                         {(tagsByNoteId[note.id] ?? []).length > 0 && (
                           <span className="flex flex-wrap justify-end gap-1.5">
                             {(tagsByNoteId[note.id] ?? []).map((t) => (
                               <Badge
                                 key={t.id}
-                                variant="outline"
-                                className="border-slate-400 bg-slate-100 text-slate-700"
+                                variant="secondary"
+                                className="border-0 bg-amber-100 text-amber-800 hover:bg-amber-200/80"
                               >
                                 {t.name}
                               </Badge>

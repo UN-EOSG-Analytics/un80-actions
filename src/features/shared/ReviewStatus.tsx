@@ -27,7 +27,7 @@ export function ReviewStatus({
   if (status === "needs_review") {
     return (
       <div className={`flex flex-wrap items-center gap-2 ${className}`}>
-        <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-200">
+        <Badge className="rounded-md bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800 ring-1 ring-amber-200/80">
           Open
         </Badge>
         {isAdmin && onApprove && (
@@ -36,13 +36,13 @@ export function ReviewStatus({
             variant="outline"
             onClick={onApprove}
             disabled={approving}
-            className="h-7 text-xs"
+            className="h-7 rounded-md border-slate-300 text-xs font-medium hover:bg-slate-50"
           >
             {approving ? (
               <Loader2 className="h-3 w-3 animate-spin" />
             ) : (
               <>
-                <Check className="mr-1 h-3 w-3" />
+                <Check className="mr-1.5 h-3 w-3" />
                 Close
               </>
             )}
@@ -54,7 +54,7 @@ export function ReviewStatus({
 
   return (
     <div className={`flex flex-wrap items-center gap-2 ${className}`}>
-      <Badge className="bg-green-100 text-green-800 border border-green-200">
+      <Badge className="rounded-md bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800 ring-1 ring-emerald-200/80">
         Closed
       </Badge>
       {(reviewedByEmail || reviewedAt) && (
