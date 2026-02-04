@@ -86,13 +86,19 @@ export function ActivityFeed() {
   const handleReadToggle = async (e: React.MouseEvent, activity: ActivityItem) => {
     e.stopPropagation();
     const isRead = !!activity.read_at;
-    if (isRead) {
-      const res = await markActivityUnread(activity.id);
-      if (res.success) await loadActivities();
-    } else {
-      const res = await markActivityRead(activity.id);
-      if (res.success) await loadActivities();
-    }
+    // Optimistic update: toggle read state immediately so the UI feels instant
+    setActivities((prev) =>
+      prev.map((a) =>
+        a.id === activity.id
+          ? { ...a, read_at: isRead ? undefined : new Date() }
+          : a,
+      ),
+    );
+    const res = isRead
+      ? await markActivityUnread(activity.id)
+      : await markActivityRead(activity.id);
+    // Only refetch on failure to restore correct state
+    if (!res.success) loadActivities();
   };
 
   return (
@@ -112,9 +118,9 @@ export function ActivityFeed() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-96 p-0" align="end">
+      <PopoverContent className="w-[32rem] max-w-[95vw] p-0" align="end">
         <div className="flex items-center justify-between border-b px-4 py-3">
-          <h3 className="text-sm font-semibold text-gray-900">Recent Activity</h3>
+          <h3 className="text-base font-semibold text-gray-900">Recent Activity</h3>
           <Button
             variant="ghost"
             size="icon"
@@ -124,7 +130,7 @@ export function ActivityFeed() {
             <X className="h-4 w-4" />
           </Button>
         </div>
-        <div className="max-h-[500px] overflow-y-auto">
+        <div className="max-h-[70vh] min-h-[320px] overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-un-blue" />
@@ -138,7 +144,7 @@ export function ActivityFeed() {
               {activities.map((activity) => (
                 <div
                   key={activity.id}
-                  className={`flex items-start gap-2 px-4 py-3 hover:bg-gray-50 transition-colors ${
+                  className={`flex items-start gap-3 px-4 py-4 hover:bg-gray-50 transition-colors ${
                     activity.read_at ? "opacity-75" : ""
                   }`}
                 >
@@ -167,7 +173,7 @@ export function ActivityFeed() {
                       <div className={`mt-0.5 shrink-0 ${getActivityColor(activity.type)}`}>
                         {getActivityIcon(activity.type)}
                       </div>
-                      <div className="min-w-0 flex-1">
+                      <div className={`min-w-0 flex-1 ${activity.read_at ? "line-through decoration-gray-400" : ""}`}>
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium text-gray-900">{activity.title}</p>
                           {activity.change_type && (
@@ -176,8 +182,8 @@ export function ActivityFeed() {
                             </span>
                           )}
                         </div>
-                        <p className="mt-0.5 text-xs text-gray-600">{activity.description}</p>
-                        <div className="mt-1 flex items-center gap-2 text-xs text-gray-400">
+                        <p className="mt-1 text-sm text-gray-600">{activity.description}</p>
+                        <div className="mt-1.5 flex items-center gap-2 text-xs text-gray-400">
                           {activity.user_email && (
                             <span>{activity.user_email}</span>
                           )}

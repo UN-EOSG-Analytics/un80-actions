@@ -358,29 +358,29 @@ export default function ActionModal({
             </TabsList>
           </div>
 
-          {/* Tab Content */}
+          {/* Tab Content - only mount the active tab to avoid loading all tab data on open */}
           <div className="min-h-0 flex-1 overflow-hidden">
             <div className="h-full overflow-y-auto p-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-              <TabsContent value="overview" className="mt-0">
+              {activeTab === "overview" && (
                 <OverviewTab action={action} />
-              </TabsContent>
-              <TabsContent value="milestones" className="mt-0">
+              )}
+              {activeTab === "milestones" && (
                 <MilestonesTab action={action} isAdmin={isAdmin} />
-              </TabsContent>
-              <TabsContent value="questions" className="mt-0">
+              )}
+              {activeTab === "questions" && (
                 <QuestionsTab
                   action={action}
                   isAdmin={isAdmin}
                   exportProps={{ onExport: handleExport, exporting }}
                 />
-              </TabsContent>
-              <TabsContent value="notes" className="mt-0">
+              )}
+              {activeTab === "notes" && (
                 <NotesTab
                   action={action}
                   isAdmin={isAdmin}
                   exportProps={{ onExport: handleExport, exporting }}
                 />
-              </TabsContent>
+              )}
             </div>
           </div>
         </Tabs>

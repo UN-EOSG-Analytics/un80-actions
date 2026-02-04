@@ -383,8 +383,7 @@ export async function getActionByNumber(
 
   const action = rowToAction(rows[0]);
 
-  // Optionally load milestones for detailed view
-  action.milestones = await getActionMilestones(action.id, action.sub_id);
+  // Milestones are loaded lazily when the user opens the Milestones tab
 
   return action;
 }
