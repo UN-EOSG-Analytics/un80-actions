@@ -348,8 +348,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
     setFilterTrackingStatus([]);
     setFilterPublicStatus([]);
     setFilterBigTicket([]);
-    setFilterWorkPackageId("");
-    setFilterRisk("");
   };
 
   return (
