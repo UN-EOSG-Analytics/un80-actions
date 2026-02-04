@@ -23,6 +23,7 @@ import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionQuestion, ActionMilestone } from "@/types";
 import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
+import { applyBoldShortcut, BoldText } from "@/features/shared/markdown-bold";
 import { Loader2, MessageCircle, Send, Trash2, Pencil, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -301,6 +302,16 @@ export default function QuestionsTab({
             value={newQuestion.question}
             onChange={(e) => setNewQuestion({ ...newQuestion, question: e.target.value })}
             onKeyDown={(e) => {
+              const bold = applyBoldShortcut(e, newQuestion.question);
+              if (bold) {
+                setNewQuestion({ ...newQuestion, question: bold.newValue });
+                const ta = e.currentTarget;
+                setTimeout(() => {
+                  ta.selectionStart = bold.cursorStart;
+                  ta.selectionEnd = bold.cursorEnd;
+                }, 0);
+                return;
+              }
               if (e.key === "Enter") {
                 const textarea = e.currentTarget;
                 const start = textarea.selectionStart;
@@ -446,6 +457,17 @@ export default function QuestionsTab({
                       <textarea
                         value={editingQuestion.question}
                         onChange={(e) => setEditingQuestion({ ...editingQuestion, question: e.target.value })}
+                        onKeyDown={(e) => {
+                          const bold = applyBoldShortcut(e, editingQuestion.question);
+                          if (bold) {
+                            setEditingQuestion({ ...editingQuestion, question: bold.newValue });
+                            const ta = e.currentTarget;
+                            setTimeout(() => {
+                              ta.selectionStart = bold.cursorStart;
+                              ta.selectionEnd = bold.cursorEnd;
+                            }, 0);
+                          }
+                        }}
                         placeholder="• "
                         rows={3}
                         className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-none"
@@ -522,13 +544,13 @@ export default function QuestionsTab({
                         {/* Question body */}
                         <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-4 py-3">
                           <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-slate-700">
-                            {q.question}
+                            <BoldText>{q.question}</BoldText>
                           </p>
                         </div>
                         {q.answer && (
                           <div className="rounded-lg border-l-4 border-green-300 bg-green-50/80 px-4 py-3">
                             <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
-                              {q.answer}
+                              <BoldText>{q.answer}</BoldText>
                             </p>
                             {q.answered_at && (
                               <p className="mt-2 text-xs font-medium text-slate-500">

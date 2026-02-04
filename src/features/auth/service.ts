@@ -120,20 +120,26 @@ export async function clearSession() {
 export async function getCurrentUser() {
   const session = await getSession();
   if (!session) return null;
-  const rows = await query<{
-    id: string;
-    email: string;
-    entity: string | null;
-    user_role: string | null;
-  }>(
-    `SELECT u.id, u.email, au.entity, au.user_role FROM ${tables.users} u LEFT JOIN ${tables.approved_users} au ON LOWER(u.email) = LOWER(au.email) WHERE u.id = $1`,
-    [session.userId],
-  );
-  if (!rows[0]) return null;
-  return {
-    id: rows[0].id,
-    email: rows[0].email,
-    entity: rows[0].entity,
-    user_role: rows[0].user_role,
-  };
+  try {
+    const rows = await query<{
+      id: string;
+      email: string;
+      entity: string | null;
+      user_role: string | null;
+    }>(
+      `SELECT u.id, u.email, au.entity, au.user_role FROM ${tables.users} u LEFT JOIN ${tables.approved_users} au ON LOWER(u.email) = LOWER(au.email) WHERE u.id = $1`,
+      [session.userId],
+    );
+    if (!rows[0]) return null;
+    return {
+      id: rows[0].id,
+      email: rows[0].email,
+      entity: rows[0].entity,
+      user_role: rows[0].user_role,
+    };
+  } catch (err) {
+    // Connection timeout / ECONNRESET / DB unreachable: treat as no user so app still renders
+    console.error("[auth] getCurrentUser DB error:", err instanceof Error ? err.message : err);
+    return null;
+  }
 }

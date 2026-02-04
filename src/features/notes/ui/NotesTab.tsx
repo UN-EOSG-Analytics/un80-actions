@@ -17,6 +17,7 @@ import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionNote } from "@/types";
 import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
+import { applyBoldShortcut, BoldText } from "@/features/shared/markdown-bold";
 import { Loader2, Plus, StickyNote, Trash2, Pencil, X, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { updateNote } from "@/features/notes/commands";
@@ -248,6 +249,16 @@ export default function NotesTab({
             value={newNote.content}
             onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
             onKeyDown={(e) => {
+              const bold = applyBoldShortcut(e, newNote.content);
+              if (bold) {
+                setNewNote({ ...newNote, content: bold.newValue });
+                const ta = e.currentTarget;
+                setTimeout(() => {
+                  ta.selectionStart = bold.cursorStart;
+                  ta.selectionEnd = bold.cursorEnd;
+                }, 0);
+                return;
+              }
               if (e.key === "Enter") {
                 const textarea = e.currentTarget;
                 const start = textarea.selectionStart;
@@ -361,6 +372,16 @@ export default function NotesTab({
                         value={editingNote.content}
                         onChange={(e) => setEditingNote({ ...editingNote, content: e.target.value })}
                         onKeyDown={(e) => {
+                          const bold = applyBoldShortcut(e, editingNote.content);
+                          if (bold) {
+                            setEditingNote({ ...editingNote, content: bold.newValue });
+                            const ta = e.currentTarget;
+                            setTimeout(() => {
+                              ta.selectionStart = bold.cursorStart;
+                              ta.selectionEnd = bold.cursorEnd;
+                            }, 0);
+                            return;
+                          }
                           if (e.key === "Enter") {
                             const textarea = e.currentTarget;
                             const start = textarea.selectionStart;
@@ -445,7 +466,7 @@ export default function NotesTab({
                         {/* Note body */}
                         <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-4 py-3">
                           <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-slate-700">
-                            {note.content}
+                            <BoldText>{note.content}</BoldText>
                           </p>
                         </div>
                         {/* Footer: meta + actions */}

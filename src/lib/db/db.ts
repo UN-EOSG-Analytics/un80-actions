@@ -25,7 +25,7 @@ function getConnectionConfig() {
     ssl: { rejectUnauthorized: false },
     max: 2, // Lower for serverless to avoid connection exhaustion
     idleTimeoutMillis: 10000,
-    connectionTimeoutMillis: 5000,
+    connectionTimeoutMillis: 15000, // 15s for slow/cold connections (e.g. Azure, VPN)
     options: "-c search_path=un80actions,systemchart,public",
   };
 }
