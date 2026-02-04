@@ -221,12 +221,12 @@ export default function MilestonesTab({
       // Close if clicking same button again
       setEditingId(null);
     } else {
-      setEditingId(milestone.id);
-      setEditForm({
-        description: milestone.description || "",
-        deadline: milestone.deadline || "",
-      });
-      setError(null);
+    setEditingId(milestone.id);
+    setEditForm({
+      description: milestone.description || "",
+      deadline: milestone.deadline || "",
+    });
+    setError(null);
       // Load updates for this milestone
       loadMilestoneUpdates(milestone.id);
     }
@@ -325,7 +325,7 @@ export default function MilestonesTab({
         result = await approveMilestoneContent(milestoneId);
       } else if (status === "needs_attention") {
         result = await requestMilestoneChanges(milestoneId);
-      } else {
+    } else {
         result = await setMilestoneToDraft(milestoneId);
       }
 
@@ -587,7 +587,7 @@ export default function MilestonesTab({
 
   const renderMilestone = (milestone: ActionMilestone) => {
     const updates = milestoneUpdates[milestone.id] || [];
-    return (
+  return (
         <Collapsible
           key={milestone.id}
           open={editingId === milestone.id || addingCommentId === milestone.id || showVersionHistoryId === milestone.id}
@@ -600,11 +600,11 @@ export default function MilestonesTab({
             onComment={() => startAddingComment(milestone.id)}
             onShowHistory={() => toggleVersionHistory(milestone.id)}
             onStatusChange={isAdmin ? (status) => handleStatusChange(milestone.id, status) : undefined}
-            isAdmin={isAdmin}
+                          isAdmin={isAdmin}
           />
 
-          {/* Collapsible Content */}
-          <CollapsibleContent>
+            {/* Collapsible Content */}
+            <CollapsibleContent>
               <div className="border-t border-slate-200 p-4">
                 {editingId === milestone.id ? (
                   // Edit Mode
@@ -626,22 +626,22 @@ export default function MilestonesTab({
                         disabled={saving}
                       />
                     </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-slate-600">
-                        Deadline
-                      </label>
-                      <input
-                        type="date"
-                        value={editForm.deadline}
-                        onChange={(e) =>
-                          setEditForm({
-                            ...editForm,
-                            deadline: e.target.value,
-                          })
-                        }
-                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
-                        disabled={saving}
-                      />
+                      <div>
+                        <label className="mb-1 block text-xs font-medium text-slate-600">
+                          Deadline
+                        </label>
+                        <input
+                          type="date"
+                          value={editForm.deadline}
+                          onChange={(e) =>
+                            setEditForm({
+                              ...editForm,
+                              deadline: e.target.value,
+                            })
+                          }
+                          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                          disabled={saving}
+                        />
                     </div>
                     {error && <p className="text-sm text-red-600">{error}</p>}
                     <div className="flex justify-end gap-2">
@@ -693,19 +693,19 @@ export default function MilestonesTab({
                             >
                               <div className="mb-2 flex items-center justify-between gap-2">
                                 <div className="flex flex-col gap-0.5">
-                                  <span className="font-medium text-slate-600">
-                                    {new Date(
-                                      version.changed_at,
-                                    ).toLocaleDateString(undefined, {
-                                      dateStyle: "medium",
-                                    })}{" "}
-                                    at{" "}
-                                    {new Date(
-                                      version.changed_at,
-                                    ).toLocaleTimeString(undefined, {
-                                      timeStyle: "short",
-                                    })}
-                                  </span>
+                                <span className="font-medium text-slate-600">
+                                  {new Date(
+                                    version.changed_at,
+                                  ).toLocaleDateString(undefined, {
+                                    dateStyle: "medium",
+                                  })}{" "}
+                                  at{" "}
+                                  {new Date(
+                                    version.changed_at,
+                                  ).toLocaleTimeString(undefined, {
+                                    timeStyle: "short",
+                                  })}
+                                </span>
                                   {version.changed_by && (
                                     <span className="text-[11px] text-slate-500">
                                       by {version.changed_by}
@@ -759,9 +759,9 @@ export default function MilestonesTab({
                           <span className="ml-1 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold">
                             {updates.length}
                           </span>
-                        )}
-                      </div>
-                    </div>
+                )}
+              </div>
+          </div>
 
                     {/* Comments List */}
                     {updates.length > 0 ? (
@@ -913,7 +913,7 @@ export default function MilestonesTab({
                                               <CornerDownRight className="h-3 w-3" />
                                             )}
                                           </Button>
-                                        </div>
+        </div>
                                       </div>
                                     </div>
                                   </div>
@@ -1221,13 +1221,13 @@ export default function MilestonesTab({
         </h3>
 
         <div className="rounded-lg border border-slate-200 bg-white p-4">
-          {loadingAttachments ? (
-            <div className="flex items-center gap-2 py-2">
-              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
-              <span className="text-sm text-slate-500">Loading…</span>
-            </div>
-          ) : attachments.length > 0 ? (
-            <div className="mb-4 space-y-3">
+        {loadingAttachments ? (
+          <div className="flex items-center gap-2 py-2">
+            <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+            <span className="text-sm text-slate-500">Loading…</span>
+          </div>
+        ) : attachments.length > 0 ? (
+          <div className="mb-4 space-y-3">
             {attachments.map((att) => {
               const milestone = milestones.find((m) => m.id === att.milestone_id);
               const isEditing = editingAttachment === att.id;
@@ -1473,7 +1473,7 @@ export default function MilestonesTab({
             <p className="mt-2 text-sm text-red-600">{uploadError}</p>
           )}
         </form>
-        </div>
+      </div>
       </section>
 
       {/* Status Change Confirmation Dialog */}
