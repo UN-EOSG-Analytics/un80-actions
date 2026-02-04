@@ -5,26 +5,15 @@ import nodemailer from "nodemailer";
  * Create transporter on-demand to ensure env vars are read at runtime.
  */
 function createTransporter() {
-  const host = process.env.SMTP_HOST || "smtp.mailbox.org";
-  const port = Number(process.env.SMTP_PORT) || 587;
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-
-  // Debug: log what we're using (mask password)
-  console.log("SMTP Config:", {
-    host,
-    port,
-    user,
-    passLength: pass?.length ?? 0,
-    passFirst3: pass?.slice(0, 3) ?? "N/A",
-  });
-
   return nodemailer.createTransport({
-    host,
-    port,
+    host: process.env.SMTP_HOST || "smtp.mailbox.org",
+    port: Number(process.env.SMTP_PORT) || 587,
     secure: false,
     requireTLS: true,
-    auth: { user, pass },
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
   });
 }
 
