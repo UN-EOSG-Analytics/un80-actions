@@ -15,11 +15,22 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { getStatusStyles, ACTION_STATUS } from "@/constants/actionStatus";
 import type { ActionsTableData } from "@/types";
 import type { RiskAssessment } from "@/types";
-import { updateRiskAssessment } from "@/features/actions/commands";
+import { updateRiskAssessment, updatePublicActionStatus } from "@/features/actions/commands";
 
-type SortField = "work_package_id" | "action_id" | "work_package_title" | "indicative_action" | "tracking_status" | "public_action_status" | "risk_assessment";
+type SortField = "work_package_id" | "action_id" | "work_package_title" | "indicative_action" | "public_action_status" | "risk_assessment";
 type SortDirection = "asc" | "desc";
 
 const RISK_OPTIONS: {
@@ -27,9 +38,14 @@ const RISK_OPTIONS: {
   label: string;
   indicatorClass: string;
 }[] = [
-  { value: "low_risk", label: "Low risk", indicatorClass: "bg-green-500" },
-  { value: "medium_risk", label: "Medium risk", indicatorClass: "bg-amber-400" },
-  { value: "at_risk", label: "High risk", indicatorClass: "bg-red-500" },
+  { value: "low_risk", label: "Low", indicatorClass: "bg-green-500" },
+  { value: "medium_risk", label: "Medium", indicatorClass: "bg-amber-400" },
+  { value: "at_risk", label: "High", indicatorClass: "bg-red-500" },
+];
+
+const STATUS_OPTIONS = [
+  { value: ACTION_STATUS.DECISION_TAKEN, label: "Decision taken" },
+  { value: ACTION_STATUS.FURTHER_WORK_ONGOING, label: "Further work ongoing" },
 ];
 
 function actionLabel(actionId: number, subId: string | null): string {
@@ -55,10 +71,28 @@ function MultiSelectFilter<T extends string | number | boolean>({
   onOpenChange: (open: boolean) => void;
   maxWidth?: string;
 }) {
+  const [searchQuery, setSearchQuery] = useState("");
   const hasFilter = selected.length > 0;
   
+  // Filter options based on search query
+  const filteredOptions = useMemo(() => {
+    if (!searchQuery.trim()) return options;
+    const query = searchQuery.toLowerCase();
+    return options.filter(option => 
+      renderOption(option).toLowerCase().includes(query)
+    );
+  }, [options, searchQuery, renderOption]);
+  
+  // Reset search when popover closes
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setSearchQuery("");
+    }
+    onOpenChange(open);
+  };
+  
   return (
-    <Popover open={isOpen} onOpenChange={onOpenChange}>
+    <Popover open={isOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <button
           type="button"
@@ -74,26 +108,42 @@ function MultiSelectFilter<T extends string | number | boolean>({
         </button>
       </PopoverTrigger>
       <PopoverContent className={`${maxWidth} p-2`} align="start" onClick={(e) => e.stopPropagation()}>
+        <div className="mb-2">
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-8 px-2 text-sm border border-gray-200 rounded outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
         <div className="max-h-64 overflow-y-auto">
           <div className="space-y-1">
-            {options.map((option) => {
-              const isSelected = selected.includes(option);
-              return (
-                <button
-                  key={String(option)}
-                  type="button"
-                  onClick={() => onToggle(option)}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-gray-100 text-left"
-                >
-                  <div className={`h-4 w-4 border rounded flex items-center justify-center shrink-0 ${
-                    isSelected ? "bg-un-blue border-un-blue" : "border-gray-300"
-                  }`}>
-                    {isSelected && <Check className="h-3 w-3 text-white" />}
-                  </div>
-                  <span className="flex-1 wrap-break-word">{renderOption(option)}</span>
-                </button>
-              );
-            })}
+            {filteredOptions.length === 0 ? (
+              <div className="px-2 py-2 text-sm text-gray-400 text-center">
+                No results found
+              </div>
+            ) : (
+              filteredOptions.map((option) => {
+                const isSelected = selected.includes(option);
+                return (
+                  <button
+                    key={String(option)}
+                    type="button"
+                    onClick={() => onToggle(option)}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-gray-100 text-left"
+                  >
+                    <div className={`h-4 w-4 border rounded flex items-center justify-center shrink-0 ${
+                      isSelected ? "bg-un-blue border-un-blue" : "border-gray-300"
+                    }`}>
+                      {isSelected && <Check className="h-3 w-3 text-white" />}
+                    </div>
+                    <span className="flex-1 wrap-break-word">{renderOption(option)}</span>
+                  </button>
+                );
+              })
+            )}
           </div>
         </div>
         {hasFilter && (
@@ -149,7 +199,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
   const [filterWPTitle, setFilterWPTitle] = useState<string[]>([]);
   const [filterAction, setFilterAction] = useState<string[]>([]);
   const [filterIndicativeAction, setFilterIndicativeAction] = useState<string[]>([]);
-  const [filterTrackingStatus, setFilterTrackingStatus] = useState<string[]>([]);
   const [filterPublicStatus, setFilterPublicStatus] = useState<string[]>([]);
   const [filterBigTicket, setFilterBigTicket] = useState<boolean[]>([]);
   const [filterWorkPackageId, setFilterWorkPackageId] = useState<string>("");
@@ -157,6 +206,14 @@ export function ActionsTable({ data }: ActionsTableProps) {
   
   // Track which filter popovers are open
   const [openFilters, setOpenFilters] = useState<Record<string, boolean>>({});
+  
+  // Status change confirmation
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    actionId: number | null;
+    actionSubId: string | null;
+    status: string | null;
+  }>({ open: false, actionId: null, actionSubId: null, status: null });
 
   const search = searchInput.trim().toLowerCase();
   const hasSearch = search.length > 0;
@@ -213,14 +270,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
     return Array.from(actions).sort();
   }, [allActions]);
 
-  const uniqueTrackingStatuses = useMemo(() => {
-    const statuses = new Set<string>();
-    allActions.forEach((a) => {
-      if (a.tracking_status) statuses.add(a.tracking_status);
-    });
-    return Array.from(statuses).sort();
-  }, [allActions]);
-
   const uniquePublicStatuses = useMemo(() => {
     const statuses = new Set<string>();
     allActions.forEach((a) => {
@@ -253,9 +302,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
     if (filterIndicativeAction.length > 0) {
       list = list.filter((a) => filterIndicativeAction.includes(a.indicative_action));
     }
-    if (filterTrackingStatus.length > 0) {
-      list = list.filter((a) => a.tracking_status && filterTrackingStatus.includes(a.tracking_status));
-    }
     if (filterPublicStatus.length > 0) {
       list = list.filter((a) => a.public_action_status && filterPublicStatus.includes(a.public_action_status));
     }
@@ -284,7 +330,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
     filterWPTitle,
     filterAction,
     filterIndicativeAction,
-    filterTrackingStatus,
     filterPublicStatus,
     filterBigTicket,
     filterWorkPackageId,
@@ -303,10 +348,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
         cmp = a.work_package_title.localeCompare(b.work_package_title);
       } else if (sortField === "indicative_action") {
         cmp = a.indicative_action.localeCompare(b.indicative_action);
-      } else if (sortField === "tracking_status") {
-        const av = a.tracking_status ?? "";
-        const bv = b.tracking_status ?? "";
-        cmp = av.localeCompare(bv);
       } else if (sortField === "public_action_status") {
         const av = a.public_action_status ?? "";
         const bv = b.public_action_status ?? "";
@@ -347,13 +388,32 @@ export function ActionsTable({ data }: ActionsTableProps) {
     }
   };
 
+  const handleStatusChange = async (
+    actionId: number,
+    actionSubId: string | null,
+    value: string | null,
+  ) => {
+    setConfirmDialog({ open: true, actionId, actionSubId, status: value });
+  };
+
+  const confirmStatusChange = async () => {
+    if (confirmDialog.actionId === null || confirmDialog.status === null) return;
+
+    const { actionId, actionSubId, status } = confirmDialog;
+    setConfirmDialog({ open: false, actionId: null, actionSubId: null, status: null });
+
+    const result = await updatePublicActionStatus(actionId, actionSubId, status);
+    if (result.success) {
+      router.refresh();
+    }
+  };
+
   // Check if any filters are active
   const hasActiveFilters = 
     filterWP.length > 0 ||
     filterWPTitle.length > 0 ||
     filterAction.length > 0 ||
     filterIndicativeAction.length > 0 ||
-    filterTrackingStatus.length > 0 ||
     filterPublicStatus.length > 0 ||
     filterBigTicket.length > 0 ||
     filterWorkPackageId.length > 0 ||
@@ -364,7 +424,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
     setFilterWPTitle([]);
     setFilterAction([]);
     setFilterIndicativeAction([]);
-    setFilterTrackingStatus([]);
     setFilterPublicStatus([]);
     setFilterBigTicket([]);
     setFilterWorkPackageId("");
@@ -411,7 +470,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-              <th className="px-4 py-3 whitespace-nowrap">
+              <th className="px-2 py-3 whitespace-nowrap w-14">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -461,7 +520,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
                   />
                 </div>
               </th>
-              <th className="px-4 py-3 whitespace-nowrap">
+              <th className="px-2 py-3 whitespace-nowrap w-16">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -509,31 +568,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
                     isOpen={openFilters.indicativeAction || false}
                     onOpenChange={(open) => setOpenFilters((prev) => ({ ...prev, indicativeAction: open }))}
                     maxWidth="w-96"
-                  />
-                </div>
-              </th>
-              <th className="px-4 py-3 whitespace-nowrap">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("tracking_status")}
-                    className="inline-flex items-center hover:text-un-blue"
-                  >
-                    TRACKING
-                    <SortIcon column="tracking_status" sortField={sortField} sortDirection={sortDirection} />
-                  </button>
-                  <MultiSelectFilter
-                    filterKey="trackingStatus"
-                    options={uniqueTrackingStatuses}
-                    selected={filterTrackingStatus}
-                    onToggle={(status) => {
-                      setFilterTrackingStatus((prev) =>
-                        prev.includes(status) ? prev.filter((v) => v !== status) : [...prev, status]
-                      );
-                    }}
-                    renderOption={(status) => status}
-                    isOpen={openFilters.trackingStatus || false}
-                    onOpenChange={(open) => setOpenFilters((prev) => ({ ...prev, trackingStatus: open }))}
                   />
                 </div>
               </th>
@@ -597,7 +631,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
             {sortedActions.length === 0 ? (
               <tr>
                 <td
-                  colSpan={9}
+                  colSpan={8}
                   className="px-4 py-12 text-center text-gray-400"
                 >
                   No actions found
@@ -610,23 +644,62 @@ export function ActionsTable({ data }: ActionsTableProps) {
                   onClick={() => handleActionClick(a.action_id, a.action_sub_id)}
                   className="cursor-pointer transition-colors hover:bg-gray-50"
                 >
-                  <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
-                    {a.work_package_id}
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 font-medium text-sm tabular-nums">
+                      {a.work_package_id}
+                    </span>
                   </td>
                   <td className="px-4 py-3 text-gray-600">
                     <span className="line-clamp-2">{a.work_package_title}</span>
                   </td>
-                  <td className="px-4 py-3 font-medium text-un-blue whitespace-nowrap">
-                    {actionLabel(a.action_id, a.action_sub_id)}
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-un-blue/10 text-un-blue font-semibold text-sm tabular-nums">
+                      {actionLabel(a.action_id, a.action_sub_id)}
+                    </span>
                   </td>
                   <td className="px-4 py-3 text-gray-700">
                     <span className="line-clamp-2">{a.indicative_action}</span>
                   </td>
-                  <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
-                    <span className="text-xs">{a.tracking_status ?? "–"}</span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
-                    <span className="text-xs">{a.public_action_status ?? "–"}</span>
+                  <td
+                    className="px-4 py-3"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button className="cursor-pointer transition-opacity hover:opacity-75">
+                          {a.public_action_status ? (
+                            <Badge className={getStatusStyles(a.public_action_status).badge}>
+                              {getStatusStyles(a.public_action_status).label}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="bg-slate-50 text-slate-500">
+                              Set status...
+                            </Badge>
+                          )}
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-56 p-2" align="start">
+                        <div className="space-y-1">
+                          {STATUS_OPTIONS.map((opt) => {
+                            const styles = getStatusStyles(opt.value);
+                            const isSelected = a.public_action_status === opt.value;
+                            return (
+                              <button
+                                key={opt.value}
+                                onClick={() => handleStatusChange(a.action_id, a.action_sub_id, opt.value)}
+                                className={`w-full rounded px-2 py-1.5 text-left text-sm transition-colors ${
+                                  isSelected ? "bg-slate-200" : "hover:bg-slate-100"
+                                }`}
+                              >
+                                <Badge className={styles.badge}>
+                                  {styles.label}
+                                </Badge>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   </td>
                   <td
                     className="px-4 py-3 text-gray-400"
@@ -642,7 +715,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
                         )
                       }
                     >
-                      <SelectTrigger className="h-8 w-full min-w-28 border-gray-200 bg-white text-gray-700">
+                      <SelectTrigger className="h-8 w-32 border-gray-200 bg-white text-gray-700">
                         <SelectValue placeholder="Select..." />
                       </SelectTrigger>
                       <SelectContent>
@@ -678,6 +751,41 @@ export function ActionsTable({ data }: ActionsTableProps) {
           </tbody>
         </table>
       </div>
+
+      {/* Status Change Confirmation Dialog */}
+      <Dialog open={confirmDialog.open} onOpenChange={(open) => !open && setConfirmDialog({ open: false, actionId: null, actionSubId: null, status: null })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change Action Status</DialogTitle>
+            <DialogDescription>
+              {confirmDialog.actionId !== null && confirmDialog.status === ACTION_STATUS.DECISION_TAKEN && (
+                <>
+                  Change <span className="font-medium text-slate-700">Action {actionLabel(confirmDialog.actionId, confirmDialog.actionSubId)}</span>'s status to 'Decision taken'?
+                </>
+              )}
+              {confirmDialog.actionId !== null && confirmDialog.status === ACTION_STATUS.FURTHER_WORK_ONGOING && (
+                <>
+                  Change <span className="font-medium text-slate-700">Action {actionLabel(confirmDialog.actionId, confirmDialog.actionSubId)}</span>'s status to 'Further work ongoing'?
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmDialog({ open: false, actionId: null, actionSubId: null, status: null })}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmStatusChange}
+              className="bg-un-blue hover:bg-un-blue/90"
+            >
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

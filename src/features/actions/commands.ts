@@ -14,6 +14,11 @@ export interface UpdateRiskAssessmentResult {
   error?: string;
 }
 
+export interface UpdatePublicStatusResult {
+  success: boolean;
+  error?: string;
+}
+
 // =========================================================
 // COMMANDS
 // =========================================================
@@ -46,6 +51,41 @@ export async function updateRiskAssessment(
        SET risk_assessment = $1
        WHERE id = $2 AND (sub_id IS NOT DISTINCT FROM $3)`,
       [riskAssessment, actionId, actionSubId],
+    );
+    return { success: true };
+  } catch {
+    return { success: false, error: "Failed to update" };
+  }
+}
+
+/**
+ * Update public action status for an action. Admin only.
+ */
+export async function updatePublicActionStatus(
+  actionId: number,
+  actionSubId: string | null,
+  publicActionStatus: string | null,
+): Promise<UpdatePublicStatusResult> {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, error: "Not authenticated" };
+  }
+
+  const adminCheck = await query<{ user_role: string }>(
+    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
+    [user.email],
+  );
+
+  if (adminCheck[0]?.user_role !== "Admin") {
+    return { success: false, error: "Admin only" };
+  }
+
+  try {
+    await query(
+      `UPDATE ${DB_SCHEMA}.actions
+       SET public_action_status = $1
+       WHERE id = $2 AND (sub_id IS NOT DISTINCT FROM $3)`,
+      [publicActionStatus, actionId, actionSubId],
     );
     return { success: true };
   } catch {
