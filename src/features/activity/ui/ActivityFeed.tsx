@@ -1,13 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Bell, X, MessageSquare, HelpCircle, Flag, Tag, FileText, CheckSquare, Square } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { getRecentActivity, type ActivityItem } from "../queries";
-import { markActivityRead, markActivityUnread } from "../commands";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
 import { formatUNDateTime } from "@/lib/format-date";
+import {
+    Bell,
+    CheckSquare,
+    FileText,
+    Flag,
+    HelpCircle,
+    MessageSquare,
+    Square,
+    Tag,
+    X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { markActivityRead, markActivityUnread } from "../commands";
+import { getRecentActivity, type ActivityItem } from "../queries";
 
 const getActivityIcon = (type: ActivityItem["type"]) => {
   switch (type) {
@@ -49,6 +63,7 @@ export function ActivityFeed() {
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [showUnreadOnly, setShowUnreadOnly] = useState(false);
   const router = useRouter();
 
   const loadActivities = async () => {
@@ -78,12 +93,30 @@ export function ActivityFeed() {
       if (activity.action_sub_id) {
         params.set("subaction", activity.action_sub_id);
       }
+      // Set the appropriate tab based on activity type
+      switch (activity.type) {
+        case "note":
+          params.set("tab", "notes");
+          break;
+        case "question":
+          params.set("tab", "questions");
+          break;
+        case "milestone":
+        case "milestone_status":
+        case "milestone_update":
+          params.set("tab", "milestones");
+          break;
+        // For "tag" and other types, don't set a tab (defaults to overview)
+      }
       router.push(`/?${params.toString()}`);
       setOpen(false);
     }
   };
 
-  const handleReadToggle = async (e: React.MouseEvent, activity: ActivityItem) => {
+  const handleReadToggle = async (
+    e: React.MouseEvent,
+    activity: ActivityItem,
+  ) => {
     e.stopPropagation();
     const isRead = !!activity.read_at;
     // Optimistic update: toggle read state immediately so the UI feels instant
@@ -101,6 +134,11 @@ export function ActivityFeed() {
     if (!res.success) loadActivities();
   };
 
+  const unreadCount = activities.filter((a) => !a.read_at).length;
+  const displayedActivities = showUnreadOnly 
+    ? activities.filter((a) => !a.read_at) 
+    : activities;
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -111,40 +149,55 @@ export function ActivityFeed() {
           aria-label="Recent activity"
         >
           <Bell className="h-4 w-4 text-gray-600" />
-          {activities.length > 0 && (
-            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-un-blue text-[10px] font-medium text-white flex items-center justify-center">
-              {activities.length > 9 ? "9+" : activities.length}
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-un-blue text-[10px] font-medium text-white">
+              {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[32rem] max-w-[95vw] p-0" align="end">
+      <PopoverContent className="w-lg max-w-[95vw] p-0" align="end">
         <div className="flex items-center justify-between border-b px-4 py-3">
-          <h3 className="text-base font-semibold text-gray-900">Recent Activity</h3>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6"
-            onClick={() => setOpen(false)}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          <h3 className="text-base font-semibold text-gray-900">
+            Recent Activity
+          </h3>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowUnreadOnly(!showUnreadOnly)}
+              className={`text-xs px-2 py-1 rounded transition-colors ${
+                showUnreadOnly 
+                  ? "bg-un-blue text-white" 
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {showUnreadOnly ? "Show all" : "Unread only"}
+            </button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => setOpen(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-        <div className="max-h-[70vh] min-h-[320px] overflow-y-auto">
+        <div className="max-h-[70vh] min-h-80 overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-un-blue" />
             </div>
-          ) : activities.length === 0 ? (
+          ) : displayedActivities.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-gray-500">
-              No recent activity
+              {showUnreadOnly ? "No unread activity" : "No recent activity"}
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
-              {activities.map((activity) => (
+              {displayedActivities.map((activity) => (
                 <div
                   key={activity.id}
-                  className={`flex items-start gap-3 px-4 py-4 hover:bg-gray-50 transition-colors ${
+                  className={`flex items-start gap-3 px-4 py-4 transition-colors hover:bg-gray-50 ${
                     activity.read_at ? "opacity-75" : ""
                   }`}
                 >
@@ -152,8 +205,14 @@ export function ActivityFeed() {
                     type="button"
                     onClick={(e) => handleReadToggle(e, activity)}
                     className="mt-1 shrink-0 rounded p-0.5 text-gray-400 hover:bg-gray-200 hover:text-un-blue"
-                    title={activity.read_at ? "Mark as unread" : "Mark as read/processed"}
-                    aria-label={activity.read_at ? "Mark as unread" : "Mark as read"}
+                    title={
+                      activity.read_at
+                        ? "Mark as unread"
+                        : "Mark as read/processed"
+                    }
+                    aria-label={
+                      activity.read_at ? "Mark as unread" : "Mark as read"
+                    }
                   >
                     {activity.read_at ? (
                       <CheckSquare className="h-4 w-4 text-un-blue" />
@@ -165,24 +224,34 @@ export function ActivityFeed() {
                     type="button"
                     onClick={() => handleActivityClick(activity)}
                     className={`min-w-0 flex-1 text-left ${
-                      activity.action_id > 0 ? "cursor-pointer" : "cursor-default"
+                      activity.action_id > 0
+                        ? "cursor-pointer"
+                        : "cursor-default"
                     }`}
                     disabled={activity.action_id === 0}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`mt-0.5 shrink-0 ${getActivityColor(activity.type)}`}>
+                      <div
+                        className={`mt-0.5 shrink-0 ${getActivityColor(activity.type)}`}
+                      >
                         {getActivityIcon(activity.type)}
                       </div>
-                      <div className={`min-w-0 flex-1 ${activity.read_at ? "line-through decoration-gray-400" : ""}`}>
+                      <div
+                        className={`min-w-0 flex-1 ${activity.read_at ? "line-through decoration-gray-400" : ""}`}
+                      >
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium text-gray-900">{activity.title}</p>
+                          <p className="text-sm font-medium text-gray-900">
+                            {activity.title}
+                          </p>
                           {activity.change_type && (
                             <span className="text-xs text-gray-500 capitalize">
                               {activity.change_type}
                             </span>
                           )}
                         </div>
-                        <p className="mt-1 text-sm text-gray-600">{activity.description}</p>
+                        <p className="mt-1 text-sm text-gray-600">
+                          {activity.description}
+                        </p>
                         <div className="mt-1.5 flex items-center gap-2 text-xs text-gray-400">
                           {activity.user_email && (
                             <span>{activity.user_email}</span>

@@ -38,7 +38,6 @@ function actionLabel(actionId: number, subId: string | null): string {
 
 // Multiselect filter component
 function MultiSelectFilter<T extends string | number | boolean>({
-  filterKey,
   options,
   selected,
   onToggle,
@@ -91,7 +90,7 @@ function MultiSelectFilter<T extends string | number | boolean>({
                   }`}>
                     {isSelected && <Check className="h-3 w-3 text-white" />}
                   </div>
-                  <span className="flex-1 break-words">{renderOption(option)}</span>
+                  <span className="flex-1 wrap-break-word">{renderOption(option)}</span>
                 </button>
               );
             })}
