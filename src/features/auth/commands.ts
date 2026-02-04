@@ -42,14 +42,18 @@ export async function requestMagicLink(email: string): Promise<Result> {
     const msg =
       error instanceof Error && error.message
         ? error.message
-        : "Failed to send email. Please try again.";
+        : "Unknown error";
 
+    // Log to Vercel function logs
+    console.error("Error sending magic link:", msg, error);
+
+    // Show detailed error in dev/preview, generic in production
+    const isProduction = process.env.VERCEL_ENV === "production";
     return {
       success: false,
-      error:
-        process.env.NODE_ENV === "development"
-          ? `Email failed: ${msg}`
-          : "Failed to send email. Please try again.",
+      error: isProduction
+        ? "Failed to send email. Please try again."
+        : `Email failed: ${msg}`,
     };
   }
 }
