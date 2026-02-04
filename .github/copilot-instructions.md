@@ -115,6 +115,7 @@ You are a senior Next.js (v16) developer working at the United Nations with exte
 - refer to `un80actions_schema.sql`
 - use migrations to add features but ALWAYS keep the schema up to date
 - DO NOT add migrations to schema, should be clean DDL
+- You can use Postgres MCP to run migrations and check the schema or understand the data better
 
 
 # Docs
