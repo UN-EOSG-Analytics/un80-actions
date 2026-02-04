@@ -56,10 +56,10 @@ export function MilestoneCard({
 
   const currentStatus = getCurrentStatus();
 
-  // Format milestone ID nicely
-  const milestoneId = milestone.action_sub_id 
-    ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}` 
-    : `${milestone.action_id}.${milestone.serial_number}`;
+  // Display label: Public, First, Second, Third, or Final (as before serial numbering)
+  const milestoneLabel = milestone.is_public
+    ? "Public"
+    : milestone.milestone_type.charAt(0).toUpperCase() + milestone.milestone_type.slice(1);
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 transition-shadow hover:shadow-md">
@@ -67,10 +67,10 @@ export function MilestoneCard({
       <div className="flex items-start gap-4">
         {/* Left: Content */}
         <div className="min-w-0 flex-1 space-y-1.5">
-          {/* Title row with ID */}
+          {/* Title row with label */}
           <div className="flex items-start gap-3">
-            <span className="mt-0.5 shrink-0 rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs font-medium text-slate-500">
-              {milestoneId}
+            <span className="mt-0.5 shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-500">
+              {milestoneLabel}
             </span>
             <div className="min-w-0 flex-1 space-y-1.5">
               <p className="font-medium leading-snug text-slate-900">

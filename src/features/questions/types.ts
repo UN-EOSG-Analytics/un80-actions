@@ -10,12 +10,14 @@ export interface QuestionCreateInput {
   header: string;
   question_date: string; // ISO date string (YYYY-MM-DD)
   question: string;
+  milestone_id?: string | null;
 }
 
 export interface QuestionUpdateInput {
   header: string;
   question_date: string; // ISO date string (YYYY-MM-DD)
   question: string;
+  milestone_id?: string | null;
 }
 
 export interface QuestionResult {

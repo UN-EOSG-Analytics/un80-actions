@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Run SQL migrations 003, 004, 005, and 006
+ * Run SQL migrations 003, 004, 005, 006, and 007
  * This script uses the same database connection as the Next.js app
  */
 
@@ -78,6 +78,9 @@ async function runAllMigrations() {
     
     // Run migration 006
     await runMigration(6, 'add_serial_number_to_milestones');
+    
+    // Run migration 007
+    await runMigration(7, 'add_milestone_id_to_questions');
     
     console.log('\n✅ All migrations completed successfully!');
   } catch (error) {

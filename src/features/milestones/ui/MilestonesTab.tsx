@@ -169,11 +169,11 @@ export default function MilestonesTab({
     return new Date(date).toLocaleDateString(undefined, { dateStyle: "medium" });
   };
 
-  const formatMilestoneId = (milestone: ActionMilestone) => {
-    const actionId = milestone.action_sub_id 
-      ? `${milestone.action_id}${milestone.action_sub_id}` 
-      : `${milestone.action_id}`;
-    return `${actionId}.${milestone.serial_number}`;
+  /** Display label for milestone: Public, First, Second, Third, or Final */
+  const formatMilestoneLabel = (milestone: ActionMilestone) => {
+    return milestone.is_public
+      ? "Public"
+      : milestone.milestone_type.charAt(0).toUpperCase() + milestone.milestone_type.slice(1);
   };
 
   const loadMilestones = useCallback(async () => {
@@ -1360,7 +1360,7 @@ export default function MilestonesTab({
                           <span className="text-slate-300">•</span>
                           {milestone ? (
                             <Badge variant="outline" className="text-[10px]">
-                              Milestone {formatMilestoneId(milestone)}
+                              {formatMilestoneLabel(milestone)}
                             </Badge>
                           ) : (
                             <Badge variant="outline" className="text-[10px]">
@@ -1395,7 +1395,7 @@ export default function MilestonesTab({
                     <option value="">General</option>
                     {milestones.map((m) => (
                       <option key={m.id} value={m.id}>
-                        Milestone {formatMilestoneId(m)}
+                        {formatMilestoneLabel(m)}
                       </option>
                     ))}
                   </select>

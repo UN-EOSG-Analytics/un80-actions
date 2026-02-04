@@ -222,6 +222,7 @@ export interface ActionQuestion {
   content_reviewed_by: string | null;
   content_reviewed_by_email: string | null;
   content_reviewed_at: Date | null;
+  milestone_id: string | null;
 }
 
 // =========================================================

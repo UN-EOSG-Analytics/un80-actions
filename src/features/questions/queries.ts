@@ -42,7 +42,8 @@ export async function getActionQuestions(
       COALESCE(q.content_review_status, 'approved')::text as content_review_status,
       q.content_reviewed_by,
       ru.email as content_reviewed_by_email,
-      q.content_reviewed_at
+      q.content_reviewed_at,
+      q.milestone_id
     FROM ${DB_SCHEMA}.action_questions q
     LEFT JOIN ${DB_SCHEMA}.users u ON q.user_id = u.id
     LEFT JOIN ${DB_SCHEMA}.users au ON q.answered_by = au.id
@@ -88,7 +89,8 @@ export async function getUnansweredQuestions(
       COALESCE(q.content_review_status, 'approved')::text as content_review_status,
       q.content_reviewed_by,
       ru.email as content_reviewed_by_email,
-      q.content_reviewed_at
+      q.content_reviewed_at,
+      q.milestone_id
     FROM ${DB_SCHEMA}.action_questions q
     LEFT JOIN ${DB_SCHEMA}.users u ON q.user_id = u.id
     LEFT JOIN ${DB_SCHEMA}.users au ON q.answered_by = au.id
@@ -126,7 +128,8 @@ export async function getQuestionById(
       COALESCE(q.content_review_status, 'approved')::text as content_review_status,
       q.content_reviewed_by,
       ru.email as content_reviewed_by_email,
-      q.content_reviewed_at
+      q.content_reviewed_at,
+      q.milestone_id
     FROM ${DB_SCHEMA}.action_questions q
     LEFT JOIN ${DB_SCHEMA}.users u ON q.user_id = u.id
     LEFT JOIN ${DB_SCHEMA}.users au ON q.answered_by = au.id

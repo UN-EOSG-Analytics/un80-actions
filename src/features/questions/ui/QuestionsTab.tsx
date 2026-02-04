@@ -16,11 +16,12 @@ import {
   approveQuestion,
   deleteQuestion,
 } from "@/features/questions/commands";
+import { getActionMilestones } from "@/features/milestones/queries";
 import { ReviewStatus } from "@/features/shared/ReviewStatus";
 import { TagSelector } from "@/features/shared/TagSelector";
 import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
-import type { Action, ActionQuestion } from "@/types";
+import type { Action, ActionQuestion, ActionMilestone } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
 import { Loader2, MessageCircle, Send, Trash2, Pencil, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -55,11 +56,13 @@ export default function QuestionsTab({
   exportProps?: { onExport: (format: "word" | "pdf" | "markdown") => void; exporting: boolean };
 }) {
   const [questions, setQuestions] = useState<ActionQuestion[]>([]);
+  const [milestones, setMilestones] = useState<ActionMilestone[]>([]);
   const [loading, setLoading] = useState(true);
   const [newQuestion, setNewQuestion] = useState({
     header: "",
     question_date: "",
     question: "• ",
+    milestone_id: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +73,7 @@ export default function QuestionsTab({
     header: "",
     question_date: "",
     question: "",
+    milestone_id: "",
   });
   const [saving, setSaving] = useState(false);
   const [tagsByQuestionId, setTagsByQuestionId] = useState<
@@ -77,6 +81,7 @@ export default function QuestionsTab({
   >({});
 
   const HEADER_OPTIONS = ["Task Force", "Steering Committee", "Check-ins"];
+  const MILESTONE_NONE_VALUE = "__none__";
 
   const loadQuestions = async () => {
     setLoading(true);
@@ -90,8 +95,18 @@ export default function QuestionsTab({
     }
   };
 
+  const loadMilestones = async () => {
+    try {
+      const data = await getActionMilestones(action.id, action.sub_id);
+      setMilestones(data);
+    } catch {
+      // silently fail - milestones are optional
+    }
+  };
+
   useEffect(() => {
     loadQuestions();
+    loadMilestones();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -112,6 +127,7 @@ export default function QuestionsTab({
         header: newQuestion.header.trim(),
         question_date: newQuestion.question_date,
         question: newQuestion.question.trim(),
+        milestone_id: newQuestion.milestone_id || null,
       });
 
       if (result.success) {
@@ -119,6 +135,7 @@ export default function QuestionsTab({
           header: "",
           question_date: "",
           question: "",
+          milestone_id: "",
         });
         await loadQuestions();
       } else {
@@ -154,6 +171,7 @@ export default function QuestionsTab({
       header: q.header || "",
       question_date: q.question_date || "",
       question: question,
+      milestone_id: q.milestone_id || "",
     });
     setError(null);
   };
@@ -164,6 +182,7 @@ export default function QuestionsTab({
       header: "",
       question_date: "",
       question: "• ",
+      milestone_id: "",
     });
     setError(null);
   };
@@ -183,6 +202,7 @@ export default function QuestionsTab({
         header: editingQuestion.header.trim(),
         question_date: editingQuestion.question_date,
         question: editingQuestion.question.trim(),
+        milestone_id: editingQuestion.milestone_id || null,
       });
 
       if (result.success) {
@@ -242,6 +262,36 @@ export default function QuestionsTab({
             disabled={submitting}
             required
           />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-600">
+            Milestone (optional)
+          </label>
+          <Select
+            value={newQuestion.milestone_id || MILESTONE_NONE_VALUE}
+            onValueChange={(value) => setNewQuestion({ ...newQuestion, milestone_id: value === MILESTONE_NONE_VALUE ? "" : value })}
+            disabled={submitting}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select milestone..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={MILESTONE_NONE_VALUE}>None</SelectItem>
+              {milestones.map((milestone) => {
+                const milestoneId = milestone.action_sub_id 
+                  ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}` 
+                  : `${milestone.action_id}.${milestone.serial_number}`;
+                const label = milestone.description 
+                  ? `${milestoneId}: ${milestone.description.substring(0, 50)}${milestone.description.length > 50 ? '...' : ''}`
+                  : milestoneId;
+                return (
+                  <SelectItem key={milestone.id} value={milestone.id}>
+                    {label}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <label className="mb-1 block text-xs font-medium text-slate-600">
@@ -361,6 +411,36 @@ export default function QuestionsTab({
                     </div>
                     <div>
                       <label className="mb-1 block text-xs font-medium text-slate-600">
+                        Milestone (optional)
+                      </label>
+                      <Select
+                        value={editingQuestion.milestone_id || MILESTONE_NONE_VALUE}
+                        onValueChange={(value) => setEditingQuestion({ ...editingQuestion, milestone_id: value === MILESTONE_NONE_VALUE ? "" : value })}
+                        disabled={saving}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select milestone..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value={MILESTONE_NONE_VALUE}>None</SelectItem>
+                          {milestones.map((milestone) => {
+                            const milestoneId = milestone.action_sub_id 
+                              ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}` 
+                              : `${milestone.action_id}.${milestone.serial_number}`;
+                            const label = milestone.description 
+                              ? `${milestoneId}: ${milestone.description.substring(0, 50)}${milestone.description.length > 50 ? '...' : ''}`
+                              : milestoneId;
+                            return (
+                              <SelectItem key={milestone.id} value={milestone.id}>
+                                {label}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-600">
                         Question *
                       </label>
                       <textarea
@@ -407,7 +487,7 @@ export default function QuestionsTab({
                   <>
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0 flex-1 space-y-3">
-                        {q.header || q.question_date ? (
+                        {q.header || q.question_date || q.milestone_id ? (
                           <div className="space-y-1">
                             {q.header && (
                               <div className="flex flex-wrap items-center gap-2">
@@ -417,18 +497,34 @@ export default function QuestionsTab({
                                 </h4>
                               </div>
                             )}
-                            {q.question_date && (
-                              <p className={`text-xs text-slate-500 ${q.header ? "ml-6" : ""}`}>
-                                Date: {q.question_date}
-                              </p>
-                            )}
+                            <div className={q.header ? "ml-6 space-y-1" : "space-y-1"}>
+                              {q.question_date && (
+                                <p className="text-xs text-slate-500">
+                                  Date: {q.question_date}
+                                </p>
+                              )}
+                              {q.milestone_id && (() => {
+                                const milestone = milestones.find(m => m.id === q.milestone_id);
+                                if (milestone) {
+                                  const milestoneId = milestone.action_sub_id 
+                                    ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}` 
+                                    : `${milestone.action_id}.${milestone.serial_number}`;
+                                  return (
+                                    <p className="text-xs text-slate-500">
+                                      Milestone: {milestoneId}
+                                    </p>
+                                  );
+                                }
+                                return null;
+                              })()}
+                            </div>
                           </div>
                         ) : (
                           <div className="flex flex-wrap items-center gap-2">
                             <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-un-blue" />
                           </div>
                         )}
-                        <div className={q.header || q.question_date ? "ml-6" : ""}>
+                        <div className={q.header || q.question_date || q.milestone_id ? "ml-6" : ""}>
                           <p className="text-sm text-slate-700">
                             {q.question}
                           </p>

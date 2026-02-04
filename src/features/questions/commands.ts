@@ -35,8 +35,8 @@ export async function createQuestion(
 
     const rows = await query<{ id: string }>(
       `INSERT INTO ${DB_SCHEMA}.action_questions 
-     (action_id, action_sub_id, user_id, header, subtext, question_date, question, content_review_status)
-     VALUES ($1, $2, $3, $4, NULL, $5, $6, 'needs_review')
+     (action_id, action_sub_id, user_id, header, subtext, question_date, question, milestone_id, content_review_status)
+     VALUES ($1, $2, $3, $4, NULL, $5, $6, $7, 'needs_review')
      RETURNING id`,
       [
         input.action_id,
@@ -45,6 +45,7 @@ export async function createQuestion(
         input.header.trim(),
         input.question_date,
         input.question.trim(),
+        input.milestone_id ?? null,
       ],
     );
 
@@ -97,15 +98,16 @@ export async function updateQuestion(
 
     await query(
       `UPDATE ${DB_SCHEMA}.action_questions
-     SET header = $1, subtext = NULL, question_date = $2, question = $3, updated_at = NOW(),
+     SET header = $1, subtext = NULL, question_date = $2, question = $3, milestone_id = $4, updated_at = NOW(),
          content_review_status = 'needs_review',
          content_reviewed_by = NULL,
          content_reviewed_at = NULL
-     WHERE id = $4`,
+     WHERE id = $5`,
       [
         input.header.trim(),
         input.question_date,
         input.question.trim(),
+        input.milestone_id ?? null,
         questionId,
       ],
     );
