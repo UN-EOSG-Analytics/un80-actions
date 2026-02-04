@@ -247,3 +247,175 @@ export async function getMilestoneVersions(
 
   return rows;
 }
+
+// =========================================================
+// MILESTONE VIEW TABLE
+// =========================================================
+
+export interface MilestoneViewCell {
+  description: string | null;
+  deadline: string | null;
+  is_draft?: boolean;
+  needs_attention?: boolean;
+  needs_ola_review?: boolean;
+}
+
+export interface MilestoneViewRow {
+  work_package_id: number;
+  work_package_title: string;
+  action_id: number;
+  action_sub_id: string | null;
+  public_milestone: MilestoneViewCell | null;
+  first_milestone: MilestoneViewCell | null;
+  final_milestone: MilestoneViewCell | null;
+}
+
+type MilestoneViewRowDb = {
+  work_package_id: number;
+  work_package_title: string;
+  action_id: number;
+  action_sub_id: string | null;
+  public_description: string | null;
+  public_deadline: string | null;
+  public_is_draft: boolean | null;
+  public_needs_attention: boolean | null;
+  public_needs_ola_review: boolean | null;
+  first_description: string | null;
+  first_deadline: string | null;
+  first_is_draft: boolean | null;
+  first_needs_attention: boolean | null;
+  first_needs_ola_review: boolean | null;
+  final_description: string | null;
+  final_deadline: string | null;
+  final_is_draft: boolean | null;
+  final_needs_attention: boolean | null;
+  final_needs_ola_review: boolean | null;
+};
+
+/**
+ * Fetch table data for the Milestone View page: one row per action with WP,
+ * action number, and public / first / final milestone (description + deadline).
+ */
+export async function getMilestoneViewTableData(): Promise<MilestoneViewRow[]> {
+  const q = `
+    SELECT
+      wp.id AS work_package_id,
+      wp.work_package_title,
+      a.id AS action_id,
+      a.sub_id AS action_sub_id,
+      (SELECT m.description FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.is_public = true
+       ORDER BY m.deadline ASC NULLS LAST
+       LIMIT 1) AS public_description,
+      (SELECT m.deadline::text FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.is_public = true
+       ORDER BY m.deadline ASC NULLS LAST
+       LIMIT 1) AS public_deadline,
+      (SELECT m.is_draft FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.is_public = true
+       ORDER BY m.deadline ASC NULLS LAST
+       LIMIT 1) AS public_is_draft,
+      (SELECT m.needs_attention FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.is_public = true
+       ORDER BY m.deadline ASC NULLS LAST
+       LIMIT 1) AS public_needs_attention,
+      (SELECT m.needs_ola_review FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.is_public = true
+       ORDER BY m.deadline ASC NULLS LAST
+       LIMIT 1) AS public_needs_ola_review,
+      (SELECT m.description FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.milestone_type = 'first'
+       LIMIT 1) AS first_description,
+      (SELECT m.deadline::text FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.milestone_type = 'first'
+       LIMIT 1) AS first_deadline,
+      (SELECT m.is_draft FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.milestone_type = 'first'
+       LIMIT 1) AS first_is_draft,
+      (SELECT m.needs_attention FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.milestone_type = 'first'
+       LIMIT 1) AS first_needs_attention,
+      (SELECT m.needs_ola_review FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.milestone_type = 'first'
+       LIMIT 1) AS first_needs_ola_review,
+      (SELECT m.description FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.milestone_type = 'final'
+       LIMIT 1) AS final_description,
+      (SELECT m.deadline::text FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.milestone_type = 'final'
+       LIMIT 1) AS final_deadline,
+      (SELECT m.is_draft FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.milestone_type = 'final'
+       LIMIT 1) AS final_is_draft,
+      (SELECT m.needs_attention FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.milestone_type = 'final'
+       LIMIT 1) AS final_needs_attention,
+      (SELECT m.needs_ola_review FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.milestone_type = 'final'
+       LIMIT 1) AS final_needs_ola_review
+    FROM work_packages wp
+    JOIN actions a ON a.work_package_id = wp.id
+    ORDER BY wp.id, a.id, a.sub_id ASC NULLS FIRST
+  `;
+  const rows = await query<MilestoneViewRowDb>(q);
+  const toCell = (
+    desc: string | null,
+    deadline: string | null,
+    isDraft: boolean | null,
+    needsAttention: boolean | null,
+    needsOlaReview: boolean | null,
+  ): MilestoneViewCell | null => {
+    if (desc == null && deadline == null && !isDraft && !needsAttention && !needsOlaReview) {
+      return null;
+    }
+    return {
+      description: desc ?? null,
+      deadline: deadline ?? null,
+      is_draft: isDraft ?? false,
+      needs_attention: needsAttention ?? false,
+      needs_ola_review: needsOlaReview ?? false,
+    };
+  };
+  return rows.map((r) => ({
+    work_package_id: r.work_package_id,
+    work_package_title: r.work_package_title,
+    action_id: r.action_id,
+    action_sub_id: r.action_sub_id,
+    public_milestone: toCell(
+      r.public_description,
+      r.public_deadline,
+      r.public_is_draft,
+      r.public_needs_attention,
+      r.public_needs_ola_review,
+    ),
+    first_milestone: toCell(
+      r.first_description,
+      r.first_deadline,
+      r.first_is_draft,
+      r.first_needs_attention,
+      r.first_needs_ola_review,
+    ),
+    final_milestone: toCell(
+      r.final_description,
+      r.final_deadline,
+      r.final_is_draft,
+      r.final_needs_attention,
+      r.final_needs_ola_review,
+    ),
+  }));
+}
