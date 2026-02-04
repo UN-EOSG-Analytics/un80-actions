@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserMenu } from "../features/auth/ui/UserMenu";
+import { ActivityFeed } from "../features/activity/ui/ActivityFeed";
 
 interface Props {
   user?: { email: string; entity?: string | null } | null;
@@ -40,7 +41,10 @@ export function Header({ user, children, maxWidth = "7xl" }: Props) {
         </Link>
         <div className="flex items-center gap-4">
           {isLoggedIn ? (
-            <UserMenu email={user.email} entity={user.entity} />
+            <>
+              <ActivityFeed />
+              <UserMenu email={user.email} entity={user.entity} />
+            </>
           ) : !isLoginPage ? (
             <Link
               href="/login"
