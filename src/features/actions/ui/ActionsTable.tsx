@@ -126,8 +126,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
   const [searchInput, setSearchInput] = useState("");
   const [sortField, setSortField] = useState<SortField>("action_id");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-  const [filterWorkPackageId, setFilterWorkPackageId] = useState<number | "">("");
-  const [filterRisk, setFilterRisk] = useState<RiskAssessment | "">("");
   
   // Column filters (multiselect - arrays)
   const [filterWP, setFilterWP] = useState<number[]>([]);
@@ -153,19 +151,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
         work_package_title: wp.work_package_title,
       })),
     );
-  }, [data.workPackages]);
-
-  // Unique work packages for filter dropdown (id + title for display)
-  const workPackageOptions = useMemo(() => {
-    const seen = new Set<number>();
-    return data.workPackages
-      .filter((wp) => {
-        if (seen.has(wp.id)) return false;
-        seen.add(wp.id);
-        return true;
-      })
-      .map((wp) => ({ id: wp.id, title: wp.work_package_title }))
-      .sort((a, b) => a.id - b.id);
   }, [data.workPackages]);
 
   // Extract unique WP IDs
@@ -237,12 +222,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
           matches(a.indicative_action),
       );
     }
-    if (filterWorkPackageId !== "") {
-      list = list.filter((a) => a.work_package_id === filterWorkPackageId);
-    }
-    if (filterRisk !== "") {
-      list = list.filter((a) => a.risk_assessment === filterRisk);
-    }
     if (filterWP.length > 0) {
       list = list.filter((a) => filterWP.includes(a.work_package_id));
     }
@@ -276,8 +255,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
     allActions,
     hasSearch,
     search,
-    filterWorkPackageId,
-    filterRisk,
     filterWP,
     filterWPTitle,
     filterAction,
@@ -360,9 +337,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
     filterIndicativeAction.length > 0 ||
     filterTrackingStatus.length > 0 ||
     filterPublicStatus.length > 0 ||
-    filterBigTicket.length > 0 ||
-    filterWorkPackageId !== "" ||
-    filterRisk !== "";
+    filterBigTicket.length > 0;
 
   const clearAllFilters = () => {
     setFilterWP([]);
@@ -399,41 +374,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
             </button>
           )}
         </div>
-        <Select
-          value={filterWorkPackageId === "" ? "all" : String(filterWorkPackageId)}
-          onValueChange={(v) => setFilterWorkPackageId(v === "all" ? "" : Number(v))}
-        >
-          <SelectTrigger className="h-9 w-44 border-gray-200 bg-white text-gray-700">
-            <SelectValue placeholder="Work package" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All work packages</SelectItem>
-            {workPackageOptions.map((wp) => (
-              <SelectItem key={wp.id} value={String(wp.id)}>
-                WP {wp.id} – {wp.title.length > 30 ? wp.title.slice(0, 30) + "…" : wp.title}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={filterRisk === "" ? "all" : filterRisk}
-          onValueChange={(v) => setFilterRisk((v === "all" ? "" : v) as RiskAssessment | "")}
-        >
-          <SelectTrigger className="h-9 w-40 border-gray-200 bg-white text-gray-700">
-            <SelectValue placeholder="Risk" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All risk levels</SelectItem>
-            {RISK_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                <span className="flex items-center gap-2">
-                  <span className={`h-2 w-2 rounded-full ${opt.indicatorClass}`} aria-hidden />
-                  {opt.label}
-                </span>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
         {hasActiveFilters && (
           <button
             type="button"
