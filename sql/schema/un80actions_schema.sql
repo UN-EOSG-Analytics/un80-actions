@@ -208,6 +208,8 @@ create table action_notes (
     action_id integer not null,
     action_sub_id text,
     user_id uuid references users on delete cascade,
+    header text,
+    note_date date,
     content text not null,
     created_at timestamp with time zone default now() not null,
     updated_at timestamp with time zone,
@@ -222,6 +224,9 @@ create table action_questions (
     action_id integer not null,
     action_sub_id text,
     user_id uuid not null references users on delete cascade,
+    header text,
+    subtext text,
+    question_date date,
     question text not null,
     answer text,
     answered_by uuid references users on delete

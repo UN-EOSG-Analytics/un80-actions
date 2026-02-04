@@ -7,6 +7,14 @@ import type { ActionQuestion } from "@/types";
 export interface QuestionCreateInput {
   action_id: number;
   action_sub_id?: string | null;
+  header: string;
+  question_date: string; // ISO date string (YYYY-MM-DD)
+  question: string;
+}
+
+export interface QuestionUpdateInput {
+  header: string;
+  question_date: string; // ISO date string (YYYY-MM-DD)
   question: string;
 }
 

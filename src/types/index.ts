@@ -156,6 +156,8 @@ export interface ActionNote {
   action_sub_id: string | null;
   user_id: string | null;
   user_email: string | null;
+  header: string | null;
+  note_date: string | null;
   content: string;
   created_at: Date;
   updated_at: Date | null;
@@ -206,6 +208,9 @@ export interface ActionQuestion {
   action_sub_id: string | null;
   user_id: string;
   user_email: string;
+  header: string | null;
+  subtext: string | null;
+  question_date: string | null; // ISO date string (YYYY-MM-DD)
   question: string;
   answer: string | null;
   answered_by: string | null;

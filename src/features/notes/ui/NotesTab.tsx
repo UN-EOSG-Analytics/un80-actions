@@ -2,6 +2,13 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { getActionNotes } from "@/features/notes/queries";
 import { createNote, approveNote, deleteNote } from "@/features/notes/commands";
 import { ReviewStatus } from "@/features/shared/ReviewStatus";
@@ -10,8 +17,9 @@ import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionNote } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
-import { Loader2, Plus, StickyNote, Trash2 } from "lucide-react";
+import { Loader2, Plus, StickyNote, Trash2, Pencil, X, Send } from "lucide-react";
 import { useEffect, useState } from "react";
+import { updateNote } from "@/features/notes/commands";
 
 // =========================================================
 // HELPER COMPONENTS
@@ -42,13 +50,25 @@ export default function NotesTab({
   isAdmin?: boolean;
   exportProps?: { onExport: (format: "word" | "pdf" | "markdown") => void; exporting: boolean };
 }) {
+  const HEADER_OPTIONS = ["Task Force", "Steering Committee", "Check-ins"];
   const [notes, setNotes] = useState<ActionNote[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newNote, setNewNote] = useState("");
+  const [newNote, setNewNote] = useState({
+    header: "",
+    note_date: "",
+    content: "",
+  });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingNote, setEditingNote] = useState({
+    header: "",
+    note_date: "",
+    content: "",
+  });
+  const [saving, setSaving] = useState(false);
   const [tagsByNoteId, setTagsByNoteId] = useState<Record<string, Tag[]>>({});
 
   const loadNotes = async () => {
@@ -70,7 +90,10 @@ export default function NotesTab({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newNote.trim()) return;
+    if (!newNote.header.trim() || !newNote.note_date || !newNote.content.trim()) {
+      setError("Please fill in all fields");
+      return;
+    }
 
     setSubmitting(true);
     setError(null);
@@ -79,11 +102,17 @@ export default function NotesTab({
       const result = await createNote({
         action_id: action.id,
         action_sub_id: action.sub_id,
-        content: newNote.trim(),
+        header: newNote.header.trim(),
+        note_date: newNote.note_date,
+        content: newNote.content.trim(),
       });
 
       if (result.success) {
-        setNewNote("");
+        setNewNote({
+          header: "",
+          note_date: "",
+          content: "",
+        });
         await loadNotes();
       } else {
         setError(result.error || "Failed to add note");
@@ -109,28 +138,124 @@ export default function NotesTab({
     }
   };
 
+  const startEditing = (note: ActionNote) => {
+    setEditingId(note.id);
+    setEditingNote({
+      header: note.header || "",
+      note_date: note.note_date || "",
+      content: note.content,
+    });
+    setError(null);
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditingNote({
+      header: "",
+      note_date: "",
+      content: "",
+    });
+    setError(null);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingId) return;
+    if (!editingNote.header.trim() || !editingNote.note_date || !editingNote.content.trim()) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const result = await updateNote(editingId, {
+        header: editingNote.header.trim(),
+        note_date: editingNote.note_date,
+        content: editingNote.content.trim(),
+      });
+
+      if (result.success) {
+        setEditingId(null);
+        setEditingNote({
+          header: "",
+          note_date: "",
+          content: "",
+        });
+        await loadNotes();
+      } else {
+        setError(result.error || "Failed to update note");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update note");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Add Note Form */}
       <form
         onSubmit={handleSubmit}
-        className="rounded-lg border border-slate-200 bg-white p-4"
+        className="rounded-lg border border-slate-200 bg-white p-4 space-y-3"
       >
-        <label className="mb-2 block text-sm font-medium text-slate-700">
+        <label className="block text-sm font-medium text-slate-700">
           Add a note
         </label>
-        <textarea
-          value={newNote}
-          onChange={(e) => setNewNote(e.target.value)}
-          placeholder="Write your note..."
-          rows={3}
-          className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
-          disabled={submitting}
-        />
-        <div className="mt-2 flex justify-end">
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-600">
+            Header *
+          </label>
+          <Select
+            value={newNote.header}
+            onValueChange={(value) => setNewNote({ ...newNote, header: value })}
+            disabled={submitting}
+            required
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select header..." />
+            </SelectTrigger>
+            <SelectContent>
+              {HEADER_OPTIONS.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-600">
+            Date *
+          </label>
+          <input
+            type="date"
+            value={newNote.note_date}
+            onChange={(e) => setNewNote({ ...newNote, note_date: e.target.value })}
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+            disabled={submitting}
+            required
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-600">
+            Note *
+          </label>
+          <textarea
+            value={newNote.content}
+            onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
+            placeholder="Write your note..."
+            rows={3}
+            className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+            disabled={submitting}
+            required
+          />
+        </div>
+        <div className="flex justify-end">
           <Button
             type="submit"
-            disabled={submitting || !newNote.trim()}
+            disabled={submitting || !newNote.header.trim() || !newNote.note_date || !newNote.content.trim()}
             className="bg-un-blue hover:bg-un-blue/90"
           >
             {submitting ? (
@@ -141,7 +266,7 @@ export default function NotesTab({
             Add Note
           </Button>
         </div>
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-red-600">{error}</p>}
       </form>
 
       {exportProps && (
@@ -160,92 +285,203 @@ export default function NotesTab({
         <EmptyState message="No notes have been added yet." />
       ) : (
         <div className="space-y-3">
-          {notes.map((note) => (
-            <div
-              key={note.id}
-              className="rounded-lg border border-slate-200 bg-white p-4"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex min-w-0 flex-1 items-start gap-2">
-                  <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm whitespace-pre-wrap text-slate-700">
-                        {note.content}
-                      </p>
+          {notes.map((note) => {
+            const isEditing = editingId === note.id;
+            return (
+              <div
+                key={note.id}
+                className="rounded-lg border border-slate-200 bg-white p-4"
+              >
+                {isEditing ? (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-600">
+                        Header *
+                      </label>
+                      <Select
+                        value={editingNote.header}
+                        onValueChange={(value) => setEditingNote({ ...editingNote, header: value })}
+                        disabled={saving}
+                        required
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select header..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {HEADER_OPTIONS.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <div className="mt-2 flex flex-wrap items-center gap-2">
-                      <p className="text-xs text-slate-400">
-                        {formatUNDateTime(note.created_at)}
-                        {note.user_email && ` by ${note.user_email}`}
-                      </p>
-                      <ReviewStatus
-                        status={
-                          note.content_review_status ?? "approved"
-                        }
-                        reviewedByEmail={note.content_reviewed_by_email}
-                        reviewedAt={note.content_reviewed_at}
-                        isAdmin={isAdmin}
-                        onApprove={async () => {
-                          setApprovingId(note.id);
-                          try {
-                            const result = await approveNote(note.id);
-                            if (result.success) {
-                              await loadNotes();
-
-                            }
-                          } finally {
-                            setApprovingId(null);
-                          }
-                        }}
-                        approving={approvingId === note.id}
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-600">
+                        Date *
+                      </label>
+                      <input
+                        type="date"
+                        value={editingNote.note_date}
+                        onChange={(e) => setEditingNote({ ...editingNote, note_date: e.target.value })}
+                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                        disabled={saving}
+                        required
                       />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-600">
+                        Note *
+                      </label>
+                      <textarea
+                        value={editingNote.content}
+                        onChange={(e) => setEditingNote({ ...editingNote, content: e.target.value })}
+                        rows={4}
+                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-none"
+                        disabled={saving}
+                        required
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2">
                       <Button
                         type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-slate-400 hover:text-red-600"
-                        onClick={() => handleDelete(note.id)}
-                        disabled={deletingId === note.id}
-                        aria-label="Delete note"
+                        variant="outline"
+                        onClick={cancelEditing}
+                        disabled={saving}
                       >
-                        {deletingId === note.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                        <X className="h-4 w-4 mr-2" />
+                        Cancel
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={handleSaveEdit}
+                        disabled={saving || !editingNote.header.trim() || !editingNote.note_date || !editingNote.content.trim()}
+                        className="bg-un-blue hover:bg-un-blue/90"
+                      >
+                        {saving ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            Saving...
+                          </>
                         ) : (
-                          <Trash2 className="h-4 w-4" />
+                          <>
+                            <Send className="h-4 w-4 mr-2" />
+                            Save
+                          </>
                         )}
                       </Button>
                     </div>
+                    {error && <p className="text-sm text-red-600">{error}</p>}
                   </div>
-                </div>
-                <div className="flex shrink-0 flex-col items-end gap-1.5">
-                  {(tagsByNoteId[note.id] ?? []).length > 0 && (
-                    <span className="flex flex-wrap justify-end gap-1.5">
-                      {(tagsByNoteId[note.id] ?? []).map((t) => (
-                        <Badge
-                          key={t.id}
-                          variant="outline"
-                          className="border-slate-400 bg-slate-100 text-slate-700"
-                        >
-                          {t.name}
-                        </Badge>
-                      ))}
-                    </span>
-                  )}
-                  <TagSelector
-                    entityId={note.id}
-                    entityType="note"
-                    isAdmin={isAdmin}
-                    initialTags={[]}
-                    onTagsChange={(tags) =>
-                      setTagsByNoteId((prev) => ({ ...prev, [note.id]: tags }))
-                    }
-                    hideInlineTags
-                  />
-                </div>
+                ) : (
+                  <>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex min-w-0 flex-1 items-start gap-2">
+                        <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                        <div className="min-w-0 flex-1">
+                          {(note.header || note.note_date) && (
+                            <div className="mb-2 space-y-1">
+                              {note.header && (
+                                <h4 className="text-sm font-semibold text-slate-800">
+                                  {note.header}
+                                </h4>
+                              )}
+                              {note.note_date && (
+                                <p className={`text-xs text-slate-500 ${note.header ? "" : ""}`}>
+                                  Date: {note.note_date}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-sm whitespace-pre-wrap text-slate-700">
+                              {note.content}
+                            </p>
+                          </div>
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <p className="text-xs text-slate-400">
+                              {formatUNDateTime(note.created_at)}
+                              {note.user_email && ` by ${note.user_email}`}
+                            </p>
+                            <ReviewStatus
+                              status={
+                                note.content_review_status ?? "approved"
+                              }
+                              reviewedByEmail={note.content_reviewed_by_email}
+                              reviewedAt={note.content_reviewed_at}
+                              isAdmin={isAdmin}
+                              onApprove={async () => {
+                                setApprovingId(note.id);
+                                try {
+                                  const result = await approveNote(note.id);
+                                  if (result.success) {
+                                    await loadNotes();
+                                  }
+                                } finally {
+                                  setApprovingId(null);
+                                }
+                              }}
+                              approving={approvingId === note.id}
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-slate-400 hover:text-un-blue"
+                              onClick={() => startEditing(note)}
+                              aria-label="Edit note"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-slate-400 hover:text-red-600"
+                              onClick={() => handleDelete(note.id)}
+                              disabled={deletingId === note.id}
+                              aria-label="Delete note"
+                            >
+                              {deletingId === note.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex shrink-0 flex-col items-end gap-1.5">
+                        {(tagsByNoteId[note.id] ?? []).length > 0 && (
+                          <span className="flex flex-wrap justify-end gap-1.5">
+                            {(tagsByNoteId[note.id] ?? []).map((t) => (
+                              <Badge
+                                key={t.id}
+                                variant="outline"
+                                className="border-slate-400 bg-slate-100 text-slate-700"
+                              >
+                                {t.name}
+                              </Badge>
+                            ))}
+                          </span>
+                        )}
+                        <TagSelector
+                          entityId={note.id}
+                          entityType="note"
+                          isAdmin={isAdmin}
+                          initialTags={[]}
+                          onTagsChange={(tags) =>
+                            setTagsByNoteId((prev) => ({ ...prev, [note.id]: tags }))
+                          }
+                          hideInlineTags
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

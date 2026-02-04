@@ -28,7 +28,7 @@ export function ReviewStatus({
     return (
       <div className={`flex flex-wrap items-center gap-2 ${className}`}>
         <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-200">
-          Needs review
+          Open
         </Badge>
         {isAdmin && onApprove && (
           <Button
@@ -43,7 +43,7 @@ export function ReviewStatus({
             ) : (
               <>
                 <Check className="mr-1 h-3 w-3" />
-                Approve
+                Close
               </>
             )}
           </Button>
@@ -55,7 +55,7 @@ export function ReviewStatus({
   return (
     <div className={`flex flex-wrap items-center gap-2 ${className}`}>
       <Badge className="bg-green-100 text-green-800 border border-green-200">
-        Approved
+        Closed
       </Badge>
       {(reviewedByEmail || reviewedAt) && (
         <span className="text-xs text-slate-500">

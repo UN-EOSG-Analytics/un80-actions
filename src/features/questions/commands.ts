@@ -4,7 +4,7 @@ import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { getQuestionById } from "./queries";
 import { getCurrentUser } from "@/features/auth/service";
-import type { QuestionCreateInput, QuestionResult } from "./types";
+import type { QuestionCreateInput, QuestionUpdateInput, QuestionResult } from "./types";
 
 // =========================================================
 // MUTATIONS
@@ -23,19 +23,27 @@ export async function createQuestion(
       return { success: false, error: "You must be logged in to ask questions" };
     }
 
+    if (!input.header || input.header.trim().length === 0) {
+      return { success: false, error: "Header cannot be empty" };
+    }
+    if (!input.question_date) {
+      return { success: false, error: "Date is required" };
+    }
     if (!input.question || input.question.trim().length === 0) {
       return { success: false, error: "Question cannot be empty" };
     }
 
     const rows = await query<{ id: string }>(
       `INSERT INTO ${DB_SCHEMA}.action_questions 
-     (action_id, action_sub_id, user_id, question, content_review_status)
-     VALUES ($1, $2, $3, $4, 'needs_review')
+     (action_id, action_sub_id, user_id, header, subtext, question_date, question, content_review_status)
+     VALUES ($1, $2, $3, $4, NULL, $5, $6, 'needs_review')
      RETURNING id`,
       [
         input.action_id,
         input.action_sub_id ?? null,
         user.id,
+        input.header.trim(),
+        input.question_date,
         input.question.trim(),
       ],
     );
@@ -57,7 +65,7 @@ export async function createQuestion(
  */
 export async function updateQuestion(
   questionId: string,
-  newQuestion: string,
+  input: QuestionUpdateInput,
 ): Promise<QuestionResult> {
   try {
     const user = await getCurrentUser();
@@ -77,18 +85,29 @@ export async function updateQuestion(
       };
     }
 
-    if (!newQuestion || newQuestion.trim().length === 0) {
+    if (!input.header || input.header.trim().length === 0) {
+      return { success: false, error: "Header cannot be empty" };
+    }
+    if (!input.question_date) {
+      return { success: false, error: "Date is required" };
+    }
+    if (!input.question || input.question.trim().length === 0) {
       return { success: false, error: "Question cannot be empty" };
     }
 
     await query(
       `UPDATE ${DB_SCHEMA}.action_questions
-     SET question = $1, updated_at = NOW(),
+     SET header = $1, subtext = NULL, question_date = $2, question = $3, updated_at = NOW(),
          content_review_status = 'needs_review',
          content_reviewed_by = NULL,
          content_reviewed_at = NULL
-     WHERE id = $2`,
-      [newQuestion.trim(), questionId],
+     WHERE id = $4`,
+      [
+        input.header.trim(),
+        input.question_date,
+        input.question.trim(),
+        questionId,
+      ],
     );
 
     const updated = await getQuestionById(questionId);

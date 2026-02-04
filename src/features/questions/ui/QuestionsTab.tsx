@@ -2,9 +2,17 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { getActionQuestions } from "@/features/questions/queries";
 import {
   createQuestion,
+  updateQuestion,
   approveQuestion,
   deleteQuestion,
 } from "@/features/questions/commands";
@@ -14,7 +22,7 @@ import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionQuestion } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
-import { Loader2, MessageCircle, Send, Trash2 } from "lucide-react";
+import { Loader2, MessageCircle, Send, Trash2, Pencil, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 // =========================================================
@@ -48,14 +56,27 @@ export default function QuestionsTab({
 }) {
   const [questions, setQuestions] = useState<ActionQuestion[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newQuestion, setNewQuestion] = useState("");
+  const [newQuestion, setNewQuestion] = useState({
+    header: "",
+    question_date: "",
+    question: "• ",
+  });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingQuestion, setEditingQuestion] = useState({
+    header: "",
+    question_date: "",
+    question: "",
+  });
+  const [saving, setSaving] = useState(false);
   const [tagsByQuestionId, setTagsByQuestionId] = useState<
     Record<string, Tag[]>
   >({});
+
+  const HEADER_OPTIONS = ["Task Force", "Steering Committee", "Check-ins"];
 
   const loadQuestions = async () => {
     setLoading(true);
@@ -76,7 +97,10 @@ export default function QuestionsTab({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newQuestion.trim()) return;
+    if (!newQuestion.header.trim() || !newQuestion.question_date || !newQuestion.question.trim()) {
+      setError("Please fill in all fields");
+      return;
+    }
 
     setSubmitting(true);
     setError(null);
@@ -85,11 +109,17 @@ export default function QuestionsTab({
       const result = await createQuestion({
         action_id: action.id,
         action_sub_id: action.sub_id,
-        question: newQuestion.trim(),
+        header: newQuestion.header.trim(),
+        question_date: newQuestion.question_date,
+        question: newQuestion.question.trim(),
       });
 
       if (result.success) {
-        setNewQuestion("");
+        setNewQuestion({
+          header: "",
+          question_date: "",
+          question: "",
+        });
         await loadQuestions();
       } else {
         setError(result.error || "Failed to submit question");
@@ -116,38 +146,135 @@ export default function QuestionsTab({
     }
   };
 
+  const startEditing = (q: ActionQuestion) => {
+    setEditingId(q.id);
+    setEditingQuestion({
+      header: q.header || "",
+      question_date: q.question_date || "",
+      question: q.question,
+    });
+    setError(null);
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditingQuestion({
+      header: "",
+      question_date: "",
+      question: "• ",
+    });
+    setError(null);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingId) return;
+    if (!editingQuestion.header.trim() || !editingQuestion.question_date || !editingQuestion.question.trim()) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const result = await updateQuestion(editingId, {
+        header: editingQuestion.header.trim(),
+        question_date: editingQuestion.question_date,
+        question: editingQuestion.question.trim(),
+      });
+
+      if (result.success) {
+        setEditingId(null);
+        await loadQuestions();
+      } else {
+        setError(result.error || "Failed to update question");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update question");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Ask Question Form */}
       <form
         onSubmit={handleSubmit}
-        className="rounded-lg border border-slate-200 bg-white p-4"
+        className="rounded-lg border border-slate-200 bg-white p-4 space-y-3"
       >
-        <label className="mb-2 block text-sm font-medium text-slate-700">
+        <label className="block text-sm font-medium text-slate-700">
           Ask a question
         </label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={newQuestion}
-            onChange={(e) => setNewQuestion(e.target.value)}
-            placeholder="Type your question..."
-            className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-600">
+            Header *
+          </label>
+          <Select
+            value={newQuestion.header}
+            onValueChange={(value) => setNewQuestion({ ...newQuestion, header: value })}
             disabled={submitting}
+            required
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select header..." />
+            </SelectTrigger>
+            <SelectContent>
+              {HEADER_OPTIONS.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-600">
+            Date *
+          </label>
+          <input
+            type="date"
+            value={newQuestion.question_date}
+            onChange={(e) => setNewQuestion({ ...newQuestion, question_date: e.target.value })}
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+            disabled={submitting}
+            required
           />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-600">
+            Question *
+          </label>
+          <textarea
+            value={newQuestion.question}
+            onChange={(e) => setNewQuestion({ ...newQuestion, question: e.target.value })}
+            placeholder="• "
+            rows={3}
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-none"
+            disabled={submitting}
+            required
+          />
+        </div>
+        <div className="flex justify-end">
           <Button
             type="submit"
-            disabled={submitting || !newQuestion.trim()}
+            disabled={submitting || !newQuestion.header.trim() || !newQuestion.question_date || !newQuestion.question.trim()}
             className="bg-un-blue hover:bg-un-blue/90"
           >
             {submitting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Submitting...
+              </>
             ) : (
-              <Send className="h-4 w-4" />
+              <>
+                <Send className="h-4 w-4 mr-2" />
+                Submit Question
+              </>
             )}
           </Button>
         </div>
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-red-600">{error}</p>}
       </form>
 
       {exportProps && (
@@ -167,19 +294,121 @@ export default function QuestionsTab({
       ) : (
         <div className="space-y-3">
           {questions.map((q) => {
+            const isEditing = editingId === q.id;
             return (
               <div
                 key={q.id}
                 className="rounded-lg border border-slate-200 bg-white p-4"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0 flex-1 space-y-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-un-blue" />
-                      <p className="text-sm font-medium text-slate-700">
-                        {q.question}
-                      </p>
+                {isEditing ? (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-600">
+                        Header *
+                      </label>
+                      <Select
+                        value={editingQuestion.header}
+                        onValueChange={(value) => setEditingQuestion({ ...editingQuestion, header: value })}
+                        disabled={saving}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select header..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {HEADER_OPTIONS.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-600">
+                        Date *
+                      </label>
+                      <input
+                        type="date"
+                        value={editingQuestion.question_date}
+                        onChange={(e) => setEditingQuestion({ ...editingQuestion, question_date: e.target.value })}
+                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                        disabled={saving}
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-slate-600">
+                        Question *
+                      </label>
+                      <textarea
+                        value={editingQuestion.question}
+                        onChange={(e) => setEditingQuestion({ ...editingQuestion, question: e.target.value })}
+                        placeholder="• "
+                        rows={3}
+                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-none"
+                        disabled={saving}
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={cancelEditing}
+                        disabled={saving}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Cancel
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={handleSaveEdit}
+                        disabled={saving || !editingQuestion.header.trim() || !editingQuestion.question_date || !editingQuestion.question.trim()}
+                        className="bg-un-blue hover:bg-un-blue/90"
+                      >
+                        {saving ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="h-4 w-4 mr-2" />
+                            Save
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    {error && <p className="text-sm text-red-600">{error}</p>}
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0 flex-1 space-y-3">
+                        {q.header || q.question_date ? (
+                          <div className="space-y-1">
+                            {q.header && (
+                              <div className="flex flex-wrap items-center gap-2">
+                                <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-un-blue" />
+                                <h4 className="text-sm font-semibold text-slate-800">
+                                  {q.header}
+                                </h4>
+                              </div>
+                            )}
+                            {q.question_date && (
+                              <p className={`text-xs text-slate-500 ${q.header ? "ml-6" : ""}`}>
+                                Date: {q.question_date}
+                              </p>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex flex-wrap items-center gap-2">
+                            <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-un-blue" />
+                          </div>
+                        )}
+                        <div className={q.header || q.question_date ? "ml-6" : ""}>
+                          <p className="text-sm text-slate-700">
+                            {q.question}
+                          </p>
+                        </div>
                     {q.answer && (
                       <div className="ml-6 border-l-2 border-green-200 bg-green-50 py-2 pr-2 pl-3">
                         <p className="text-sm text-slate-600">{q.answer}</p>
@@ -213,6 +442,18 @@ export default function QuestionsTab({
                         }}
                         approving={approvingId === q.id}
                       />
+                      {!q.answer && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-slate-400 hover:text-un-blue"
+                          onClick={() => startEditing(q)}
+                          aria-label="Edit question"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      )}
                       <Button
                         type="button"
                         variant="ghost"
@@ -259,6 +500,8 @@ export default function QuestionsTab({
                     />
                   </div>
                 </div>
+                  </>
+                )}
               </div>
             );
           })}

@@ -21,20 +21,28 @@ export async function createNote(input: NoteCreateInput): Promise<NoteResult> {
       return { success: false, error: "You must be logged in to add notes" };
     }
 
-    // Validate content
+    // Validate input
+    if (!input.header || input.header.trim().length === 0) {
+      return { success: false, error: "Header cannot be empty" };
+    }
+    if (!input.note_date) {
+      return { success: false, error: "Date is required" };
+    }
     if (!input.content || input.content.trim().length === 0) {
       return { success: false, error: "Note content cannot be empty" };
     }
 
     const rows = await query<{ id: string }>(
       `INSERT INTO ${DB_SCHEMA}.action_notes 
-     (action_id, action_sub_id, user_id, content, content_review_status)
-     VALUES ($1, $2, $3, $4, 'needs_review')
+     (action_id, action_sub_id, user_id, header, note_date, content, content_review_status)
+     VALUES ($1, $2, $3, $4, $5, $6, 'needs_review')
      RETURNING id`,
       [
         input.action_id,
         input.action_sub_id ?? null,
         user.id,
+        input.header.trim(),
+        input.note_date,
         input.content.trim(),
       ],
     );
