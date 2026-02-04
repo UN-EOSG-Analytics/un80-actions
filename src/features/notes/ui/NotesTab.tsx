@@ -76,8 +76,8 @@ export default function NotesTab({
     try {
       const data = await getActionNotes(action.id, action.sub_id);
       setNotes(data);
-    } catch (err) {
-      console.error("Failed to load notes:", err);
+    } catch {
+      // silently fail - UI handles empty state
     } finally {
       setLoading(false);
     }

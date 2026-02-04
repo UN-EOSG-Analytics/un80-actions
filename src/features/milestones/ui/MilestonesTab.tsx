@@ -181,8 +181,8 @@ export default function MilestonesTab({
     try {
       const data = await getActionMilestones(action.id, action.sub_id);
       setMilestones(data);
-    } catch (err) {
-      console.error("Failed to load milestones:", err);
+    } catch {
+      // silently fail - UI handles empty state
     } finally {
       setLoading(false);
     }
@@ -266,8 +266,8 @@ export default function MilestonesTab({
     try {
       const updates = await getMilestoneUpdates(milestoneId);
       setMilestoneUpdates(prev => ({ ...prev, [milestoneId]: updates }));
-    } catch (err) {
-      console.error("Failed to load milestone updates:", err);
+    } catch {
+      // silently fail
     }
   };
 
@@ -459,8 +459,8 @@ export default function MilestonesTab({
       ]);
       setAttachmentCount(count);
       setAttachments(data);
-    } catch (err) {
-      console.error("Failed to load attachments:", err);
+    } catch {
+      // silently fail
     } finally {
       setLoadingAttachments(false);
     }
@@ -515,8 +515,7 @@ export default function MilestonesTab({
       } else {
         setUploadError(result.error || "Upload failed");
       }
-    } catch (error) {
-      console.error("Upload error:", error);
+    } catch {
       setUploadError("Upload failed");
     } finally {
       setUploading(false);
@@ -534,8 +533,8 @@ export default function MilestonesTab({
       if (result.success) {
         await loadAttachments();
       }
-    } catch (error) {
-      console.error("Delete error:", error);
+    } catch {
+      // silently fail
     }
   };
 
@@ -563,8 +562,8 @@ export default function MilestonesTab({
         await loadAttachments();
         setEditingAttachment(null);
       }
-    } catch (error) {
-      console.error("Save error:", error);
+    } catch {
+      // silently fail
     }
   };
 
@@ -573,8 +572,8 @@ export default function MilestonesTab({
     try {
       const data = await getMilestoneVersions(milestoneId);
       setVersions((prev) => ({ ...prev, [milestoneId]: data }));
-    } catch (err) {
-      console.error("Failed to load versions:", err);
+    } catch {
+      // silently fail
     } finally {
       setLoadingVersions((prev) => ({ ...prev, [milestoneId]: false }));
     }

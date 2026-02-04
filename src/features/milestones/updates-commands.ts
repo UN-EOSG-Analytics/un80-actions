@@ -46,7 +46,6 @@ export async function createMilestoneUpdate(
 
     return { success: true, update: rows[0] };
   } catch (err) {
-    console.error("Failed to create milestone update:", err);
     return {
       success: false,
       error: err instanceof Error ? err.message : "Failed to create update",
@@ -79,7 +78,6 @@ export async function toggleMilestoneUpdateResolved(
 
     return { success: true };
   } catch (err) {
-    console.error("Failed to toggle resolved status:", err);
     return {
       success: false,
       error: err instanceof Error ? err.message : "Failed to toggle resolved status",
@@ -123,7 +121,6 @@ export async function deleteMilestoneUpdate(
 
     return { success: true };
   } catch (err) {
-    console.error("Failed to delete milestone update:", err);
     return {
       success: false,
       error: err instanceof Error ? err.message : "Failed to delete update",

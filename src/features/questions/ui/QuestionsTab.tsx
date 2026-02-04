@@ -83,8 +83,8 @@ export default function QuestionsTab({
     try {
       const data = await getActionQuestions(action.id, action.sub_id);
       setQuestions(data);
-    } catch (err) {
-      console.error("Failed to load questions:", err);
+    } catch {
+      // silently fail - UI handles empty state
     } finally {
       setLoading(false);
     }

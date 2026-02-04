@@ -48,8 +48,6 @@ export async function uploadActionAttachment(
     if (!user) {
       return { success: false, error: "Unauthorized" };
     }
-    
-    console.log("Upload - Current user:", { id: user.id, email: user.email });
 
     const file = formData.get("file") as File;
     if (!file) {
@@ -71,8 +69,6 @@ export async function uploadActionAttachment(
     await uploadBlob(blobName, buffer, file.type);
 
     // Store metadata in database
-    console.log("Storing uploaded_by:", user.id);
-    
     const result = await query<{ id: string }>(
       `INSERT INTO un80actions.action_attachments (
         action_id,
@@ -110,7 +106,6 @@ export async function uploadActionAttachment(
       attachmentId: result[0].id,
     };
   } catch (error) {
-    console.error("Upload error:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Upload failed",
@@ -161,7 +156,6 @@ export async function deleteActionAttachment(
 
     return { success: true };
   } catch (error) {
-    console.error("Delete error:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Delete failed",
@@ -194,7 +188,6 @@ export async function updateAttachmentMetadata(
     revalidatePath("/");
     return { success: true };
   } catch (error) {
-    console.error("Update error:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Update failed",
@@ -227,7 +220,6 @@ export async function getAttachmentDownloadUrl(
 
     return { success: true, url };
   } catch (error) {
-    console.error("Download URL error:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to generate URL",

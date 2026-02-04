@@ -63,8 +63,8 @@ export default function LegalTab({
     try {
       const data = await getActionLegalComments(action.id, action.sub_id);
       setComments(data);
-    } catch (err) {
-      console.error("Failed to load legal comments:", err);
+    } catch {
+      // silently fail - UI handles empty state
     } finally {
       setLoading(false);
     }

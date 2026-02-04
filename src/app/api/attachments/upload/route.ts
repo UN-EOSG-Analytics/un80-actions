@@ -46,8 +46,7 @@ export async function POST(request: NextRequest) {
       success: true,
       attachmentId: result.attachmentId,
     });
-  } catch (error) {
-    console.error("Upload API error:", error);
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

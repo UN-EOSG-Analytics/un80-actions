@@ -48,8 +48,7 @@ export async function updateRiskAssessment(
       [riskAssessment, actionId, actionSubId],
     );
     return { success: true };
-  } catch (e) {
-    console.error("updateRiskAssessment:", e);
+  } catch {
     return { success: false, error: "Failed to update" };
   }
 }

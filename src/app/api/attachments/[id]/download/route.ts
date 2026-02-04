@@ -46,8 +46,7 @@ export async function GET(
         "Content-Length": content.length.toString(),
       },
     });
-  } catch (error) {
-    console.error("Download API error:", error);
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

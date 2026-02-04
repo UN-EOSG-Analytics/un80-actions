@@ -10,8 +10,8 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error(error);
+    // Error boundary caught an error
+    // Could send to error reporting service here
   }, [error]);
 
   return (

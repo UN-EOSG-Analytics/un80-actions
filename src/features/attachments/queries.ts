@@ -39,12 +39,6 @@ export async function getActionAttachments(
     [actionId, actionSubId],
   );
 
-  console.log("Fetched attachments:", rows.map(r => ({ 
-    id: r.id, 
-    uploaded_by: r.uploaded_by, 
-    uploaded_by_email: r.uploaded_by_email 
-  })));
-
   return rows.map((r) => ({
     ...r,
     uploaded_at: new Date(r.uploaded_at),

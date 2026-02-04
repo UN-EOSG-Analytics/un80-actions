@@ -963,8 +963,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       actionsWithNotes,
       actionsWithQuestions,
     };
-  } catch (e) {
-    console.error("getActionsTableData:", e);
+  } catch {
     return empty;
   }
 }
