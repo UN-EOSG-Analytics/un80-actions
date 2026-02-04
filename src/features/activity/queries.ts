@@ -18,54 +18,58 @@ export interface ActivityItem {
 /**
  * Fetch recent activity across the platform
  * Returns changes from notes, questions, milestones, tags, and milestone updates
+ * Each section is wrapped in try/catch so one failing query (e.g. missing column) doesn't empty the feed.
  */
 export async function getRecentActivity(limit: number = 50): Promise<ActivityItem[]> {
   const activities: ActivityItem[] = [];
+  const perSourceLimit = Math.min(limit, 20);
 
-  // Recent notes (created or updated) - only user-created notes
-  const notes = await query<{
-    id: string;
-    action_id: number;
-    action_sub_id: string | null;
-    user_email: string | null;
-    created_at: Date;
-    updated_at: Date | null;
-    header: string | null;
-  }>(
-    `SELECT 
-      n.id,
-      n.action_id,
-      n.action_sub_id,
-      u.email as user_email,
-      n.created_at,
-      n.updated_at,
-      n.header
-    FROM ${DB_SCHEMA}.action_notes n
-    LEFT JOIN ${DB_SCHEMA}.users u ON n.user_id = u.id
-    WHERE n.user_id IS NOT NULL
-    ORDER BY GREATEST(n.created_at, COALESCE(n.updated_at, n.created_at)) DESC
-    LIMIT $1`,
-    [limit * 2], // Get more to account for filtering
-  );
+  // Recent notes (created or updated) – include all notes so seed/pipeline notes show too
+  try {
+    const notes = await query<{
+      id: string;
+      action_id: number;
+      action_sub_id: string | null;
+      user_email: string | null;
+      created_at: Date;
+      updated_at: Date | null;
+      header: string | null;
+    }>(
+      `SELECT 
+        n.id,
+        n.action_id,
+        n.action_sub_id,
+        u.email as user_email,
+        n.created_at,
+        n.updated_at,
+        n.header
+      FROM ${DB_SCHEMA}.action_notes n
+      LEFT JOIN ${DB_SCHEMA}.users u ON n.user_id = u.id
+      ORDER BY GREATEST(n.created_at, COALESCE(n.updated_at, n.created_at)) DESC
+      LIMIT $1`,
+      [perSourceLimit],
+    );
 
-  for (const note of notes) {
-    const createdDate = note.created_at instanceof Date ? note.created_at : new Date(note.created_at);
-    const updatedDate = note.updated_at ? (note.updated_at instanceof Date ? note.updated_at : new Date(note.updated_at)) : null;
-    const isUpdated = updatedDate && updatedDate.getTime() > createdDate.getTime();
-    activities.push({
-      id: `note-${note.id}`,
-      type: "note",
-      action_id: note.action_id,
-      action_sub_id: note.action_sub_id,
-      title: note.header || "Note",
-      description: isUpdated ? "Note updated" : "Note added",
-      user_email: note.user_email,
-      timestamp: isUpdated ? updatedDate! : createdDate,
-      change_type: isUpdated ? "updated" : "created",
-    });
+    for (const note of notes) {
+      const isUpdated = note.updated_at && note.updated_at > note.created_at;
+      activities.push({
+        id: `note-${note.id}`,
+        type: "note",
+        action_id: note.action_id,
+        action_sub_id: note.action_sub_id,
+        title: note.header || "Note",
+        description: isUpdated ? "Note updated" : "Note added",
+        user_email: note.user_email,
+        timestamp: isUpdated ? note.updated_at! : note.created_at,
+        change_type: isUpdated ? "updated" : "created",
+      });
+    }
+  } catch (e) {
+    console.error("[Activity] Notes query failed:", e);
   }
 
   // Recent questions (created or updated)
+  try {
   const questions = await query<{
     id: string;
     action_id: number;
@@ -87,13 +91,11 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
     LEFT JOIN ${DB_SCHEMA}.users u ON q.user_id = u.id
     ORDER BY GREATEST(q.created_at, COALESCE(q.updated_at, q.created_at)) DESC
     LIMIT $1`,
-    [limit * 2], // Get more to account for filtering
+    [perSourceLimit],
   );
 
   for (const question of questions) {
-    const createdDate = question.created_at instanceof Date ? question.created_at : new Date(question.created_at);
-    const updatedDate = question.updated_at ? (question.updated_at instanceof Date ? question.updated_at : new Date(question.updated_at)) : null;
-    const isUpdated = updatedDate && updatedDate.getTime() > createdDate.getTime();
+    const isUpdated = question.updated_at && question.updated_at > question.created_at;
     activities.push({
       id: `question-${question.id}`,
       type: "question",
@@ -102,12 +104,16 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
       title: question.header || "Question",
       description: isUpdated ? "Question updated" : "Question added",
       user_email: question.user_email,
-      timestamp: isUpdated ? updatedDate! : createdDate,
+      timestamp: isUpdated ? question.updated_at! : question.created_at,
       change_type: isUpdated ? "updated" : "created",
     });
   }
+  } catch (e) {
+    console.error("[Activity] Questions query failed:", e);
+  }
 
   // Recent milestone changes (submitted, reviewed, approved)
+  try {
   const milestones = await query<{
     id: string;
     action_id: number;
@@ -142,7 +148,7 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
       COALESCE(m.approved_at, '1970-01-01'::timestamp)
     ) DESC
     LIMIT $1`,
-    [limit * 2], // Get more to account for filtering
+    [perSourceLimit],
   );
 
   for (const milestone of milestones) {
@@ -150,16 +156,11 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
       { time: milestone.approved_at, type: "approved", email: milestone.approved_by_email },
       { time: milestone.reviewed_at, type: "reviewed", email: milestone.reviewed_by_email },
       { time: milestone.submitted_at, type: "submitted", email: milestone.submitted_by_email },
-    ]
-      .filter((t) => t.time !== null)
-      .map((t) => ({
-        ...t,
-        time: t.time instanceof Date ? t.time : new Date(t.time!),
-      }));
+    ].filter((t) => t.time !== null);
 
     if (timestamps.length > 0) {
       const latest = timestamps.reduce((prev, curr) =>
-        curr.time.getTime() > prev.time.getTime() ? curr : prev,
+        curr.time! > prev.time! ? curr : prev,
       );
       activities.push({
         id: `milestone-${milestone.id}-${latest.type}`,
@@ -169,13 +170,17 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
         title: `${milestone.milestone_type} milestone`,
         description: `Milestone ${latest.type}`,
         user_email: latest.email,
-        timestamp: latest.time,
+        timestamp: latest.time!,
         change_type: latest.type === "submitted" ? "created" : "updated",
       });
     }
   }
+  } catch (e) {
+    console.error("[Activity] Milestones query failed:", e);
+  }
 
   // Recent milestone updates
+  try {
   const milestoneUpdates = await query<{
     id: string;
     milestone_id: string;
@@ -198,13 +203,11 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
     LEFT JOIN ${DB_SCHEMA}.users u ON mu.user_id = u.id
     ORDER BY GREATEST(mu.created_at, COALESCE(mu.updated_at, mu.created_at)) DESC
     LIMIT $1`,
-    [limit * 2], // Get more to account for filtering
+    [perSourceLimit],
   );
 
   for (const update of milestoneUpdates) {
-    const createdDate = update.created_at instanceof Date ? update.created_at : new Date(update.created_at);
-    const updatedDate = update.updated_at ? (update.updated_at instanceof Date ? update.updated_at : new Date(update.updated_at)) : null;
-    const isUpdated = updatedDate && updatedDate.getTime() > createdDate.getTime();
+    const isUpdated = update.updated_at && update.updated_at > update.created_at;
     activities.push({
       id: `milestone-update-${update.id}`,
       type: "milestone_update",
@@ -213,12 +216,16 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
       title: "Milestone update",
       description: isUpdated ? "Milestone update modified" : "Milestone update added",
       user_email: update.user_email,
-      timestamp: isUpdated ? updatedDate! : createdDate,
+      timestamp: isUpdated ? update.updated_at! : update.created_at,
       change_type: isUpdated ? "updated" : "created",
     });
   }
+  } catch (e) {
+    console.error("[Activity] Milestone updates query failed:", e);
+  }
 
   // Recent tags (when tags are created)
+  try {
   const tags = await query<{
     id: string;
     name: string;
@@ -228,11 +235,10 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
     FROM ${DB_SCHEMA}.tags
     ORDER BY created_at DESC
     LIMIT $1`,
-    [limit * 2], // Get more to account for filtering
+    [perSourceLimit],
   );
 
   for (const tag of tags) {
-    const createdDate = tag.created_at instanceof Date ? tag.created_at : new Date(tag.created_at);
     activities.push({
       id: `tag-${tag.id}`,
       type: "tag",
@@ -241,13 +247,18 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
       title: tag.name,
       description: "Tag created",
       user_email: null,
-      timestamp: createdDate,
+      timestamp: tag.created_at,
       change_type: "created",
     });
   }
+  } catch (e) {
+    console.error("[Activity] Tags query failed:", e);
+  }
 
   // Sort all activities by timestamp (most recent first) and limit
+  const toTime = (t: Date | string) =>
+    t instanceof Date ? t.getTime() : new Date(t).getTime();
   return activities
-    .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+    .sort((a, b) => toTime(b.timestamp) - toTime(a.timestamp))
     .slice(0, limit);
 }
