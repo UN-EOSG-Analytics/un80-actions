@@ -118,6 +118,24 @@ function MultiSelectFilter<T extends string | number | boolean>({
   );
 }
 
+// Sort icon component (must be outside render to satisfy React 19)
+function SortIcon({ 
+  column, 
+  sortField, 
+  sortDirection 
+}: { 
+  column: SortField; 
+  sortField: SortField; 
+  sortDirection: SortDirection 
+}) {
+  if (sortField !== column) return <ArrowUpDown className="ml-1 h-3.5 w-3.5 text-gray-400" />;
+  return sortDirection === "asc" ? (
+    <ArrowUp className="ml-1 h-3.5 w-3.5 text-un-blue" />
+  ) : (
+    <ArrowDown className="ml-1 h-3.5 w-3.5 text-un-blue" />
+  );
+}
+
 interface ActionsTableProps {
   data: ActionsTableData;
 }
@@ -136,6 +154,8 @@ export function ActionsTable({ data }: ActionsTableProps) {
   const [filterTrackingStatus, setFilterTrackingStatus] = useState<string[]>([]);
   const [filterPublicStatus, setFilterPublicStatus] = useState<string[]>([]);
   const [filterBigTicket, setFilterBigTicket] = useState<boolean[]>([]);
+  const [filterWorkPackageId, setFilterWorkPackageId] = useState<string>("");
+  const [filterRisk, setFilterRisk] = useState<string>("");
   
   // Track which filter popovers are open
   const [openFilters, setOpenFilters] = useState<Record<string, boolean>>({});
@@ -251,6 +271,12 @@ export function ActionsTable({ data }: ActionsTableProps) {
       }
       // If both are selected, show all (no filter)
     }
+    if (filterWorkPackageId) {
+      list = list.filter((a) => String(a.work_package_id).includes(filterWorkPackageId));
+    }
+    if (filterRisk) {
+      list = list.filter((a) => a.risk_assessment === filterRisk);
+    }
     return list;
   }, [
     allActions,
@@ -263,6 +289,8 @@ export function ActionsTable({ data }: ActionsTableProps) {
     filterTrackingStatus,
     filterPublicStatus,
     filterBigTicket,
+    filterWorkPackageId,
+    filterRisk,
   ]);
 
   const sortedActions = useMemo(() => {
@@ -304,15 +332,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
     }
   };
 
-  const SortIcon = ({ column }: { column: SortField }) => {
-    if (sortField !== column) return <ArrowUpDown className="ml-1 h-3.5 w-3.5 text-gray-400" />;
-    return sortDirection === "asc" ? (
-      <ArrowUp className="ml-1 h-3.5 w-3.5 text-un-blue" />
-    ) : (
-      <ArrowDown className="ml-1 h-3.5 w-3.5 text-un-blue" />
-    );
-  };
-
   const handleActionClick = (actionId: number, actionSubId: string | null) => {
     sessionStorage.setItem("actionModalReturnUrl", window.location.href);
     const actionParam = actionSubId ? `${actionId}${actionSubId}` : `${actionId}`;
@@ -338,7 +357,9 @@ export function ActionsTable({ data }: ActionsTableProps) {
     filterIndicativeAction.length > 0 ||
     filterTrackingStatus.length > 0 ||
     filterPublicStatus.length > 0 ||
-    filterBigTicket.length > 0;
+    filterBigTicket.length > 0 ||
+    filterWorkPackageId.length > 0 ||
+    filterRisk.length > 0;
 
   const clearAllFilters = () => {
     setFilterWP([]);
@@ -403,7 +424,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
                     className="inline-flex items-center hover:text-un-blue"
                   >
                     WP
-                    <SortIcon column="work_package_id" />
+                    <SortIcon column="work_package_id" sortField={sortField} sortDirection={sortDirection} />
                   </button>
                   <MultiSelectFilter
                     filterKey="wp"
@@ -428,7 +449,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
                     className="inline-flex items-center hover:text-un-blue"
                   >
                     WP TITLE
-                    <SortIcon column="work_package_title" />
+                    <SortIcon column="work_package_title" sortField={sortField} sortDirection={sortDirection} />
                   </button>
                   <MultiSelectFilter
                     filterKey="wpTitle"
@@ -453,7 +474,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
                     className="inline-flex items-center hover:text-un-blue"
                   >
                     ACTION
-                    <SortIcon column="action_id" />
+                    <SortIcon column="action_id" sortField={sortField} sortDirection={sortDirection} />
                   </button>
                   <MultiSelectFilter
                     filterKey="action"
@@ -478,7 +499,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
                     className="inline-flex items-center hover:text-un-blue"
                   >
                     INDICATIVE ACTION
-                    <SortIcon column="indicative_action" />
+                    <SortIcon column="indicative_action" sortField={sortField} sortDirection={sortDirection} />
                   </button>
                   <MultiSelectFilter
                     filterKey="indicativeAction"
@@ -504,7 +525,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
                     className="inline-flex items-center hover:text-un-blue"
                   >
                     TRACKING
-                    <SortIcon column="tracking_status" />
+                    <SortIcon column="tracking_status" sortField={sortField} sortDirection={sortDirection} />
                   </button>
                   <MultiSelectFilter
                     filterKey="trackingStatus"
@@ -529,7 +550,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
                     className="inline-flex items-center hover:text-un-blue"
                   >
                     PUBLIC STATUS
-                    <SortIcon column="public_action_status" />
+                    <SortIcon column="public_action_status" sortField={sortField} sortDirection={sortDirection} />
                   </button>
                   <MultiSelectFilter
                     filterKey="publicStatus"
@@ -553,7 +574,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
                   className="inline-flex items-center hover:text-un-blue"
                 >
                   RISK
-                  <SortIcon column="risk_assessment" />
+                  <SortIcon column="risk_assessment" sortField={sortField} sortDirection={sortDirection} />
                 </button>
               </th>
               <th className="px-4 py-3 whitespace-nowrap">

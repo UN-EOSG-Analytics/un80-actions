@@ -35,7 +35,7 @@ export async function requestMagicLink(email: string): Promise<Result> {
   }
   try {
     const token = await createMagicToken(trimmedEmail);
-    const baseUrl = getBaseUrl();
+    const baseUrl = await getBaseUrl();
     await sendMagicLink(trimmedEmail, token, baseUrl);
     return { success: true };
   } catch (error) {

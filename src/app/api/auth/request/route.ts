@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       { status: 429 },
     );
   const token = await createMagicToken(email);
-  const baseUrl = getBaseUrl();
+  const baseUrl = await getBaseUrl();
   await sendMagicLink(email, token, baseUrl);
   return NextResponse.json({ ok: true });
 }
