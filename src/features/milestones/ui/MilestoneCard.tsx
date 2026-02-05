@@ -179,7 +179,7 @@ export function MilestoneCard({
                       }}
                     >
                       <SelectTrigger
-                        className={`inline-flex items-center gap-1 rounded-full text-xs font-medium px-2.5 py-0.5 transition-colors hover:opacity-80 ${
+                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors hover:opacity-80 ${
                           documentSubmitted
                             ? "border-green-300 bg-green-50 text-green-800 hover:bg-green-100"
                             : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"

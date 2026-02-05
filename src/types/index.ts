@@ -121,6 +121,16 @@ export interface ActionAttachment {
   uploaded_at: Date;
 }
 
+/** Comment on an action attachment (document) */
+export interface AttachmentComment {
+  id: string;
+  attachment_id: string;
+  user_id: string | null;
+  user_email: string | null;
+  comment: string;
+  created_at: Date;
+}
+
 /** Milestone attached to an action */
 export interface ActionMilestone {
   id: string;

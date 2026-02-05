@@ -226,3 +226,89 @@ export async function getAttachmentDownloadUrl(
     };
   }
 }
+
+// =========================================================
+// ATTACHMENT COMMENTS
+// =========================================================
+
+/** Shape returned by createAttachmentComment (created_at is ISO string after serialization) */
+export interface AttachmentCommentResult {
+  id: string;
+  attachment_id: string;
+  user_id: string | null;
+  user_email: string | null;
+  comment: string;
+  created_at: Date | string;
+}
+
+export interface CreateAttachmentCommentResult {
+  success: boolean;
+  error?: string;
+  comment?: AttachmentCommentResult;
+}
+
+/**
+ * Add a comment to an attachment
+ */
+export async function createAttachmentComment(
+  attachmentId: string,
+  comment: string,
+): Promise<CreateAttachmentCommentResult> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const trimmed = comment.trim();
+    if (!trimmed) {
+      return { success: false, error: "Comment cannot be empty" };
+    }
+
+    // Verify attachment exists and belongs to an action the user can access (same action context is assumed via UI)
+    const attachmentRows = await query<{ id: string }>(
+      `SELECT id FROM un80actions.action_attachments WHERE id = $1`,
+      [attachmentId],
+    );
+    if (attachmentRows.length === 0) {
+      return { success: false, error: "Attachment not found" };
+    }
+
+    const rows = await query<{
+      id: string;
+      attachment_id: string;
+      user_id: string | null;
+      body: string;
+      comment: string;
+      created_at: Date;
+    }>(
+      `INSERT INTO un80actions.attachment_comments (attachment_id, user_id, body, comment)
+       VALUES ($1, $2, $3, $3)
+       RETURNING id, attachment_id, user_id, body, comment, created_at`,
+      [attachmentId, user.id, trimmed],
+    );
+
+    const row = rows[0];
+    const createdAt = row.created_at instanceof Date ? row.created_at : new Date(row.created_at);
+    const text = row.comment ?? row.body;
+
+    revalidatePath("/");
+
+    return {
+      success: true,
+      comment: {
+        id: row.id,
+        attachment_id: row.attachment_id,
+        user_id: row.user_id,
+        user_email: user.email,
+        comment: text,
+        created_at: createdAt.toISOString(),
+      },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to add comment",
+    };
+  }
+}

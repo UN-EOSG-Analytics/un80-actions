@@ -40,13 +40,16 @@ import {
 import {
   getActionAttachments,
   getActionAttachmentCount,
+  getAttachmentComments,
+  type AttachmentComment,
 } from "@/features/attachments/queries";
 import {
   deleteActionAttachment,
   updateAttachmentMetadata,
+  createAttachmentComment,
 } from "@/features/attachments/commands";
 
-import type { Action, ActionMilestone, ActionAttachment, MilestoneType } from "@/types";
+import type { Action, ActionMilestone, ActionAttachment, AttachmentComment, MilestoneType } from "@/types";
 import {
   Check,
   CheckCircle2,
@@ -140,6 +143,12 @@ export default function MilestonesTab({
     status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | null;
   }>({ open: false, milestoneId: null, status: null });
   const [milestoneDocumentSubmitted, setMilestoneDocumentSubmitted] = useState<Record<string, boolean>>({});
+  const [attachmentComments, setAttachmentComments] = useState<Record<string, AttachmentComment[]>>({});
+  const [showCommentsAttachmentId, setShowCommentsAttachmentId] = useState<string | null>(null);
+  const [loadingCommentsForAttachmentId, setLoadingCommentsForAttachmentId] = useState<string | null>(null);
+  const [newCommentText, setNewCommentText] = useState<Record<string, string>>({});
+  const [submittingCommentForAttachmentId, setSubmittingCommentForAttachmentId] = useState<string | null>(null);
+  const [commentErrorByAttachmentId, setCommentErrorByAttachmentId] = useState<Record<string, string>>({});
 
   const getFileIcon = (contentType: string, filename: string) => {
     if (contentType.startsWith("image/")) {
@@ -576,6 +585,56 @@ export default function MilestonesTab({
       }
     } catch {
       // silently fail
+    }
+  };
+
+  const toggleAttachmentComments = async (attachmentId: string) => {
+    const next = showCommentsAttachmentId === attachmentId ? null : attachmentId;
+    setShowCommentsAttachmentId(next);
+    if (next) {
+      setLoadingCommentsForAttachmentId(next);
+      try {
+        const comments = await getAttachmentComments(next);
+        setAttachmentComments((prev) => ({ ...prev, [next]: comments }));
+      } catch {
+        setAttachmentComments((prev) => ({ ...prev, [attachmentId]: [] }));
+      } finally {
+        setLoadingCommentsForAttachmentId(null);
+      }
+    }
+  };
+
+  const handleAddAttachmentComment = async (attachmentId: string) => {
+    const text = (newCommentText[attachmentId] ?? "").trim();
+    if (!text) return;
+    setCommentErrorByAttachmentId((prev) => ({ ...prev, [attachmentId]: "" }));
+    setSubmittingCommentForAttachmentId(attachmentId);
+    try {
+      const result = await createAttachmentComment(attachmentId, text);
+      if (result?.success && result.comment) {
+        const comment = result.comment;
+        setAttachmentComments((prev) => ({
+          ...prev,
+          [attachmentId]: [
+            ...(prev[attachmentId] ?? []),
+            {
+              id: comment.id,
+              attachment_id: comment.attachment_id,
+              user_id: comment.user_id,
+              user_email: comment.user_email,
+              comment: comment.comment,
+              created_at: typeof comment.created_at === "string" ? new Date(comment.created_at) : comment.created_at,
+            },
+          ],
+        }));
+        setNewCommentText((prev) => ({ ...prev, [attachmentId]: "" }));
+      } else if (result && !result.success) {
+        setCommentErrorByAttachmentId((prev) => ({ ...prev, [attachmentId]: result.error ?? "Failed to post comment" }));
+      }
+    } catch {
+      setCommentErrorByAttachmentId((prev) => ({ ...prev, [attachmentId]: "Failed to post comment. Please try again." }));
+    } finally {
+      setSubmittingCommentForAttachmentId(null);
     }
   };
 
@@ -1333,6 +1392,18 @@ export default function MilestonesTab({
                             )}
                           </div>
                           <div className="flex shrink-0 gap-1">
+                            <button
+                              type="button"
+                              onClick={() => toggleAttachmentComments(att.id)}
+                              className={`rounded p-1.5 transition-all ${
+                                showCommentsAttachmentId === att.id
+                                  ? "bg-un-blue/10 text-un-blue"
+                                  : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                              }`}
+                              title="Comments"
+                            >
+                              <MessageSquare className="h-4 w-4" />
+                            </button>
                             <a
                               href={`/api/attachments/${att.id}/download`}
                               download={att.original_filename}
@@ -1392,6 +1463,97 @@ export default function MilestonesTab({
                           )}
                         </div>
                       </div>
+                    </div>
+                  )}
+
+                  {/* Comments for this document */}
+                  {showCommentsAttachmentId === att.id && (
+                    <div className="mt-4 border-t border-slate-200 pt-4">
+                      <div className="mb-3 flex items-center gap-2">
+                        <MessageSquare className="h-3.5 w-3.5 text-slate-400" />
+                        <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Comments
+                        </span>
+                      </div>
+                      {loadingCommentsForAttachmentId === att.id ? (
+                        <div className="flex items-center gap-2 py-2">
+                          <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                          <span className="text-sm text-slate-500">Loading…</span>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="mb-3 space-y-2">
+                            {(attachmentComments[att.id] ?? []).length === 0 ? (
+                              <p className="text-sm text-slate-400 italic">No comments yet.</p>
+                            ) : (
+                              (attachmentComments[att.id] ?? []).map((c) => (
+                                <div
+                                  key={c.id}
+                                  className="rounded-md border border-slate-100 bg-slate-50/50 px-3 py-2 text-sm"
+                                >
+                                  <div className="mb-1 flex items-center gap-2 text-xs text-slate-500">
+                                    {c.user_email ? (
+                                      <span className="font-medium text-slate-600">{c.user_email}</span>
+                                    ) : (
+                                      <span className="italic">Unknown user</span>
+                                    )}
+                                    <span>
+                                      {new Date(c.created_at).toLocaleString(undefined, {
+                                        dateStyle: "short",
+                                        timeStyle: "short",
+                                      })}
+                                    </span>
+                                  </div>
+                                  <p className="text-slate-700 whitespace-pre-wrap">{c.comment}</p>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <div className="flex gap-2">
+                              <textarea
+                                value={newCommentText[att.id] ?? ""}
+                                onChange={(e) => {
+                                  setNewCommentText((prev) => ({ ...prev, [att.id]: e.target.value }));
+                                  if (commentErrorByAttachmentId[att.id]) {
+                                    setCommentErrorByAttachmentId((prev) => {
+                                      const next = { ...prev };
+                                      delete next[att.id];
+                                      return next;
+                                    });
+                                  }
+                                }}
+                                placeholder="Add a comment…"
+                                className="min-h-[72px] w-full resize-y rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                                rows={2}
+                                disabled={submittingCommentForAttachmentId === att.id}
+                              />
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={() => handleAddAttachmentComment(att.id)}
+                                disabled={
+                                  submittingCommentForAttachmentId === att.id ||
+                                  !(newCommentText[att.id] ?? "").trim()
+                                }
+                                className="shrink-0 bg-un-blue hover:bg-un-blue/90"
+                              >
+                                {submittingCommentForAttachmentId === att.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <>
+                                    <Send className="mr-1 h-3.5 w-3.5" />
+                                    Post
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                            {commentErrorByAttachmentId[att.id] && (
+                              <p className="text-sm text-red-600">{commentErrorByAttachmentId[att.id]}</p>
+                            )}
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>

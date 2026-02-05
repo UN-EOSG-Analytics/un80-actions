@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Run SQL migrations 003 through 011
+ * Run SQL migrations 003 through 013
  * This script uses the same database connection as the Next.js app
  */
 
@@ -93,6 +93,12 @@ async function runAllMigrations() {
     
     // Run migration 011
     await runMigration(11, 'add_question_comment');
+    
+    // Run migration 012
+    await runMigration(12, 'add_attachment_comments');
+    
+    // Run migration 013
+    await runMigration(13, 'add_user_id_to_attachment_comments');
     
     console.log('\n✅ All migrations completed successfully!');
   } catch (error) {
