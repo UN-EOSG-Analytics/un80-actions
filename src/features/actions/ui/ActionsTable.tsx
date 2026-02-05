@@ -624,7 +624,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
                   />
                 </div>
               </th>
-              <th className="px-4 py-3 whitespace-nowrap">DELIVERABLES</th>
               <th className="w-10 px-4 py-3"></th>
             </tr>
           </thead>
@@ -632,7 +631,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
             {sortedActions.length === 0 ? (
               <tr>
                 <td
-                  colSpan={9}
+                  colSpan={8}
                   className="px-4 py-12 text-center text-gray-400"
                 >
                   No actions found
@@ -741,19 +740,6 @@ export function ActionsTable({ data }: ActionsTableProps) {
                   <td className="px-4 py-3 text-center">
                     {a.is_big_ticket && (
                       <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-un-blue text-white text-xs font-bold">!</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    {a.document_submitted ? (
-                      <Badge className="bg-green-100 text-green-800 border-green-200 flex items-center gap-1.5 w-fit">
-                        <Send className="h-3 w-3" />
-                        Submitted
-                      </Badge>
-                    ) : (
-                      <Badge className="bg-amber-100 text-amber-800 border-amber-200 flex items-center gap-1.5 w-fit">
-                        <Clock className="h-3 w-3" />
-                        Not submitted
-                      </Badge>
                     )}
                   </td>
                   <td className="px-4 py-3 text-gray-400">
