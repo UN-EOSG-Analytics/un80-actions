@@ -7,6 +7,13 @@ import {
   CollapsibleContent,
 } from "@/components/ui/collapsible";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -55,6 +62,8 @@ import {
   FileText,
   ImageIcon,
   User,
+  Send,
+  Clock,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -130,6 +139,7 @@ export default function MilestonesTab({
     milestoneId: string | null;
     status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | null;
   }>({ open: false, milestoneId: null, status: null });
+  const [documentSubmitted, setDocumentSubmitted] = useState<"submitted" | "not_submitted">("not_submitted");
 
   const getFileIcon = (contentType: string, filename: string) => {
     if (contentType.startsWith("image/")) {
@@ -1217,10 +1227,37 @@ export default function MilestonesTab({
 
       {/* Documents section */}
       <section className="space-y-3">
-        <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-          <Paperclip className="h-4 w-4" />
-          Documents {attachmentCount > 0 && <span className="font-normal text-slate-500">({attachmentCount})</span>}
-        </h3>
+        <div className="flex items-center justify-between gap-4">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+            <Paperclip className="h-4 w-4" />
+            Documents {attachmentCount > 0 && <span className="font-normal text-slate-500">({attachmentCount})</span>}
+          </h3>
+          <Select
+            value={documentSubmitted}
+            onValueChange={(value: "submitted" | "not_submitted") => setDocumentSubmitted(value)}
+          >
+            <SelectTrigger 
+              className={`h-9 min-w-[160px] font-medium shadow-sm transition-all hover:shadow-md ${
+                documentSubmitted === "submitted"
+                  ? "border-green-300 bg-green-50 text-green-800 hover:bg-green-100"
+                  : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                {documentSubmitted === "submitted" ? (
+                  <Send className="h-3.5 w-3.5" />
+                ) : (
+                  <Clock className="h-3.5 w-3.5" />
+                )}
+                <SelectValue />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="not_submitted">Not submitted</SelectItem>
+              <SelectItem value="submitted">Submitted</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         <div className="rounded-lg border border-slate-200 bg-white p-4">
         {loadingAttachments ? (
