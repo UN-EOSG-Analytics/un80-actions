@@ -2,9 +2,8 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import Bold from "@tiptap/extension-bold";
-import BulletList from "@tiptap/extension-bullet-list";
 import Document from "@tiptap/extension-document";
-import ListItem from "@tiptap/extension-list-item";
+import { BulletList, ListItem } from "@tiptap/extension-list";
 import Paragraph from "@tiptap/extension-paragraph";
 import Strike from "@tiptap/extension-strike";
 import Text from "@tiptap/extension-text";
@@ -67,13 +66,6 @@ export function NoteEditor({
       attributes: {
         class:
           "min-h-[5rem] w-full px-3 py-2 text-sm outline-none focus:outline-none prose prose-sm max-w-none text-slate-800",
-      },
-      handleKeyDown: (_view, event) => {
-        if (event.key === "Enter") {
-          // Allow default (new paragraph)
-          return false;
-        }
-        return false;
       },
     },
     immediatelyRender: true,
@@ -165,7 +157,7 @@ export function NoteEditor({
           <Minus className="h-4 w-4" />
         </button>
       </div>
-      <div className="rounded-b-md bg-white">
+      <div className="rounded-b-md bg-white min-h-[8rem] resize-y overflow-auto border-t border-slate-200">
         <EditorContent editor={editor} />
       </div>
     </div>

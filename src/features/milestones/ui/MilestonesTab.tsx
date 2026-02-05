@@ -613,7 +613,17 @@ export default function MilestonesTab({
             onComment={() => startAddingComment(milestone.id)}
             onShowHistory={() => toggleVersionHistory(milestone.id)}
             onStatusChange={isAdmin ? (status) => handleStatusChange(milestone.id, status) : undefined}
-                          isAdmin={isAdmin}
+            isAdmin={isAdmin}
+            onDocumentSubmittedChange={
+              !milestone.is_public && (milestone.milestone_type === "first" || milestone.milestone_type === "final")
+                ? (_id, submitted) => setDocumentSubmitted(submitted ? "submitted" : "not_submitted")
+                : undefined
+            }
+            documentSubmitted={
+              !milestone.is_public && (milestone.milestone_type === "first" || milestone.milestone_type === "final")
+                ? documentSubmitted === "submitted"
+                : undefined
+            }
           />
 
             {/* Collapsible Content */}
@@ -1228,37 +1238,10 @@ export default function MilestonesTab({
 
       {/* Documents section */}
       <section className="space-y-3">
-        <div className="flex items-center justify-between gap-4">
-          <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-            <Paperclip className="h-4 w-4" />
-            Documents {attachmentCount > 0 && <span className="font-normal text-slate-500">({attachmentCount})</span>}
-          </h3>
-          <Select
-            value={documentSubmitted}
-            onValueChange={(value: "submitted" | "not_submitted") => setDocumentSubmitted(value)}
-          >
-            <SelectTrigger 
-              className={`h-9 min-w-[160px] font-medium shadow-sm transition-all hover:shadow-md ${
-                documentSubmitted === "submitted"
-                  ? "border-green-300 bg-green-50 text-green-800 hover:bg-green-100"
-                  : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                {documentSubmitted === "submitted" ? (
-                  <Send className="h-3.5 w-3.5" />
-                ) : (
-                  <Clock className="h-3.5 w-3.5" />
-                )}
-                <SelectValue />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="not_submitted">Not submitted</SelectItem>
-              <SelectItem value="submitted">Submitted</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+          <Paperclip className="h-4 w-4" />
+          Documents {attachmentCount > 0 && <span className="font-normal text-slate-500">({attachmentCount})</span>}
+        </h3>
 
         <div className="rounded-lg border border-slate-200 bg-white p-4">
         {loadingAttachments ? (

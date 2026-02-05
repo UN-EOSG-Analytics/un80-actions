@@ -76,22 +76,16 @@ export function MilestoneCard({
     ? "Public"
     : milestone.milestone_type.charAt(0).toUpperCase() + milestone.milestone_type.slice(1);
 
-  // Check if milestone is delayed (deadline has passed)
-  const getTimelineStatus = () => {
-    if (!milestone.deadline) return null;
-    const deadlineDate = new Date(milestone.deadline);
-    const today = new Date();
-    // Reset time to compare dates only
-    today.setHours(0, 0, 0, 0);
-    deadlineDate.setHours(0, 0, 0, 0);
-    
-    if (deadlineDate < today) {
-      return { label: "Delayed", className: "bg-red-100 text-red-700" };
-    }
-    return { label: "On-track", className: "bg-green-100 text-green-700" };
-  };
-
-  const timelineStatus = getTimelineStatus();
+  // Past due: deadline has passed
+  const isPastDue =
+    milestone.deadline &&
+    (() => {
+      const deadlineDate = new Date(milestone.deadline);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      deadlineDate.setHours(0, 0, 0, 0);
+      return deadlineDate < today;
+    })();
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 transition-shadow hover:shadow-md">
@@ -168,20 +162,23 @@ export function MilestoneCard({
                     year: 'numeric' 
                   }) : <span className="italic">No deadline</span>}
                 </span>
-                {timelineStatus && (
-                  <Badge className={`${timelineStatus.className} text-xs font-medium`}>
-                    {timelineStatus.label}
-                  </Badge>
+                {isPastDue && (
+                  <span
+                    className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-100 text-xs font-bold text-red-700"
+                    title="Past due"
+                  >
+                    !
+                  </span>
                 )}
-                {onDocumentSubmittedChange && (
-                  <div onClick={(e) => e.stopPropagation()}>
+                {onDocumentSubmittedChange != null && (
+                  <span className="inline-flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                     <Select
                       value={documentSubmitted ? "submitted" : "not_submitted"}
                       onValueChange={(value: "submitted" | "not_submitted") => {
                         onDocumentSubmittedChange(milestone.id, value === "submitted");
                       }}
                     >
-                      <SelectTrigger 
+                      <SelectTrigger
                         className={`inline-flex items-center gap-1 rounded-full text-xs font-medium px-2.5 py-0.5 transition-colors hover:opacity-80 ${
                           documentSubmitted
                             ? "border-green-300 bg-green-50 text-green-800 hover:bg-green-100"
@@ -200,7 +197,7 @@ export function MilestoneCard({
                         <SelectItem value="submitted">Submitted</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
+                  </span>
                 )}
               </div>
             </div>
