@@ -49,7 +49,8 @@ export async function getActionQuestions(
       q.content_reviewed_by,
       ru.email as content_reviewed_by_email,
       q.content_reviewed_at,
-      q.milestone_id
+      q.milestone_id,
+      q.comment
     FROM ${DB_SCHEMA}.action_questions q
     LEFT JOIN ${DB_SCHEMA}.users u ON q.user_id = u.id
     LEFT JOIN ${DB_SCHEMA}.users au ON q.answered_by = au.id
@@ -102,7 +103,8 @@ export async function getUnansweredQuestions(
       q.content_reviewed_by,
       ru.email as content_reviewed_by_email,
       q.content_reviewed_at,
-      q.milestone_id
+      q.milestone_id,
+      q.comment
     FROM ${DB_SCHEMA}.action_questions q
     LEFT JOIN ${DB_SCHEMA}.users u ON q.user_id = u.id
     LEFT JOIN ${DB_SCHEMA}.users au ON q.answered_by = au.id
@@ -147,7 +149,8 @@ export async function getQuestionById(
       q.content_reviewed_by,
       ru.email as content_reviewed_by_email,
       q.content_reviewed_at,
-      q.milestone_id
+      q.milestone_id,
+      q.comment
     FROM ${DB_SCHEMA}.action_questions q
     LEFT JOIN ${DB_SCHEMA}.users u ON q.user_id = u.id
     LEFT JOIN ${DB_SCHEMA}.users au ON q.answered_by = au.id

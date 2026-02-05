@@ -240,6 +240,7 @@ create table action_questions (
         content_reviewed_by uuid references users on delete
     set null,
         content_reviewed_at timestamp with time zone,
+        comment text,
         foreign key (action_id, action_sub_id) references actions (id, sub_id) on delete cascade
 );
 create table tags (

@@ -224,6 +224,8 @@ export interface ActionQuestion {
   content_reviewed_by_email: string | null;
   content_reviewed_at: Date | null;
   milestone_id: string | null;
+  /** Internal comment on the question (e.g. for reviewers). */
+  comment: string | null;
 }
 
 // =========================================================

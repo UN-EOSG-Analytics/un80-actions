@@ -14,6 +14,11 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  Popover,
+  PopoverContent,
+  PopoverAnchor,
+} from "@/components/ui/popover";
 import { getActionQuestions } from "@/features/questions/queries";
 import {
   createQuestion,
@@ -29,9 +34,9 @@ import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionQuestion, ActionMilestone, ActionNote } from "@/types";
 import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
-import { applyBoldShortcut, BoldText } from "@/features/shared/markdown-bold";
-import { Loader2, MessageCircle, Send, Trash2, Pencil, X, StickyNote, ChevronDown } from "lucide-react";
-import { useEffect, useState } from "react";
+import { applyBoldShortcut, applyStrikethroughShortcut, BoldText } from "@/features/shared/markdown-bold";
+import { Loader2, MessageCircle, Send, Trash2, Pencil, X, StickyNote, ChevronDown, Bold, Minus } from "lucide-react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 // =========================================================
 // HELPER COMPONENTS
@@ -48,6 +53,280 @@ const LoadingState = () => (
     <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-un-blue" />
   </div>
 );
+
+// Component for selectable text with formatting popover
+function SelectableText({
+  text,
+  questionId,
+  onUpdate,
+  isAdmin,
+}: {
+  text: string;
+  questionId: string;
+  onUpdate: (newText: string) => Promise<void>;
+  isAdmin: boolean;
+}) {
+  const [selection, setSelection] = useState<{
+    start: number;
+    end: number;
+    text: string;
+    rect: DOMRect;
+  } | null>(null);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const textRef = useRef<HTMLParagraphElement>(null);
+  const anchorRef = useRef<HTMLSpanElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleSelection = useCallback(() => {
+    // Clear any pending timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    // Debounce selection detection slightly for smoother experience
+    timeoutRef.current = setTimeout(() => {
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) {
+        setSelection(null);
+        setPopoverOpen(false);
+        return;
+      }
+
+      const range = selection.getRangeAt(0);
+      const selectedText = selection.toString().trim();
+
+      if (selectedText.length === 0 || !textRef.current?.contains(range.commonAncestorContainer)) {
+        setSelection(null);
+        setPopoverOpen(false);
+        return;
+      }
+
+      // Get plain text (without markdown formatting) to find positions
+      const plainText = textRef.current.textContent || "";
+      
+      // Create a mapping: for each character in plainText, find its position in original text
+      let plainIndex = 0;
+      const plainToOriginal: number[] = [];
+      
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        // Skip markdown markers
+        if (char === "*" && (text[i + 1] === "*" || text[i - 1] === "*")) continue;
+        if (char === "~" && (text[i + 1] === "~" || text[i - 1] === "~")) continue;
+        plainToOriginal[plainIndex] = i;
+        plainIndex++;
+      }
+
+      // Find selection in plain text - try to find the exact match
+      let selectionStartInPlain = -1;
+      // Try to find exact match first
+      selectionStartInPlain = plainText.indexOf(selectedText);
+      
+      // If not found, try without trimming
+      if (selectionStartInPlain === -1) {
+        const untrimmed = selection.toString();
+        selectionStartInPlain = plainText.indexOf(untrimmed);
+      }
+
+      if (selectionStartInPlain === -1) {
+        setSelection(null);
+        setPopoverOpen(false);
+        return;
+      }
+
+      const selectionEndInPlain = selectionStartInPlain + selectedText.length;
+      const startPos = plainToOriginal[selectionStartInPlain] ?? selectionStartInPlain;
+      const endPos = plainToOriginal[selectionEndInPlain - 1] !== undefined 
+        ? plainToOriginal[selectionEndInPlain - 1] + 1 
+        : selectionEndInPlain;
+
+      // Get the bounding rect of the selection (kept for any future use)
+      const rect = range.getBoundingClientRect();
+
+      // Position the popover in the middle of the screen
+      const left = window.innerWidth / 2;
+      const top = window.innerHeight / 2;
+
+      setSelection({
+        start: startPos,
+        end: endPos,
+        text: selectedText,
+        rect,
+      });
+
+      // Position the popover anchor at screen center
+      if (anchorRef.current) {
+        anchorRef.current.style.position = "fixed";
+        anchorRef.current.style.left = `${left}px`;
+        anchorRef.current.style.top = `${top}px`;
+        anchorRef.current.style.width = "1px";
+        anchorRef.current.style.height = "1px";
+        anchorRef.current.style.pointerEvents = "none";
+      }
+
+      setPopoverOpen(true);
+    }, 50); // Small debounce for smoother experience
+  }, [text]);
+
+  const handleDoubleClick = useCallback((e: React.MouseEvent) => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    
+    // Expand selection to word boundaries on double-click
+    try {
+      // Try using modify method (non-standard but widely supported)
+      const selectionWithModify = selection as Selection & { modify?: (alter: string, direction: string, granularity: string) => void };
+      if (selectionWithModify.modify) {
+        selectionWithModify.modify("extend", "forward", "word");
+        selectionWithModify.modify("extend", "backward", "word");
+      } else {
+        // Fallback: manually find word boundaries
+        const textNode = range.startContainer;
+        if (textNode.nodeType === Node.TEXT_NODE) {
+          const text = textNode.textContent || "";
+          const offset = range.startOffset;
+          
+          // Find word start (backward)
+          let start = offset;
+          while (start > 0 && /\w/.test(text[start - 1])) {
+            start--;
+          }
+          
+          // Find word end (forward)
+          let end = offset;
+          while (end < text.length && /\w/.test(text[end])) {
+            end++;
+          }
+          
+          // Create new range for the word
+          const newRange = document.createRange();
+          newRange.setStart(textNode, start);
+          newRange.setEnd(textNode, end);
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+        }
+      }
+    } catch (err) {
+      // If expansion fails, use current selection
+      console.warn("Could not expand selection to word:", err);
+    }
+    
+    // Trigger selection handler after a brief delay to ensure selection is set
+    setTimeout(() => {
+      handleSelection();
+    }, 10);
+  }, [handleSelection]);
+
+  useEffect(() => {
+    const handleMouseUp = () => {
+      handleSelection();
+    };
+
+    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("selectionchange", handleSelection);
+    
+    return () => {
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("selectionchange", handleSelection);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [handleSelection]);
+
+  useEffect(() => {
+    document.addEventListener("selectionchange", handleSelection);
+    return () => {
+      document.removeEventListener("selectionchange", handleSelection);
+    };
+  }, [handleSelection]);
+
+  const applyFormatting = async (format: "bold" | "strikethrough") => {
+    if (!selection) return;
+
+    const before = text.substring(0, selection.start);
+    const selected = text.substring(selection.start, selection.end);
+    const after = text.substring(selection.end);
+
+    // Remove existing formatting from selected text if any
+    let cleanSelected = selected.replace(/\*\*/g, "").replace(/~~/g, "");
+
+    let formattedText: string;
+    if (format === "bold") {
+      formattedText = before + "**" + cleanSelected + "**" + after;
+    } else {
+      formattedText = before + "~~" + cleanSelected + "~~" + after;
+    }
+
+    // Close popover and clear selection immediately so UI doesn't jump or hang
+    setSelection(null);
+    setPopoverOpen(false);
+    window.getSelection()?.removeAllRanges();
+
+    // Run update in background (onUpdate can do optimistic local update + server call)
+    onUpdate(formattedText).catch(() => {
+      // Optionally show error; parent may have reverted on failure
+    });
+  };
+
+  if (!isAdmin) {
+    return (
+      <p ref={textRef} className="whitespace-pre-wrap text-[15px] leading-relaxed text-slate-700">
+        <BoldText>{text}</BoldText>
+      </p>
+    );
+  }
+
+  return (
+    <>
+      <Popover open={popoverOpen && !!selection} onOpenChange={setPopoverOpen}>
+        <PopoverAnchor asChild>
+          <span ref={anchorRef} className="pointer-events-none" />
+        </PopoverAnchor>
+        <PopoverContent 
+          className="w-auto p-1.5 shadow-lg z-50" 
+          align="center" 
+          side="top"
+          sideOffset={0}
+          alignOffset={0}
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          collisionPadding={10}
+        >
+          <div className="flex gap-1.5">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => applyFormatting("bold")}
+              className="h-8 px-2.5 text-xs font-medium hover:bg-slate-50"
+            >
+              <Bold className="h-3.5 w-3.5 mr-1.5" />
+              Bold
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => applyFormatting("strikethrough")}
+              className="h-8 px-2.5 text-xs font-medium hover:bg-slate-50"
+            >
+              <Minus className="h-3.5 w-3.5 mr-1.5" />
+              Strikethrough
+            </Button>
+          </div>
+        </PopoverContent>
+      </Popover>
+      <p 
+        ref={textRef} 
+        className="whitespace-pre-wrap text-[15px] leading-relaxed text-slate-700 select-text cursor-text"
+        onMouseUp={handleSelection}
+        onDoubleClick={handleDoubleClick}
+      >
+        <BoldText>{text}</BoldText>
+      </p>
+    </>
+  );
+}
 
 // =========================================================
 // QUESTIONS TAB
@@ -73,6 +352,7 @@ export default function QuestionsTab({
     question_date: "",
     question: "• ",
     milestone_id: "",
+    comment: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,7 +369,6 @@ export default function QuestionsTab({
   const [tagsByQuestionId, setTagsByQuestionId] = useState<
     Record<string, Tag[]>
   >({});
-
   const HEADER_OPTIONS = ["Task Force", "Steering Committee", "Check-ins"];
   const MILESTONE_NONE_VALUE = "__none__";
 
@@ -145,13 +424,14 @@ export default function QuestionsTab({
     setError(null);
 
     try {
-      const result = await createQuestion({
+      const         result = await createQuestion({
         action_id: action.id,
         action_sub_id: action.sub_id,
         header: newQuestion.header.trim(),
         question_date: newQuestion.question_date,
         question: newQuestion.question.trim(),
         milestone_id: newQuestion.milestone_id || null,
+        comment: newQuestion.comment?.trim() || null,
       });
 
       if (result.success) {
@@ -160,6 +440,7 @@ export default function QuestionsTab({
           question_date: "",
           question: "",
           milestone_id: "",
+          comment: "",
         });
         await loadQuestions();
       } else {
@@ -388,6 +669,16 @@ export default function QuestionsTab({
                 }, 0);
                 return;
               }
+              const strikethrough = applyStrikethroughShortcut(e, newQuestion.question);
+              if (strikethrough) {
+                setNewQuestion({ ...newQuestion, question: strikethrough.newValue });
+                const ta = e.currentTarget;
+                setTimeout(() => {
+                  ta.selectionStart = strikethrough.cursorStart;
+                  ta.selectionEnd = strikethrough.cursorEnd;
+                }, 0);
+                return;
+              }
               if (e.key === "Enter") {
                 const textarea = e.currentTarget;
                 const start = textarea.selectionStart;
@@ -411,9 +702,22 @@ export default function QuestionsTab({
             }}
             placeholder="• "
             rows={3}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-none"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-y"
             disabled={submitting}
             required
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-600">
+            Additional comments (optional)
+          </label>
+          <textarea
+            value={newQuestion.comment}
+            onChange={(e) => setNewQuestion({ ...newQuestion, comment: e.target.value })}
+            placeholder="Add any additional context or comments..."
+            rows={2}
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-y"
+            disabled={submitting}
           />
         </div>
         <div className="flex justify-end">
@@ -457,131 +761,12 @@ export default function QuestionsTab({
           {questions.map((q) => {
             const isEditing = editingId === q.id;
             return (
-              <div
+              <Collapsible
                 key={q.id}
-                className="rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+                open={editingId === q.id}
               >
-                {isEditing ? (
-                  <div className="space-y-4 p-5">
-                    <div>
-                      <label className="mb-1.5 block text-xs font-medium text-slate-600">
-                        Header *
-                      </label>
-                      <Select
-                        value={editingQuestion.header}
-                        onValueChange={(value) => setEditingQuestion({ ...editingQuestion, header: value })}
-                        disabled={saving}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select header..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {HEADER_OPTIONS.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-slate-600">
-                        Date *
-                      </label>
-                      <input
-                        type="date"
-                        value={editingQuestion.question_date}
-                        onChange={(e) => setEditingQuestion({ ...editingQuestion, question_date: e.target.value })}
-                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
-                        disabled={saving}
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-slate-600">
-                        Milestone (optional)
-                      </label>
-                      <Select
-                        value={editingQuestion.milestone_id || MILESTONE_NONE_VALUE}
-                        onValueChange={(value) => setEditingQuestion({ ...editingQuestion, milestone_id: value === MILESTONE_NONE_VALUE ? "" : value })}
-                        disabled={saving}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select milestone..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={MILESTONE_NONE_VALUE}>None</SelectItem>
-                          {milestones.map((milestone) => {
-                            const milestoneId = milestone.action_sub_id 
-                              ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}` 
-                              : `${milestone.action_id}.${milestone.serial_number}`;
-                            const label = milestone.description 
-                              ? `${milestoneId}: ${milestone.description.substring(0, 50)}${milestone.description.length > 50 ? '...' : ''}`
-                              : milestoneId;
-                            return (
-                              <SelectItem key={milestone.id} value={milestone.id}>
-                                {label}
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-slate-600">
-                        Question *
-                      </label>
-                      <textarea
-                        value={editingQuestion.question}
-                        onChange={(e) => setEditingQuestion({ ...editingQuestion, question: e.target.value })}
-                        onKeyDown={(e) => {
-                          const bold = applyBoldShortcut(e, editingQuestion.question);
-                          if (bold) {
-                            setEditingQuestion({ ...editingQuestion, question: bold.newValue });
-                            const ta = e.currentTarget;
-                            setTimeout(() => {
-                              ta.selectionStart = bold.cursorStart;
-                              ta.selectionEnd = bold.cursorEnd;
-                            }, 0);
-                          }
-                        }}
-                        placeholder="• "
-                        rows={3}
-                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-none"
-                        disabled={saving}
-                      />
-                    </div>
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={cancelEditing}
-                        disabled={saving}
-                      >
-                        <X className="h-4 w-4 mr-2" />
-                        Cancel
-                      </Button>
-                      <Button
-                        type="button"
-                        onClick={handleSaveEdit}
-                        disabled={saving || !editingQuestion.header.trim() || !editingQuestion.question_date || !editingQuestion.question.trim()}
-                        className="bg-un-blue hover:bg-un-blue/90"
-                      >
-                        {saving ? (
-                          <>
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <Send className="h-4 w-4 mr-2" />
-                            Save
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                    {error && <p className="text-sm text-red-600">{error}</p>}
-                  </div>
-                ) : (
+                <div className="rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+                {!isEditing && (
                   <>
                     <div className="flex items-start justify-between gap-4 p-5">
                       <div className="min-w-0 flex-1 space-y-4">
@@ -619,9 +804,26 @@ export default function QuestionsTab({
                         </div>
                         {/* Question body */}
                         <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-4 py-3">
-                          <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-slate-700">
-                            <BoldText>{q.question}</BoldText>
-                          </p>
+                          <SelectableText
+                            text={q.question}
+                            questionId={q.id}
+                            onUpdate={async (newText) => {
+                              // Optimistic update: show new text immediately
+                              setQuestions((prev) =>
+                                prev.map((qq) =>
+                                  qq.id === q.id ? { ...qq, question: newText } : qq
+                                )
+                              );
+                              // Persist in background (no full refetch)
+                              await updateQuestion(q.id, {
+                                header: q.header || "",
+                                question_date: q.question_date || "",
+                                question: newText,
+                                milestone_id: q.milestone_id || null,
+                              });
+                            }}
+                            isAdmin={isAdmin}
+                          />
                         </div>
                         {q.answer && (
                           <div className="rounded-lg border-l-4 border-green-300 bg-green-50/80 px-4 py-3">
@@ -634,6 +836,14 @@ export default function QuestionsTab({
                                 {q.answered_by_email && ` by ${q.answered_by_email}`}
                               </p>
                             )}
+                          </div>
+                        )}
+                        {q.comment && (
+                          <div className="rounded-lg border border-slate-200 bg-slate-50/80 px-4 py-2.5">
+                            <p className="text-xs font-medium text-slate-500 mb-1">Additional comments</p>
+                            <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
+                              <BoldText>{q.comment}</BoldText>
+                            </p>
                           </div>
                         )}
                         {/* Footer: meta + actions */}
@@ -723,7 +933,108 @@ export default function QuestionsTab({
                     </div>
                   </>
                 )}
-              </div>
+                </div>
+                <CollapsibleContent>
+                  <div className="border-t border-slate-200 p-4">
+                    {isEditing ? (
+                      <div className="space-y-4">
+                        <div>
+                          <label className="mb-1.5 block text-xs font-medium text-slate-600">Header *</label>
+                          <Select
+                            value={editingQuestion.header}
+                            onValueChange={(value) => setEditingQuestion({ ...editingQuestion, header: value })}
+                            disabled={saving}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select header..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {HEADER_OPTIONS.map((option) => (
+                                <SelectItem key={option} value={option}>{option}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-slate-600">Date *</label>
+                          <input
+                            type="date"
+                            value={editingQuestion.question_date}
+                            onChange={(e) => setEditingQuestion({ ...editingQuestion, question_date: e.target.value })}
+                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                            disabled={saving}
+                          />
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-slate-600">Milestone (optional)</label>
+                          <Select
+                            value={editingQuestion.milestone_id || MILESTONE_NONE_VALUE}
+                            onValueChange={(value) => setEditingQuestion({ ...editingQuestion, milestone_id: value === MILESTONE_NONE_VALUE ? "" : value })}
+                            disabled={saving}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select milestone..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value={MILESTONE_NONE_VALUE}>None</SelectItem>
+                              {milestones.map((milestone) => {
+                                const milestoneId = milestone.action_sub_id
+                                  ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
+                                  : `${milestone.action_id}.${milestone.serial_number}`;
+                                const label = milestone.description
+                                  ? `${milestoneId}: ${milestone.description.substring(0, 50)}${milestone.description.length > 50 ? "..." : ""}`
+                                  : milestoneId;
+                                return <SelectItem key={milestone.id} value={milestone.id}>{label}</SelectItem>;
+                              })}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-slate-600">Question *</label>
+                          <textarea
+                            value={editingQuestion.question}
+                            onChange={(e) => setEditingQuestion({ ...editingQuestion, question: e.target.value })}
+                            onKeyDown={(e) => {
+                              const bold = applyBoldShortcut(e, editingQuestion.question);
+                              if (bold) {
+                                setEditingQuestion({ ...editingQuestion, question: bold.newValue });
+                                const ta = e.currentTarget;
+                                setTimeout(() => { ta.selectionStart = bold.cursorStart; ta.selectionEnd = bold.cursorEnd; }, 0);
+                                return;
+                              }
+                              const strikethrough = applyStrikethroughShortcut(e, editingQuestion.question);
+                              if (strikethrough) {
+                                setEditingQuestion({ ...editingQuestion, question: strikethrough.newValue });
+                                const ta = e.currentTarget;
+                                setTimeout(() => { ta.selectionStart = strikethrough.cursorStart; ta.selectionEnd = strikethrough.cursorEnd; }, 0);
+                                return;
+                              }
+                            }}
+                            placeholder="• "
+                            rows={3}
+                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-y"
+                            disabled={saving}
+                          />
+                        </div>
+                        {error && <p className="text-sm text-red-600">{error}</p>}
+                        <div className="flex justify-end gap-2">
+                          <Button type="button" variant="outline" onClick={cancelEditing} disabled={saving}>
+                            <X className="h-4 w-4 mr-2" /> Cancel
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={handleSaveEdit}
+                            disabled={saving || !editingQuestion.header.trim() || !editingQuestion.question_date || !editingQuestion.question.trim()}
+                            className="bg-un-blue hover:bg-un-blue/90"
+                          >
+                            {saving ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Saving...</> : <><Send className="h-4 w-4 mr-2" /> Save</>}
+                          </Button>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                </CollapsibleContent>
+            </Collapsible>
             );
           })}
         </div>

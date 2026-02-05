@@ -11,6 +11,8 @@ export interface QuestionCreateInput {
   question_date: string; // ISO date string (YYYY-MM-DD)
   question: string;
   milestone_id?: string | null;
+  /** Optional additional comment when submitting the question. */
+  comment?: string | null;
 }
 
 export interface QuestionUpdateInput {

@@ -36,8 +36,8 @@ export async function createQuestion(
 
     const rows = await query<{ id: string }>(
       `INSERT INTO ${DB_SCHEMA}.action_questions 
-     (action_id, action_sub_id, user_id, header, subtext, question_date, question, milestone_id, content_review_status)
-     VALUES ($1, $2, $3, $4, NULL, $5, $6, $7, 'needs_review')
+     (action_id, action_sub_id, user_id, header, subtext, question_date, question, milestone_id, content_review_status, comment)
+     VALUES ($1, $2, $3, $4, NULL, $5, $6, $7, 'needs_review', $8)
      RETURNING id`,
       [
         input.action_id,
@@ -47,6 +47,7 @@ export async function createQuestion(
         input.question_date,
         input.question.trim(),
         input.milestone_id ?? null,
+        input.comment?.trim() || null,
       ],
     );
 
@@ -251,6 +252,42 @@ export async function approveQuestion(
     return {
       success: false,
       error: e instanceof Error ? e.message : "Failed to approve question",
+    };
+  }
+}
+
+/**
+ * Update the internal comment on a question.
+ * Admin-only. Comment can be null to clear.
+ */
+export async function updateQuestionComment(
+  questionId: string,
+  comment: string | null,
+): Promise<QuestionResult> {
+  try {
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return { success: false, error: auth.error };
+    }
+
+    const question = await getQuestionById(questionId);
+    if (!question) {
+      return { success: false, error: "Question not found" };
+    }
+
+    await query(
+      `UPDATE ${DB_SCHEMA}.action_questions
+     SET comment = $1, updated_at = NOW()
+     WHERE id = $2`,
+      [comment?.trim() || null, questionId],
+    );
+
+    const updated = await getQuestionById(questionId);
+    return { success: true, question: updated || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to update comment",
     };
   }
 }
