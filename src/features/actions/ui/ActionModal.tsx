@@ -26,7 +26,7 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 // =========================================================
@@ -69,6 +69,7 @@ export default function ActionModal({
 }: ActionModalProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -141,7 +142,7 @@ export default function ActionModal({
   const handleTabChange = (newTab: string) => {
     setActiveTab(newTab);
     
-    // Update URL with the new tab
+    // Update URL with the new tab, preserving the current pathname
     const params = new URLSearchParams(searchParams);
     if (newTab !== "overview") {
       params.set("tab", newTab);
@@ -149,7 +150,8 @@ export default function ActionModal({
       params.delete("tab");
     }
     
-    router.replace(`/?${params.toString()}`, { scroll: false });
+    // Preserve the current pathname (e.g., /milestones or /)
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   const handleExport = useCallback(

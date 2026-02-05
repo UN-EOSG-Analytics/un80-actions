@@ -9,6 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { getActionQuestions } from "@/features/questions/queries";
 import {
   createQuestion,
@@ -17,14 +22,15 @@ import {
   deleteQuestion,
 } from "@/features/questions/commands";
 import { getActionMilestones } from "@/features/milestones/queries";
+import { getActionNotes } from "@/features/notes/queries";
 import { ReviewStatus } from "@/features/shared/ReviewStatus";
 import { TagSelector } from "@/features/shared/TagSelector";
 import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
-import type { Action, ActionQuestion, ActionMilestone } from "@/types";
+import type { Action, ActionQuestion, ActionMilestone, ActionNote } from "@/types";
 import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
 import { applyBoldShortcut, BoldText } from "@/features/shared/markdown-bold";
-import { Loader2, MessageCircle, Send, Trash2, Pencil, X } from "lucide-react";
+import { Loader2, MessageCircle, Send, Trash2, Pencil, X, StickyNote, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 
 // =========================================================
@@ -58,7 +64,10 @@ export default function QuestionsTab({
 }) {
   const [questions, setQuestions] = useState<ActionQuestion[]>([]);
   const [milestones, setMilestones] = useState<ActionMilestone[]>([]);
+  const [notes, setNotes] = useState<ActionNote[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingNotes, setLoadingNotes] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
   const [newQuestion, setNewQuestion] = useState({
     header: "",
     question_date: "",
@@ -105,9 +114,23 @@ export default function QuestionsTab({
     }
   };
 
+  const loadNotes = async () => {
+    if (!isAdmin) return; // Notes are admin-only
+    setLoadingNotes(true);
+    try {
+      const data = await getActionNotes(action.id, action.sub_id);
+      setNotes(data);
+    } catch {
+      // silently fail - notes are optional
+    } finally {
+      setLoadingNotes(false);
+    }
+  };
+
   useEffect(() => {
     loadQuestions();
     loadMilestones();
+    loadNotes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -221,6 +244,59 @@ export default function QuestionsTab({
 
   return (
     <div className="space-y-4">
+      {/* View Notes Collapsible Section */}
+      {isAdmin && notes.length > 0 && (
+        <Collapsible open={showNotes} onOpenChange={setShowNotes}>
+          <CollapsibleTrigger asChild>
+            <button
+              type="button"
+              className="flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left shadow-sm transition-colors hover:bg-slate-50"
+            >
+              <div className="flex items-center gap-2">
+                <StickyNote className="h-4 w-4 text-amber-600" />
+                <span className="text-sm font-medium text-slate-700">
+                  View Notes ({notes.length})
+                </span>
+              </div>
+              <ChevronDown
+                className={`h-4 w-4 text-slate-500 transition-transform ${
+                  showNotes ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="mt-2 max-h-96 space-y-2 overflow-y-auto rounded-lg border border-slate-200 bg-slate-50/50 p-4">
+              {notes.map((note) => (
+                <div
+                  key={note.id}
+                  className="rounded-md border border-slate-200 bg-white p-3 shadow-sm"
+                >
+                  <div className="mb-2 flex items-center gap-2">
+                    {note.header && (
+                      <span className="text-xs font-semibold text-slate-700">
+                        {note.header}
+                      </span>
+                    )}
+                    {note.note_date && (
+                      <span className="text-xs text-slate-500">
+                        {formatUNDate(note.note_date)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="whitespace-pre-wrap text-sm text-slate-600 line-clamp-3">
+                    <BoldText>{note.content}</BoldText>
+                  </p>
+                  <p className="mt-1 text-xs text-slate-400">
+                    {formatUNDateTime(note.created_at)} · {note.user_email}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+
       {/* Ask Question Form */}
       <form
         onSubmit={handleSubmit}

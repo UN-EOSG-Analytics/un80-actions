@@ -9,16 +9,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { getActionNotes } from "@/features/notes/queries";
+import { getActionQuestions } from "@/features/questions/queries";
 import { createNote, approveNote, deleteNote } from "@/features/notes/commands";
 import { ReviewStatus } from "@/features/shared/ReviewStatus";
 import { TagSelector } from "@/features/shared/TagSelector";
 import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
-import type { Action, ActionNote } from "@/types";
+import type { Action, ActionNote, ActionQuestion } from "@/types";
 import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
 import { applyBoldShortcut, BoldText } from "@/features/shared/markdown-bold";
-import { Loader2, Plus, StickyNote, Trash2, Pencil, X, Send } from "lucide-react";
+import { Loader2, Plus, StickyNote, Trash2, Pencil, X, Send, MessageCircle, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { updateNote } from "@/features/notes/commands";
 
@@ -53,7 +59,10 @@ export default function NotesTab({
 }) {
   const HEADER_OPTIONS = ["Task Force", "Steering Committee", "Check-ins"];
   const [notes, setNotes] = useState<ActionNote[]>([]);
+  const [questions, setQuestions] = useState<ActionQuestion[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const [showQuestions, setShowQuestions] = useState(false);
   const [newNote, setNewNote] = useState({
     header: "",
     note_date: "",
@@ -84,8 +93,22 @@ export default function NotesTab({
     }
   };
 
+  const loadQuestions = async () => {
+    if (!isAdmin) return; // Questions are admin-only
+    setLoadingQuestions(true);
+    try {
+      const data = await getActionQuestions(action.id, action.sub_id);
+      setQuestions(data);
+    } catch {
+      // silently fail - questions are optional
+    } finally {
+      setLoadingQuestions(false);
+    }
+  };
+
   useEffect(() => {
     loadNotes();
+    loadQuestions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -198,6 +221,66 @@ export default function NotesTab({
 
   return (
     <div className="space-y-4">
+      {/* View Questions Collapsible Section */}
+      {isAdmin && questions.length > 0 && (
+        <Collapsible open={showQuestions} onOpenChange={setShowQuestions}>
+          <CollapsibleTrigger asChild>
+            <button
+              type="button"
+              className="flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left shadow-sm transition-colors hover:bg-slate-50"
+            >
+              <div className="flex items-center gap-2">
+                <MessageCircle className="h-4 w-4 text-un-blue" />
+                <span className="text-sm font-medium text-slate-700">
+                  View Questions ({questions.length})
+                </span>
+              </div>
+              <ChevronDown
+                className={`h-4 w-4 text-slate-500 transition-transform ${
+                  showQuestions ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="mt-2 max-h-96 space-y-2 overflow-y-auto rounded-lg border border-slate-200 bg-slate-50/50 p-4">
+              {questions.map((question) => (
+                <div
+                  key={question.id}
+                  className="rounded-md border border-slate-200 bg-white p-3 shadow-sm"
+                >
+                  <div className="mb-2 flex items-center gap-2">
+                    {question.header && (
+                      <span className="text-xs font-semibold text-slate-700">
+                        {question.header}
+                      </span>
+                    )}
+                    {question.question_date && (
+                      <span className="text-xs text-slate-500">
+                        {formatUNDate(question.question_date)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="whitespace-pre-wrap text-sm text-slate-600 line-clamp-3">
+                    <BoldText>{question.question}</BoldText>
+                  </p>
+                  {question.answer && (
+                    <div className="mt-2 rounded border-l-2 border-green-300 bg-green-50/50 pl-2">
+                      <p className="whitespace-pre-wrap text-xs text-slate-600 line-clamp-2">
+                        <BoldText>{question.answer}</BoldText>
+                      </p>
+                    </div>
+                  )}
+                  <p className="mt-1 text-xs text-slate-400">
+                    {formatUNDateTime(question.created_at)} · {question.user_email}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+
       {/* Add Note Form */}
       <form
         onSubmit={handleSubmit}
