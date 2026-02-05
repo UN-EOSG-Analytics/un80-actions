@@ -7,7 +7,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calendar, Check, ChevronDown, Clock, MessageSquare, Pencil } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar, Check, ChevronDown, Clock, MessageSquare, Pencil, Send } from "lucide-react";
 import type { ActionMilestone } from "@/types";
 import type { MilestoneUpdate } from "@/features/milestones/updates-queries";
 
@@ -18,6 +25,8 @@ interface MilestoneCardProps {
   onComment: () => void;
   onShowHistory: () => void;
   onStatusChange?: (status: "draft" | "approved" | "needs_attention" | "needs_ola_review") => void;
+  onDocumentSubmittedChange?: (milestoneId: string, submitted: boolean) => void;
+  documentSubmitted?: boolean;
   isAdmin?: boolean;
 }
 
@@ -28,6 +37,8 @@ export function MilestoneCard({
   onComment,
   onShowHistory,
   onStatusChange,
+  onDocumentSubmittedChange,
+  documentSubmitted = false,
   isAdmin = false,
 }: MilestoneCardProps) {
   // Determine display status
@@ -64,6 +75,23 @@ export function MilestoneCard({
   const milestoneLabel = milestone.is_public
     ? "Public"
     : milestone.milestone_type.charAt(0).toUpperCase() + milestone.milestone_type.slice(1);
+
+  // Check if milestone is delayed (deadline has passed)
+  const getTimelineStatus = () => {
+    if (!milestone.deadline) return null;
+    const deadlineDate = new Date(milestone.deadline);
+    const today = new Date();
+    // Reset time to compare dates only
+    today.setHours(0, 0, 0, 0);
+    deadlineDate.setHours(0, 0, 0, 0);
+    
+    if (deadlineDate < today) {
+      return { label: "Delayed", className: "bg-red-100 text-red-700" };
+    }
+    return { label: "On-track", className: "bg-green-100 text-green-700" };
+  };
+
+  const timelineStatus = getTimelineStatus();
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 transition-shadow hover:shadow-md">
@@ -140,6 +168,40 @@ export function MilestoneCard({
                     year: 'numeric' 
                   }) : <span className="italic">No deadline</span>}
                 </span>
+                {timelineStatus && (
+                  <Badge className={`${timelineStatus.className} text-xs font-medium`}>
+                    {timelineStatus.label}
+                  </Badge>
+                )}
+                {onDocumentSubmittedChange && (
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <Select
+                      value={documentSubmitted ? "submitted" : "not_submitted"}
+                      onValueChange={(value: "submitted" | "not_submitted") => {
+                        onDocumentSubmittedChange(milestone.id, value === "submitted");
+                      }}
+                    >
+                      <SelectTrigger 
+                        className={`inline-flex items-center gap-1 rounded-full text-xs font-medium px-2.5 py-0.5 transition-colors hover:opacity-80 ${
+                          documentSubmitted
+                            ? "border-green-300 bg-green-50 text-green-800 hover:bg-green-100"
+                            : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                        }`}
+                      >
+                        {documentSubmitted ? (
+                          <Send className="h-3 w-3" />
+                        ) : (
+                          <Clock className="h-3 w-3" />
+                        )}
+                        <SelectValue className="text-xs" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="not_submitted">Not submitted</SelectItem>
+                        <SelectItem value="submitted">Submitted</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -183,6 +183,21 @@ const STATUS_STYLES: Record<string, { badge: string }> = {
   "Approved": { badge: "bg-green-100 text-green-800 border-green-200" },
 };
 
+/** Check if milestone is delayed (deadline has passed) */
+function getTimelineStatus(cell: MilestoneViewCell | null): { label: string; className: string } | null {
+  if (!cell || !cell.deadline) return null;
+  const deadlineDate = new Date(cell.deadline);
+  const today = new Date();
+  // Reset time to compare dates only
+  today.setHours(0, 0, 0, 0);
+  deadlineDate.setHours(0, 0, 0, 0);
+  
+  if (deadlineDate < today) {
+    return { label: "Delayed", className: "bg-red-100 text-red-700 border-red-200" };
+  }
+  return { label: "On-track", className: "bg-green-100 text-green-700 border-green-200" };
+}
+
 function MilestoneCell({ cell }: { cell: MilestoneViewCell | null }) {
   if (!cell) {
     return <span className="text-gray-400">—</span>;
@@ -190,7 +205,8 @@ function MilestoneCell({ cell }: { cell: MilestoneViewCell | null }) {
   const hasDesc = cell.description?.trim();
   const hasDeadline = cell.deadline?.trim();
   const statusLabel = getCellStatusLabel(cell);
-  const hasContent = hasDesc || hasDeadline || statusLabel;
+  const timelineStatus = getTimelineStatus(cell);
+  const hasContent = hasDesc || hasDeadline || statusLabel || timelineStatus;
   if (!hasContent) {
     return <span className="text-gray-400">—</span>;
   }
@@ -208,6 +224,14 @@ function MilestoneCell({ cell }: { cell: MilestoneViewCell | null }) {
           className={`text-xs font-medium ${STATUS_STYLES[statusLabel]?.badge ?? "bg-gray-100 text-gray-700"}`}
         >
           {statusLabel}
+        </Badge>
+      )}
+      {timelineStatus && (
+        <Badge
+          variant="outline"
+          className={`text-xs font-medium ${timelineStatus.className}`}
+        >
+          {timelineStatus.label}
         </Badge>
       )}
     </div>

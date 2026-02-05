@@ -140,6 +140,7 @@ export default function MilestonesTab({
     status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | null;
   }>({ open: false, milestoneId: null, status: null });
   const [documentSubmitted, setDocumentSubmitted] = useState<"submitted" | "not_submitted">("not_submitted");
+  const [milestoneDocumentSubmitted, setMilestoneDocumentSubmitted] = useState<Record<string, boolean>>({});
 
   const getFileIcon = (contentType: string, filename: string) => {
     if (contentType.startsWith("image/")) {
