@@ -88,6 +88,9 @@ async function runAllMigrations() {
     // Run migration 009
     await runMigration(9, 'add_activity_entries_and_read');
     
+    // Run migration 010
+    await runMigration(10, 'add_document_submitted_to_actions');
+    
     console.log('\n✅ All migrations completed successfully!');
   } catch (error) {
     console.error('\n❌ Migration failed:', error.message);

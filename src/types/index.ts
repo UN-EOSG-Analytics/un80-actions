@@ -362,6 +362,7 @@ export interface ActionWithMilestones {
   public_action_status: PublicActionStatus | null;
   is_big_ticket: boolean;
   risk_assessment: RiskAssessment | null;
+  document_submitted: boolean;
   milestones: MilestoneRow[];
 }
 

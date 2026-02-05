@@ -673,6 +673,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       a.public_action_status,
       a.is_big_ticket,
       a.risk_assessment,
+      COALESCE(a.document_submitted, false) AS document_submitted,
       m.milestone_type,
       m.description AS milestone_description,
       m.deadline::text AS milestone_deadline,
@@ -694,6 +695,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       a.tracking_status,
       a.public_action_status,
       a.is_big_ticket,
+      COALESCE(a.document_submitted, false) AS document_submitted,
       m.milestone_type,
       m.description AS milestone_description,
       m.deadline::text AS milestone_deadline,
@@ -716,6 +718,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
     public_action_status: string | null;
     is_big_ticket: boolean;
     risk_assessment?: string | null;
+    document_submitted?: boolean;
     milestone_type: string | null;
     milestone_description: string | null;
     milestone_deadline: string | null;
@@ -845,6 +848,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
           public_action_status: r.public_action_status as ActionWithMilestones["public_action_status"],
           is_big_ticket: r.is_big_ticket,
           risk_assessment: (r.risk_assessment ?? null) as ActionWithMilestones["risk_assessment"],
+          document_submitted: r.document_submitted ?? false,
           milestones: [],
         };
         actionsMap.set(key, action);

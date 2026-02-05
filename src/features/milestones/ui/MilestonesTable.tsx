@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Search, X, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, Filter, Check } from "lucide-react";
+import { Search, X, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, Filter, Check, Send, Clock } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -443,6 +443,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
               <th className="px-4 py-3">Public milestone</th>
               <th className="px-4 py-3">First milestone</th>
               <th className="px-4 py-3">Final milestone</th>
+              <th className="px-4 py-3 whitespace-nowrap">Deliverables</th>
               <th className="w-10 px-4 py-3"></th>
             </tr>
           </thead>
@@ -450,7 +451,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
             {sortedRows.length === 0 ? (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="px-4 py-12 text-center text-gray-400"
                 >
                   No actions found
@@ -481,6 +482,19 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                 </td>
                 <td className="px-4 py-3">
                   <MilestoneCell cell={r.final_milestone} />
+                </td>
+                <td className="px-4 py-3">
+                  {r.document_submitted ? (
+                    <Badge className="bg-green-100 text-green-800 border-green-200 flex items-center gap-1.5 w-fit">
+                      <Send className="h-3 w-3" />
+                      Submitted
+                    </Badge>
+                  ) : (
+                    <Badge className="bg-amber-100 text-amber-800 border-amber-200 flex items-center gap-1.5 w-fit">
+                      <Clock className="h-3 w-3" />
+                      Not submitted
+                    </Badge>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-gray-400">
                   <ChevronRight className="h-4 w-4" />

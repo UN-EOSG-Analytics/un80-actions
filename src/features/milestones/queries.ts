@@ -268,6 +268,7 @@ export interface MilestoneViewRow {
   public_milestone: MilestoneViewCell | null;
   first_milestone: MilestoneViewCell | null;
   final_milestone: MilestoneViewCell | null;
+  document_submitted: boolean;
 }
 
 type MilestoneViewRowDb = {
@@ -290,6 +291,7 @@ type MilestoneViewRowDb = {
   final_is_draft: boolean | null;
   final_needs_attention: boolean | null;
   final_needs_ola_review: boolean | null;
+  document_submitted: boolean;
 };
 
 /**
@@ -367,7 +369,8 @@ export async function getMilestoneViewTableData(): Promise<MilestoneViewRow[]> {
       (SELECT m.needs_ola_review FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
          AND m.milestone_type = 'final'
-       LIMIT 1) AS final_needs_ola_review
+       LIMIT 1) AS final_needs_ola_review,
+      COALESCE(a.document_submitted, false) AS document_submitted
     FROM work_packages wp
     JOIN actions a ON a.work_package_id = wp.id
     ORDER BY wp.id, a.id, a.sub_id ASC NULLS FIRST
@@ -417,5 +420,6 @@ export async function getMilestoneViewTableData(): Promise<MilestoneViewRow[]> {
       r.final_needs_attention,
       r.final_needs_ola_review,
     ),
+    document_submitted: r.document_submitted,
   }));
 }

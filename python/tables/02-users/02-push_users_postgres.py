@@ -51,9 +51,18 @@ df_clean["full_name"] = df_clean["full_name"].apply(
     lambda x: str(x).strip() if x else None
 )
 df_clean["entity"] = df_clean["entity"].apply(lambda x: str(x).strip() if x else None)
-df_clean["user_role"] = df_clean["user_role"].apply(
-    lambda x: str(x).strip() if x else None
-)
+
+# Map user roles to valid enum values
+def normalize_user_role(role):
+    if not role:
+        return None
+    role = str(role).strip()
+    # Map "Entity Focal Point" to "Focal Point"
+    if role == "Entity Focal Point":
+        return "Focal Point"
+    return role
+
+df_clean["user_role"] = df_clean["user_role"].apply(normalize_user_role)
 
 # lead_positions is already a list from Parquet (but may be numpy arrays)
 # Convert numpy arrays to Python lists and ensure empty lists for missing lead_positions
