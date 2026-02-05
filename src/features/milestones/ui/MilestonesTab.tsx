@@ -139,7 +139,6 @@ export default function MilestonesTab({
     milestoneId: string | null;
     status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | null;
   }>({ open: false, milestoneId: null, status: null });
-  const [documentSubmitted, setDocumentSubmitted] = useState<"submitted" | "not_submitted">("not_submitted");
   const [milestoneDocumentSubmitted, setMilestoneDocumentSubmitted] = useState<Record<string, boolean>>({});
 
   const getFileIcon = (contentType: string, filename: string) => {
@@ -616,12 +615,13 @@ export default function MilestonesTab({
             isAdmin={isAdmin}
             onDocumentSubmittedChange={
               !milestone.is_public && (milestone.milestone_type === "first" || milestone.milestone_type === "final")
-                ? (_id, submitted) => setDocumentSubmitted(submitted ? "submitted" : "not_submitted")
+                ? (milestoneId, submitted) =>
+                    setMilestoneDocumentSubmitted((prev) => ({ ...prev, [milestoneId]: submitted }))
                 : undefined
             }
             documentSubmitted={
               !milestone.is_public && (milestone.milestone_type === "first" || milestone.milestone_type === "final")
-                ? documentSubmitted === "submitted"
+                ? milestoneDocumentSubmitted[milestone.id] ?? false
                 : undefined
             }
           />
