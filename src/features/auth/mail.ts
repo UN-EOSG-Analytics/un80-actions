@@ -21,7 +21,7 @@ function createTransporter() {
  * Sends a magic link email for authentication.
  * @param email - User's email address
  * @param token - Magic link token
- * @param baseUrl - The base URL (e.g., https://app.un80actions.eosg.dev) - REQUIRED
+ * @param baseUrl - The base URL
  */
 export async function sendMagicLink(
   email: string,

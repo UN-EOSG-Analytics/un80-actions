@@ -199,7 +199,7 @@ function MilestoneCell({ cell }: { cell: MilestoneViewCell | null }) {
       {hasDesc && (
         <p className="text-gray-700 text-sm line-clamp-2">{cell.description}</p>
       )}
-      {hasDeadline && (
+      {hasDeadline && cell.deadline && (
         <p className="text-xs text-gray-500">{formatUNDate(cell.deadline)}</p>
       )}
       {statusLabel && (

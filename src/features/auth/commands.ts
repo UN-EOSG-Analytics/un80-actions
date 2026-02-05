@@ -72,3 +72,35 @@ export async function logout(): Promise<void> {
   await clearSession();
   redirect("/login");
 }
+
+/**
+ * Toggle admin role for testing purposes.
+ * DEV ONLY - remove in production.
+ */
+export async function toggleAdminRole(): Promise<Result> {
+  const { getCurrentUser } = await import("./service");
+  const { query } = await import("@/lib/db/db");
+  const { DB_SCHEMA } = await import("@/lib/db/config");
+
+  const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, error: "Not authenticated" };
+  }
+
+  // Get current role
+  const [current] = await query<{ user_role: string | null }>(
+    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
+    [user.email],
+  );
+
+  // Toggle between Admin and null
+  const newRole = current?.user_role === "Admin" ? null : "Admin";
+
+  await query(
+    `UPDATE ${DB_SCHEMA}.approved_users SET user_role = $1 WHERE LOWER(email) = LOWER($2)`,
+    [newRole, user.email],
+  );
+
+  revalidatePath("/", "layout");
+  return { success: true };
+}

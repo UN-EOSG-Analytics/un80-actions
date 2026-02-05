@@ -2,6 +2,7 @@
 
 import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
+import { checkIsAdmin } from "@/features/auth/lib/permissions";
 import type { ActionNote } from "@/types";
 
 // =========================================================
@@ -10,12 +11,17 @@ import type { ActionNote } from "@/types";
 
 /**
  * Fetch all notes for a specific action.
- * Returns every note from every user so all users see the full history.
+ * Admin-only: Returns empty array for non-admin users.
  */
 export async function getActionNotes(
   actionId: number,
   subId?: string | null,
 ): Promise<ActionNote[]> {
+  // Admin-only feature
+  if (!(await checkIsAdmin())) {
+    return [];
+  }
+
   const whereClause =
     subId !== undefined
       ? "WHERE n.action_id = $1 AND (n.action_sub_id IS NOT DISTINCT FROM $2)"
@@ -52,8 +58,14 @@ export async function getActionNotes(
 
 /**
  * Fetch a single note by ID.
+ * Admin-only: Returns null for non-admin users.
  */
 export async function getNoteById(noteId: string): Promise<ActionNote | null> {
+  // Admin-only feature
+  if (!(await checkIsAdmin())) {
+    return null;
+  }
+
   const rows = await query<ActionNote>(
     `SELECT
       n.id,

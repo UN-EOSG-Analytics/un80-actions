@@ -39,17 +39,18 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getCurrentUser();
+  const isAdmin = user?.user_role === "Admin" || user?.user_role === "Legal";
 
   return (
     <html lang="en" className={`${roboto.className} antialiased`}>
       <body>
         <div className="flex min-h-screen flex-col">
-          <Header user={user} />
+          <Header user={user} isAdmin={isAdmin} />
           {children}
           <Footer />
         </div>
         <Suspense fallback={null}>
-          <ModalHandler isAdmin={user?.user_role === "Admin"} />
+          <ModalHandler isAdmin={isAdmin} />
         </Suspense>
         <GoogleAnalytics gaId="G-XYZ" />
       </body>

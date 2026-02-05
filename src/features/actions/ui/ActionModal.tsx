@@ -78,13 +78,16 @@ export default function ActionModal({
   // Initialize tab from URL or default to overview
   useEffect(() => {
     const tabParam = searchParams.get("tab");
-    const validTabs = ["overview", "milestones", "questions", "notes"];
+    // Only allow questions/notes tabs for admins
+    const validTabs = isAdmin
+      ? ["overview", "milestones", "questions", "notes"]
+      : ["overview", "milestones"];
     if (tabParam && validTabs.includes(tabParam)) {
       setActiveTab(tabParam);
     } else {
       setActiveTab("overview");
     }
-  }, [action?.id, action?.sub_id, searchParams]);
+  }, [action?.id, action?.sub_id, searchParams, isAdmin]);
 
   // Animation state management
   useEffect(() => {
@@ -348,14 +351,18 @@ export default function ActionModal({
                 <Calendar className="h-4 w-4" />
                 Milestones
               </TabsTrigger>
-              <TabsTrigger value="questions" className="gap-1.5">
-                <MessageCircle className="h-4 w-4" />
-                Questions
-              </TabsTrigger>
-              <TabsTrigger value="notes" className="gap-1.5">
-                <StickyNote className="h-4 w-4" />
-                Notes
-              </TabsTrigger>
+              {isAdmin && (
+                <TabsTrigger value="questions" className="gap-1.5">
+                  <MessageCircle className="h-4 w-4" />
+                  Questions
+                </TabsTrigger>
+              )}
+              {isAdmin && (
+                <TabsTrigger value="notes" className="gap-1.5">
+                  <StickyNote className="h-4 w-4" />
+                  Notes
+                </TabsTrigger>
+              )}
             </TabsList>
           </div>
 
@@ -368,14 +375,14 @@ export default function ActionModal({
               {activeTab === "milestones" && (
                 <MilestonesTab action={action} isAdmin={isAdmin} />
               )}
-              {activeTab === "questions" && (
+              {activeTab === "questions" && isAdmin && (
                 <QuestionsTab
                   action={action}
                   isAdmin={isAdmin}
                   exportProps={{ onExport: handleExport, exporting }}
                 />
               )}
-              {activeTab === "notes" && (
+              {activeTab === "notes" && isAdmin && (
                 <NotesTab
                   action={action}
                   isAdmin={isAdmin}

@@ -9,11 +9,12 @@ import { ActivityFeed } from "../features/activity/ui/ActivityFeed";
 
 interface Props {
   user?: { email: string; entity?: string | null } | null;
+  isAdmin?: boolean;
   children?: React.ReactNode;
   maxWidth?: "6xl" | "7xl";
 }
 
-export function Header({ user, children, maxWidth = "7xl" }: Props) {
+export function Header({ user, isAdmin, children, maxWidth = "7xl" }: Props) {
   const pathname = usePathname();
   const isLoggedIn = !!user;
   const isLoginPage = pathname === "/login";
@@ -49,7 +50,7 @@ export function Header({ user, children, maxWidth = "7xl" }: Props) {
                 Milestone View
               </Link>
               <ActivityFeed />
-              <UserMenu email={user.email} entity={user.entity} />
+              <UserMenu email={user.email} entity={user.entity} isAdmin={isAdmin} />
             </>
           ) : !isLoginPage ? (
             <Link

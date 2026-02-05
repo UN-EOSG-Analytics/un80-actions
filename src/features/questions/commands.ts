@@ -3,7 +3,7 @@
 import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { getQuestionById } from "./queries";
-import { getCurrentUser } from "@/features/auth/service";
+import { requireAdmin } from "@/features/auth/lib/permissions";
 import type { QuestionCreateInput, QuestionUpdateInput, QuestionResult } from "./types";
 
 // =========================================================
@@ -12,16 +12,17 @@ import type { QuestionCreateInput, QuestionUpdateInput, QuestionResult } from ".
 
 /**
  * Create a new question for an action.
- * Any authenticated user can ask questions.
+ * Admin-only: Only Admin/Legal users can create questions.
  */
 export async function createQuestion(
   input: QuestionCreateInput,
 ): Promise<QuestionResult> {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "You must be logged in to ask questions" };
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return { success: false, error: auth.error };
     }
+    const user = auth.user;
 
     if (!input.header || input.header.trim().length === 0) {
       return { success: false, error: "Header cannot be empty" };
@@ -62,16 +63,16 @@ export async function createQuestion(
 
 /**
  * Update a question (before it's answered).
- * Any authenticated user can edit.
+ * Admin-only: Only Admin/Legal users can edit questions.
  */
 export async function updateQuestion(
   questionId: string,
   input: QuestionUpdateInput,
 ): Promise<QuestionResult> {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "You must be logged in" };
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return { success: false, error: auth.error };
     }
 
     const question = await getQuestionById(questionId);
@@ -124,17 +125,18 @@ export async function updateQuestion(
 
 /**
  * Answer a question.
- * Any authenticated user can answer.
+ * Admin-only: Only Admin/Legal users can answer questions.
  */
 export async function answerQuestion(
   questionId: string,
   answer: string,
 ): Promise<QuestionResult> {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "You must be logged in" };
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return { success: false, error: auth.error };
     }
+    const user = auth.user;
 
     const question = await getQuestionById(questionId);
     if (!question) {
@@ -170,16 +172,16 @@ export async function answerQuestion(
 
 /**
  * Update an existing answer.
- * Any authenticated user can update.
+ * Admin-only: Only Admin/Legal users can update answers.
  */
 export async function updateAnswer(
   questionId: string,
   newAnswer: string,
 ): Promise<QuestionResult> {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "You must be logged in" };
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return { success: false, error: auth.error };
     }
 
     const question = await getQuestionById(questionId);
@@ -216,24 +218,18 @@ export async function updateAnswer(
 }
 
 /**
- * Approve a question's content (admin/reviewer only).
+ * Approve a question's content.
+ * Admin-only: Only Admin/Legal users can approve questions.
  */
 export async function approveQuestion(
   questionId: string,
 ): Promise<QuestionResult> {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Not authenticated" };
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return { success: false, error: auth.error };
     }
-
-    const adminCheck = await query<{ user_role: string }>(
-      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-      [user.email],
-    );
-    if (adminCheck[0]?.user_role !== "Admin") {
-      return { success: false, error: "Admin only" };
-    }
+    const user = auth.user;
 
     const question = await getQuestionById(questionId);
     if (!question) {
@@ -261,15 +257,15 @@ export async function approveQuestion(
 
 /**
  * Delete a question.
- * Only the question author (if unanswered) or admin can delete.
+ * Admin-only: Only Admin/Legal users can delete questions.
  */
 export async function deleteQuestion(
   questionId: string,
 ): Promise<QuestionResult> {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Not authenticated" };
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return { success: false, error: auth.error };
     }
 
     const question = await getQuestionById(questionId);
@@ -277,28 +273,10 @@ export async function deleteQuestion(
       return { success: false, error: "Question not found" };
     }
 
-    const isAuthor = question.user_id === user.id;
-    const adminCheck = await query<{ user_role: string }>(
-      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-      [user.email],
-    );
-    const isAdmin = adminCheck[0]?.user_role === "Admin";
-
-    if (isAuthor && !question.answer) {
-      await query(`DELETE FROM ${DB_SCHEMA}.action_questions WHERE id = $1`, [
-        questionId,
-      ]);
-      return { success: true };
-    }
-
-    if (isAdmin) {
-      await query(`DELETE FROM ${DB_SCHEMA}.action_questions WHERE id = $1`, [
-        questionId,
-      ]);
-      return { success: true };
-    }
-
-    return { success: false, error: "Not authorized to delete this question" };
+    await query(`DELETE FROM ${DB_SCHEMA}.action_questions WHERE id = $1`, [
+      questionId,
+    ]);
+    return { success: true };
   } catch (e) {
     return {
       success: false,

@@ -2,6 +2,7 @@
 
 import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
+import { checkIsAdmin } from "@/features/auth/lib/permissions";
 import type { ActionQuestion } from "@/types";
 
 // =========================================================
@@ -10,12 +11,17 @@ import type { ActionQuestion } from "@/types";
 
 /**
  * Fetch all questions for a specific action.
- * Returns every question from every user so all users see the full history.
+ * Admin-only: Returns empty array for non-admin users.
  */
 export async function getActionQuestions(
   actionId: number,
   subId?: string | null,
 ): Promise<ActionQuestion[]> {
+  // Admin-only feature
+  if (!(await checkIsAdmin())) {
+    return [];
+  }
+
   const whereClause =
     subId !== undefined
       ? "WHERE q.action_id = $1 AND (q.action_sub_id IS NOT DISTINCT FROM $2)"
@@ -58,11 +64,17 @@ export async function getActionQuestions(
 
 /**
  * Fetch unanswered questions for a specific action.
+ * Admin-only: Returns empty array for non-admin users.
  */
 export async function getUnansweredQuestions(
   actionId: number,
   subId?: string | null,
 ): Promise<ActionQuestion[]> {
+  // Admin-only feature
+  if (!(await checkIsAdmin())) {
+    return [];
+  }
+
   const whereClause =
     subId !== undefined
       ? "WHERE q.action_id = $1 AND (q.action_sub_id IS NOT DISTINCT FROM $2) AND q.answer IS NULL"
@@ -105,10 +117,16 @@ export async function getUnansweredQuestions(
 
 /**
  * Fetch a single question by ID.
+ * Admin-only: Returns null for non-admin users.
  */
 export async function getQuestionById(
   questionId: string,
 ): Promise<ActionQuestion | null> {
+  // Admin-only feature
+  if (!(await checkIsAdmin())) {
+    return null;
+  }
+
   const rows = await query<ActionQuestion>(
     `SELECT
       q.id,

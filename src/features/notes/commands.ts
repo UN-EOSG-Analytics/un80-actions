@@ -3,7 +3,7 @@
 import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { getNoteById } from "./queries";
-import { getCurrentUser } from "@/features/auth/service";
+import { requireAdmin } from "@/features/auth/lib/permissions";
 import type { NoteCreateInput, NoteUpdateInput, NoteResult } from "./types";
 
 // =========================================================
@@ -12,14 +12,16 @@ import type { NoteCreateInput, NoteUpdateInput, NoteResult } from "./types";
 
 /**
  * Create a new note for an action.
+ * Admin-only: Only Admin/Legal users can create notes.
  */
 export async function createNote(input: NoteCreateInput): Promise<NoteResult> {
   try {
-    // Check authentication
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "You must be logged in to add notes" };
+    // Check admin access
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return { success: false, error: auth.error };
     }
+    const user = auth.user;
 
     // Validate input
     if (!input.header || input.header.trim().length === 0) {
@@ -59,32 +61,21 @@ export async function createNote(input: NoteCreateInput): Promise<NoteResult> {
 
 /**
  * Update an existing note.
- * Only the note author can edit their notes.
+ * Admin-only: Only Admin/Legal users can edit notes.
  */
 export async function updateNote(
   noteId: string,
   input: NoteUpdateInput,
 ): Promise<NoteResult> {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Not authenticated" };
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return { success: false, error: auth.error };
     }
 
     const note = await getNoteById(noteId);
     if (!note) {
       return { success: false, error: "Note not found" };
-    }
-
-    const isAuthor = note.user_id === user.id;
-    const adminCheck = await query<{ user_role: string }>(
-      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-      [user.email],
-    );
-    const isAdmin = adminCheck[0]?.user_role === "Admin";
-
-    if (!isAuthor && !isAdmin) {
-      return { success: false, error: "Not authorized to edit this note" };
     }
 
     if (!input.content || input.content.trim().length === 0) {
@@ -112,22 +103,16 @@ export async function updateNote(
 }
 
 /**
- * Approve a note's content (admin/reviewer only).
+ * Approve a note's content.
+ * Admin-only: Only Admin/Legal users can approve notes.
  */
 export async function approveNote(noteId: string): Promise<NoteResult> {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Not authenticated" };
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return { success: false, error: auth.error };
     }
-
-    const adminCheck = await query<{ user_role: string }>(
-      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-      [user.email],
-    );
-    if (adminCheck[0]?.user_role !== "Admin") {
-      return { success: false, error: "Admin only" };
-    }
+    const user = auth.user;
 
     const note = await getNoteById(noteId);
     if (!note) {
@@ -155,10 +140,15 @@ export async function approveNote(noteId: string): Promise<NoteResult> {
 
 /**
  * Delete a note.
- * Only the note author or admin can delete.
+ * Admin-only: Only Admin/Legal users can delete notes.
  */
 export async function deleteNote(noteId: string): Promise<NoteResult> {
   try {
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
+      return { success: false, error: auth.error };
+    }
+
     const note = await getNoteById(noteId);
     if (!note) {
       return { success: false, error: "Note not found" };
