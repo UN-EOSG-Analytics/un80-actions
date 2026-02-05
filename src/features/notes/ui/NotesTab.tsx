@@ -23,7 +23,8 @@ import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionNote, ActionQuestion } from "@/types";
 import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
-import { applyBoldShortcut, BoldText } from "@/features/shared/markdown-bold";
+import { BoldText } from "@/features/shared/markdown-bold";
+import { NoteEditor, isNoteContentEmpty } from "@/features/notes/ui/NoteEditor";
 import { Loader2, Plus, StickyNote, Trash2, Pencil, X, Send, MessageCircle, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { updateNote } from "@/features/notes/commands";
@@ -66,7 +67,7 @@ export default function NotesTab({
   const [newNote, setNewNote] = useState({
     header: "",
     note_date: "",
-    content: "• ",
+    content: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -114,7 +115,7 @@ export default function NotesTab({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newNote.header.trim() || !newNote.note_date || !newNote.content.trim()) {
+    if (!newNote.header.trim() || !newNote.note_date || isNoteContentEmpty(newNote.content)) {
       setError("Please fill in all fields");
       return;
     }
@@ -135,7 +136,7 @@ export default function NotesTab({
         setNewNote({
           header: "",
           note_date: "",
-          content: "• ",
+          content: "",
         });
         await loadNotes();
       } else {
@@ -164,12 +165,10 @@ export default function NotesTab({
 
   const startEditing = (note: ActionNote) => {
     setEditingId(note.id);
-    // Ensure content starts with bullet point if it doesn't already
-    const content = note.content.trim().startsWith("•") ? note.content : "• " + note.content;
     setEditingNote({
       header: note.header || "",
       note_date: note.note_date || "",
-      content: content,
+      content: note.content || "",
     });
     setError(null);
   };
@@ -179,14 +178,14 @@ export default function NotesTab({
     setEditingNote({
       header: "",
       note_date: "",
-      content: "• ",
+      content: "",
     });
     setError(null);
   };
 
   const handleSaveEdit = async () => {
     if (!editingId) return;
-    if (!editingNote.header.trim() || !editingNote.note_date || !editingNote.content.trim()) {
+    if (!editingNote.header.trim() || !editingNote.note_date || isNoteContentEmpty(editingNote.content)) {
       setError("Please fill in all fields");
       return;
     }
@@ -328,52 +327,19 @@ export default function NotesTab({
           <label className="mb-1.5 block text-xs font-medium text-slate-600">
             Note *
           </label>
-          <textarea
+          <NoteEditor
+            key="new-note"
             value={newNote.content}
-            onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
-            onKeyDown={(e) => {
-              const bold = applyBoldShortcut(e, newNote.content);
-              if (bold) {
-                setNewNote({ ...newNote, content: bold.newValue });
-                const ta = e.currentTarget;
-                setTimeout(() => {
-                  ta.selectionStart = bold.cursorStart;
-                  ta.selectionEnd = bold.cursorEnd;
-                }, 0);
-                return;
-              }
-              if (e.key === "Enter") {
-                const textarea = e.currentTarget;
-                const start = textarea.selectionStart;
-                const end = textarea.selectionEnd;
-                const value = textarea.value;
-                
-                // Insert bullet point at the start of the new line
-                const beforeCursor = value.substring(0, start);
-                const afterCursor = value.substring(end);
-                const newValue = beforeCursor + "\n• " + afterCursor;
-                
-                setNewNote({ ...newNote, content: newValue });
-                
-                // Set cursor position after the bullet point
-                setTimeout(() => {
-                  textarea.selectionStart = textarea.selectionEnd = start + 3; // 3 = "\n• ".length
-                }, 0);
-                
-                e.preventDefault();
-              }
-            }}
+            onChange={(html) => setNewNote({ ...newNote, content: html })}
             placeholder="• "
-            rows={3}
-            className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
             disabled={submitting}
-            required
+            minRows={3}
           />
         </div>
         <div className="flex justify-end">
           <Button
             type="submit"
-            disabled={submitting || !newNote.header.trim() || !newNote.note_date || !newNote.content.trim()}
+            disabled={submitting || !newNote.header.trim() || !newNote.note_date || isNoteContentEmpty(newNote.content)}
             className="bg-un-blue hover:bg-un-blue/90"
           >
             {submitting ? (
@@ -451,46 +417,13 @@ export default function NotesTab({
                       <label className="mb-1.5 block text-xs font-medium text-slate-600">
                         Note *
                       </label>
-                      <textarea
+                      <NoteEditor
+                        key={editingId}
                         value={editingNote.content}
-                        onChange={(e) => setEditingNote({ ...editingNote, content: e.target.value })}
-                        onKeyDown={(e) => {
-                          const bold = applyBoldShortcut(e, editingNote.content);
-                          if (bold) {
-                            setEditingNote({ ...editingNote, content: bold.newValue });
-                            const ta = e.currentTarget;
-                            setTimeout(() => {
-                              ta.selectionStart = bold.cursorStart;
-                              ta.selectionEnd = bold.cursorEnd;
-                            }, 0);
-                            return;
-                          }
-                          if (e.key === "Enter") {
-                            const textarea = e.currentTarget;
-                            const start = textarea.selectionStart;
-                            const end = textarea.selectionEnd;
-                            const value = textarea.value;
-                            
-                            // Insert bullet point at the start of the new line
-                            const beforeCursor = value.substring(0, start);
-                            const afterCursor = value.substring(end);
-                            const newValue = beforeCursor + "\n• " + afterCursor;
-                            
-                            setEditingNote({ ...editingNote, content: newValue });
-                            
-                            // Set cursor position after the bullet point
-                            setTimeout(() => {
-                              textarea.selectionStart = textarea.selectionEnd = start + 3; // 3 = "\n• ".length
-                            }, 0);
-                            
-                            e.preventDefault();
-                          }
-                        }}
-                        placeholder="• "
-                        rows={4}
-                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-none"
+                        onChange={(html) => setEditingNote({ ...editingNote, content: html })}
+                        placeholder=""
                         disabled={saving}
-                        required
+                        minRows={4}
                       />
                     </div>
                     <div className="flex justify-end gap-2">
@@ -506,7 +439,7 @@ export default function NotesTab({
                       <Button
                         type="button"
                         onClick={handleSaveEdit}
-                        disabled={saving || !editingNote.header.trim() || !editingNote.note_date || !editingNote.content.trim()}
+                        disabled={saving || !editingNote.header.trim() || !editingNote.note_date || isNoteContentEmpty(editingNote.content)}
                         className="bg-un-blue hover:bg-un-blue/90"
                       >
                         {saving ? (
@@ -548,9 +481,16 @@ export default function NotesTab({
                         </div>
                         {/* Note body */}
                         <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-4 py-3">
-                          <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-slate-700">
-                            <BoldText>{note.content}</BoldText>
-                          </p>
+                          {note.content.trim().startsWith("<") ? (
+                            <div
+                              className="prose prose-sm max-w-none text-[15px] leading-relaxed text-slate-700 [&_p]:whitespace-pre-wrap [&_p]:my-1 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6 [&_li]:my-0.5"
+                              dangerouslySetInnerHTML={{ __html: note.content }}
+                            />
+                          ) : (
+                            <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-slate-700">
+                              <BoldText>{note.content}</BoldText>
+                            </p>
+                          )}
                         </div>
                         {/* Footer: meta + actions */}
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-slate-100 pt-3">
