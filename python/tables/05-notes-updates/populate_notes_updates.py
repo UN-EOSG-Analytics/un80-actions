@@ -26,7 +26,7 @@ updates = []
 
 for _, row in df_actions.iterrows():
     action_id = int(row["id"])
-    action_sub_id = str(row["sub_id"]) if pd.notna(row["sub_id"]) and row["sub_id"] else None
+    action_sub_id = str(row["sub_id"]) if pd.notna(row["sub_id"]) and row["sub_id"] else ""
     
     # Extract notes if present
     if pd.notna(row.get("action_notes")) and row.get("action_notes"):

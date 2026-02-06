@@ -85,7 +85,7 @@ for _, row in df_clean.iterrows():
     action_rows.append(
         (
             int(row["id"]),
-            str(row["sub_id"]) if pd.notna(row["sub_id"]) and row["sub_id"] else None,
+            str(row["sub_id"]) if pd.notna(row["sub_id"]) and row["sub_id"] else "",
             int(row["work_package_id"]) if pd.notna(row["work_package_id"]) else None,
             row["indicative_action"] if pd.notna(row["indicative_action"]) else None,
             row.get("sub_action") if pd.notna(row.get("sub_action")) else None,
@@ -133,7 +133,7 @@ action_member_entities_links = []
 for _, row in df_clean.iterrows():
     action_id = int(row["id"])
     action_sub_id = (
-        str(row["sub_id"]) if pd.notna(row["sub_id"]) and row["sub_id"] else None
+        str(row["sub_id"]) if pd.notna(row["sub_id"]) and row["sub_id"] else ""
     )
     wp_id = int(row["work_package_id"]) if pd.notna(row["work_package_id"]) else None
 

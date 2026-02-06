@@ -1,10 +1,10 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 DROP SCHEMA IF EXISTS un80actions CASCADE;
 CREATE SCHEMA un80actions AUTHORIZATION un80actions_schema_owner;
 REVOKE ALL ON SCHEMA un80actions
 FROM PUBLIC;
 GRANT USAGE ON SCHEMA un80actions TO un80actions_app_user,
     un80actions_readonly_user;
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- =========================================================
 -- ENUM TYPES
 -- =========================================================
@@ -34,7 +34,11 @@ create type un80actions.user_roles as enum (
 );
 create type un80actions.user_status as enum ('Active', 'Inactive');
 create type un80actions.content_review_status as enum ('approved', 'needs_review');
--- Tables 
+
+-- =========================================================
+-- TABLES
+-- =========================================================
+
 create table un80actions.approved_users (
     email text not null primary key,
     full_name text,
@@ -80,7 +84,7 @@ create table un80actions.work_packages (
 );
 create table un80actions.actions (
     id integer not null,
-    sub_id text,
+    sub_id text not null,
     work_package_id integer not null references un80actions.work_packages on delete cascade,
     indicative_action text not null,
     sub_action text,
@@ -97,12 +101,12 @@ create table un80actions.actions (
     risk_assessment un80actions.risk_assessment,
     action_record_id text,
     document_submitted boolean default false not null,
-    unique (id, sub_id)
+    primary key (id, sub_id)
 );
 create table un80actions.action_milestones (
     id uuid default gen_random_uuid() not null primary key,
     action_id integer not null,
-    action_sub_id text,
+    action_sub_id text not null default '',
     milestone_type un80actions.milestone_type not null,
     is_public boolean default false not null,
     is_draft boolean default true not null,
@@ -153,7 +157,7 @@ create index idx_milestone_versions_changed_at on un80actions.milestone_versions
 create table un80actions.action_attachments (
     id uuid default gen_random_uuid() not null primary key,
     action_id integer not null,
-    action_sub_id text,
+    action_sub_id text not null default '',
     milestone_id uuid references un80actions.action_milestones on delete
     set null,
         title text,
@@ -183,35 +187,35 @@ create table un80actions.work_package_focal_points (
 );
 create table un80actions.action_leads (
     action_id integer not null,
-    action_sub_id text,
+    action_sub_id text not null default '',
     lead_name text not null references un80actions.leads on delete restrict,
     unique (action_id, action_sub_id, lead_name),
     foreign key (action_id, action_sub_id) references un80actions.actions (id, sub_id) on delete cascade
 );
 create table un80actions.action_focal_points (
     action_id integer not null,
-    action_sub_id text,
+    action_sub_id text not null default '',
     user_email text not null references un80actions.approved_users on delete cascade,
     unique (action_id, action_sub_id, user_email),
     foreign key (action_id, action_sub_id) references un80actions.actions (id, sub_id) on delete cascade
 );
 create table un80actions.action_member_persons (
     action_id integer not null,
-    action_sub_id text,
+    action_sub_id text not null default '',
     user_email text not null references un80actions.approved_users on delete cascade,
     unique (action_id, action_sub_id, user_email),
     foreign key (action_id, action_sub_id) references un80actions.actions (id, sub_id) on delete cascade
 );
 create table un80actions.action_support_persons (
     action_id integer not null,
-    action_sub_id text,
+    action_sub_id text not null default '',
     user_email text not null references un80actions.approved_users on delete cascade,
     unique (action_id, action_sub_id, user_email),
     foreign key (action_id, action_sub_id) references un80actions.actions (id, sub_id) on delete cascade
 );
 create table un80actions.action_member_entities (
     action_id integer not null,
-    action_sub_id text,
+    action_sub_id text not null default '',
     entity text not null references systemchart.entities (entity) on delete restrict,
     unique (action_id, action_sub_id, entity),
     foreign key (action_id, action_sub_id) references un80actions.actions (id, sub_id) on delete cascade
@@ -219,7 +223,7 @@ create table un80actions.action_member_entities (
 create table un80actions.action_notes (
     id uuid default gen_random_uuid() not null primary key,
     action_id integer not null,
-    action_sub_id text,
+    action_sub_id text not null default '',
     user_id uuid references un80actions.users on delete cascade,
     header text,
     note_date date,
@@ -235,7 +239,7 @@ create table un80actions.action_notes (
 create table un80actions.action_questions (
     id uuid default gen_random_uuid() not null primary key,
     action_id integer not null,
-    action_sub_id text,
+    action_sub_id text not null default '',
     user_id uuid not null references un80actions.users on delete cascade,
     header text,
     subtext text,
@@ -278,7 +282,7 @@ create index idx_question_tags_tag_id on un80actions.question_tags (tag_id);
 create table un80actions.action_legal_comments (
     id uuid default gen_random_uuid() not null primary key,
     action_id integer not null,
-    action_sub_id text,
+    action_sub_id text not null default '',
     user_id uuid references un80actions.users on delete cascade,
     content text not null,
     reply_to uuid references un80actions.action_legal_comments on delete cascade,
@@ -303,7 +307,7 @@ create index idx_legal_comment_tags_tag_id on un80actions.legal_comment_tags (ta
 create table un80actions.action_updates (
     id uuid default gen_random_uuid() not null primary key,
     action_id integer not null,
-    action_sub_id text,
+    action_sub_id text not null default '',
     user_id uuid references un80actions.users on delete cascade,
     content text not null,
     created_at timestamp with time zone default now() not null,
@@ -350,7 +354,7 @@ create table un80actions.activity_entries (
     id uuid default gen_random_uuid() not null primary key,
     type text not null,
     action_id integer not null,
-    action_sub_id text,
+    action_sub_id text not null default '',
     milestone_id uuid references un80actions.action_milestones on delete
     set null,
         title text not null,
@@ -382,3 +386,17 @@ create table un80actions.attachment_comments (
 );
 create index idx_attachment_comments_attachment_id on un80actions.attachment_comments (attachment_id);
 create index idx_attachment_comments_created_at on un80actions.attachment_comments (created_at);
+
+
+
+
+-- =========================================================
+-- GRANTS
+-- =========================================================
+
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA un80actions TO un80actions_app_user;
+GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA un80actions TO un80actions_app_user;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA un80actions TO un80actions_readonly_user;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA un80actions TO un80actions_readonly_user;
