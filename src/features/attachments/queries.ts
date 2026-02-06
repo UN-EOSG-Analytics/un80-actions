@@ -116,6 +116,7 @@ export async function getAttachmentComments(
     user_email: string | null;
     body: string | null;
     comment: string | null;
+    is_legal?: boolean;
     created_at: Date;
   }>(
     `SELECT
@@ -125,11 +126,12 @@ export async function getAttachmentComments(
       u.email as user_email,
       c.body,
       c.comment,
+      COALESCE(c.is_legal, false) as is_legal,
       c.created_at
     FROM un80actions.attachment_comments c
     LEFT JOIN un80actions.users u ON c.user_id = u.id
     WHERE c.attachment_id = $1
-    ORDER BY c.created_at ASC`,
+    ORDER BY c.is_legal ASC, c.created_at ASC`,
     [attachmentId],
   );
 
@@ -139,6 +141,7 @@ export async function getAttachmentComments(
     user_id: r.user_id,
     user_email: r.user_email,
     comment: r.comment ?? r.body ?? "",
+    is_legal: Boolean(r.is_legal),
     created_at: new Date(r.created_at),
   }));
 }

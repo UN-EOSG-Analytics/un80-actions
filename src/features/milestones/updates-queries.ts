@@ -15,6 +15,7 @@ export interface MilestoneUpdate {
   content: string;
   reply_to: string | null;
   is_resolved: boolean;
+  is_legal: boolean;
   created_at: Date;
   updated_at: Date | null;
   content_review_status: "approved" | "needs_review";
@@ -33,7 +34,7 @@ export interface MilestoneUpdate {
 export async function getMilestoneUpdates(
   milestoneId: string,
 ): Promise<MilestoneUpdate[]> {
-  const rows = await query<MilestoneUpdate>(
+  const rows = await query<MilestoneUpdate & { is_legal?: boolean }>(
     `SELECT
       u.id,
       u.milestone_id,
@@ -42,6 +43,7 @@ export async function getMilestoneUpdates(
       u.content,
       u.reply_to,
       u.is_resolved,
+      COALESCE(u.is_legal, false) as is_legal,
       u.created_at,
       u.updated_at,
       COALESCE(u.content_review_status, 'approved')::text as content_review_status,
@@ -52,11 +54,14 @@ export async function getMilestoneUpdates(
     LEFT JOIN ${DB_SCHEMA}.users us ON u.user_id = us.id
     LEFT JOIN ${DB_SCHEMA}.users ru ON u.content_reviewed_by = ru.id
     WHERE u.milestone_id = $1
-    ORDER BY u.created_at ASC`,
+    ORDER BY u.is_legal ASC, u.created_at ASC`,
     [milestoneId],
   );
 
-  return rows;
+  return rows.map((r) => ({
+    ...r,
+    is_legal: Boolean(r.is_legal),
+  }));
 }
 
 /**
@@ -65,13 +70,16 @@ export async function getMilestoneUpdates(
 export async function getMilestoneUpdateById(
   updateId: string,
 ): Promise<MilestoneUpdate | null> {
-  const rows = await query<MilestoneUpdate>(
+  const rows = await query<MilestoneUpdate & { is_legal?: boolean }>(
     `SELECT
       u.id,
       u.milestone_id,
       u.user_id,
       us.email as user_email,
       u.content,
+      u.reply_to,
+      u.is_resolved,
+      COALESCE(u.is_legal, false) as is_legal,
       u.created_at,
       u.updated_at,
       COALESCE(u.content_review_status, 'approved')::text as content_review_status,
@@ -85,5 +93,7 @@ export async function getMilestoneUpdateById(
     [updateId],
   );
 
-  return rows[0] || null;
+  const r = rows[0];
+  if (!r) return null;
+  return { ...r, is_legal: Boolean(r.is_legal) };
 }

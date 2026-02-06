@@ -238,6 +238,7 @@ export interface AttachmentCommentResult {
   user_id: string | null;
   user_email: string | null;
   comment: string;
+  is_legal: boolean;
   created_at: Date | string;
 }
 
@@ -274,18 +275,21 @@ export async function createAttachmentComment(
       return { success: false, error: "Attachment not found" };
     }
 
+    const isLegal = user.user_role === "Legal";
+
     const rows = await query<{
       id: string;
       attachment_id: string;
       user_id: string | null;
       body: string;
       comment: string;
+      is_legal?: boolean;
       created_at: Date;
     }>(
-      `INSERT INTO un80actions.attachment_comments (attachment_id, user_id, body, comment)
-       VALUES ($1, $2, $3, $3)
-       RETURNING id, attachment_id, user_id, body, comment, created_at`,
-      [attachmentId, user.id, trimmed],
+      `INSERT INTO un80actions.attachment_comments (attachment_id, user_id, body, comment, is_legal)
+       VALUES ($1, $2, $3, $3, $4)
+       RETURNING id, attachment_id, user_id, body, comment, is_legal, created_at`,
+      [attachmentId, user.id, trimmed, isLegal],
     );
 
     const row = rows[0];
@@ -302,6 +306,7 @@ export async function createAttachmentComment(
         user_id: row.user_id,
         user_email: user.email,
         comment: text,
+        is_legal: Boolean(row.is_legal),
         created_at: createdAt.toISOString(),
       },
     };

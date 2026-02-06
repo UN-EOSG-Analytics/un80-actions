@@ -356,6 +356,13 @@ export function ActionsTable({ data }: ActionsTableProps) {
     filterDeliverablesMonth,
   ]);
 
+  // Calculate deliverables counter
+  const deliverablesCounter = useMemo(() => {
+    const total = filteredActions.length;
+    const submitted = filteredActions.filter((a) => a.deliverables_status === "submitted").length;
+    return { submitted, total };
+  }, [filteredActions]);
+
   const sortedActions = useMemo(() => {
     const dir = sortDirection === "asc" ? 1 : -1;
     return [...filteredActions].sort((a, b) => {
@@ -622,32 +629,37 @@ export function ActionsTable({ data }: ActionsTableProps) {
                   />
                 </div>
               </th>
-              <th className="px-4 py-3 whitespace-nowrap">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("deliverables")}
-                    className="inline-flex items-center hover:text-un-blue"
-                  >
-                    DELIVERABLES
-                    <SortIcon column="deliverables" sortField={sortField} sortDirection={sortDirection} />
-                  </button>
-                  <MultiSelectFilter
-                    filterKey="deliverablesMonth"
-                    options={uniqueDeliverablesMonths}
-                    selected={filterDeliverablesMonth}
-                    onToggle={(month) => {
-                      setFilterDeliverablesMonth((prev) =>
-                        prev.includes(month) ? prev.filter((v) => v !== month) : [...prev, month]
-                      );
-                    }}
-                    renderOption={(month) => {
-                      const date = new Date(2024, month - 1, 1);
-                      return date.toLocaleString('en-US', { month: 'short' });
-                    }}
-                    isOpen={openFilters.deliverablesMonth || false}
-                    onOpenChange={(open) => setOpenFilters((prev) => ({ ...prev, deliverablesMonth: open }))}
-                  />
+              <th className="px-4 py-3 whitespace-nowrap align-top">
+                <div className="flex flex-col gap-1">
+                  <div className="text-xs font-normal text-gray-500 tabular-nums">
+                    {deliverablesCounter.submitted}/{deliverablesCounter.total} submitted
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleSort("deliverables")}
+                      className="inline-flex items-center hover:text-un-blue"
+                    >
+                      DELIVERABLES
+                      <SortIcon column="deliverables" sortField={sortField} sortDirection={sortDirection} />
+                    </button>
+                    <MultiSelectFilter
+                      filterKey="deliverablesMonth"
+                      options={uniqueDeliverablesMonths}
+                      selected={filterDeliverablesMonth}
+                      onToggle={(month) => {
+                        setFilterDeliverablesMonth((prev) =>
+                          prev.includes(month) ? prev.filter((v) => v !== month) : [...prev, month]
+                        );
+                      }}
+                      renderOption={(month) => {
+                        const date = new Date(2024, month - 1, 1);
+                        return date.toLocaleString('en-US', { month: 'short' });
+                      }}
+                      isOpen={openFilters.deliverablesMonth || false}
+                      onOpenChange={(open) => setOpenFilters((prev) => ({ ...prev, deliverablesMonth: open }))}
+                    />
+                  </div>
                 </div>
               </th>
               <th className="px-4 py-3 whitespace-nowrap">

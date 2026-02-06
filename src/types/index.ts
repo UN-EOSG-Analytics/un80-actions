@@ -128,6 +128,7 @@ export interface AttachmentComment {
   user_id: string | null;
   user_email: string | null;
   comment: string;
+  is_legal: boolean;
   created_at: Date;
 }
 

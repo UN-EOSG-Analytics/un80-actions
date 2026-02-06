@@ -13,6 +13,8 @@ export interface MilestoneUpdateCreateInput {
   milestone_id: string;
   content: string;
   reply_to?: string | null;
+  /** When true, comment goes to Legal updates & comments; otherwise Team updates & comments */
+  is_legal?: boolean;
 }
 
 export interface MilestoneUpdateResult {
@@ -36,15 +38,18 @@ export async function createMilestoneUpdate(
     return { success: false, error: "Not authenticated" };
   }
 
+  const isLegal = input.is_legal ?? false;
+
   try {
-    const rows = await query<MilestoneUpdate>(
-      `INSERT INTO ${DB_SCHEMA}.milestone_updates (milestone_id, user_id, content, reply_to)
-       VALUES ($1, $2, $3, $4)
+    const rows = await query<MilestoneUpdate & { is_legal?: boolean }>(
+      `INSERT INTO ${DB_SCHEMA}.milestone_updates (milestone_id, user_id, content, reply_to, is_legal)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [input.milestone_id, user.id, input.content, input.reply_to || null],
+      [input.milestone_id, user.id, input.content, input.reply_to || null, isLegal],
     );
 
-    return { success: true, update: rows[0] };
+    const row = rows[0];
+    return { success: true, update: row ? { ...row, is_legal: Boolean(row.is_legal) } : undefined };
   } catch (err) {
     return {
       success: false,

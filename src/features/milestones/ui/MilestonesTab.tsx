@@ -66,6 +66,7 @@ import {
   User,
   Send,
   Clock,
+  Scale,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -118,6 +119,7 @@ export default function MilestonesTab({
   const [milestoneUpdates, setMilestoneUpdates] = useState<Record<string, MilestoneUpdate[]>>({});
   const [addingCommentId, setAddingCommentId] = useState<string | null>(null);
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
+  const [commentIsLegal, setCommentIsLegal] = useState(false);
   const [showVersionHistoryId, setShowVersionHistoryId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
   const [saving, setSaving] = useState(false);
@@ -276,6 +278,7 @@ export default function MilestonesTab({
   const cancelAddingComment = () => {
     setAddingCommentId(null);
     setReplyingToId(null);
+    setCommentIsLegal(false);
     setCommentText("");
     setError(null);
   };
@@ -294,6 +297,7 @@ export default function MilestonesTab({
     setEditForm({ description: "", deadline: "" });
     setAddingCommentId(null);
     setReplyingToId(null);
+    setCommentIsLegal(false);
     setCommentText("");
     setError(null);
   };
@@ -417,6 +421,10 @@ export default function MilestonesTab({
   const handleAddComment = async (milestoneId: string) => {
     if (!commentText.trim()) return;
     
+    const updates = milestoneUpdates[milestoneId] || [];
+    const parentUpdate = replyingToId ? updates.find((u) => u.id === replyingToId) : null;
+    const isLegal = parentUpdate ? parentUpdate.is_legal : commentIsLegal;
+
     setSaving(true);
     setError(null);
 
@@ -425,11 +433,13 @@ export default function MilestonesTab({
         milestone_id: milestoneId,
         content: commentText.trim(),
         reply_to: replyingToId,
+        is_legal: isLegal,
       });
 
       if (result.success) {
         setCommentText("");
         setReplyingToId(null);
+        if (!replyingToId) setCommentIsLegal(false);
         await loadMilestoneUpdates(milestoneId);
       } else {
         setError(result.error || "Failed to add comment");
@@ -842,43 +852,41 @@ export default function MilestonesTab({
                     )}
                   </div>
                 ) : (
-                  // Comments Thread Mode
-                  <div className="space-y-3">
-                    {/* Header */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        <MessageSquare className="h-3.5 w-3.5" />
-                        Updates & Comments
-                        {updates.length > 0 && (
-                          <span className="ml-1 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold">
-                            {updates.length}
-                          </span>
-                )}
-              </div>
-          </div>
-
-                    {/* Comments List */}
-                    {updates.length > 0 ? (
-                      <div className="space-y-2">
-                        {updates.filter(u => !u.reply_to).map((update) => {
-                          const replies = updates.filter(r => r.reply_to === update.id);
-                          const replyingTo = replyingToId === update.id;
-                          
-                          return (
-                            <div key={update.id} className="space-y-2">
-                              {/* Main Comment */}
-                              <div className={`group relative rounded-lg border transition-all ${
-                                update.is_resolved 
-                                  ? 'border-green-200 bg-green-50/30' 
-                                  : 'border-slate-200 bg-white hover:border-un-blue/30 hover:shadow-sm'
-                              }`}>
-                                <div className="p-3">
-                                  {/* Header */}
-                                  <div className="mb-2 flex items-start justify-between gap-2">
-                                    <div className="flex items-center gap-2">
-                                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-un-blue/10 text-[10px] font-semibold text-un-blue">
-                                        {(update.user_email?.[0] || 'U').toUpperCase()}
-                                      </div>
+                  // Comments Thread Mode – Team vs Legal
+                  <div className="space-y-4">
+                    {/* Section: Team updates & comments */}
+                    <div className="rounded-lg border border-slate-200 border-l-4 border-l-un-blue bg-slate-50/30">
+                      <div className="flex items-center gap-2 border-b border-slate-200 bg-white/80 px-3 py-2">
+                        <User className="h-4 w-4 text-un-blue" />
+                        <span className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+                          Team updates & comments
+                        </span>
+                        {(() => {
+                          const teamTop = updates.filter(u => !u.reply_to && !u.is_legal);
+                          return teamTop.length > 0 ? (
+                            <span className="rounded-full bg-un-blue/15 px-2 py-0.5 text-[10px] font-semibold text-un-blue">
+                              {teamTop.length}
+                            </span>
+                          ) : null;
+                        })()}
+                      </div>
+                      <div className="p-2">
+                        {updates.filter(u => !u.reply_to && !u.is_legal).length > 0 ? (
+                          <div className="space-y-2">
+                            {updates.filter(u => !u.reply_to && !u.is_legal).map((update) => {
+                              const replies = updates.filter(r => r.reply_to === update.id);
+                              const replyingTo = replyingToId === update.id;
+                              return (
+                                <div key={update.id} className="space-y-2">
+                                  <div className={`group relative rounded-lg border transition-all ${
+                                    update.is_resolved ? 'border-green-200 bg-green-50/30' : 'border-slate-200 bg-white hover:border-un-blue/30 hover:shadow-sm'
+                                  }`}>
+                                    <div className="p-3">
+                                      <div className="mb-2 flex items-start justify-between gap-2">
+                                        <div className="flex items-center gap-2">
+                                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-un-blue/10 text-[10px] font-semibold text-un-blue">
+                                            {(update.user_email?.[0] || 'U').toUpperCase()}
+                                          </div>
                                       <div className="flex flex-col">
                                         <span className="text-xs font-medium text-slate-700">
                                           {update.user_email?.split('@')[0] || "Unknown"}
@@ -1015,19 +1023,169 @@ export default function MilestonesTab({
                               </div>
                             </div>
                           );
-                        })}
+                            })}
+                          </div>
+                        ) : (
+                          <div className="py-4 text-center">
+                            <p className="text-xs text-slate-400">No team comments yet</p>
+                          </div>
+                        )}
                       </div>
-                    ) : (
-                      <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50/50 py-8 text-center">
-                        <MessageSquare className="mx-auto mb-2 h-8 w-8 text-slate-300" />
-                        <p className="text-sm text-slate-400">No comments yet</p>
+                    </div>
+
+                    {/* Section: Legal updates & comments */}
+                    <div className="rounded-lg border border-amber-200 border-l-4 border-l-amber-500 bg-amber-50/20">
+                      <div className="flex items-center gap-2 border-b border-amber-200 bg-white/80 px-3 py-2">
+                        <Scale className="h-4 w-4 text-amber-600" />
+                        <span className="text-xs font-semibold uppercase tracking-wide text-amber-800/90">
+                          Legal updates & comments
+                        </span>
+                        {(() => {
+                          const legalTop = updates.filter(u => !u.reply_to && u.is_legal);
+                          return legalTop.length > 0 ? (
+                            <span className="rounded-full bg-amber-200/80 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
+                              {legalTop.length}
+                            </span>
+                          ) : null;
+                        })()}
                       </div>
-                    )}
+                      <div className="p-2">
+                        {updates.filter(u => !u.reply_to && u.is_legal).length > 0 ? (
+                          <div className="space-y-2">
+                            {updates.filter(u => !u.reply_to && u.is_legal).map((update) => {
+                              const replies = updates.filter(r => r.reply_to === update.id);
+                              const replyingTo = replyingToId === update.id;
+                              return (
+                                <div key={update.id} className="space-y-2">
+                                  <div className={`group relative rounded-lg border transition-all ${
+                                    update.is_resolved ? 'border-green-200 bg-green-50/30' : 'border-amber-200 bg-white hover:border-amber-400/50 hover:shadow-sm'
+                                  }`}>
+                                    <div className="p-3">
+                                      <div className="mb-2 flex items-start justify-between gap-2">
+                                        <div className="flex items-center gap-2">
+                                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 text-[10px] font-semibold text-amber-700">
+                                            {(update.user_email?.[0] || 'U').toUpperCase()}
+                                          </div>
+                                          <div className="flex flex-col">
+                                            <span className="text-xs font-medium text-slate-700">
+                                              {update.user_email?.split('@')[0] || "Unknown"}
+                                            </span>
+                                            <span className="text-[10px] text-slate-400">
+                                              {new Date(update.created_at).toLocaleDateString()} at {new Date(update.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                          </div>
+                                          {update.is_resolved && (
+                                            <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700">
+                                              <CheckCircle2 className="h-3 w-3" />
+                                              Resolved
+                                            </span>
+                                          )}
+                                        </div>
+                                        <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                                          <button onClick={() => startReply(milestone.id, update.id)} className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-amber-600" title="Reply">
+                                            <CornerDownRight className="h-3 w-3" />
+                                          </button>
+                                          {isAdmin && (
+                                            <>
+                                              <button onClick={() => handleToggleResolved(milestone.id, update.id)} className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-green-600" title={update.is_resolved ? "Mark as unresolved" : "Mark as resolved"}>
+                                                <CheckCircle2 className="h-3 w-3" />
+                                              </button>
+                                              <button onClick={() => handleDeleteComment(milestone.id, update.id)} className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600" title="Delete">
+                                                <Trash2 className="h-3 w-3" />
+                                              </button>
+                                            </>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">{update.content}</p>
+                                    </div>
+                                    {replies.length > 0 && (
+                                      <div className="border-t border-amber-100 bg-amber-50/30 px-3 py-2">
+                                        <div className="space-y-2">
+                                          {replies.map((reply) => (
+                                            <div key={reply.id} className="group/reply relative flex gap-2 rounded-md bg-white p-2 hover:bg-amber-50/50">
+                                              <CornerDownRight className="mt-1 h-3 w-3 shrink-0 text-amber-300" />
+                                              <div className="min-w-0 flex-1">
+                                                <div className="mb-1 flex items-center justify-between gap-2">
+                                                  <div className="flex items-center gap-2">
+                                                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-[9px] font-semibold text-amber-700">
+                                                      {(reply.user_email?.[0] || 'U').toUpperCase()}
+                                                    </div>
+                                                    <span className="text-xs font-medium text-slate-600">{reply.user_email?.split('@')[0] || "Unknown"}</span>
+                                                    <span className="text-[10px] text-slate-400">{new Date(reply.created_at).toLocaleDateString()} at {new Date(reply.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                  </div>
+                                                  {isAdmin && (
+                                                    <button onClick={() => handleDeleteComment(milestone.id, reply.id)} className="shrink-0 rounded p-1 text-slate-400 opacity-0 transition-all hover:bg-slate-100 hover:text-red-600 group-hover/reply:opacity-100" title="Delete reply">
+                                                      <Trash2 className="h-3 w-3" />
+                                                    </button>
+                                                  )}
+                                                </div>
+                                                <p className="text-sm text-slate-700 whitespace-pre-wrap">{reply.content}</p>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {replyingTo && (
+                                      <div className="border-t border-amber-100 bg-amber-50/30 p-3">
+                                        <div className="flex gap-2">
+                                          <CornerDownRight className="mt-2 h-3 w-3 shrink-0 text-amber-400" />
+                                          <div className="flex-1 space-y-2">
+                                            <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500" rows={2} placeholder="Write a reply..." disabled={saving} autoFocus />
+                                            <div className="flex justify-end gap-2">
+                                              <Button variant="outline" size="sm" onClick={cancelAddingComment} disabled={saving}>Cancel</Button>
+                                              <Button size="sm" onClick={() => handleAddComment(milestone.id)} disabled={saving || !commentText.trim()} className="bg-amber-600 hover:bg-amber-700">{(saving ? <Loader2 className="h-3 w-3 animate-spin" /> : <CornerDownRight className="h-3 w-3" />)}</Button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div className="py-4 text-center">
+                            <p className="text-xs text-amber-700/70">No legal comments yet</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
                     {/* Add New Comment Form */}
                     {addingCommentId === milestone.id && !replyingToId && (
                       <div className="rounded-lg border border-un-blue/20 bg-un-blue/5 p-3">
                         <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-slate-600">Post to:</span>
+                            <div className="flex rounded-lg border border-slate-200 bg-white p-0.5">
+                              <button
+                                type="button"
+                                onClick={() => setCommentIsLegal(false)}
+                                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                                  !commentIsLegal
+                                    ? "bg-un-blue text-white"
+                                    : "text-slate-600 hover:bg-slate-100"
+                                }`}
+                              >
+                                Team updates & comments
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setCommentIsLegal(true)}
+                                className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                                  commentIsLegal
+                                    ? "bg-amber-600 text-white"
+                                    : "text-slate-600 hover:bg-slate-100"
+                                }`}
+                              >
+                                <Scale className="h-3 w-3" />
+                                Legal updates & comments
+                              </button>
+                            </div>
+                          </div>
                           <textarea
                             value={commentText}
                             onChange={(e) => setCommentText(e.target.value)}
@@ -1478,15 +1636,9 @@ export default function MilestonesTab({
                     </div>
                   )}
 
-                  {/* Comments for this document */}
+                  {/* Comments for this document – Team vs Legal */}
                   {showCommentsAttachmentId === att.id && (
-                    <div className="mt-4 border-t border-slate-200 pt-4">
-                      <div className="mb-3 flex items-center gap-2">
-                        <MessageSquare className="h-3.5 w-3.5 text-slate-400" />
-                        <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                          Comments
-                        </span>
-                      </div>
+                    <div className="mt-4 border-t border-slate-200 pt-4 space-y-4">
                       {loadingCommentsForAttachmentId === att.id ? (
                         <div className="flex items-center gap-2 py-2">
                           <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
@@ -1494,33 +1646,107 @@ export default function MilestonesTab({
                         </div>
                       ) : (
                         <>
-                          <div className="mb-3 space-y-2">
-                            {(attachmentComments[att.id] ?? []).length === 0 ? (
-                              <p className="text-sm text-slate-400 italic">No comments yet.</p>
-                            ) : (
-                              (attachmentComments[att.id] ?? []).map((c) => (
-                                <div
-                                  key={c.id}
-                                  className="rounded-md border border-slate-100 bg-slate-50/50 px-3 py-2 text-sm"
-                                >
-                                  <div className="mb-1 flex items-center gap-2 text-xs text-slate-500">
-                                    {c.user_email ? (
-                                      <span className="font-medium text-slate-600">{c.user_email}</span>
-                                    ) : (
-                                      <span className="italic">Unknown user</span>
-                                    )}
-                                    <span>
-                                      {new Date(c.created_at).toLocaleString(undefined, {
-                                        dateStyle: "short",
-                                        timeStyle: "short",
-                                      })}
+                          {(() => {
+                            const comments = attachmentComments[att.id] ?? [];
+                            const teamComments = comments.filter((c) => !c.is_legal);
+                            const legalComments = comments.filter((c) => c.is_legal);
+                            return (
+                              <>
+                                {/* Team comments */}
+                                <div className="rounded-lg border border-slate-200 border-l-4 border-l-un-blue bg-slate-50/30">
+                                  <div className="flex items-center gap-2 border-b border-slate-200 bg-white/80 px-3 py-2">
+                                    <User className="h-4 w-4 text-un-blue" />
+                                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                      Team comments
                                     </span>
+                                    {teamComments.length > 0 && (
+                                      <span className="rounded-full bg-un-blue/15 px-2 py-0.5 text-[10px] font-semibold text-un-blue">
+                                        {teamComments.length}
+                                      </span>
+                                    )}
                                   </div>
-                                  <p className="text-slate-700 whitespace-pre-wrap">{c.comment}</p>
+                                  <div className="p-2">
+                                    {teamComments.length === 0 ? (
+                                      <p className="py-3 text-center text-xs text-slate-400">No team comments yet.</p>
+                                    ) : (
+                                      <div className="space-y-2">
+                                        {teamComments.map((c) => (
+                                          <div
+                                            key={c.id}
+                                            className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+                                          >
+                                            <div className="mb-1 flex items-center gap-2 text-xs text-slate-500">
+                                              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-un-blue/10 text-[9px] font-semibold text-un-blue">
+                                                {(c.user_email?.[0] ?? "U").toUpperCase()}
+                                              </div>
+                                              {c.user_email ? (
+                                                <span className="font-medium text-slate-600">{c.user_email}</span>
+                                              ) : (
+                                                <span className="italic">Unknown user</span>
+                                              )}
+                                              <span>
+                                                {new Date(c.created_at).toLocaleString(undefined, {
+                                                  dateStyle: "short",
+                                                  timeStyle: "short",
+                                                })}
+                                              </span>
+                                            </div>
+                                            <p className="text-slate-700 whitespace-pre-wrap">{c.comment}</p>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
-                              ))
-                            )}
-                          </div>
+                                {/* Legal comments */}
+                                <div className="rounded-lg border border-amber-200 border-l-4 border-l-amber-500 bg-amber-50/20">
+                                  <div className="flex items-center gap-2 border-b border-amber-200 bg-white/80 px-3 py-2">
+                                    <Scale className="h-4 w-4 text-amber-600" />
+                                    <span className="text-xs font-semibold uppercase tracking-wide text-amber-800/90">
+                                      Legal comments
+                                    </span>
+                                    {legalComments.length > 0 && (
+                                      <span className="rounded-full bg-amber-200/80 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
+                                        {legalComments.length}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="p-2">
+                                    {legalComments.length === 0 ? (
+                                      <p className="py-3 text-center text-xs text-amber-700/70">No legal comments yet.</p>
+                                    ) : (
+                                      <div className="space-y-2">
+                                        {legalComments.map((c) => (
+                                          <div
+                                            key={c.id}
+                                            className="rounded-md border border-amber-200 bg-white px-3 py-2 text-sm"
+                                          >
+                                            <div className="mb-1 flex items-center gap-2 text-xs text-slate-500">
+                                              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-[9px] font-semibold text-amber-700">
+                                                {(c.user_email?.[0] ?? "U").toUpperCase()}
+                                              </div>
+                                              {c.user_email ? (
+                                                <span className="font-medium text-slate-600">{c.user_email}</span>
+                                              ) : (
+                                                <span className="italic">Unknown user</span>
+                                              )}
+                                              <span>
+                                                {new Date(c.created_at).toLocaleString(undefined, {
+                                                  dateStyle: "short",
+                                                  timeStyle: "short",
+                                                })}
+                                              </span>
+                                            </div>
+                                            <p className="text-slate-700 whitespace-pre-wrap">{c.comment}</p>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </>
+                            );
+                          })()}
                           <div className="flex flex-col gap-2">
                             <div className="flex gap-2">
                               <textarea
