@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Run SQL migrations 003 through 015
+ * Run SQL migrations 003 through 016
  * This script uses the same database connection as the Next.js app
  */
 
@@ -105,6 +105,9 @@ async function runAllMigrations() {
     
     // Run migration 015
     await runMigration(15, 'add_attention_to_timeline_and_confirmation_needed_to_milestones');
+    
+    // Run migration 016
+    await runMigration(16, 'add_milestone_document_submitted');
     
     console.log('\n✅ All migrations completed successfully!');
   } catch (error) {

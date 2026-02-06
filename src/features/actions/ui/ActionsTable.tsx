@@ -30,7 +30,7 @@ import type { ActionsTableData } from "@/types";
 import type { RiskAssessment } from "@/types";
 import { updateRiskAssessment, updatePublicActionStatus } from "@/features/actions/commands";
 
-type SortField = "work_package_id" | "action_id" | "work_package_title" | "indicative_action" | "public_action_status" | "risk_assessment";
+type SortField = "work_package_id" | "action_id" | "work_package_title" | "indicative_action" | "public_action_status" | "risk_assessment" | "deliverables";
 type SortDirection = "asc" | "desc";
 
 const RISK_OPTIONS: {
@@ -203,6 +203,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
   const [filterBigTicket, setFilterBigTicket] = useState<boolean[]>([]);
   const [filterWorkPackageId, setFilterWorkPackageId] = useState<string>("");
   const [filterRisk, setFilterRisk] = useState<string>("");
+  const [filterDeliverablesMonth, setFilterDeliverablesMonth] = useState<number[]>([]);
   
   // Track which filter popovers are open
   const [openFilters, setOpenFilters] = useState<Record<string, boolean>>({});
@@ -278,6 +279,19 @@ export function ActionsTable({ data }: ActionsTableProps) {
     return Array.from(statuses).sort();
   }, [allActions]);
 
+  const uniqueDeliverablesMonths = useMemo(() => {
+    const months = new Set<number>();
+    allActions.forEach((a) => {
+      // Include all upcoming milestone months
+      a.upcoming_milestone_months.forEach((month) => {
+        months.add(month);
+      });
+      // Also include January 2026 (month 1) if not already present
+      months.add(1);
+    });
+    return Array.from(months).sort((a, b) => a - b);
+  }, [allActions]);
+
   const filteredActions = useMemo(() => {
     let list = allActions;
     if (hasSearch) {
@@ -321,6 +335,11 @@ export function ActionsTable({ data }: ActionsTableProps) {
     if (filterRisk) {
       list = list.filter((a) => a.risk_assessment === filterRisk);
     }
+    if (filterDeliverablesMonth.length > 0) {
+      list = list.filter((a) => 
+        a.upcoming_milestone_months.some((month) => filterDeliverablesMonth.includes(month))
+      );
+    }
     return list;
   }, [
     allActions,
@@ -334,6 +353,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
     filterBigTicket,
     filterWorkPackageId,
     filterRisk,
+    filterDeliverablesMonth,
   ]);
 
   const sortedActions = useMemo(() => {
@@ -357,6 +377,11 @@ export function ActionsTable({ data }: ActionsTableProps) {
         const av = a.risk_assessment ?? "";
         const bv = b.risk_assessment ?? "";
         cmp = (order[av] ?? -1) - (order[bv] ?? -1);
+      } else if (sortField === "deliverables") {
+        const order: Record<string, number> = { submitted: 0, not_submitted: 1 };
+        const av = a.deliverables_status ?? "";
+        const bv = b.deliverables_status ?? "";
+        cmp = (order[av] ?? 2) - (order[bv] ?? 2);
       }
       return cmp * dir;
     });
@@ -428,6 +453,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
     setFilterBigTicket([]);
     setFilterWorkPackageId("");
     setFilterRisk("");
+    setFilterDeliverablesMonth([]);
   };
 
   return (
@@ -597,6 +623,34 @@ export function ActionsTable({ data }: ActionsTableProps) {
                 </div>
               </th>
               <th className="px-4 py-3 whitespace-nowrap">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleSort("deliverables")}
+                    className="inline-flex items-center hover:text-un-blue"
+                  >
+                    DELIVERABLES
+                    <SortIcon column="deliverables" sortField={sortField} sortDirection={sortDirection} />
+                  </button>
+                  <MultiSelectFilter
+                    filterKey="deliverablesMonth"
+                    options={uniqueDeliverablesMonths}
+                    selected={filterDeliverablesMonth}
+                    onToggle={(month) => {
+                      setFilterDeliverablesMonth((prev) =>
+                        prev.includes(month) ? prev.filter((v) => v !== month) : [...prev, month]
+                      );
+                    }}
+                    renderOption={(month) => {
+                      const date = new Date(2024, month - 1, 1);
+                      return date.toLocaleString('en-US', { month: 'short' });
+                    }}
+                    isOpen={openFilters.deliverablesMonth || false}
+                    onOpenChange={(open) => setOpenFilters((prev) => ({ ...prev, deliverablesMonth: open }))}
+                  />
+                </div>
+              </th>
+              <th className="px-4 py-3 whitespace-nowrap">
                 <button
                   type="button"
                   onClick={() => handleSort("risk_assessment")}
@@ -631,7 +685,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
             {sortedActions.length === 0 ? (
               <tr>
                 <td
-                  colSpan={8}
+                  colSpan={9}
                   className="px-4 py-12 text-center text-gray-400"
                 >
                   No actions found
@@ -700,6 +754,26 @@ export function ActionsTable({ data }: ActionsTableProps) {
                         </div>
                       </PopoverContent>
                     </Popover>
+                  </td>
+                  <td className="px-4 py-3">
+                    {a.deliverables_status ? (
+                      <Badge
+                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                          a.deliverables_status === "submitted"
+                            ? "border-green-300 bg-green-50 text-green-800"
+                            : "border-amber-300 bg-amber-50 text-amber-800"
+                        }`}
+                      >
+                        {a.deliverables_status === "submitted" ? (
+                          <Send className="h-3 w-3" />
+                        ) : (
+                          <Clock className="h-3 w-3" />
+                        )}
+                        {a.deliverables_status === "submitted" ? "Submitted" : "Not submitted"}
+                      </Badge>
+                    ) : (
+                      <span className="text-gray-400 text-xs">—</span>
+                    )}
                   </td>
                   <td
                     className="px-4 py-3 text-gray-400"

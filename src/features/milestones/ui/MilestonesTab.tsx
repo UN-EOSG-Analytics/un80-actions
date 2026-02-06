@@ -26,7 +26,7 @@ import {
   getMilestoneVersions,
   type MilestoneVersion,
 } from "@/features/milestones/queries";
-import { updateMilestone, createMilestone, approveMilestoneContent, requestMilestoneChanges, setMilestoneToDraft, setMilestoneNeedsOlaReview, setMilestoneReviewedByOla, setMilestoneFinalized, setMilestoneAttentionToTimeline, setMilestoneConfirmationNeeded } from "@/features/milestones/commands";
+import { updateMilestone, createMilestone, approveMilestoneContent, requestMilestoneChanges, setMilestoneToDraft, setMilestoneNeedsOlaReview, setMilestoneReviewedByOla, setMilestoneFinalized, setMilestoneAttentionToTimeline, setMilestoneConfirmationNeeded, updateMilestoneDocumentSubmitted } from "@/features/milestones/commands";
 import { MilestoneCard } from "./MilestoneCard";
 import {
   getMilestoneUpdates,
@@ -681,13 +681,18 @@ export default function MilestonesTab({
             isAdmin={isAdmin}
             onDocumentSubmittedChange={
               !milestone.is_public && (milestone.milestone_type === "first" || milestone.milestone_type === "final")
-                ? (milestoneId, submitted) =>
-                    setMilestoneDocumentSubmitted((prev) => ({ ...prev, [milestoneId]: submitted }))
+                ? async (milestoneId, submitted) => {
+                    setMilestoneDocumentSubmitted((prev) => ({ ...prev, [milestoneId]: submitted }));
+                    // Persist to database
+                    await updateMilestoneDocumentSubmitted(milestoneId, submitted);
+                    // Reload milestones to refresh the table
+                    await loadMilestones();
+                  }
                 : undefined
             }
             documentSubmitted={
               !milestone.is_public && (milestone.milestone_type === "first" || milestone.milestone_type === "final")
-                ? milestoneDocumentSubmitted[milestone.id] ?? false
+                ? milestoneDocumentSubmitted[milestone.id] ?? milestone.milestone_document_submitted ?? false
                 : undefined
             }
           />

@@ -710,6 +710,36 @@ export async function setMilestoneConfirmationNeeded(
 }
 
 /**
+ * Update milestone document submitted status.
+ */
+export async function updateMilestoneDocumentSubmitted(
+  milestoneId: string,
+  submitted: boolean,
+): Promise<MilestoneResult> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    await query(
+      `UPDATE ${DB_SCHEMA}.action_milestones
+       SET milestone_document_submitted = $1
+       WHERE id = $2`,
+      [submitted, milestoneId],
+    );
+
+    const updated = await getMilestoneById(milestoneId);
+    return { success: true, milestone: updated || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to update milestone document status",
+    };
+  }
+}
+
+/**
  * Submit a milestone for review.
  * Changes status from 'draft' to 'submitted' and records submission metadata.
  */

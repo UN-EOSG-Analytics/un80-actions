@@ -147,6 +147,7 @@ export interface ActionMilestone {
   finalized: boolean;
   attention_to_timeline: boolean;
   confirmation_needed: boolean;
+  milestone_document_submitted: boolean;
   description: string | null;
   deadline: string | null; // ISO date string
   updates: string | null;
@@ -379,6 +380,9 @@ export interface ActionWithMilestones {
   is_big_ticket: boolean;
   risk_assessment: RiskAssessment | null;
   document_submitted: boolean;
+  deliverables_status: "submitted" | "not_submitted" | null; // From next upcoming internal milestone
+  deliverables_deadline_month: number | null; // Month (1-12) of next upcoming milestone deadline for display
+  upcoming_milestone_months: number[]; // All months (1-12) of upcoming milestones for filtering
   milestones: MilestoneRow[];
 }
 

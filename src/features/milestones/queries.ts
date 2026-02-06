@@ -54,6 +54,9 @@ export async function getActionMilestones(
         m.needs_ola_review,
         m.reviewed_by_ola,
         m.finalized,
+        m.attention_to_timeline,
+        m.confirmation_needed,
+        m.milestone_document_submitted,
         m.description,
         m.deadline::text,
         m.updates,
@@ -85,7 +88,7 @@ export async function getActionMilestones(
     );
   } catch (e) {
     const msg = String((e as Error).message ?? "");
-    if (msg.includes("content_review") || msg.includes("does not exist")) {
+    if (msg.includes("content_review") || msg.includes("does not exist") || msg.includes("milestone_document_submitted") || msg.includes("attention_to_timeline") || msg.includes("confirmation_needed")) {
       rows = await query(
         `SELECT
           m.id,
@@ -128,6 +131,7 @@ export async function getActionMilestones(
         finalized: (r as ActionMilestone).finalized ?? false,
         attention_to_timeline: (r as ActionMilestone).attention_to_timeline ?? false,
         confirmation_needed: (r as ActionMilestone).confirmation_needed ?? false,
+        milestone_document_submitted: (r as ActionMilestone).milestone_document_submitted ?? false,
         content_review_status: "approved" as const,
         content_reviewed_by: null,
         content_reviewed_by_email: null,
@@ -162,6 +166,9 @@ export async function getMilestoneById(
         m.needs_ola_review,
         m.reviewed_by_ola,
         m.finalized,
+        m.attention_to_timeline,
+        m.confirmation_needed,
+        m.milestone_document_submitted,
         m.description,
         m.deadline::text,
         m.updates,
@@ -184,7 +191,7 @@ export async function getMilestoneById(
     );
   } catch (e) {
     const msg = String((e as Error).message ?? "");
-    if (msg.includes("content_review") || msg.includes("does not exist")) {
+    if (msg.includes("content_review") || msg.includes("does not exist") || msg.includes("milestone_document_submitted") || msg.includes("attention_to_timeline") || msg.includes("confirmation_needed")) {
       rows = await query(
         `SELECT
           m.id,

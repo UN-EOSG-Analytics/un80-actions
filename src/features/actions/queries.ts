@@ -678,7 +678,32 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       m.description AS milestone_description,
       m.deadline::text AS milestone_deadline,
       m.updates AS milestone_updates,
-      m.status AS milestone_status
+      m.status AS milestone_status,
+      (SELECT COALESCE(next_m.milestone_document_submitted, false)
+       FROM un80actions.action_milestones next_m
+       WHERE next_m.action_id = a.id
+         AND (next_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND next_m.is_public = false
+         AND next_m.deadline IS NOT NULL
+         AND next_m.deadline >= CURRENT_DATE
+       ORDER BY next_m.deadline ASC
+       LIMIT 1) AS next_upcoming_milestone_document_submitted,
+      (SELECT EXTRACT(MONTH FROM next_m.deadline)::integer
+       FROM un80actions.action_milestones next_m
+       WHERE next_m.action_id = a.id
+         AND (next_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND next_m.is_public = false
+         AND next_m.deadline IS NOT NULL
+         AND next_m.deadline >= CURRENT_DATE
+       ORDER BY next_m.deadline ASC
+       LIMIT 1) AS next_upcoming_milestone_deadline_month,
+      (SELECT ARRAY_AGG(DISTINCT EXTRACT(MONTH FROM all_m.deadline)::integer ORDER BY EXTRACT(MONTH FROM all_m.deadline)::integer)
+       FROM un80actions.action_milestones all_m
+       WHERE all_m.action_id = a.id
+         AND (all_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND all_m.is_public = false
+         AND all_m.deadline IS NOT NULL
+         AND (all_m.deadline >= CURRENT_DATE OR (EXTRACT(YEAR FROM all_m.deadline) = 2026 AND EXTRACT(MONTH FROM all_m.deadline) = 1))) AS all_upcoming_milestone_months
     FROM work_packages wp
     JOIN actions a ON a.work_package_id = wp.id
     LEFT JOIN action_milestones m ON m.action_id = a.id
@@ -700,7 +725,32 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       m.description AS milestone_description,
       m.deadline::text AS milestone_deadline,
       m.updates AS milestone_updates,
-      m.status AS milestone_status
+      m.status AS milestone_status,
+      (SELECT COALESCE(next_m.milestone_document_submitted, false)
+       FROM un80actions.action_milestones next_m
+       WHERE next_m.action_id = a.id
+         AND (next_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND next_m.is_public = false
+         AND next_m.deadline IS NOT NULL
+         AND next_m.deadline >= CURRENT_DATE
+       ORDER BY next_m.deadline ASC
+       LIMIT 1) AS next_upcoming_milestone_document_submitted,
+      (SELECT EXTRACT(MONTH FROM next_m.deadline)::integer
+       FROM un80actions.action_milestones next_m
+       WHERE next_m.action_id = a.id
+         AND (next_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND next_m.is_public = false
+         AND next_m.deadline IS NOT NULL
+         AND next_m.deadline >= CURRENT_DATE
+       ORDER BY next_m.deadline ASC
+       LIMIT 1) AS next_upcoming_milestone_deadline_month,
+      (SELECT ARRAY_AGG(DISTINCT EXTRACT(MONTH FROM all_m.deadline)::integer ORDER BY EXTRACT(MONTH FROM all_m.deadline)::integer)
+       FROM un80actions.action_milestones all_m
+       WHERE all_m.action_id = a.id
+         AND (all_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND all_m.is_public = false
+         AND all_m.deadline IS NOT NULL
+         AND (all_m.deadline >= CURRENT_DATE OR (EXTRACT(YEAR FROM all_m.deadline) = 2026 AND EXTRACT(MONTH FROM all_m.deadline) = 1))) AS all_upcoming_milestone_months
     FROM work_packages wp
     JOIN actions a ON a.work_package_id = wp.id
     LEFT JOIN action_milestones m ON m.action_id = a.id
@@ -849,6 +899,9 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
           is_big_ticket: r.is_big_ticket,
           risk_assessment: (r.risk_assessment ?? null) as ActionWithMilestones["risk_assessment"],
           document_submitted: r.document_submitted ?? false,
+          deliverables_status: r.next_upcoming_milestone_document_submitted === true ? "submitted" : r.next_upcoming_milestone_document_submitted === false ? "not_submitted" : null,
+          deliverables_deadline_month: r.next_upcoming_milestone_deadline_month ?? null,
+          upcoming_milestone_months: Array.isArray(r.all_upcoming_milestone_months) ? r.all_upcoming_milestone_months : [],
           milestones: [],
         };
         actionsMap.set(key, action);
