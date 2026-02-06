@@ -1,4 +1,3 @@
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
 DROP SCHEMA IF EXISTS un80actions CASCADE;
 CREATE SCHEMA un80actions AUTHORIZATION un80actions_schema_owner;
 REVOKE ALL ON SCHEMA un80actions
@@ -394,6 +393,8 @@ create index idx_attachment_comments_created_at on un80actions.attachment_commen
 -- GRANTS
 -- =========================================================
 
+GRANT USAGE ON SCHEMA systemchart TO un80actions_app_user;
+GRANT SELECT ON TABLE systemchart.entities TO un80actions_app_user;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA un80actions TO un80actions_app_user;
 GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA un80actions TO un80actions_app_user;

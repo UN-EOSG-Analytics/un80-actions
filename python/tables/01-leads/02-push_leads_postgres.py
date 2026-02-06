@@ -28,7 +28,7 @@ with get_conn() as conn:
         for record in records:
             cur.execute(
                 """
-                INSERT INTO leads (name, entity)
+                INSERT INTO un80actions.leads (name, entity)
                 VALUES (%s, %s)
                 ON CONFLICT (name) 
                 DO UPDATE SET entity = EXCLUDED.entity

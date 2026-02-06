@@ -507,9 +507,9 @@ try:
                         (action_id, action_sub_id),
                     )
                 INSERT_ACTION_ENTITIES_SQL = """
-                INSERT INTO un80actions.action_member_entities (action_id, action_sub_id, entity_id)
+                INSERT INTO un80actions.action_member_entities (action_id, action_sub_id, entity)
                 VALUES (%s, %s, %s)
-                ON CONFLICT (action_id, action_sub_id, entity_id) DO NOTHING
+                ON CONFLICT (action_id, action_sub_id, entity) DO NOTHING
                 """
                 cur.executemany(
                     INSERT_ACTION_ENTITIES_SQL, action_member_entities_links

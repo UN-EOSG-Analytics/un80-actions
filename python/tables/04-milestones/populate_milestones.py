@@ -34,7 +34,7 @@ milestones_raw = []
 
 for _, row in df_actions.iterrows():
     action_id = int(row["id"])
-    action_sub_id = str(row["sub_id"]) if pd.notna(row["sub_id"]) and row["sub_id"] else None
+    action_sub_id = str(row["sub_id"]) if pd.notna(row["sub_id"]) and row["sub_id"] else ""
     action_key = (action_id, action_sub_id)
     
     # Milestone 1 (type='first')
@@ -123,7 +123,7 @@ if not milestones_df.empty:
     milestones = [
         (
             int(row['action_id']),
-            row['action_sub_id'] if pd.notna(row['action_sub_id']) else None,
+            row['action_sub_id'] if pd.notna(row['action_sub_id']) and row['action_sub_id'] else '',
             int(row['serial_number']),
             row['milestone_type'],
             bool(row['is_public']),
