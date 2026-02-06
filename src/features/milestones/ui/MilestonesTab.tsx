@@ -41,7 +41,6 @@ import {
   getActionAttachments,
   getActionAttachmentCount,
   getAttachmentComments,
-  type AttachmentComment,
 } from "@/features/attachments/queries";
 import {
   deleteActionAttachment,

@@ -80,7 +80,7 @@ export function NoteEditor({
     const next = value.trim() ? toTipTapHtml(value) : DEFAULT_HTML;
     const current = editor.getHTML();
     if (current !== next) {
-      editor.commands.setContent(next, false);
+      editor.commands.setContent(next, { emitUpdate: false });
     }
   }, [editor, value]);
 
