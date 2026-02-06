@@ -2,6 +2,7 @@
 
 import { query } from "@/lib/db/db";
 import { getCurrentUser } from "@/features/auth/service";
+import { requireAdmin } from "@/features/auth/lib/permissions";
 import { DB_SCHEMA } from "@/lib/db/config";
 import type { MilestoneUpdate } from "./updates-queries";
 
@@ -33,9 +34,9 @@ export interface MilestoneUpdateResult {
 export async function createMilestoneUpdate(
   input: MilestoneUpdateCreateInput,
 ): Promise<MilestoneUpdateResult> {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
   }
 
   const isLegal = input.is_legal ?? false;
@@ -45,7 +46,7 @@ export async function createMilestoneUpdate(
       `INSERT INTO ${DB_SCHEMA}.milestone_updates (milestone_id, user_id, content, reply_to, is_legal)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [input.milestone_id, user.id, input.content, input.reply_to || null, isLegal],
+      [input.milestone_id, auth.user.id, input.content, input.reply_to || null, isLegal],
     );
 
     const row = rows[0];
@@ -64,13 +65,9 @@ export async function createMilestoneUpdate(
 export async function toggleMilestoneUpdateResolved(
   updateId: string,
 ): Promise<MilestoneUpdateResult> {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
-  }
-
-  if (user.user_role !== "Admin") {
-    return { success: false, error: "Only admins can resolve comments" };
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
   }
 
   try {
@@ -96,13 +93,12 @@ export async function toggleMilestoneUpdateResolved(
 export async function deleteMilestoneUpdate(
   updateId: string,
 ): Promise<MilestoneUpdateResult> {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
   }
 
   try {
-    // Check if user owns the update or is admin
     const checkRows = await query<{ user_id: string }>(
       `SELECT user_id FROM ${DB_SCHEMA}.milestone_updates WHERE id = $1`,
       [updateId],
@@ -110,13 +106,6 @@ export async function deleteMilestoneUpdate(
 
     if (!checkRows[0]) {
       return { success: false, error: "Update not found" };
-    }
-
-    const isAdmin = user.user_role === "Admin";
-    const isOwner = checkRows[0].user_id === user.id;
-
-    if (!isAdmin && !isOwner) {
-      return { success: false, error: "Not authorized to delete this update" };
     }
 
     await query(

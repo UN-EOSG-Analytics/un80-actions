@@ -5,6 +5,7 @@ import { DB_SCHEMA } from "@/lib/db/config";
 import type { ActionMilestone } from "@/types";
 import { getMilestoneById } from "./queries";
 import { getCurrentUser } from "@/features/auth/service";
+import { requireAdmin } from "@/features/auth/lib/permissions";
 import { insertActivityEntry } from "@/features/activity/commands";
 
 function getMilestoneStatusLabel(m: ActionMilestone): string {
@@ -55,6 +56,10 @@ export interface MilestoneResult {
 export async function createMilestone(
   input: MilestoneCreateInput,
 ): Promise<MilestoneResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -120,6 +125,10 @@ export async function updateMilestone(
   milestoneId: string,
   input: MilestoneUpdateInput,
 ): Promise<MilestoneResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -716,12 +725,11 @@ export async function updateMilestoneDocumentSubmitted(
   milestoneId: string,
   submitted: boolean,
 ): Promise<MilestoneResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Not authenticated" };
-    }
-
     await query(
       `UPDATE ${DB_SCHEMA}.action_milestones
        SET milestone_document_submitted = $1

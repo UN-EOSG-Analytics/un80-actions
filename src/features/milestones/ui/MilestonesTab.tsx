@@ -212,6 +212,16 @@ export default function MilestonesTab({
     loadMilestones();
   }, [loadMilestones]);
 
+  // Preload milestone updates for admins only (non-admins cannot see comments)
+  const milestoneIds = milestones.map((m) => m.id).join(",");
+  useEffect(() => {
+    if (!isAdmin || milestones.length === 0) return;
+    milestones.forEach((m) => {
+      loadMilestoneUpdates(m.id);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadMilestoneUpdates is stable; we want to run when milestone ids change
+  }, [milestoneIds, isAdmin]);
+
   // Separate public and private milestones
   const publicMilestones = milestones.filter((m) => m.is_public);
   const privateMilestones = milestones.filter((m) => !m.is_public);
@@ -690,7 +700,7 @@ export default function MilestonesTab({
             onStatusChange={isAdmin ? (status) => handleStatusChange(milestone.id, status) : undefined}
             isAdmin={isAdmin}
             onDocumentSubmittedChange={
-              !milestone.is_public && (milestone.milestone_type === "first" || milestone.milestone_type === "final")
+              isAdmin && !milestone.is_public && (milestone.milestone_type === "first" || milestone.milestone_type === "final")
                 ? async (milestoneId, submitted) => {
                     setMilestoneDocumentSubmitted((prev) => ({ ...prev, [milestoneId]: submitted }));
                     // Persist to database
@@ -903,7 +913,8 @@ export default function MilestonesTab({
                                       )}
                                     </div>
                                     
-                                    {/* Actions */}
+                                    {/* Actions - admin only */}
+                                    {isAdmin && (
                                     <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                                       <button
                                         onClick={() => startReply(milestone.id, update.id)}
@@ -912,25 +923,22 @@ export default function MilestonesTab({
                                       >
                                         <CornerDownRight className="h-3 w-3" />
                                       </button>
-                                      {isAdmin && (
-                                        <>
-                                          <button
-                                            onClick={() => handleToggleResolved(milestone.id, update.id)}
-                                            className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-green-600"
-                                            title={update.is_resolved ? "Mark as unresolved" : "Mark as resolved"}
-                                          >
-                                            <CheckCircle2 className="h-3 w-3" />
-                                          </button>
-                                          <button
-                                            onClick={() => handleDeleteComment(milestone.id, update.id)}
-                                            className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600"
-                                            title="Delete"
-                                          >
-                                            <Trash2 className="h-3 w-3" />
-                                          </button>
-                                        </>
-                                      )}
+                                      <button
+                                        onClick={() => handleToggleResolved(milestone.id, update.id)}
+                                        className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-green-600"
+                                        title={update.is_resolved ? "Mark as unresolved" : "Mark as resolved"}
+                                      >
+                                        <CheckCircle2 className="h-3 w-3" />
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteComment(milestone.id, update.id)}
+                                        className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600"
+                                        title="Delete"
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </button>
                                     </div>
+                                    )}
                                   </div>
                                   
                                   {/* Content */}
@@ -1081,21 +1089,19 @@ export default function MilestonesTab({
                                             </span>
                                           )}
                                         </div>
+                                        {isAdmin && (
                                         <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                                           <button onClick={() => startReply(milestone.id, update.id)} className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-amber-600" title="Reply">
                                             <CornerDownRight className="h-3 w-3" />
                                           </button>
-                                          {isAdmin && (
-                                            <>
-                                              <button onClick={() => handleToggleResolved(milestone.id, update.id)} className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-green-600" title={update.is_resolved ? "Mark as unresolved" : "Mark as resolved"}>
-                                                <CheckCircle2 className="h-3 w-3" />
-                                              </button>
-                                              <button onClick={() => handleDeleteComment(milestone.id, update.id)} className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600" title="Delete">
-                                                <Trash2 className="h-3 w-3" />
-                                              </button>
-                                            </>
-                                          )}
+                                          <button onClick={() => handleToggleResolved(milestone.id, update.id)} className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-green-600" title={update.is_resolved ? "Mark as unresolved" : "Mark as resolved"}>
+                                            <CheckCircle2 className="h-3 w-3" />
+                                          </button>
+                                          <button onClick={() => handleDeleteComment(milestone.id, update.id)} className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600" title="Delete">
+                                            <Trash2 className="h-3 w-3" />
+                                          </button>
                                         </div>
+                                        )}
                                       </div>
                                       <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">{update.content}</p>
                                     </div>
@@ -1154,8 +1160,8 @@ export default function MilestonesTab({
                       </div>
                     </div>
 
-                    {/* Add New Comment Form */}
-                    {addingCommentId === milestone.id && !replyingToId && (
+                    {/* Add New Comment Form - admin only */}
+                    {isAdmin && addingCommentId === milestone.id && !replyingToId && (
                       <div className="rounded-lg border border-un-blue/20 bg-un-blue/5 p-3">
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
@@ -1242,7 +1248,7 @@ export default function MilestonesTab({
         {sortedPublicMilestones.map((milestone) => renderMilestone(milestone))}
         
         {/* Add Public Milestone Button / Form */}
-        {!creatingNew && getAvailableMilestoneTypes().length > 0 && (
+        {isAdmin && !creatingNew && getAvailableMilestoneTypes().length > 0 && (
           <button
             onClick={() => {
               const availableTypes = getAvailableMilestoneTypes();
@@ -1262,7 +1268,7 @@ export default function MilestonesTab({
         )}
         
         {/* Create Public Milestone Form */}
-        {creatingNew && newMilestoneForm.is_public && (
+        {isAdmin && creatingNew && newMilestoneForm.is_public && (
           <div className="rounded-lg border border-un-blue/20 bg-white p-4">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-slate-700">Create New Public Milestone</h3>
@@ -1358,7 +1364,7 @@ export default function MilestonesTab({
         {sortedPrivateMilestones.map((milestone) => renderMilestone(milestone))}
         
         {/* Add Internal Milestone Button / Form */}
-        {!creatingNew && getAvailableMilestoneTypes().length > 0 && (
+        {isAdmin && !creatingNew && getAvailableMilestoneTypes().length > 0 && (
           <button
             onClick={() => {
               const availableTypes = getAvailableMilestoneTypes();
@@ -1378,7 +1384,7 @@ export default function MilestonesTab({
         )}
         
         {/* Create Internal Milestone Form */}
-        {creatingNew && !newMilestoneForm.is_public && (
+        {isAdmin && creatingNew && !newMilestoneForm.is_public && (
           <div className="rounded-lg border border-slate-300 bg-white p-4">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-slate-700">Create New Internal Milestone</h3>
@@ -1541,14 +1547,20 @@ export default function MilestonesTab({
                   ) : (
                     // View mode
                     <div className="flex gap-4">
-                      {/* File Icon/Preview */}
-                      <a
-                        href={`/api/attachments/${att.id}/download`}
-                        download={att.original_filename}
-                        className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-slate-100 transition-colors hover:bg-un-blue/10"
-                      >
-                        {getFileIcon(att.content_type, att.original_filename)}
-                      </a>
+                      {/* File Icon/Preview - clickable download for admins only */}
+                      {isAdmin ? (
+                        <a
+                          href={`/api/attachments/${att.id}/download`}
+                          download={att.original_filename}
+                          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-slate-100 transition-colors hover:bg-un-blue/10"
+                        >
+                          {getFileIcon(att.content_type, att.original_filename)}
+                        </a>
+                      ) : (
+                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+                          {getFileIcon(att.content_type, att.original_filename)}
+                        </div>
+                      )}
 
                       {/* Content */}
                       <div className="min-w-0 flex-1">
@@ -1562,6 +1574,7 @@ export default function MilestonesTab({
                             )}
                           </div>
                           <div className="flex shrink-0 gap-1">
+                            {isAdmin && (
                             <button
                               type="button"
                               onClick={() => toggleAttachmentComments(att.id)}
@@ -1574,6 +1587,8 @@ export default function MilestonesTab({
                             >
                               <MessageSquare className="h-4 w-4" />
                             </button>
+                            )}
+                            {isAdmin && (
                             <a
                               href={`/api/attachments/${att.id}/download`}
                               download={att.original_filename}
@@ -1582,22 +1597,27 @@ export default function MilestonesTab({
                             >
                               <Download className="h-4 w-4" />
                             </a>
-                            <button
-                              type="button"
-                              onClick={() => startEditingAttachment(att)}
-                              className="rounded p-1.5 text-slate-400 opacity-0 transition-all hover:bg-slate-100 hover:text-slate-600 group-hover:opacity-100"
-                              title="Edit"
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteAttachment(att.id)}
-                              className="rounded p-1.5 text-slate-400 opacity-0 transition-all hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
-                              title="Delete"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
+                            )}
+                            {isAdmin && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => startEditingAttachment(att)}
+                                  className="rounded p-1.5 text-slate-400 opacity-0 transition-all hover:bg-slate-100 hover:text-slate-600 group-hover:opacity-100"
+                                  title="Edit"
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteAttachment(att.id)}
+                                  className="rounded p-1.5 text-slate-400 opacity-0 transition-all hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
+                                  title="Delete"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </>
+                            )}
                           </div>
                         </div>
 
@@ -1747,6 +1767,7 @@ export default function MilestonesTab({
                               </>
                             );
                           })()}
+                          {isAdmin && (
                           <div className="flex flex-col gap-2">
                             <div className="flex gap-2">
                               <textarea
@@ -1790,6 +1811,7 @@ export default function MilestonesTab({
                               <p className="text-sm text-red-600">{commentErrorByAttachmentId[att.id]}</p>
                             )}
                           </div>
+                          )}
                         </>
                       )}
                     </div>
@@ -1802,6 +1824,7 @@ export default function MilestonesTab({
           <p className="mb-4 text-sm italic text-slate-400">No documents yet</p>
         )}
 
+        {isAdmin && (
         <form className="mt-3" onSubmit={handleUpload}>
           <div className="space-y-3">
             <div className="flex flex-wrap items-end gap-2">
@@ -1896,6 +1919,7 @@ export default function MilestonesTab({
             <p className="mt-2 text-sm text-red-600">{uploadError}</p>
           )}
         </form>
+        )}
       </div>
       </section>
 

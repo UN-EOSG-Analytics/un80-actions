@@ -6,6 +6,7 @@
 "use server";
 
 import { query } from "@/lib/db/db";
+import { checkIsAdmin } from "@/features/auth/lib/permissions";
 import type { ActionAttachment, AttachmentComment } from "@/types";
 
 /**
@@ -104,11 +105,16 @@ export async function getAttachmentById(
 // =========================================================
 
 /**
- * Get all comments for an attachment
+ * Get all comments for an attachment.
+ * Admin-only: returns empty array for non-admins.
  */
 export async function getAttachmentComments(
   attachmentId: string,
 ): Promise<AttachmentComment[]> {
+  if (!(await checkIsAdmin())) {
+    return [];
+  }
+
   const rows = await query<{
     id: string;
     attachment_id: string;

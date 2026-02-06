@@ -8,18 +8,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAttachmentById } from "@/features/attachments/queries";
 import { downloadBlob } from "@/lib/blob-storage";
 import { getCurrentUser } from "@/features/auth/service";
+import { requireAdmin } from "@/features/auth/lib/permissions";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    // Require authentication
-    const user = await getCurrentUser();
-    if (!user) {
+    const auth = await requireAdmin();
+    if (!auth.authorized) {
       return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 },
+        { error: "Admin access required to download documents" },
+        { status: 403 },
       );
     }
 

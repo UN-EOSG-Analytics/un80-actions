@@ -277,6 +277,7 @@ export function MilestoneCard({
           >
             <Clock className="h-4 w-4" />
           </button>
+          {isAdmin && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -292,16 +293,19 @@ export function MilestoneCard({
               </span>
             )}
           </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit();
-            }}
-            className="rounded p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-            title="Edit"
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
+          )}
+          {isAdmin && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit();
+              }}
+              className="rounded p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+              title="Edit"
+            >
+              <Pencil className="h-4 w-4" />
+            </button>
+          )}
         </div>
       </div>
     </div>

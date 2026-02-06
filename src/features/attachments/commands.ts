@@ -8,6 +8,7 @@
 import { revalidatePath } from "next/cache";
 import { query } from "@/lib/db/db";
 import { getCurrentUser } from "@/features/auth/service";
+import { requireAdmin } from "@/features/auth/lib/permissions";
 import {
   uploadBlob,
   deleteBlob,
@@ -42,8 +43,11 @@ export async function uploadActionAttachment(
   milestoneId: string | null,
   formData: FormData,
 ): Promise<UploadResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
-    // Require authentication
     const user = await getCurrentUser();
     if (!user) {
       return { success: false, error: "Unauthorized" };
@@ -120,12 +124,11 @@ export async function uploadActionAttachment(
 export async function deleteActionAttachment(
   attachmentId: string,
 ): Promise<DeleteResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
-    // Require authentication
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
 
     // Get attachment details
     const rows = await query<{
@@ -171,12 +174,11 @@ export async function updateAttachmentMetadata(
   title: string | null,
   description: string | null,
 ): Promise<{ success: boolean; error?: string }> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
-    // Require authentication
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
 
     await query(
       `UPDATE un80actions.action_attachments 
@@ -255,6 +257,10 @@ export async function createAttachmentComment(
   attachmentId: string,
   comment: string,
 ): Promise<CreateAttachmentCommentResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
     const user = await getCurrentUser();
     if (!user) {

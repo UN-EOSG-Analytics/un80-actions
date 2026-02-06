@@ -186,9 +186,10 @@ function SortIcon({
 
 interface ActionsTableProps {
   data: ActionsTableData;
+  isAdmin?: boolean;
 }
 
-export function ActionsTable({ data }: ActionsTableProps) {
+export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
   const router = useRouter();
   const [searchInput, setSearchInput] = useState("");
   const [sortField, setSortField] = useState<SortField>("action_id");
@@ -629,6 +630,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
                   />
                 </div>
               </th>
+              {isAdmin && (
               <th className="px-4 py-3 whitespace-nowrap align-top">
                 <div className="flex flex-col gap-1">
                   <div className="text-xs font-normal text-gray-500 tabular-nums">
@@ -662,6 +664,8 @@ export function ActionsTable({ data }: ActionsTableProps) {
                   </div>
                 </div>
               </th>
+              )}
+              {isAdmin && (
               <th className="px-4 py-3 whitespace-nowrap">
                 <button
                   type="button"
@@ -672,6 +676,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
                   <SortIcon column="risk_assessment" sortField={sortField} sortDirection={sortDirection} />
                 </button>
               </th>
+              )}
               <th className="px-4 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   <span>BIG TICKET</span>
@@ -697,7 +702,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
             {sortedActions.length === 0 ? (
               <tr>
                 <td
-                  colSpan={9}
+                  colSpan={isAdmin ? 9 : 7}
                   className="px-4 py-12 text-center text-gray-400"
                 >
                   No actions found
@@ -767,6 +772,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
                       </PopoverContent>
                     </Popover>
                   </td>
+                  {isAdmin && (
                   <td className="px-4 py-3">
                     {a.deliverables_status ? (
                       <Badge
@@ -787,6 +793,8 @@ export function ActionsTable({ data }: ActionsTableProps) {
                       <span className="text-gray-400 text-xs">—</span>
                     )}
                   </td>
+                  )}
+                  {isAdmin && (
                   <td
                     className="px-4 py-3 text-gray-400"
                     onClick={(e) => e.stopPropagation()}
@@ -823,6 +831,7 @@ export function ActionsTable({ data }: ActionsTableProps) {
                       </SelectContent>
                     </Select>
                   </td>
+                  )}
                   <td className="px-4 py-3 text-center">
                     {a.is_big_ticket && (
                       <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-un-blue text-white text-xs font-bold">!</span>
