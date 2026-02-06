@@ -94,6 +94,7 @@ create table actions (
     public_action_status un80actions.public_action_status,
     risk_assessment un80actions.risk_assessment,
     action_record_id text,
+    document_submitted boolean default false not null,
     unique (id, sub_id)
 );
 create table action_milestones (
@@ -122,6 +123,8 @@ create table action_milestones (
         approved_by uuid references users on delete cascade,
         approved_at timestamp with time zone,
         serial_number integer not null,
+        needs_ola_review boolean default false not null,
+        documents_submitted boolean default false not null,
         constraint action_milestones_action_type_key unique (action_id, action_sub_id, milestone_type),
         foreign key (action_id, action_sub_id) references actions (id, sub_id) on delete cascade
 );
@@ -240,6 +243,8 @@ create table action_questions (
         content_reviewed_by uuid references users on delete
     set null,
         content_reviewed_at timestamp with time zone,
+        milestone_id uuid references action_milestones on delete
+    set null,
         comment text,
         foreign key (action_id, action_sub_id) references actions (id, sub_id) on delete cascade
 );
@@ -332,3 +337,38 @@ create table milestone_attachments (
         uploaded_at timestamp with time zone default now() not null
 );
 create index idx_milestone_attachments_milestone_id on milestone_attachments (milestone_id);
+create table activity_entries (
+    id uuid default gen_random_uuid() not null primary key,
+    type text not null,
+    action_id integer not null,
+    action_sub_id text,
+    milestone_id uuid references action_milestones on delete
+    set null,
+        title text not null,
+        description text not null,
+        user_id uuid references users on delete
+    set null,
+        created_at timestamp with time zone default now() not null
+);
+create index idx_activity_entries_created_at on activity_entries (created_at desc);
+create index idx_activity_entries_action on activity_entries (action_id, action_sub_id);
+create table activity_read (
+    activity_id text not null,
+    user_id uuid not null references users on delete cascade,
+    read_at timestamp with time zone default now() not null,
+    primary key (activity_id, user_id)
+);
+create index idx_activity_read_user_id on activity_read (user_id);
+create table attachment_comments (
+    id uuid default gen_random_uuid() not null primary key,
+    attachment_id uuid not null references action_attachments on delete cascade,
+    author_id uuid references users on delete
+    set null,
+        body text not null,
+        created_at timestamp with time zone default now() not null,
+        user_id uuid references users on delete
+    set null,
+        comment text not null
+);
+create index idx_attachment_comments_attachment_id on attachment_comments (attachment_id);
+create index idx_attachment_comments_created_at on attachment_comments (created_at);

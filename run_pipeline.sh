@@ -23,9 +23,9 @@ echo ""
 
 # 1. Recreate schema — WIPES ALL DATA (questions, notes, legal comments).
 #    Leave commented out to preserve user-created content.
-# echo "⏳ Step 1/9: Recreating database schema..."
-# uv run python python/db/recreate_schema.py
-# echo ""
+echo "⏳ Step 1/9: Recreating database schema..."
+uv run python python/db/recreate_schema.py
+echo ""
 
 # 1. Fetch leads from Airtable
 echo "⏳ Step 1/8: Fetching leads from Airtable..."
