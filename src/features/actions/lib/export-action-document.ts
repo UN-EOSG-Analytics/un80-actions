@@ -107,14 +107,47 @@ function buildWordDocument(
       );
     } else {
       questions.forEach((q, i) => {
+        // Header and question date
+        const headerParts: string[] = [];
+        if (q.header) headerParts.push(q.header);
+        if (q.question_date) headerParts.push(formatDate(q.question_date));
+        if (headerParts.length > 0) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `${i + 1}. ${headerParts.join(" · ")}`,
+                  bold: true,
+                }),
+              ],
+              spacing: { before: 120, after: 40 },
+            }),
+          );
+        }
+        // Question text
         children.push(
           new Paragraph({
             children: [
-              new TextRun({ text: `${i + 1}. ${q.question}`, bold: true }),
+              new TextRun({
+                text: headerParts.length > 0 ? q.question : `${i + 1}. ${q.question}`,
+                bold: headerParts.length === 0,
+              }),
             ],
-            spacing: { before: 120, after: 60 },
+            indent: headerParts.length > 0 ? { left: 360 } : undefined,
+            spacing: { after: 40 },
           }),
         );
+        // Subtext (if any)
+        if (q.subtext) {
+          children.push(
+            new Paragraph({
+              children: [new TextRun({ text: q.subtext, italics: true, size: 20 })],
+              indent: { left: 360 },
+              spacing: { after: 40 },
+            }),
+          );
+        }
+        // Answer
         if (q.answer) {
           children.push(
             new Paragraph({
@@ -137,11 +170,25 @@ function buildWordDocument(
                   }),
                 ],
                 indent: { left: 360 },
-                spacing: { after: 120 },
+                spacing: { after: 60 },
               }),
             );
           }
         }
+        // Additional comments (internal)
+        if (q.comment) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: "Additional comments: ", bold: true }),
+                new TextRun({ text: q.comment }),
+              ],
+              indent: { left: 360 },
+              spacing: { after: 60 },
+            }),
+          );
+        }
+        // Metadata
         children.push(
           new Paragraph({
             children: [
@@ -316,7 +363,16 @@ export function exportActionToPdf(
       addText("No questions recorded.", PDF_BODY);
     } else {
       questions.forEach((q, i) => {
-        addText(`${i + 1}. ${q.question}`, PDF_BODY, true);
+        const headerParts: string[] = [];
+        if (q.header) headerParts.push(q.header);
+        if (q.question_date) headerParts.push(formatDate(q.question_date));
+        if (headerParts.length > 0) {
+          addText(`${i + 1}. ${headerParts.join(" · ")}`, PDF_BODY, true);
+        }
+        addText(headerParts.length > 0 ? q.question : `${i + 1}. ${q.question}`, PDF_BODY, headerParts.length === 0);
+        if (q.subtext) {
+          addText(q.subtext, PDF_SMALL);
+        }
         if (q.answer) {
           addText(`Answer: ${q.answer}`, PDF_BODY);
           if (q.answered_at || q.answered_by_email) {
@@ -325,6 +381,9 @@ export function exportActionToPdf(
               PDF_SMALL,
             );
           }
+        }
+        if (q.comment) {
+          addText(`Additional comments: ${q.comment}`, PDF_BODY);
         }
         addText(`${formatDate(q.created_at)} · ${q.user_email ?? "—"}`, PDF_SMALL);
         addSpace(4);
@@ -393,12 +452,24 @@ export function exportActionToMarkdown(
       markdown += `_No questions recorded._\n\n`;
     } else {
       questions.forEach((q, i) => {
-        markdown += `### ${i + 1}. ${q.question}\n\n`;
+        const headerParts: string[] = [];
+        if (q.header) headerParts.push(q.header);
+        if (q.question_date) headerParts.push(formatDate(q.question_date));
+        if (headerParts.length > 0) {
+          markdown += `### ${i + 1}. ${headerParts.join(" · ")}\n\n`;
+        }
+        markdown += headerParts.length > 0 ? `${q.question}\n\n` : `### ${i + 1}. ${q.question}\n\n`;
+        if (q.subtext) {
+          markdown += `_${q.subtext}_\n\n`;
+        }
         if (q.answer) {
           markdown += `**Answer:** ${q.answer}\n\n`;
           if (q.answered_at || q.answered_by_email) {
             markdown += `_Answered ${formatDate(q.answered_at)}${q.answered_by_email ? ` by ${q.answered_by_email}` : ""}_\n\n`;
           }
+        }
+        if (q.comment) {
+          markdown += `**Additional comments:** ${q.comment}\n\n`;
         }
         markdown += `_${formatDate(q.created_at)} · ${q.user_email ?? "—"}_\n\n`;
       });
