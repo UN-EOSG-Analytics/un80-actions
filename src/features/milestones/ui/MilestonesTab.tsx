@@ -26,7 +26,7 @@ import {
   getMilestoneVersions,
   type MilestoneVersion,
 } from "@/features/milestones/queries";
-import { updateMilestone, createMilestone, approveMilestoneContent, requestMilestoneChanges, setMilestoneToDraft, setMilestoneNeedsOlaReview } from "@/features/milestones/commands";
+import { updateMilestone, createMilestone, approveMilestoneContent, requestMilestoneChanges, setMilestoneToDraft, setMilestoneNeedsOlaReview, setMilestoneReviewedByOla, setMilestoneFinalized, setMilestoneAttentionToTimeline, setMilestoneConfirmationNeeded } from "@/features/milestones/commands";
 import { MilestoneCard } from "./MilestoneCard";
 import {
   getMilestoneUpdates,
@@ -139,7 +139,7 @@ export default function MilestonesTab({
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     milestoneId: string | null;
-    status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | null;
+    status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed" | null;
   }>({ open: false, milestoneId: null, status: null });
   const [milestoneDocumentSubmitted, setMilestoneDocumentSubmitted] = useState<Record<string, boolean>>({});
   const [attachmentComments, setAttachmentComments] = useState<Record<string, AttachmentComment[]>>({});
@@ -323,7 +323,7 @@ export default function MilestonesTab({
     }
   };
 
-  const handleStatusChange = (milestoneId: string, status: "draft" | "approved" | "needs_attention" | "needs_ola_review") => {
+  const handleStatusChange = (milestoneId: string, status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized") => {
     setConfirmDialog({ open: true, milestoneId, status });
   };
 
@@ -345,6 +345,14 @@ export default function MilestonesTab({
         result = await requestMilestoneChanges(milestoneId);
       } else if (status === "needs_ola_review") {
         result = await setMilestoneNeedsOlaReview(milestoneId);
+      } else if (status === "reviewed_by_ola") {
+        result = await setMilestoneReviewedByOla(milestoneId);
+      } else if (status === "finalized") {
+        result = await setMilestoneFinalized(milestoneId);
+      } else if (status === "attention_to_timeline") {
+        result = await setMilestoneAttentionToTimeline(milestoneId);
+      } else if (status === "confirmation_needed") {
+        result = await setMilestoneConfirmationNeeded(milestoneId);
       } else {
         result = await setMilestoneToDraft(milestoneId);
       }
@@ -1670,6 +1678,10 @@ export default function MilestonesTab({
               {confirmDialog.status === "approved" && "Approve this milestone? This will mark it as approved and no longer a draft."}
               {confirmDialog.status === "needs_attention" && "Mark this milestone as needing attention? This will notify the team to make changes."}
               {confirmDialog.status === "needs_ola_review" && "Mark this milestone as needing OLA (Office of Legal Affairs) review?"}
+              {confirmDialog.status === "reviewed_by_ola" && "Mark this milestone as reviewed by OLA (Office of Legal Affairs)?"}
+              {confirmDialog.status === "finalized" && "Finalize this milestone? This marks it as complete."}
+              {confirmDialog.status === "attention_to_timeline" && "Mark this milestone as needing attention to timeline?"}
+              {confirmDialog.status === "confirmation_needed" && "Mark this milestone as needing confirmation?"}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

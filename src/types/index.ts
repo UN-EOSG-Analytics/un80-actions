@@ -143,6 +143,10 @@ export interface ActionMilestone {
   is_approved: boolean;
   needs_attention: boolean;
   needs_ola_review: boolean;
+  reviewed_by_ola: boolean;
+  finalized: boolean;
+  attention_to_timeline: boolean;
+  confirmation_needed: boolean;
   description: string | null;
   deadline: string | null; // ISO date string
   updates: string | null;

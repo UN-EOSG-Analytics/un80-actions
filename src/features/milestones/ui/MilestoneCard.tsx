@@ -24,7 +24,7 @@ interface MilestoneCardProps {
   onEdit: () => void;
   onComment: () => void;
   onShowHistory: () => void;
-  onStatusChange?: (status: "draft" | "approved" | "needs_attention" | "needs_ola_review") => void;
+  onStatusChange?: (status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed") => void;
   onDocumentSubmittedChange?: (milestoneId: string, submitted: boolean) => void;
   documentSubmitted?: boolean;
   isAdmin?: boolean;
@@ -46,6 +46,18 @@ export function MilestoneCard({
     if (milestone.is_draft) {
       return { label: "Draft", className: "bg-slate-100 text-slate-600" };
     }
+    if (milestone.finalized) {
+      return { label: "Finalized", className: "bg-green-100 text-green-700" };
+    }
+    if (milestone.confirmation_needed) {
+      return { label: "Confirmation needed", className: "bg-orange-100 text-orange-700" };
+    }
+    if (milestone.attention_to_timeline) {
+      return { label: "Attention to timeline", className: "bg-yellow-100 text-yellow-700" };
+    }
+    if (milestone.reviewed_by_ola) {
+      return { label: "Reviewed by OLA", className: "bg-blue-100 text-blue-700" };
+    }
     if (milestone.is_approved) {
       return { label: "Approved", className: "bg-green-100 text-green-700" };
     }
@@ -61,8 +73,12 @@ export function MilestoneCard({
   const status = getDisplayStatus();
 
   // Determine current status (mutually exclusive)
-  const getCurrentStatus = (): "draft" | "approved" | "needs_attention" | "needs_ola_review" | "in_review" => {
+  const getCurrentStatus = (): "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed" | "in_review" => {
     if (milestone.is_draft) return "draft";
+    if (milestone.finalized) return "finalized";
+    if (milestone.confirmation_needed) return "confirmation_needed";
+    if (milestone.attention_to_timeline) return "attention_to_timeline";
+    if (milestone.reviewed_by_ola) return "reviewed_by_ola";
     if (milestone.is_approved) return "approved";
     if (milestone.needs_attention) return "needs_attention";
     if (milestone.needs_ola_review) return "needs_ola_review";
@@ -113,42 +129,87 @@ export function MilestoneCard({
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-40">
-                      <DropdownMenuItem
-                        onClick={() => onStatusChange("draft")}
-                        disabled={currentStatus === "draft"}
-                      >
-                        <span className="flex w-full items-center justify-between">
-                          Draft
-                          {currentStatus === "draft" && <Check className="h-3 w-3" />}
-                        </span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => onStatusChange("approved")}
-                        disabled={currentStatus === "approved"}
-                      >
-                        <span className="flex w-full items-center justify-between">
-                          Approved
-                          {currentStatus === "approved" && <Check className="h-3 w-3" />}
-                        </span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => onStatusChange("needs_attention")}
-                        disabled={currentStatus === "needs_attention"}
-                      >
-                        <span className="flex w-full items-center justify-between">
-                          Needs Attention
-                          {currentStatus === "needs_attention" && <Check className="h-3 w-3" />}
-                        </span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => onStatusChange("needs_ola_review")}
-                        disabled={currentStatus === "needs_ola_review"}
-                      >
-                        <span className="flex w-full items-center justify-between">
-                          Needs OLA review
-                          {currentStatus === "needs_ola_review" && <Check className="h-3 w-3" />}
-                        </span>
-                      </DropdownMenuItem>
+                      {milestone.is_public ? (
+                        // Public milestones: draft, needs OLA review, reviewed by OLA, finalized
+                        <>
+                          <DropdownMenuItem
+                            onClick={() => onStatusChange("draft")}
+                            disabled={currentStatus === "draft"}
+                          >
+                            <span className="flex w-full items-center justify-between">
+                              Draft
+                              {currentStatus === "draft" && <Check className="h-3 w-3" />}
+                            </span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => onStatusChange("needs_ola_review")}
+                            disabled={currentStatus === "needs_ola_review"}
+                          >
+                            <span className="flex w-full items-center justify-between">
+                              Needs OLA review
+                              {currentStatus === "needs_ola_review" && <Check className="h-3 w-3" />}
+                            </span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => onStatusChange("reviewed_by_ola")}
+                            disabled={currentStatus === "reviewed_by_ola"}
+                          >
+                            <span className="flex w-full items-center justify-between">
+                              Reviewed by OLA
+                              {currentStatus === "reviewed_by_ola" && <Check className="h-3 w-3" />}
+                            </span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => onStatusChange("finalized")}
+                            disabled={currentStatus === "finalized"}
+                          >
+                            <span className="flex w-full items-center justify-between">
+                              Finalized
+                              {currentStatus === "finalized" && <Check className="h-3 w-3" />}
+                            </span>
+                          </DropdownMenuItem>
+                        </>
+                      ) : (
+                        // Internal milestones: draft, attention to timeline, confirmation needed, finalized
+                        <>
+                          <DropdownMenuItem
+                            onClick={() => onStatusChange("draft")}
+                            disabled={currentStatus === "draft"}
+                          >
+                            <span className="flex w-full items-center justify-between">
+                              Draft
+                              {currentStatus === "draft" && <Check className="h-3 w-3" />}
+                            </span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => onStatusChange("attention_to_timeline")}
+                            disabled={currentStatus === "attention_to_timeline"}
+                          >
+                            <span className="flex w-full items-center justify-between">
+                              Attention to timeline
+                              {currentStatus === "attention_to_timeline" && <Check className="h-3 w-3" />}
+                            </span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => onStatusChange("confirmation_needed")}
+                            disabled={currentStatus === "confirmation_needed"}
+                          >
+                            <span className="flex w-full items-center justify-between">
+                              Confirmation needed
+                              {currentStatus === "confirmation_needed" && <Check className="h-3 w-3" />}
+                            </span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => onStatusChange("finalized")}
+                            disabled={currentStatus === "finalized"}
+                          >
+                            <span className="flex w-full items-center justify-between">
+                              Finalized
+                              {currentStatus === "finalized" && <Check className="h-3 w-3" />}
+                            </span>
+                          </DropdownMenuItem>
+                        </>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
