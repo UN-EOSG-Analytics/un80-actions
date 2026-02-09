@@ -338,7 +338,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
   const handleRowClick = (actionId: number, actionSubId: string | null) => {
     sessionStorage.setItem("actionModalReturnUrl", "/milestones");
     const actionParam = actionSubId ? `${actionId}${actionSubId}` : `${actionId}`;
-    router.push(`/milestones?action=${actionParam}`, { scroll: false });
+    router.push(`/milestones?action=${actionParam}&tab=milestones`, { scroll: false });
   };
 
   return (
