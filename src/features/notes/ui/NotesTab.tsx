@@ -83,6 +83,7 @@ export default function NotesTab({
   const [tagsByNoteId, setTagsByNoteId] = useState<Record<string, Tag[]>>({});
 
   const loadNotes = async () => {
+    if (!isAdmin) return; // Notes are admin-only
     setLoading(true);
     try {
       const data = await getActionNotes(action.id, action.sub_id);

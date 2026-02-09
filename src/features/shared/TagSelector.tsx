@@ -93,16 +93,9 @@ export function TagSelector({
   // Sync from parent only when entity changes (avoid loop from new initialTags ref every render)
   useEffect(() => {
     setTags(initialTags);
-  }, [entityId, entityType]);
+  }, [entityId, entityType, initialTags]);
 
-  // Load tags when entity changes; use ref for callback so deps stay stable
-  useEffect(() => {
-    loadTagsForEntity().then((t) => {
-      setTags(t);
-      onTagsChangeRef.current?.(t);
-    });
-  }, [entityId, entityType, loadTagsForEntity]);
-
+  // Load tags only when popover opens (lazy loading)
   useEffect(() => {
     if (open) {
       refresh();

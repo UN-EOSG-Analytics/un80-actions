@@ -236,13 +236,6 @@ function SelectableText({
     };
   }, [handleSelection]);
 
-  useEffect(() => {
-    document.addEventListener("selectionchange", handleSelection);
-    return () => {
-      document.removeEventListener("selectionchange", handleSelection);
-    };
-  }, [handleSelection]);
-
   const applyFormatting = async (format: "bold" | "strikethrough") => {
     if (!selection) return;
 
@@ -373,6 +366,7 @@ export default function QuestionsTab({
   const MILESTONE_NONE_VALUE = "__none__";
 
   const loadQuestions = async () => {
+    if (!isAdmin) return; // Questions are admin-only
     setLoading(true);
     try {
       const data = await getActionQuestions(action.id, action.sub_id);
@@ -407,6 +401,7 @@ export default function QuestionsTab({
   };
 
   useEffect(() => {
+    // Load data only once on mount
     loadQuestions();
     loadMilestones();
     loadNotes();
