@@ -2,7 +2,18 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Search, X, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, Filter, Check, Send, Clock } from "lucide-react";
+import {
+  Search,
+  X,
+  ChevronRight,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Filter,
+  Check,
+  Send,
+  CircleAlert,
+} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -785,9 +796,19 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                         {a.deliverables_status === "submitted" ? (
                           <Send className="h-3 w-3" />
                         ) : (
-                          <Clock className="h-3 w-3" />
+                          <CircleAlert className="h-3 w-3" />
                         )}
-                        {a.deliverables_status === "submitted" ? "Submitted" : "Not submitted"}
+                        {a.deliverables_status === "submitted" ? (
+                          "Submitted"
+                        ) : (
+                          <span
+                            className="font-extrabold leading-none"
+                            title="Not submitted"
+                            aria-label="Not submitted"
+                          >
+                            !
+                          </span>
+                        )}
                       </Badge>
                     ) : (
                       <span className="text-gray-400 text-xs">—</span>
