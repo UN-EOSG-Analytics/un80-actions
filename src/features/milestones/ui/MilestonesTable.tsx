@@ -431,9 +431,9 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                   <button
                     type="button"
                     onClick={() => handleSort("action_id")}
-                    className="inline-flex items-center hover:text-un-blue"
+                    className="inline-flex items-center hover:text-un-blue uppercase"
                   >
-                    Action Number
+                    Action
                     <SortIcon
                       column="action_id"
                       sortField={sortField}

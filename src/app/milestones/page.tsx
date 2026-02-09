@@ -14,14 +14,14 @@ export default async function MilestonesPage() {
   const rows = await getMilestoneViewTableData();
 
   return (
-    <main className="flex-1 bg-background px-4 py-6 sm:px-6 sm:py-8">
+    <main className="flex-1 bg-background px-4 py-4 sm:px-6 sm:py-4">
       <div className="mx-auto max-w-7xl space-y-4">
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <Link href="/" className="hover:text-un-blue hover:underline">
             Actions
           </Link>
           <span>/</span>
-          <span className="text-gray-700 font-medium">Milestone View</span>
+          <span className="text-gray-700 font-medium">Milestones</span>
         </div>
         <MilestonesTable rows={rows} />
       </div>
