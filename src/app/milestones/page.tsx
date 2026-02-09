@@ -11,6 +11,12 @@ export default async function MilestonesPage() {
     redirect("/login");
   }
 
+  // Admin-only page
+  const isAdmin = user.user_role === "Admin" || user.user_role === "Legal";
+  if (!isAdmin) {
+    redirect("/");
+  }
+
   const rows = await getMilestoneViewTableData();
 
   return (
