@@ -685,7 +685,7 @@ export default function MilestonesTab({
             ...(prev[attachmentId] ?? []),
             {
               ...comment,
-              is_legal: comment.is_legal ?? false,
+              is_legal: comment.is_legal ?? false, // Ensure is_legal is present
               created_at: typeof comment.created_at === "string" ? new Date(comment.created_at) : comment.created_at,
             },
           ],
