@@ -90,9 +90,10 @@ export default function ModalHandler({
 
   return (
     <ActionModal
-      action={error ? null : action}
+      action={action}
       onClose={handleClose}
       loading={loading}
+      error={error}
       isAdmin={isAdmin}
     />
   );

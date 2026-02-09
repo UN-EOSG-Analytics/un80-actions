@@ -58,6 +58,7 @@ interface ActionModalProps {
   action: Action | null;
   onClose: () => void;
   loading: boolean;
+  error?: string | null;
   isAdmin?: boolean;
 }
 
@@ -65,6 +66,7 @@ export default function ActionModal({
   action,
   onClose,
   loading,
+  error = null,
   isAdmin = false,
 }: ActionModalProps) {
   const router = useRouter();
@@ -236,36 +238,82 @@ export default function ActionModal({
   if (loading) {
     return (
       <div
-        className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-opacity duration-300 ${
+        className={`fixed inset-0 z-50 flex justify-end bg-black/50 transition-opacity duration-300 ${
           isVisible && !isClosing ? "opacity-100" : "opacity-0"
         }`}
         onClick={handleBackdropClick}
       >
-        <div className="rounded-lg bg-white p-8">
-          <LoadingState />
+        {/* Slide-in panel */}
+        <div
+          className={`flex h-full w-full max-w-2xl flex-col bg-slate-50 shadow-xl transition-transform duration-300 ${
+            isVisible && !isClosing ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          {/* Header */}
+          <div className="shrink-0 border-b border-slate-200 bg-white px-6 py-4">
+            <div className="flex items-start justify-between gap-4">
+              <p className="text-base font-semibold text-slate-700">Loading...</p>
+              <button
+                onClick={handleClose}
+                className="shrink-0 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                aria-label="Close modal"
+              >
+                <X size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="flex min-h-0 flex-1 items-center justify-center">
+            <LoadingState />
+          </div>
         </div>
       </div>
     );
   }
 
-  // Render not found state
-  if (!action) {
+  // Render error state
+  if (error || !action) {
     return (
       <div
-        className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-opacity duration-300 ${
+        className={`fixed inset-0 z-50 flex justify-end bg-black/50 transition-opacity duration-300 ${
           isVisible && !isClosing ? "opacity-100" : "opacity-0"
         }`}
         onClick={handleBackdropClick}
       >
-        <div className="rounded-lg bg-white p-8">
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-lg text-slate-500">Action not found</p>
-            <button
-              onClick={handleClose}
-              className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-            >
-              <X size={24} />
-            </button>
+        {/* Slide-in panel */}
+        <div
+          className={`flex h-full w-full max-w-2xl flex-col bg-slate-50 shadow-xl transition-transform duration-300 ${
+            isVisible && !isClosing ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          {/* Header */}
+          <div className="shrink-0 border-b border-slate-200 bg-white px-6 py-4">
+            <div className="flex items-start justify-between gap-4">
+              <p className="text-base font-semibold text-slate-700">Error</p>
+              <button
+                onClick={handleClose}
+                className="shrink-0 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                aria-label="Close modal"
+              >
+                <X size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="flex min-h-0 flex-1 items-center justify-center px-6">
+            <div className="text-center">
+              <p className="text-lg text-slate-500 mb-4">
+                {error || "Action not found"}
+              </p>
+              <button
+                onClick={handleClose}
+                className="px-4 py-2 rounded-md bg-un-blue text-white text-sm font-medium hover:bg-un-blue/90"
+              >
+                Go back
+              </button>
+            </div>
           </div>
         </div>
       </div>
