@@ -205,6 +205,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
   const [filterWorkPackageId, setFilterWorkPackageId] = useState<string>("");
   const [filterRisk, setFilterRisk] = useState<string>("");
   const [filterDeliverablesMonth, setFilterDeliverablesMonth] = useState<number[]>([]);
+  const [filterAttention, setFilterAttention] = useState<boolean[]>([]);
   
   // Track which filter popovers are open
   const [openFilters, setOpenFilters] = useState<Record<string, boolean>>({});
@@ -341,6 +342,16 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
         a.upcoming_milestone_months.some((month) => filterDeliverablesMonth.includes(month))
       );
     }
+    if (filterAttention.length > 0) {
+      const hasAttention = filterAttention.includes(true);
+      const hasNoAttention = filterAttention.includes(false);
+      if (hasAttention && !hasNoAttention) {
+        list = list.filter((a) => a.has_delayed_milestone);
+      } else if (hasNoAttention && !hasAttention) {
+        list = list.filter((a) => !a.has_delayed_milestone);
+      }
+      // If both are selected, show all (no filter)
+    }
     return list;
   }, [
     allActions,
@@ -355,6 +366,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     filterWorkPackageId,
     filterRisk,
     filterDeliverablesMonth,
+    filterAttention,
   ]);
 
   // Calculate deliverables counter
@@ -450,7 +462,8 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     filterPublicStatus.length > 0 ||
     filterBigTicket.length > 0 ||
     filterWorkPackageId.length > 0 ||
-    filterRisk.length > 0;
+    filterRisk.length > 0 ||
+    filterAttention.length > 0;
 
   const clearAllFilters = () => {
     setFilterWP([]);
@@ -462,6 +475,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     setFilterWorkPackageId("");
     setFilterRisk("");
     setFilterDeliverablesMonth([]);
+    setFilterAttention([]);
   };
 
   return (
@@ -500,8 +514,8 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
       </div>
 
       {/* Simple Table */}
-      <div className="overflow-x-auto overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+        <table className="min-w-full w-full text-sm">
           <thead>
             <tr className="border-b bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
               <th className="px-3 py-3 whitespace-nowrap w-14">
@@ -579,6 +593,26 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   />
                 </div>
               </th>
+              {isAdmin && (
+              <th className="px-4 py-3 whitespace-nowrap w-20">
+                <div className="flex items-center gap-2">
+                  <span>NOTE</span>
+                  <MultiSelectFilter
+                    filterKey="attention"
+                    options={[true, false]}
+                    selected={filterAttention}
+                    onToggle={(value) => {
+                      setFilterAttention((prev) =>
+                        prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+                      );
+                    }}
+                    renderOption={(value) => value ? "Needs Attention" : "No Issues"}
+                    isOpen={openFilters.attention || false}
+                    onOpenChange={(open) => setOpenFilters((prev) => ({ ...prev, attention: open }))}
+                  />
+                </div>
+              </th>
+              )}
               <th className="px-4 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   <button
@@ -702,7 +736,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
             {sortedActions.length === 0 ? (
               <tr>
                 <td
-                  colSpan={isAdmin ? 9 : 7}
+                  colSpan={isAdmin ? 10 : 7}
                   className="px-4 py-12 text-center text-gray-400"
                 >
                   No actions found
@@ -728,6 +762,18 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                       {actionLabel(a.action_id, a.action_sub_id)}
                     </span>
                   </td>
+                  {isAdmin && (
+                  <td className="px-4 py-3 whitespace-nowrap text-center">
+                    {a.has_delayed_milestone && (
+                      <span
+                        className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-100 text-xs font-bold text-red-700"
+                        title="One or more milestones are overdue and not submitted"
+                      >
+                        !
+                      </span>
+                    )}
+                  </td>
+                  )}
                   <td className="px-4 py-3 text-gray-700">
                     <span className="line-clamp-2">{a.indicative_action}</span>
                   </td>

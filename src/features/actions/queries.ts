@@ -679,6 +679,15 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       m.deadline::text AS milestone_deadline,
       m.updates AS milestone_updates,
       m.status AS milestone_status,
+      m.attention_to_timeline AS milestone_attention_to_timeline,
+      (SELECT EXISTS(
+         SELECT 1 FROM un80actions.action_milestones delayed_m
+         WHERE delayed_m.action_id = a.id
+           AND (delayed_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+           AND delayed_m.deadline IS NOT NULL
+           AND delayed_m.deadline < CURRENT_DATE
+           AND COALESCE(delayed_m.milestone_document_submitted, false) = false
+       )) AS has_overdue_milestone,
       (SELECT COALESCE(next_m.milestone_document_submitted, false)
        FROM un80actions.action_milestones next_m
        WHERE next_m.action_id = a.id
@@ -726,6 +735,23 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       m.deadline::text AS milestone_deadline,
       m.updates AS milestone_updates,
       m.status AS milestone_status,
+      m.attention_to_timeline AS milestone_attention_to_timeline,
+      (SELECT EXISTS(
+         SELECT 1 FROM un80actions.action_milestones delayed_m
+         WHERE delayed_m.action_id = a.id
+           AND (delayed_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+           AND delayed_m.deadline IS NOT NULL
+           AND delayed_m.deadline < CURRENT_DATE
+           AND COALESCE(delayed_m.milestone_document_submitted, false) = false
+       )) AS has_overdue_milestone,
+      (SELECT EXISTS(
+         SELECT 1 FROM un80actions.action_milestones delayed_m
+         WHERE delayed_m.action_id = a.id
+           AND (delayed_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+           AND delayed_m.deadline IS NOT NULL
+           AND delayed_m.deadline < CURRENT_DATE
+           AND COALESCE(delayed_m.milestone_document_submitted, false) = false
+       )) AS has_overdue_milestone,
       (SELECT COALESCE(next_m.milestone_document_submitted, false)
        FROM un80actions.action_milestones next_m
        WHERE next_m.action_id = a.id
@@ -769,11 +795,16 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
     is_big_ticket: boolean;
     risk_assessment?: string | null;
     document_submitted?: boolean;
+    next_upcoming_milestone_document_submitted?: boolean | null;
+    next_upcoming_milestone_deadline_month?: number | null;
+    all_upcoming_milestone_months?: number[] | null;
     milestone_type: string | null;
     milestone_description: string | null;
     milestone_deadline: string | null;
     milestone_updates: string | null;
     milestone_status: string | null;
+    milestone_attention_to_timeline: boolean | null;
+    has_overdue_milestone: boolean;
   };
 
   try {
@@ -903,6 +934,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
           deliverables_deadline_month: r.next_upcoming_milestone_deadline_month ?? null,
           upcoming_milestone_months: Array.isArray(r.all_upcoming_milestone_months) ? r.all_upcoming_milestone_months : [],
           milestones: [],
+          has_delayed_milestone: r.has_overdue_milestone,
         };
         actionsMap.set(key, action);
         wp.actions.push(action);
@@ -914,6 +946,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
           deadline: r.milestone_deadline,
           updates: r.milestone_updates,
           status: r.milestone_status!,
+          attention_to_timeline: r.milestone_attention_to_timeline ?? false,
         });
       }
     }

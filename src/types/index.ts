@@ -370,6 +370,7 @@ export interface MilestoneRow {
   deadline: string | null;
   updates: string | null;
   status: string;
+  attention_to_timeline: boolean;
 }
 
 export interface ActionWithMilestones {
@@ -385,6 +386,7 @@ export interface ActionWithMilestones {
   deliverables_deadline_month: number | null; // Month (1-12) of next upcoming milestone deadline for display
   upcoming_milestone_months: number[]; // All months (1-12) of upcoming milestones for filtering
   milestones: MilestoneRow[];
+  has_delayed_milestone?: boolean; // True if any milestone has a past deadline and is not submitted
 }
 
 export interface WorkPackageWithActions {

@@ -343,7 +343,7 @@ export default function MilestonesTab({
     }
   };
 
-  const handleStatusChange = (milestoneId: string, status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized") => {
+  const handleStatusChange = (milestoneId: string, status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed") => {
     setConfirmDialog({ open: true, milestoneId, status });
   };
 
@@ -654,6 +654,7 @@ export default function MilestonesTab({
               user_id: comment.user_id,
               user_email: comment.user_email,
               comment: comment.comment,
+              is_legal: comment.is_legal,
               created_at: typeof comment.created_at === "string" ? new Date(comment.created_at) : comment.created_at,
             },
           ],

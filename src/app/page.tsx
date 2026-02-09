@@ -16,7 +16,7 @@ export default async function Home() {
 
   return (
     <main className="flex-1 bg-background px-4 py-4 sm:px-6 sm:py-4">
-      <div className="mx-auto max-w-7xl space-y-4">
+      <div className="mx-auto max-w-screen-2xl space-y-4">
         {isAdmin && (
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <span className="text-gray-700 font-medium">Actions</span>
