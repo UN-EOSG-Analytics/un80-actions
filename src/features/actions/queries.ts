@@ -694,8 +694,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
          AND (next_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
          AND next_m.is_public = false
          AND next_m.deadline IS NOT NULL
-         AND next_m.deadline >= CURRENT_DATE
-       ORDER BY next_m.deadline ASC
+       ORDER BY (next_m.deadline >= CURRENT_DATE) DESC, (CASE WHEN next_m.deadline >= CURRENT_DATE THEN next_m.deadline END) ASC NULLS LAST, next_m.deadline DESC NULLS LAST
        LIMIT 1) AS next_upcoming_milestone_document_submitted,
       (SELECT EXTRACT(MONTH FROM next_m.deadline)::integer
        FROM un80actions.action_milestones next_m
@@ -703,8 +702,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
          AND (next_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
          AND next_m.is_public = false
          AND next_m.deadline IS NOT NULL
-         AND next_m.deadline >= CURRENT_DATE
-       ORDER BY next_m.deadline ASC
+       ORDER BY (next_m.deadline >= CURRENT_DATE) DESC, (CASE WHEN next_m.deadline >= CURRENT_DATE THEN next_m.deadline END) ASC NULLS LAST, next_m.deadline DESC NULLS LAST
        LIMIT 1) AS next_upcoming_milestone_deadline_month,
       (SELECT ARRAY_AGG(DISTINCT EXTRACT(MONTH FROM all_m.deadline)::integer ORDER BY EXTRACT(MONTH FROM all_m.deadline)::integer)
        FROM un80actions.action_milestones all_m
@@ -758,8 +756,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
          AND (next_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
          AND next_m.is_public = false
          AND next_m.deadline IS NOT NULL
-         AND next_m.deadline >= CURRENT_DATE
-       ORDER BY next_m.deadline ASC
+       ORDER BY (next_m.deadline >= CURRENT_DATE) DESC, (CASE WHEN next_m.deadline >= CURRENT_DATE THEN next_m.deadline END) ASC NULLS LAST, next_m.deadline DESC NULLS LAST
        LIMIT 1) AS next_upcoming_milestone_document_submitted,
       (SELECT EXTRACT(MONTH FROM next_m.deadline)::integer
        FROM un80actions.action_milestones next_m
@@ -767,8 +764,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
          AND (next_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
          AND next_m.is_public = false
          AND next_m.deadline IS NOT NULL
-         AND next_m.deadline >= CURRENT_DATE
-       ORDER BY next_m.deadline ASC
+       ORDER BY (next_m.deadline >= CURRENT_DATE) DESC, (CASE WHEN next_m.deadline >= CURRENT_DATE THEN next_m.deadline END) ASC NULLS LAST, next_m.deadline DESC NULLS LAST
        LIMIT 1) AS next_upcoming_milestone_deadline_month,
       (SELECT ARRAY_AGG(DISTINCT EXTRACT(MONTH FROM all_m.deadline)::integer ORDER BY EXTRACT(MONTH FROM all_m.deadline)::integer)
        FROM un80actions.action_milestones all_m
