@@ -40,7 +40,7 @@ import type { ActionsTableData } from "@/types";
 import type { RiskAssessment } from "@/types";
 import { updateRiskAssessment, updatePublicActionStatus } from "@/features/actions/commands";
 
-type SortField = "work_package_id" | "action_id" | "work_package_title" | "indicative_action" | "public_action_status" | "risk_assessment" | "deliverables";
+type SortField = "work_package_id" | "action_id" | "work_package_title" | "indicative_action" | "risk_assessment" | "deliverables";
 type SortDirection = "asc" | "desc";
 
 const RISK_OPTIONS: {
@@ -210,7 +210,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
   const [filterWPTitle, setFilterWPTitle] = useState<string[]>([]);
   const [filterAction, setFilterAction] = useState<string[]>([]);
   const [filterIndicativeAction, setFilterIndicativeAction] = useState<string[]>([]);
-  const [filterPublicStatus, setFilterPublicStatus] = useState<string[]>([]);
   const [filterBigTicket, setFilterBigTicket] = useState<boolean[]>([]);
   const [filterWorkPackageId, setFilterWorkPackageId] = useState<string>("");
   const [filterRisk, setFilterRisk] = useState<string>("");
@@ -282,14 +281,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     return Array.from(actions).sort();
   }, [allActions]);
 
-  const uniquePublicStatuses = useMemo(() => {
-    const statuses = new Set<string>();
-    allActions.forEach((a) => {
-      if (a.public_action_status) statuses.add(a.public_action_status);
-    });
-    return Array.from(statuses).sort();
-  }, [allActions]);
-
   const uniqueDeliverablesMonths = useMemo(() => {
     const months = new Set<number>();
     allActions.forEach((a) => {
@@ -327,9 +318,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     if (filterIndicativeAction.length > 0) {
       list = list.filter((a) => filterIndicativeAction.includes(a.indicative_action));
     }
-    if (filterPublicStatus.length > 0) {
-      list = list.filter((a) => a.public_action_status && filterPublicStatus.includes(a.public_action_status));
-    }
     if (filterBigTicket.length > 0) {
       const hasBigTicket = filterBigTicket.includes(true);
       const hasNotBigTicket = filterBigTicket.includes(false);
@@ -360,7 +348,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     filterWPTitle,
     filterAction,
     filterIndicativeAction,
-    filterPublicStatus,
     filterBigTicket,
     filterWorkPackageId,
     filterRisk,
@@ -386,10 +373,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
         cmp = a.work_package_title.localeCompare(b.work_package_title);
       } else if (sortField === "indicative_action") {
         cmp = a.indicative_action.localeCompare(b.indicative_action);
-      } else if (sortField === "public_action_status") {
-        const av = a.public_action_status ?? "";
-        const bv = b.public_action_status ?? "";
-        cmp = av.localeCompare(bv);
       } else if (sortField === "risk_assessment") {
         const order: Record<string, number> = { low_risk: 0, medium_risk: 1, at_risk: 2 };
         const av = a.risk_assessment ?? "";
@@ -452,12 +435,11 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
   };
 
   // Check if any filters are active
-  const hasActiveFilters = 
+  const hasActiveFilters =
     filterWP.length > 0 ||
     filterWPTitle.length > 0 ||
     filterAction.length > 0 ||
     filterIndicativeAction.length > 0 ||
-    filterPublicStatus.length > 0 ||
     filterBigTicket.length > 0 ||
     filterWorkPackageId.length > 0 ||
     filterRisk.length > 0;
@@ -467,7 +449,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     setFilterWPTitle([]);
     setFilterAction([]);
     setFilterIndicativeAction([]);
-    setFilterPublicStatus([]);
     setFilterBigTicket([]);
     setFilterWorkPackageId("");
     setFilterRisk("");
@@ -615,31 +596,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   />
                 </div>
               </th>
-              <th className="px-4 py-3 whitespace-nowrap">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("public_action_status")}
-                    className="inline-flex items-center hover:text-un-blue"
-                  >
-                    PUBLIC STATUS
-                    <SortIcon column="public_action_status" sortField={sortField} sortDirection={sortDirection} />
-                  </button>
-                  <MultiSelectFilter
-                    filterKey="publicStatus"
-                    options={uniquePublicStatuses}
-                    selected={filterPublicStatus}
-                    onToggle={(status) => {
-                      setFilterPublicStatus((prev) =>
-                        prev.includes(status) ? prev.filter((v) => v !== status) : [...prev, status]
-                      );
-                    }}
-                    renderOption={(status) => status}
-                    isOpen={openFilters.publicStatus || false}
-                    onOpenChange={(open) => setOpenFilters((prev) => ({ ...prev, publicStatus: open }))}
-                  />
-                </div>
-              </th>
               {isAdmin && (
               <th className="px-4 py-3 whitespace-nowrap align-top">
                 <div className="flex flex-col gap-1">
@@ -712,7 +668,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
             {sortedActions.length === 0 ? (
               <tr>
                 <td
-                  colSpan={isAdmin ? 9 : 7}
+                  colSpan={isAdmin ? 8 : 6}
                   className="px-4 py-12 text-center text-gray-400"
                 >
                   No actions found
@@ -740,47 +696,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   </td>
                   <td className="px-4 py-3 text-gray-700">
                     <span className="line-clamp-2">{a.indicative_action}</span>
-                  </td>
-                  <td
-                    className="px-4 py-3"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <button className="cursor-pointer transition-opacity hover:opacity-75">
-                          {a.public_action_status ? (
-                            <Badge className={getStatusStyles(a.public_action_status).badge}>
-                              {getStatusStyles(a.public_action_status).label}
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline" className="bg-slate-50 text-slate-500">
-                              Set status...
-                            </Badge>
-                          )}
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-56 p-2" align="start">
-                        <div className="space-y-1">
-                          {STATUS_OPTIONS.map((opt) => {
-                            const styles = getStatusStyles(opt.value);
-                            const isSelected = a.public_action_status === opt.value;
-                            return (
-                              <button
-                                key={opt.value}
-                                onClick={() => handleStatusChange(a.action_id, a.action_sub_id, opt.value)}
-                                className={`w-full rounded px-2 py-1.5 text-left text-sm transition-colors ${
-                                  isSelected ? "bg-slate-200" : "hover:bg-slate-100"
-                                }`}
-                              >
-                                <Badge className={styles.badge}>
-                                  {styles.label}
-                                </Badge>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </PopoverContent>
-                    </Popover>
                   </td>
                   {isAdmin && (
                   <td className="px-4 py-3">
