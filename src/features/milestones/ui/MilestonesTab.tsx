@@ -684,11 +684,7 @@ export default function MilestonesTab({
           [attachmentId]: [
             ...(prev[attachmentId] ?? []),
             {
-              id: comment.id,
-              attachment_id: comment.attachment_id,
-              user_id: comment.user_id,
-              user_email: comment.user_email,
-              comment: comment.comment,
+              ...comment,
               is_legal: comment.is_legal ?? false,
               created_at: typeof comment.created_at === "string" ? new Date(comment.created_at) : comment.created_at,
             },
