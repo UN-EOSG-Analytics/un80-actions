@@ -30,6 +30,7 @@ import { updateMilestone, createMilestone, approveMilestoneContent, requestMiles
 import { MilestoneCard } from "./MilestoneCard";
 import {
   getMilestoneUpdates,
+  getBatchMilestoneUpdates,
   type MilestoneUpdate,
 } from "@/features/milestones/updates-queries";
 import {
@@ -212,14 +213,19 @@ export default function MilestonesTab({
     loadMilestones();
   }, [loadMilestones]);
 
-  // Preload milestone updates for admins only (non-admins cannot see comments)
+  // Batch-load milestone updates for all milestones at once (admins only)
   const milestoneIds = milestones.map((m) => m.id).join(",");
   useEffect(() => {
     if (!isAdmin || milestones.length === 0) return;
-    milestones.forEach((m) => {
-      loadMilestoneUpdates(m.id);
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadMilestoneUpdates is stable; we want to run when milestone ids change
+    
+    const loadAllUpdates = async () => {
+      const ids = milestones.map((m) => m.id);
+      const batchedUpdates = await getBatchMilestoneUpdates(ids);
+      setMilestoneUpdates(batchedUpdates);
+    };
+    
+    loadAllUpdates();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- we want to run when milestone ids change
   }, [milestoneIds, isAdmin]);
 
   // Separate public and private milestones
