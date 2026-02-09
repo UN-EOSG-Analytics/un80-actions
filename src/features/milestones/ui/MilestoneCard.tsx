@@ -215,7 +215,7 @@ export function MilestoneCard({
                 ) : (
                   <Badge className={`${status.className} text-xs font-medium`}>{status.label}</Badge>
                 )}
-                <span className="flex items-center gap-1.5 text-xs text-slate-500">
+                <span className={`flex items-center gap-1.5 text-xs ${isPastDue ? 'text-red-600 font-medium' : 'text-slate-500'}`}>
                   <Calendar className="h-3 w-3" />
                   {milestone.deadline ? new Date(milestone.deadline).toLocaleDateString(undefined, { 
                     month: 'short', 
