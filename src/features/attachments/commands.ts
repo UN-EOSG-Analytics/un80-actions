@@ -90,7 +90,7 @@ export async function uploadActionAttachment(
       RETURNING id`,
       [
         actionId,
-        actionSubId,
+        actionSubId ?? "",
         milestoneId,
         formData.get("title") || null,
         formData.get("description") || null,
