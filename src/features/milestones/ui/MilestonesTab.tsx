@@ -346,7 +346,7 @@ export default function MilestonesTab({
     }
   };
 
-  const handleStatusChange = (milestoneId: string, status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized") => {
+  const handleStatusChange = (milestoneId: string, status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed") => {
     setConfirmDialog({ open: true, milestoneId, status });
   };
 
