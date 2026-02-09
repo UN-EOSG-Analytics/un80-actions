@@ -44,6 +44,18 @@ export function Header({ user, isAdmin, children, maxWidth = "7xl" }: Props) {
         <div className="flex items-center gap-4">
           {isLoggedIn ? (
             <>
+              {isAdmin && (
+                <Link
+                  href="/milestones"
+                  className={`text-sm font-medium transition-colors ${
+                    isMilestonePage
+                      ? "text-un-blue"
+                      : "text-gray-600 hover:text-un-blue"
+                  }`}
+                >
+                  Milestones
+                </Link>
+              )}
               <ActivityFeed />
               <UserMenu email={user.email} entity={user.entity} isAdmin={isAdmin} />
             </>

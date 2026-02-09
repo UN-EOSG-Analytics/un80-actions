@@ -463,7 +463,6 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                   />
                 </div>
               </th>
-              <th className="px-4 py-3">Public milestone</th>
               <th className="px-4 py-3">First milestone</th>
               <th className="px-4 py-3">Final milestone</th>
               <th className="w-10 px-4 py-3"></th>
@@ -473,7 +472,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
             {sortedRows.length === 0 ? (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={5}
                   className="px-4 py-12 text-center text-gray-400"
                 >
                   No actions found
@@ -495,9 +494,6 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                   <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-un-blue/10 text-un-blue font-semibold text-sm tabular-nums">
                     {actionLabel(r.action_id, r.action_sub_id)}
                   </span>
-                </td>
-                <td className="px-4 py-3 align-top">
-                  <MilestoneCell cell={r.public_milestone} />
                 </td>
                 <td className="px-4 py-3 align-top">
                   <MilestoneCell cell={r.first_milestone} />
