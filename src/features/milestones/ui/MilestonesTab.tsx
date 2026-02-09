@@ -408,7 +408,7 @@ export default function MilestonesTab({
     try {
       const result = await createMilestone({
         action_id: action.id,
-        action_sub_id: action.sub_id,
+        action_sub_id: action.sub_id || "",
         milestone_type: newMilestoneForm.milestone_type,
         is_public: newMilestoneForm.is_public,
         description: newMilestoneForm.description || null,
@@ -545,9 +545,7 @@ export default function MilestonesTab({
 
       // Add action info to form data
       formData.set("action_id", action.id.toString());
-      if (action.sub_id) {
-        formData.set("action_sub_id", action.sub_id);
-      }
+      formData.set("action_sub_id", action.sub_id || "");
 
       // Convert empty milestone_id to null (remove it from formData)
       const milestoneId = formData.get("milestone_id");

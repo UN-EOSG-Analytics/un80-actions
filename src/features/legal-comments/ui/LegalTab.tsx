@@ -85,7 +85,7 @@ export default function LegalTab({
     try {
       const result = await createLegalComment({
         action_id: action.id,
-        action_sub_id: action.sub_id,
+        action_sub_id: action.sub_id || "",
         content: newComment.trim(),
       });
 
@@ -137,7 +137,7 @@ export default function LegalTab({
     try {
       const result = await createLegalComment({
         action_id: action.id,
-        action_sub_id: action.sub_id,
+        action_sub_id: action.sub_id || "",
         content: replyText.trim(),
         reply_to: replyToCommentId,
       });

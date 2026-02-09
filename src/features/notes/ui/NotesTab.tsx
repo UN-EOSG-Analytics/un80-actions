@@ -127,7 +127,7 @@ export default function NotesTab({
     try {
       const result = await createNote({
         action_id: action.id,
-        action_sub_id: action.sub_id,
+        action_sub_id: action.sub_id || "",
         header: newNote.header.trim(),
         note_date: newNote.note_date,
         content: newNote.content.trim(),

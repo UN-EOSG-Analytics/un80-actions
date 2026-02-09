@@ -421,7 +421,7 @@ export default function QuestionsTab({
     try {
       const         result = await createQuestion({
         action_id: action.id,
-        action_sub_id: action.sub_id,
+        action_sub_id: action.sub_id || "",
         header: newQuestion.header.trim(),
         question_date: newQuestion.question_date,
         question: newQuestion.question.trim(),
