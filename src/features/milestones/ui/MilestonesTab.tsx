@@ -36,7 +36,9 @@ import {
   createMilestoneUpdate,
   deleteMilestoneUpdate,
   toggleMilestoneUpdateResolved,
+  updateMilestoneUpdate,
 } from "@/features/milestones/updates-commands";
+import { getCurrentUserIdForClient } from "@/features/auth/commands";
 import {
   getActionAttachments,
   getActionAttachmentCount,
@@ -150,6 +152,13 @@ export default function MilestonesTab({
   const [newCommentText, setNewCommentText] = useState<Record<string, string>>({});
   const [submittingCommentForAttachmentId, setSubmittingCommentForAttachmentId] = useState<string | null>(null);
   const [commentErrorByAttachmentId, setCommentErrorByAttachmentId] = useState<Record<string, string>>({});
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [editingUpdateId, setEditingUpdateId] = useState<string | null>(null);
+  const [editingContent, setEditingContent] = useState("");
+
+  useEffect(() => {
+    getCurrentUserIdForClient().then(({ userId }) => setCurrentUserId(userId));
+  }, []);
 
   const getFileIcon = (contentType: string, filename: string) => {
     if (contentType.startsWith("image/")) {
@@ -212,15 +221,15 @@ export default function MilestonesTab({
     loadMilestones();
   }, [loadMilestones]);
 
-  // Preload milestone updates for admins only (non-admins cannot see comments)
+  // Preload milestone updates for all users (comment on public and internal milestones)
   const milestoneIds = milestones.map((m) => m.id).join(",");
   useEffect(() => {
-    if (!isAdmin || milestones.length === 0) return;
+    if (milestones.length === 0) return;
     milestones.forEach((m) => {
       loadMilestoneUpdates(m.id);
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps -- loadMilestoneUpdates is stable; we want to run when milestone ids change
-  }, [milestoneIds, isAdmin]);
+  }, [milestoneIds]);
 
   // Separate public and private milestones
   const publicMilestones = milestones.filter((m) => m.is_public);
@@ -484,6 +493,36 @@ export default function MilestonesTab({
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete comment");
+    }
+  };
+
+  const startEditComment = (update: MilestoneUpdate) => {
+    setEditingUpdateId(update.id);
+    setEditingContent(update.content);
+  };
+
+  const cancelEditComment = () => {
+    setEditingUpdateId(null);
+    setEditingContent("");
+  };
+
+  const handleSaveEditComment = async (milestoneId: string, updateId: string) => {
+    if (!editingContent.trim()) return;
+    setSaving(true);
+    setError(null);
+    try {
+      const result = await updateMilestoneUpdate(updateId, editingContent.trim());
+      if (result.success) {
+        setEditingUpdateId(null);
+        setEditingContent("");
+        await loadMilestoneUpdates(milestoneId);
+      } else {
+        setError(result.error || "Failed to update comment");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update comment");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -913,8 +952,7 @@ export default function MilestonesTab({
                                       )}
                                     </div>
                                     
-                                    {/* Actions - admin only */}
-                                    {isAdmin && (
+                                    {/* Actions: Reply for all; Resolve for admin; Edit/Delete for author or admin */}
                                     <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                                       <button
                                         onClick={() => startReply(milestone.id, update.id)}
@@ -923,28 +961,66 @@ export default function MilestonesTab({
                                       >
                                         <CornerDownRight className="h-3 w-3" />
                                       </button>
-                                      <button
-                                        onClick={() => handleToggleResolved(milestone.id, update.id)}
-                                        className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-green-600"
-                                        title={update.is_resolved ? "Mark as unresolved" : "Mark as resolved"}
-                                      >
-                                        <CheckCircle2 className="h-3 w-3" />
-                                      </button>
-                                      <button
-                                        onClick={() => handleDeleteComment(milestone.id, update.id)}
-                                        className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600"
-                                        title="Delete"
-                                      >
-                                        <Trash2 className="h-3 w-3" />
-                                      </button>
+                                      {isAdmin && (
+                                        <button
+                                          onClick={() => handleToggleResolved(milestone.id, update.id)}
+                                          className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-green-600"
+                                          title={update.is_resolved ? "Mark as unresolved" : "Mark as resolved"}
+                                        >
+                                          <CheckCircle2 className="h-3 w-3" />
+                                        </button>
+                                      )}
+                                      {(isAdmin || (currentUserId && update.user_id === currentUserId)) && (
+                                        <>
+                                          <button
+                                            onClick={() => startEditComment(update)}
+                                            className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-un-blue"
+                                            title="Edit"
+                                          >
+                                            <Pencil className="h-3 w-3" />
+                                          </button>
+                                          <button
+                                            onClick={() => handleDeleteComment(milestone.id, update.id)}
+                                            className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600"
+                                            title="Delete"
+                                          >
+                                            <Trash2 className="h-3 w-3" />
+                                          </button>
+                                        </>
+                                      )}
                                     </div>
-                                    )}
                                   </div>
                                   
-                                  {/* Content */}
-                                  <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">
-                                    {update.content}
-                                  </p>
+                                  {/* Content or edit form */}
+                                  {editingUpdateId === update.id ? (
+                                    <div className="space-y-2">
+                                      <textarea
+                                        value={editingContent}
+                                        onChange={(e) => setEditingContent(e.target.value)}
+                                        className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                                        rows={3}
+                                        disabled={saving}
+                                        autoFocus
+                                      />
+                                      <div className="flex justify-end gap-2">
+                                        <Button variant="outline" size="sm" onClick={cancelEditComment} disabled={saving}>
+                                          Cancel
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          onClick={() => handleSaveEditComment(milestone.id, update.id)}
+                                          disabled={saving || !editingContent.trim()}
+                                          className="bg-un-blue hover:bg-un-blue/90"
+                                        >
+                                          {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">
+                                      {update.content}
+                                    </p>
+                                  )}
                                 </div>
 
                                 {/* Replies */}
@@ -967,7 +1043,7 @@ export default function MilestonesTab({
                                                   {new Date(reply.created_at).toLocaleDateString()} at {new Date(reply.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </span>
                                               </div>
-                                              {isAdmin && (
+                                              {(isAdmin || (currentUserId && reply.user_id === currentUserId)) && (
                                                 <button
                                                   onClick={() => handleDeleteComment(milestone.id, reply.id)}
                                                   className="shrink-0 rounded p-1 text-slate-400 opacity-0 transition-all hover:bg-slate-100 hover:text-red-600 group-hover/reply:opacity-100"
@@ -1089,21 +1165,47 @@ export default function MilestonesTab({
                                             </span>
                                           )}
                                         </div>
-                                        {isAdmin && (
                                         <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                                           <button onClick={() => startReply(milestone.id, update.id)} className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-amber-600" title="Reply">
                                             <CornerDownRight className="h-3 w-3" />
                                           </button>
-                                          <button onClick={() => handleToggleResolved(milestone.id, update.id)} className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-green-600" title={update.is_resolved ? "Mark as unresolved" : "Mark as resolved"}>
-                                            <CheckCircle2 className="h-3 w-3" />
-                                          </button>
-                                          <button onClick={() => handleDeleteComment(milestone.id, update.id)} className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600" title="Delete">
-                                            <Trash2 className="h-3 w-3" />
-                                          </button>
+                                          {isAdmin && (
+                                            <button onClick={() => handleToggleResolved(milestone.id, update.id)} className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-green-600" title={update.is_resolved ? "Mark as unresolved" : "Mark as resolved"}>
+                                              <CheckCircle2 className="h-3 w-3" />
+                                            </button>
+                                          )}
+                                          {(isAdmin || (currentUserId && update.user_id === currentUserId)) && (
+                                            <>
+                                              <button onClick={() => startEditComment(update)} className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-amber-600" title="Edit">
+                                                <Pencil className="h-3 w-3" />
+                                              </button>
+                                              <button onClick={() => handleDeleteComment(milestone.id, update.id)} className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600" title="Delete">
+                                                <Trash2 className="h-3 w-3" />
+                                              </button>
+                                            </>
+                                          )}
                                         </div>
-                                        )}
                                       </div>
-                                      <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">{update.content}</p>
+                                      {editingUpdateId === update.id ? (
+                                        <div className="space-y-2">
+                                          <textarea
+                                            value={editingContent}
+                                            onChange={(e) => setEditingContent(e.target.value)}
+                                            className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                                            rows={3}
+                                            disabled={saving}
+                                            autoFocus
+                                          />
+                                          <div className="flex justify-end gap-2">
+                                            <Button variant="outline" size="sm" onClick={cancelEditComment} disabled={saving}>Cancel</Button>
+                                            <Button size="sm" onClick={() => handleSaveEditComment(milestone.id, update.id)} disabled={saving || !editingContent.trim()} className="bg-amber-600 hover:bg-amber-700">
+                                              {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">{update.content}</p>
+                                      )}
                                     </div>
                                     {replies.length > 0 && (
                                       <div className="border-t border-amber-100 bg-amber-50/30 px-3 py-2">
@@ -1120,7 +1222,7 @@ export default function MilestonesTab({
                                                     <span className="text-xs font-medium text-slate-600">{reply.user_email?.split('@')[0] || "Unknown"}</span>
                                                     <span className="text-[10px] text-slate-400">{new Date(reply.created_at).toLocaleDateString()} at {new Date(reply.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                                   </div>
-                                                  {isAdmin && (
+                                                  {(isAdmin || (currentUserId && reply.user_id === currentUserId)) && (
                                                     <button onClick={() => handleDeleteComment(milestone.id, reply.id)} className="shrink-0 rounded p-1 text-slate-400 opacity-0 transition-all hover:bg-slate-100 hover:text-red-600 group-hover/reply:opacity-100" title="Delete reply">
                                                       <Trash2 className="h-3 w-3" />
                                                     </button>
@@ -1160,8 +1262,8 @@ export default function MilestonesTab({
                       </div>
                     </div>
 
-                    {/* Add New Comment Form - admin only */}
-                    {isAdmin && addingCommentId === milestone.id && !replyingToId && (
+                    {/* Add New Comment Form - all users */}
+                    {addingCommentId === milestone.id && !replyingToId && (
                       <div className="rounded-lg border border-un-blue/20 bg-un-blue/5 p-3">
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">

@@ -2,7 +2,7 @@
 
 import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
-import { checkIsAdmin } from "@/features/auth/lib/permissions";
+import { getCurrentUser } from "@/features/auth/service";
 
 // =========================================================
 // TYPES
@@ -31,12 +31,13 @@ export interface MilestoneUpdate {
 
 /**
  * Fetch all updates for a specific milestone.
- * Admin-only: returns empty array for non-admins.
+ * Any authenticated user can read (for both public and internal milestones).
  */
 export async function getMilestoneUpdates(
   milestoneId: string,
 ): Promise<MilestoneUpdate[]> {
-  if (!(await checkIsAdmin())) {
+  const user = await getCurrentUser();
+  if (!user) {
     return [];
   }
 

@@ -8,6 +8,7 @@ import {
   clearSession,
   createMagicToken,
   createSession,
+  getCurrentUser,
   isApprovedUser,
   recentTokenExists,
   upsertUser,
@@ -71,6 +72,14 @@ export async function verify(token: string): Promise<Result> {
 export async function logout(): Promise<void> {
   await clearSession();
   redirect("/login");
+}
+
+/**
+ * Returns the current user's id for client-side use (e.g. to show edit/delete on own comments).
+ */
+export async function getCurrentUserIdForClient(): Promise<{ userId: string | null }> {
+  const user = await getCurrentUser();
+  return { userId: user?.id ?? null };
 }
 
 /**
