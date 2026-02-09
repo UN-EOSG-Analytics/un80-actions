@@ -215,7 +215,7 @@ export function MilestoneCard({
                 ) : (
                   <Badge className={`${status.className} text-xs font-medium`}>{status.label}</Badge>
                 )}
-                <span className={`flex items-center gap-1.5 text-xs ${isPastDue ? 'text-red-600 font-medium' : 'text-slate-500'}`}>
+                <span className="flex items-center gap-1.5 text-xs text-slate-500">
                   <Calendar className="h-3 w-3" />
                   {milestone.deadline ? new Date(milestone.deadline).toLocaleDateString(undefined, { 
                     month: 'short', 
@@ -232,7 +232,7 @@ export function MilestoneCard({
                   </span>
                 )}
                 {onDocumentSubmittedChange != null && (
-                  <span onClick={(e) => e.stopPropagation()}>
+                  <span className="inline-flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                     <Select
                       value={documentSubmitted ? "submitted" : "not_submitted"}
                       onValueChange={(value: "submitted" | "not_submitted") => {
@@ -240,18 +240,18 @@ export function MilestoneCard({
                       }}
                     >
                       <SelectTrigger
-                        className={`!h-auto inline-flex w-auto items-center gap-1 rounded-full border-0 !px-2.5 !py-0.5 !text-xs font-medium !shadow-none transition-colors hover:opacity-80 focus-visible:!outline-none focus-visible:!ring-0 ${
+                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors hover:opacity-80 ${
                           documentSubmitted
-                            ? "bg-green-100 text-green-700"
-                            : "bg-amber-100 text-amber-700"
-                        } [&>svg]:!size-3 [&>svg]:!shrink-0 [&>svg]:!text-current`}
+                            ? "border-green-300 bg-green-50 text-green-800 hover:bg-green-100"
+                            : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                        }`}
                       >
                         {documentSubmitted ? (
-                          <Send className="h-3 w-3 shrink-0 text-current" />
+                          <Send className="h-3 w-3" />
                         ) : (
-                          <Clock className="h-3 w-3 shrink-0 text-current" />
+                          <Clock className="h-3 w-3" />
                         )}
-                        <SelectValue />
+                        <SelectValue className="text-xs" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="not_submitted">Not submitted</SelectItem>
@@ -277,6 +277,7 @@ export function MilestoneCard({
           >
             <Clock className="h-4 w-4" />
           </button>
+          {isAdmin && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -292,6 +293,7 @@ export function MilestoneCard({
               </span>
             )}
           </button>
+          )}
           {isAdmin && (
             <button
               onClick={(e) => {
