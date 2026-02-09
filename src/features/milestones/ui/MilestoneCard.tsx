@@ -232,7 +232,7 @@ export function MilestoneCard({
                   </span>
                 )}
                 {onDocumentSubmittedChange != null && (
-                  <span className="inline-flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                  <span onClick={(e) => e.stopPropagation()}>
                     <Select
                       value={documentSubmitted ? "submitted" : "not_submitted"}
                       onValueChange={(value: "submitted" | "not_submitted") => {
@@ -240,18 +240,18 @@ export function MilestoneCard({
                       }}
                     >
                       <SelectTrigger
-                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors hover:opacity-80 ${
+                        className={`!h-auto inline-flex w-auto items-center gap-1 rounded-full border-0 !px-2.5 !py-0.5 !text-xs font-medium !shadow-none transition-colors hover:opacity-80 focus-visible:!outline-none focus-visible:!ring-0 ${
                           documentSubmitted
-                            ? "border-green-300 bg-green-50 text-green-800 hover:bg-green-100"
-                            : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
-                        }`}
+                            ? "bg-green-100 text-green-700"
+                            : "bg-amber-100 text-amber-700"
+                        } [&>svg]:!size-3 [&>svg]:!shrink-0 [&>svg]:!text-current`}
                       >
                         {documentSubmitted ? (
-                          <Send className="h-3 w-3" />
+                          <Send className="h-3 w-3 shrink-0 text-current" />
                         ) : (
-                          <Clock className="h-3 w-3" />
+                          <Clock className="h-3 w-3 shrink-0 text-current" />
                         )}
-                        <SelectValue className="text-xs" />
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="not_submitted">Not submitted</SelectItem>
