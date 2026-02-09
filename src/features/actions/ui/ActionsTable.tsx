@@ -518,16 +518,9 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
         <table className="min-w-full w-full text-sm">
           <thead>
             <tr className="border-b bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-              <th className="px-3 py-3 whitespace-nowrap w-14">
+              <th className="pl-2 pr-1 py-3 whitespace-nowrap w-14">
                 <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("work_package_id")}
-                    className="inline-flex items-center hover:text-un-blue"
-                  >
-                    WP
-                    <SortIcon column="work_package_id" sortField={sortField} sortDirection={sortDirection} />
-                  </button>
+                  <span>WP</span>
                   <MultiSelectFilter
                     filterKey="wp"
                     options={uniqueWPIds}
@@ -749,7 +742,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   onClick={() => handleActionClick(a.action_id, a.action_sub_id)}
                   className="cursor-pointer transition-colors hover:bg-gray-50"
                 >
-                  <td className="px-3 py-3 whitespace-nowrap">
+                  <td className="pl-2 pr-1 py-3 whitespace-nowrap">
                     <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 font-medium text-sm tabular-nums">
                       {a.work_package_id}
                     </span>
