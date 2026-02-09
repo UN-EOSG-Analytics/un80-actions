@@ -312,7 +312,7 @@ export default function ActionModal({
                   className={`${breadcrumbActionClass} cursor-pointer`}
                   title={copied ? "Copied!" : "Click to copy link"}
                 >
-                  Action {action.action_display_id}
+                  <span>Action&nbsp;</span><span className="normal-case">{action.action_display_id}</span>
                   {copied && <Check className="inline ml-1.5 h-4 w-4 text-un-blue" />}
                 </button>
               </div>

@@ -102,7 +102,7 @@ const ACTION_SELECT = `
     ) as action_member_persons,
     -- Aggregated member entities (semicolon-separated)
     COALESCE(
-      (SELECT string_agg(DISTINCT ame.entity_id, ';')
+      (SELECT string_agg(DISTINCT ame.entity, ';')
        FROM action_member_entities ame
        WHERE ame.action_id = a.id
          AND (ame.action_sub_id IS NOT DISTINCT FROM a.sub_id)),
@@ -280,7 +280,7 @@ function buildWhereClause(
         SELECT 1 FROM action_member_entities ame
         WHERE ame.action_id = a.id
           AND (ame.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-          AND ame.entity_id ILIKE $${paramIndex++}
+          AND ame.entity ILIKE $${paramIndex++}
       )
     `);
     params.push(`%${filters.entity}%`);
@@ -369,14 +369,14 @@ export async function getActionByNumber(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   firstMilestone?: string | null,
 ): Promise<Action | null> {
-  // Match exact action by id and sub_id (or null)
+  // Match exact action by id and sub_id (empty string for no sub_id)
   // TODO: Use firstMilestone to filter or highlight specific milestone
   const rows = await query<ActionRow>(
     `${ACTION_SELECT}
      WHERE a.id = $1
-       AND (a.sub_id IS NOT DISTINCT FROM $2)
+       AND a.sub_id = $2
      LIMIT 1`,
-    [actionId, actionSubId ?? null],
+    [actionId, actionSubId ?? ''],
   );
 
   if (rows.length === 0) return null;

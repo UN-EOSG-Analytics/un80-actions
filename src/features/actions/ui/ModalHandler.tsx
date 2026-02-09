@@ -43,7 +43,8 @@ export default function ModalHandler({
     }
 
     const actionId = parseInt(actionMatch[1], 10);
-    const actionSubId = actionMatch[2] || null;
+    // Keep parentheses in sub_id as they're stored in the database (e.g., "(a)")
+    const actionSubId = actionMatch[2] || '';
     const firstMilestone = milestoneParam
       ? decodeUrlParam(milestoneParam)
       : null;
