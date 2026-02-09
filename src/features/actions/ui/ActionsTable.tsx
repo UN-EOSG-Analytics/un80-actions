@@ -12,7 +12,6 @@ import {
   Filter,
   Check,
   Send,
-  CircleAlert,
 } from "lucide-react";
 import {
   Select,
@@ -794,12 +793,10 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                         }`}
                       >
                         {a.deliverables_status === "submitted" ? (
-                          <Send className="h-3 w-3" />
-                        ) : (
-                          <CircleAlert className="h-3 w-3" />
-                        )}
-                        {a.deliverables_status === "submitted" ? (
-                          "Submitted"
+                          <>
+                            <Send className="h-3 w-3" />
+                            Submitted
+                          </>
                         ) : (
                           <span
                             className="font-extrabold leading-none"
