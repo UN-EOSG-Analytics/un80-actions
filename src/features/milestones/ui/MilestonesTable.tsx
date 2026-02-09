@@ -206,29 +206,33 @@ function MilestoneCell({ cell }: { cell: MilestoneViewCell | null }) {
     return <span className="text-gray-400">—</span>;
   }
   return (
-    <div className="space-y-1">
-      {hasDesc && (
-        <p className="text-gray-700 text-sm line-clamp-2">{cell.description}</p>
-      )}
-      {hasDeadline && cell.deadline && (
-        <p className="text-xs text-gray-500">{formatUNDate(cell.deadline)}</p>
-      )}
-      {statusLabel && (
-        <Badge
-          variant="outline"
-          className={`text-xs font-medium ${STATUS_STYLES[statusLabel]?.badge ?? "bg-gray-100 text-gray-700"}`}
-        >
-          {statusLabel}
-        </Badge>
-      )}
-      {pastDue && (
-        <span
-          className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-100 text-xs font-bold text-red-700"
-          title="Past due"
-        >
-          !
-        </span>
-      )}
+    <div className="space-y-2">
+      <div className="space-y-0.5">
+        {hasDesc && (
+          <p className="text-gray-700 text-sm line-clamp-2">{cell.description}</p>
+        )}
+        {hasDeadline && cell.deadline && (
+          <p className={`text-xs ${pastDue ? 'text-red-600 font-medium' : 'text-gray-500'}`}>{formatUNDate(cell.deadline)}</p>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        {statusLabel && (
+          <Badge
+            variant="outline"
+            className={`text-xs font-medium ${STATUS_STYLES[statusLabel]?.badge ?? "bg-gray-100 text-gray-700"}`}
+          >
+            {statusLabel}
+          </Badge>
+        )}
+        {pastDue && (
+          <span
+            className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-100 text-xs font-bold text-red-700"
+            title="Past due"
+          >
+            !
+          </span>
+        )}
+      </div>
     </div>
   );
 }
@@ -492,13 +496,13 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                     {actionLabel(r.action_id, r.action_sub_id)}
                   </span>
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 align-top">
                   <MilestoneCell cell={r.public_milestone} />
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 align-top">
                   <MilestoneCell cell={r.first_milestone} />
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 align-top">
                   <MilestoneCell cell={r.final_milestone} />
                 </td>
                 <td className="px-4 py-3 text-gray-400">
