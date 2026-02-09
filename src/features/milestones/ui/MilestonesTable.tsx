@@ -399,7 +399,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-              <th className="px-2 py-3 whitespace-nowrap w-14">
+              <th className="px-3 py-3 whitespace-nowrap w-14">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
