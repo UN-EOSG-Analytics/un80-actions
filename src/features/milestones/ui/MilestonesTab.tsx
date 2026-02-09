@@ -30,7 +30,6 @@ import { updateMilestone, createMilestone, approveMilestoneContent, requestMiles
 import { MilestoneCard } from "./MilestoneCard";
 import {
   getMilestoneUpdates,
-  getBatchMilestoneUpdates,
   type MilestoneUpdate,
 } from "@/features/milestones/updates-queries";
 import {
@@ -213,19 +212,14 @@ export default function MilestonesTab({
     loadMilestones();
   }, [loadMilestones]);
 
-  // Batch-load milestone updates for all milestones at once (admins only)
+  // Preload milestone updates for admins only (non-admins cannot see comments)
   const milestoneIds = milestones.map((m) => m.id).join(",");
   useEffect(() => {
     if (!isAdmin || milestones.length === 0) return;
-    
-    const loadAllUpdates = async () => {
-      const ids = milestones.map((m) => m.id);
-      const batchedUpdates = await getBatchMilestoneUpdates(ids);
-      setMilestoneUpdates(batchedUpdates);
-    };
-    
-    loadAllUpdates();
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- we want to run when milestone ids change
+    milestones.forEach((m) => {
+      loadMilestoneUpdates(m.id);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadMilestoneUpdates is stable; we want to run when milestone ids change
   }, [milestoneIds, isAdmin]);
 
   // Separate public and private milestones
@@ -343,7 +337,7 @@ export default function MilestonesTab({
     }
   };
 
-  const handleStatusChange = (milestoneId: string, status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed") => {
+  const handleStatusChange = (milestoneId: string, status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized") => {
     setConfirmDialog({ open: true, milestoneId, status });
   };
 
@@ -408,7 +402,7 @@ export default function MilestonesTab({
     try {
       const result = await createMilestone({
         action_id: action.id,
-        action_sub_id: action.sub_id || "",
+        action_sub_id: action.sub_id,
         milestone_type: newMilestoneForm.milestone_type,
         is_public: newMilestoneForm.is_public,
         description: newMilestoneForm.description || null,
@@ -545,7 +539,9 @@ export default function MilestonesTab({
 
       // Add action info to form data
       formData.set("action_id", action.id.toString());
-      formData.set("action_sub_id", action.sub_id || "");
+      if (action.sub_id) {
+        formData.set("action_sub_id", action.sub_id);
+      }
 
       // Convert empty milestone_id to null (remove it from formData)
       const milestoneId = formData.get("milestone_id");
@@ -654,7 +650,6 @@ export default function MilestonesTab({
               user_id: comment.user_id,
               user_email: comment.user_email,
               comment: comment.comment,
-              is_legal: comment.is_legal,
               created_at: typeof comment.created_at === "string" ? new Date(comment.created_at) : comment.created_at,
             },
           ],

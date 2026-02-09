@@ -30,13 +30,14 @@ export interface MilestoneUpdateResult {
 
 /**
  * Create a new update for a milestone.
+ * Any authenticated user can add comments on internal and public milestones.
  */
 export async function createMilestoneUpdate(
   input: MilestoneUpdateCreateInput,
 ): Promise<MilestoneUpdateResult> {
-  const auth = await requireAdmin();
-  if (!auth.authorized) {
-    return { success: false, error: auth.error };
+  const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, error: "Not authenticated" };
   }
 
   const isLegal = input.is_legal ?? false;
@@ -46,7 +47,7 @@ export async function createMilestoneUpdate(
       `INSERT INTO ${DB_SCHEMA}.milestone_updates (milestone_id, user_id, content, reply_to, is_legal)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [input.milestone_id, auth.user.id, input.content, input.reply_to || null, isLegal],
+      [input.milestone_id, user.id, input.content, input.reply_to || null, isLegal],
     );
 
     const row = rows[0];
@@ -93,9 +94,9 @@ export async function toggleMilestoneUpdateResolved(
 export async function deleteMilestoneUpdate(
   updateId: string,
 ): Promise<MilestoneUpdateResult> {
-  const auth = await requireAdmin();
-  if (!auth.authorized) {
-    return { success: false, error: auth.error };
+  const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, error: "Not authenticated" };
   }
 
   try {
@@ -106,6 +107,13 @@ export async function deleteMilestoneUpdate(
 
     if (!checkRows[0]) {
       return { success: false, error: "Update not found" };
+    }
+
+    const isAdmin = user.user_role === "Admin" || user.user_role === "Legal";
+    const isOwner = checkRows[0].user_id === user.id;
+
+    if (!isAdmin && !isOwner) {
+      return { success: false, error: "Not authorized to delete this update" };
     }
 
     await query(

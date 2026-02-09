@@ -277,7 +277,6 @@ export function MilestoneCard({
           >
             <Clock className="h-4 w-4" />
           </button>
-          {isAdmin && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -293,7 +292,6 @@ export function MilestoneCard({
               </span>
             )}
           </button>
-          )}
           {isAdmin && (
             <button
               onClick={(e) => {

@@ -2,7 +2,6 @@
 
 import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
-import { checkIsAdmin } from "@/features/auth/lib/permissions";
 
 // =========================================================
 // TYPES
@@ -31,15 +30,10 @@ export interface MilestoneUpdate {
 
 /**
  * Fetch all updates for a specific milestone.
- * Admin-only: returns empty array for non-admins.
  */
 export async function getMilestoneUpdates(
   milestoneId: string,
 ): Promise<MilestoneUpdate[]> {
-  if (!(await checkIsAdmin())) {
-    return [];
-  }
-
   const rows = await query<MilestoneUpdate & { is_legal?: boolean }>(
     `SELECT
       u.id,
