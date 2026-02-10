@@ -151,7 +151,9 @@ export default function OverviewTab({ action }: { action: Action }) {
             {action.document_paragraph && (
               <InfoRow label="Paragraph">
                 <span className="font-mono text-sm">
-                  {action.document_paragraph}
+                  {Number.isFinite(Number(action.document_paragraph))
+                    ? Math.round(Number(action.document_paragraph))
+                    : String(action.document_paragraph)}
                 </span>
               </InfoRow>
             )}
