@@ -271,7 +271,7 @@ export default function MilestonesTab({
     }
   };
 
-  const startAddingComment = (milestoneId: string) => {
+  const startAddingComment = (milestoneId: string, isPublic?: boolean) => {
     if (addingCommentId === milestoneId) {
       // Close if clicking same button again
       setAddingCommentId(null);
@@ -280,6 +280,7 @@ export default function MilestonesTab({
       setReplyingToId(null);
       setCommentText("");
       setError(null);
+      if (isPublic === false) setCommentIsLegal(false);
       // Load updates if not already loaded
       if (!milestoneUpdates[milestoneId]) {
         loadMilestoneUpdates(milestoneId);
@@ -731,7 +732,7 @@ export default function MilestonesTab({
             milestone={milestone}
             updates={updates}
             onEdit={() => startEditing(milestone)}
-            onComment={() => startAddingComment(milestone.id)}
+            onComment={() => startAddingComment(milestone.id, milestone.is_public)}
             onShowHistory={() => toggleVersionHistory(milestone.id)}
             onStatusChange={isAdmin ? (status) => handleStatusChange(milestone.id, status) : undefined}
             isAdmin={isAdmin}
@@ -1114,7 +1115,8 @@ export default function MilestonesTab({
                       </div>
                     </div>
 
-                    {/* Section: Legal updates & comments */}
+                    {/* Section: Legal updates & comments (public milestones only) */}
+                    {milestone.is_public && (
                     <div className="rounded-lg border border-amber-200 border-l-4 border-l-amber-500 bg-amber-50/20">
                       <div className="flex items-center gap-2 border-b border-amber-200 bg-white/80 px-3 py-2">
                         <Scale className="h-4 w-4 text-amber-600" />
@@ -1258,11 +1260,13 @@ export default function MilestonesTab({
                         )}
                       </div>
                     </div>
+                    )}
 
                     {/* Add New Comment Form - all users */}
                     {addingCommentId === milestone.id && !replyingToId && (
                       <div className="rounded-lg border border-un-blue/20 bg-un-blue/5 p-3">
                         <div className="space-y-2">
+                          {milestone.is_public && (
                           <div className="flex items-center gap-2">
                             <span className="text-xs font-medium text-slate-600">Post to:</span>
                             <div className="flex rounded-lg border border-slate-200 bg-white p-0.5">
@@ -1291,6 +1295,7 @@ export default function MilestonesTab({
                               </button>
                             </div>
                           </div>
+                          )}
                           <textarea
                             value={commentText}
                             onChange={(e) => setCommentText(e.target.value)}
