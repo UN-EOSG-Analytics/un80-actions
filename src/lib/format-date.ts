@@ -20,8 +20,14 @@ const MONTHS = [
 
 /**
  * Format date according to UN style: "21 April 2004"
+ * Date-only strings (YYYY-MM-DD) are treated as calendar dates to avoid timezone
+ * shifting the day (e.g. "2026-02-12" must display as 12 February, not 11 in UTC-*).
  */
 export function formatUNDate(date: Date | string): string {
+  if (typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date.trim())) {
+    const [y, m, d] = date.trim().split("-").map(Number);
+    return `${d} ${MONTHS[m - 1]} ${y}`;
+  }
   const d = typeof date === "string" ? new Date(date) : date;
   const day = d.getDate();
   const month = MONTHS[d.getMonth()];
