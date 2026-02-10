@@ -8,7 +8,7 @@ Source:
 
 Behaviour:
 - Each record is one question. We insert into action_questions with:
-  - action_id from ActionNo, action_sub_id "", header from classify_header(question),
+  - action_id from ActionNo, action_sub_id "", header "Unspecified",
   - question_date and question from the record, comment from notes.
 
 Idempotent:
@@ -18,7 +18,6 @@ Idempotent:
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -40,16 +39,6 @@ class QuestionInput:
   question: str
   # Optional notes mapped to the "Notes (on questions)" field (comment column)
   comment: Optional[str]
-
-
-def classify_header(text: str) -> str:
-  """Choose header for the question based on text content."""
-  lower = text.lower()
-  if "task force" in lower:
-    return "Task Force"
-  if "steering committee" in lower or "steering commitee" in lower:
-    return "Steering Committee"
-  return "Unspecified"
 
 
 def record_to_question(record: dict) -> Optional[QuestionInput]:
@@ -79,10 +68,9 @@ def record_to_question(record: dict) -> Optional[QuestionInput]:
   if raw_notes is not None and str(raw_notes).strip():
     notes = str(raw_notes).strip()
 
-  header = classify_header(question)
   return QuestionInput(
     action_id=action_id,
-    header=header,
+    header="Unspecified",
     question_date=question_date,
     question=question,
     comment=notes,
