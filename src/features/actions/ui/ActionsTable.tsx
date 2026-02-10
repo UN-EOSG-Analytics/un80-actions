@@ -596,7 +596,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   />
                 </div>
               </th>
-              {isAdmin && (
               <th className="px-4 py-3 whitespace-nowrap align-top">
                 <div className="flex flex-col gap-1">
                   <div className="text-xs font-normal text-gray-500 tabular-nums">
@@ -630,7 +629,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   </div>
                 </div>
               </th>
-              )}
               {isAdmin && (
               <th className="px-4 py-3 whitespace-nowrap">
                 <button
@@ -668,7 +666,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
             {sortedActions.length === 0 ? (
               <tr>
                 <td
-                  colSpan={isAdmin ? 8 : 6}
+                  colSpan={isAdmin ? 8 : 7}
                   className="px-4 py-12 text-center text-gray-400"
                 >
                   No actions found
@@ -697,7 +695,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   <td className="px-4 py-3 text-gray-700">
                     <span className="line-clamp-2">{a.indicative_action}</span>
                   </td>
-                  {isAdmin && (
                   <td className="px-4 py-3">
                     {a.deliverables_status ? (
                       <Badge
@@ -726,7 +723,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                       <span className="text-gray-400 text-xs">—</span>
                     )}
                   </td>
-                  )}
                   {isAdmin && (
                   <td
                     className="px-4 py-3 text-gray-400"
