@@ -271,7 +271,7 @@ export default function MilestonesTab({
     }
   };
 
-  const startAddingComment = (milestoneId: string, isPublic?: boolean) => {
+  const startAddingComment = (milestoneId: string, isPublic?: boolean, userIsAdmin?: boolean) => {
     if (addingCommentId === milestoneId) {
       // Close if clicking same button again
       setAddingCommentId(null);
@@ -280,7 +280,7 @@ export default function MilestonesTab({
       setReplyingToId(null);
       setCommentText("");
       setError(null);
-      if (isPublic === false) setCommentIsLegal(false);
+      if (isPublic === false || userIsAdmin === false) setCommentIsLegal(false);
       // Load updates if not already loaded
       if (!milestoneUpdates[milestoneId]) {
         loadMilestoneUpdates(milestoneId);
@@ -732,7 +732,7 @@ export default function MilestonesTab({
             milestone={milestone}
             updates={updates}
             onEdit={() => startEditing(milestone)}
-            onComment={() => startAddingComment(milestone.id, milestone.is_public)}
+            onComment={() => startAddingComment(milestone.id, milestone.is_public, isAdmin)}
             onShowHistory={() => toggleVersionHistory(milestone.id)}
             onStatusChange={isAdmin ? (status) => handleStatusChange(milestone.id, status) : undefined}
             isAdmin={isAdmin}
@@ -1115,8 +1115,8 @@ export default function MilestonesTab({
                       </div>
                     </div>
 
-                    {/* Section: Legal updates & comments (public milestones only) */}
-                    {milestone.is_public && (
+                    {/* Section: Legal updates & comments (public milestones, admin only) */}
+                    {milestone.is_public && isAdmin && (
                     <div className="rounded-lg border border-amber-200 border-l-4 border-l-amber-500 bg-amber-50/20">
                       <div className="flex items-center gap-2 border-b border-amber-200 bg-white/80 px-3 py-2">
                         <Scale className="h-4 w-4 text-amber-600" />
@@ -1266,7 +1266,7 @@ export default function MilestonesTab({
                     {addingCommentId === milestone.id && !replyingToId && (
                       <div className="rounded-lg border border-un-blue/20 bg-un-blue/5 p-3">
                         <div className="space-y-2">
-                          {milestone.is_public && (
+                          {milestone.is_public && isAdmin && (
                           <div className="flex items-center gap-2">
                             <span className="text-xs font-medium text-slate-600">Post to:</span>
                             <div className="flex rounded-lg border border-slate-200 bg-white p-0.5">
@@ -1760,7 +1760,7 @@ export default function MilestonesTab({
                     </div>
                   )}
 
-                  {/* Comments for this document – Team vs Legal */}
+                  {/* Comments for this document – team only */}
                   {showCommentsAttachmentId === att.id && (
                     <div className="mt-4 border-t border-slate-200 pt-4 space-y-4">
                       {loadingCommentsForAttachmentId === att.id ? (
@@ -1773,102 +1773,52 @@ export default function MilestonesTab({
                           {(() => {
                             const comments = attachmentComments[att.id] ?? [];
                             const teamComments = comments.filter((c) => !c.is_legal);
-                            const legalComments = comments.filter((c) => c.is_legal);
                             return (
-                              <>
-                                {/* Team comments */}
-                                <div className="rounded-lg border border-slate-200 border-l-4 border-l-un-blue bg-slate-50/30">
-                                  <div className="flex items-center gap-2 border-b border-slate-200 bg-white/80 px-3 py-2">
-                                    <User className="h-4 w-4 text-un-blue" />
-                                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-600">
-                                      Team comments
+                              <div className="rounded-lg border border-slate-200 border-l-4 border-l-un-blue bg-slate-50/30">
+                                <div className="flex items-center gap-2 border-b border-slate-200 bg-white/80 px-3 py-2">
+                                  <User className="h-4 w-4 text-un-blue" />
+                                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                    Team comments
+                                  </span>
+                                  {teamComments.length > 0 && (
+                                    <span className="rounded-full bg-un-blue/15 px-2 py-0.5 text-[10px] font-semibold text-un-blue">
+                                      {teamComments.length}
                                     </span>
-                                    {teamComments.length > 0 && (
-                                      <span className="rounded-full bg-un-blue/15 px-2 py-0.5 text-[10px] font-semibold text-un-blue">
-                                        {teamComments.length}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="p-2">
-                                    {teamComments.length === 0 ? (
-                                      <p className="py-3 text-center text-xs text-slate-400">No team comments yet.</p>
-                                    ) : (
-                                      <div className="space-y-2">
-                                        {teamComments.map((c) => (
-                                          <div
-                                            key={c.id}
-                                            className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
-                                          >
-                                            <div className="mb-1 flex items-center gap-2 text-xs text-slate-500">
-                                              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-un-blue/10 text-[9px] font-semibold text-un-blue">
-                                                {(c.user_email?.[0] ?? "U").toUpperCase()}
-                                              </div>
-                                              {c.user_email ? (
-                                                <span className="font-medium text-slate-600">{c.user_email}</span>
-                                              ) : (
-                                                <span className="italic">Unknown user</span>
-                                              )}
-                                              <span>
-                                                {new Date(c.created_at).toLocaleString(undefined, {
-                                                  dateStyle: "short",
-                                                  timeStyle: "short",
-                                                })}
-                                              </span>
-                                            </div>
-                                            <p className="text-slate-700 whitespace-pre-wrap">{c.comment}</p>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
+                                  )}
                                 </div>
-                                {/* Legal comments */}
-                                <div className="rounded-lg border border-amber-200 border-l-4 border-l-amber-500 bg-amber-50/20">
-                                  <div className="flex items-center gap-2 border-b border-amber-200 bg-white/80 px-3 py-2">
-                                    <Scale className="h-4 w-4 text-amber-600" />
-                                    <span className="text-xs font-semibold uppercase tracking-wide text-amber-800/90">
-                                      Legal comments
-                                    </span>
-                                    {legalComments.length > 0 && (
-                                      <span className="rounded-full bg-amber-200/80 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
-                                        {legalComments.length}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="p-2">
-                                    {legalComments.length === 0 ? (
-                                      <p className="py-3 text-center text-xs text-amber-700/70">No legal comments yet.</p>
-                                    ) : (
-                                      <div className="space-y-2">
-                                        {legalComments.map((c) => (
-                                          <div
-                                            key={c.id}
-                                            className="rounded-md border border-amber-200 bg-white px-3 py-2 text-sm"
-                                          >
-                                            <div className="mb-1 flex items-center gap-2 text-xs text-slate-500">
-                                              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-[9px] font-semibold text-amber-700">
-                                                {(c.user_email?.[0] ?? "U").toUpperCase()}
-                                              </div>
-                                              {c.user_email ? (
-                                                <span className="font-medium text-slate-600">{c.user_email}</span>
-                                              ) : (
-                                                <span className="italic">Unknown user</span>
-                                              )}
-                                              <span>
-                                                {new Date(c.created_at).toLocaleString(undefined, {
-                                                  dateStyle: "short",
-                                                  timeStyle: "short",
-                                                })}
-                                              </span>
+                                <div className="p-2">
+                                  {teamComments.length === 0 ? (
+                                    <p className="py-3 text-center text-xs text-slate-400">No team comments yet.</p>
+                                  ) : (
+                                    <div className="space-y-2">
+                                      {teamComments.map((c) => (
+                                        <div
+                                          key={c.id}
+                                          className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+                                        >
+                                          <div className="mb-1 flex items-center gap-2 text-xs text-slate-500">
+                                            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-un-blue/10 text-[9px] font-semibold text-un-blue">
+                                              {(c.user_email?.[0] ?? "U").toUpperCase()}
                                             </div>
-                                            <p className="text-slate-700 whitespace-pre-wrap">{c.comment}</p>
+                                            {c.user_email ? (
+                                              <span className="font-medium text-slate-600">{c.user_email}</span>
+                                            ) : (
+                                              <span className="italic">Unknown user</span>
+                                            )}
+                                            <span>
+                                              {new Date(c.created_at).toLocaleString(undefined, {
+                                                dateStyle: "short",
+                                                timeStyle: "short",
+                                              })}
+                                            </span>
                                           </div>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
+                                          <p className="text-slate-700 whitespace-pre-wrap">{c.comment}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
-                              </>
+                              </div>
                             );
                           })()}
                           {isAdmin && (
