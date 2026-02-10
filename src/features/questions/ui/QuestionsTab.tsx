@@ -362,7 +362,7 @@ export default function QuestionsTab({
   const [tagsByQuestionId, setTagsByQuestionId] = useState<
     Record<string, Tag[]>
   >({});
-  const HEADER_OPTIONS = ["Task Force", "Steering Committee", "Check-ins"];
+  const HEADER_OPTIONS = ["Task Force", "Steering Committee", "Check-ins", "Unspecified"];
   const MILESTONE_NONE_VALUE = "__none__";
 
   const loadQuestions = async () => {
@@ -618,33 +618,16 @@ export default function QuestionsTab({
         </div>
         <div>
           <label className="mb-1 block text-xs font-medium text-slate-600">
-            Milestone (optional)
+            Notes (on questions) (optional)
           </label>
-          <Select
-            value={newQuestion.milestone_id || MILESTONE_NONE_VALUE}
-            onValueChange={(value) => setNewQuestion({ ...newQuestion, milestone_id: value === MILESTONE_NONE_VALUE ? "" : value })}
+          <textarea
+            value={newQuestion.comment}
+            onChange={(e) => setNewQuestion({ ...newQuestion, comment: e.target.value })}
+            placeholder="Add any additional context or notes related to these questions..."
+            rows={2}
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-y"
             disabled={submitting}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select milestone..." />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={MILESTONE_NONE_VALUE}>None</SelectItem>
-              {milestones.map((milestone) => {
-                const milestoneId = milestone.action_sub_id 
-                  ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}` 
-                  : `${milestone.action_id}.${milestone.serial_number}`;
-                const label = milestone.description 
-                  ? `${milestoneId}: ${milestone.description.substring(0, 50)}${milestone.description.length > 50 ? '...' : ''}`
-                  : milestoneId;
-                return (
-                  <SelectItem key={milestone.id} value={milestone.id}>
-                    {label}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
+          />
         </div>
         <div>
           <label className="mb-1 block text-xs font-medium text-slate-600">
@@ -704,16 +687,33 @@ export default function QuestionsTab({
         </div>
         <div>
           <label className="mb-1 block text-xs font-medium text-slate-600">
-            Additional comments (optional)
+            Milestone (optional)
           </label>
-          <textarea
-            value={newQuestion.comment}
-            onChange={(e) => setNewQuestion({ ...newQuestion, comment: e.target.value })}
-            placeholder="Add any additional context or comments..."
-            rows={2}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-y"
+          <Select
+            value={newQuestion.milestone_id || MILESTONE_NONE_VALUE}
+            onValueChange={(value) => setNewQuestion({ ...newQuestion, milestone_id: value === MILESTONE_NONE_VALUE ? "" : value })}
             disabled={submitting}
-          />
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select milestone..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={MILESTONE_NONE_VALUE}>None</SelectItem>
+              {milestones.map((milestone) => {
+                const milestoneId = milestone.action_sub_id 
+                  ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}` 
+                  : `${milestone.action_id}.${milestone.serial_number}`;
+                const label = milestone.description 
+                  ? `${milestoneId}: ${milestone.description.substring(0, 50)}${milestone.description.length > 50 ? '...' : ''}`
+                  : milestoneId;
+                return (
+                  <SelectItem key={milestone.id} value={milestone.id}>
+                    {label}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex justify-end">
           <Button
@@ -835,7 +835,7 @@ export default function QuestionsTab({
                         )}
                         {q.comment && (
                           <div className="rounded-lg border border-slate-200 bg-slate-50/80 px-4 py-2.5">
-                            <p className="text-xs font-medium text-slate-500 mb-1">Additional comments</p>
+                            <p className="text-xs font-medium text-slate-500 mb-1">Notes (on questions)</p>
                             <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
                               <BoldText>{q.comment}</BoldText>
                             </p>

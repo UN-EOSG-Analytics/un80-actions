@@ -2,5 +2,6 @@
 <project version="4">
   <component name="DataSourcePerFileMappings">
     <file url="file://$PROJECT_DIR$/sql/migrations/016_add_milestone_document_submitted.sql" value="08f42892-aa46-4815-9350-c13360bd4311" />
+    <file url="file://$PROJECT_DIR$/sql/seed_question_action1_task_force.sql" value="08f42892-aa46-4815-9350-c13360bd4311" />
   </component>
 </project>
