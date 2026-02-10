@@ -58,7 +58,7 @@ export default function NotesTab({
   isAdmin?: boolean;
   exportProps?: { onExport: (format: "word" | "pdf" | "markdown") => void; exporting: boolean };
 }) {
-  const HEADER_OPTIONS = ["Task Force", "Steering Committee", "Check-ins"];
+  const HEADER_OPTIONS = ["Task Force", "Steering Committee", "Check-ins", "Unspecified"];
   const [notes, setNotes] = useState<ActionNote[]>([]);
   const [questions, setQuestions] = useState<ActionQuestion[]>([]);
   const [loading, setLoading] = useState(true);
