@@ -361,6 +361,18 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     return { submitted, total };
   }, [filteredActions]);
 
+  // Calculate intermediate milestones counter
+  const intermediateMilestonesCounter = useMemo(() => {
+    const actionsWithIntermediate = filteredActions.filter((a) => {
+      return a.milestones.some((m) => 
+        m.milestone_type === "second" || 
+        m.milestone_type === "third" || 
+        m.milestone_type === "fourth"
+      );
+    });
+    return actionsWithIntermediate.length;
+  }, [filteredActions]);
+
   const sortedActions = useMemo(() => {
     const dir = sortDirection === "asc" ? 1 : -1;
     return [...filteredActions].sort((a, b) => {
@@ -488,6 +500,12 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
             Clear all filters
           </button>
         )}
+      </div>
+
+      {/* Intermediate Milestones Counter */}
+      <div className="flex items-center gap-2 text-sm text-gray-600">
+        <span className="font-medium">Actions with intermediate milestones:</span>
+        <span className="font-semibold text-un-blue">{intermediateMilestonesCounter}</span>
       </div>
 
       {/* Simple Table */}
