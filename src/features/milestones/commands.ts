@@ -66,12 +66,15 @@ export async function createMilestone(
       return { success: false, error: "You must be logged in" };
     }
 
+    // action_sub_id is NOT NULL in DB; use '' when absent (e.g. internal milestones on actions without sub_id)
+    const actionSubId = input.action_sub_id ?? "";
+
     // Get next serial_number for this action (max + 1, or 1 if none exist)
     const nextSerial = await query<{ next_serial: number }>(
       `SELECT COALESCE(MAX(serial_number), 0) + 1 AS next_serial
        FROM ${DB_SCHEMA}.action_milestones
        WHERE action_id = $1 AND (action_sub_id IS NOT DISTINCT FROM $2)`,
-      [input.action_id, input.action_sub_id ?? null],
+      [input.action_id, actionSubId],
     );
     const serial_number = nextSerial[0]?.next_serial ?? 1;
 
@@ -82,7 +85,7 @@ export async function createMilestone(
        RETURNING *`,
       [
         input.action_id,
-        input.action_sub_id || null,
+        actionSubId,
         serial_number,
         input.milestone_type,
         input.is_public ?? false,
