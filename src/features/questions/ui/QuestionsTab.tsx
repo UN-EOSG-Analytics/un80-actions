@@ -797,6 +797,15 @@ export default function QuestionsTab({
                             return null;
                           })()}
                         </div>
+                        {/* Notes on questions (if any) */}
+                        {q.comment && (
+                          <div className="rounded-lg border border-slate-200 bg-slate-50/80 px-4 py-2.5">
+                            <p className="text-xs font-medium text-slate-500 mb-1">Notes (on questions)</p>
+                            <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
+                              <BoldText>{q.comment}</BoldText>
+                            </p>
+                          </div>
+                        )}
                         {/* Question body */}
                         <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-4 py-3">
                           <SelectableText
@@ -831,14 +840,6 @@ export default function QuestionsTab({
                                 {q.answered_by_email && ` by ${q.answered_by_email}`}
                               </p>
                             )}
-                          </div>
-                        )}
-                        {q.comment && (
-                          <div className="rounded-lg border border-slate-200 bg-slate-50/80 px-4 py-2.5">
-                            <p className="text-xs font-medium text-slate-500 mb-1">Notes (on questions)</p>
-                            <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
-                              <BoldText>{q.comment}</BoldText>
-                            </p>
                           </div>
                         )}
                         {/* Footer: meta + actions */}
