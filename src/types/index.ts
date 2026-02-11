@@ -148,7 +148,6 @@ export interface ActionMilestone {
   finalized: boolean;
   attention_to_timeline: boolean;
   confirmation_needed: boolean;
-  no_submission: boolean;
   milestone_document_submitted: boolean;
   description: string | null;
   deadline: string | null; // ISO date string

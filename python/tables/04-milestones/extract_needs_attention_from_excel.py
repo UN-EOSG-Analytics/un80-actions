@@ -7,8 +7,7 @@ Reads:
 
 Maps Excel status text to the milestone dropdown status (internal milestones only;
 public milestones are not updated):
-  - "Draft" → draft
-  - "No submission" → no_submission (No Submission)
+  - "Draft" / "No submission" → draft
   - "Needs Attention" / "Needs attention" → needs_attention
   - "Attention to timeline" → attention_to_timeline
   - "Confirmation needed" → confirmation_needed
@@ -49,7 +48,7 @@ HEADER_ROW = 3  # 0-indexed
 # Excel "Needs attention" value (normalized) -> internal status name
 STATUS_MAP = {
     "draft": "draft",
-    "no submission": "no_submission",
+    "no submission": "draft",
     "needs attention": "needs_attention",
     "attention to timeline": "attention_to_timeline",
     "confirmation needed": "confirmation_needed",
@@ -117,22 +116,6 @@ def sql_for_status(status: str) -> str:
         return """
     UPDATE un80actions.action_milestones
     SET is_draft = TRUE,
-        no_submission = FALSE,
-        is_approved = FALSE,
-        needs_attention = FALSE,
-        needs_ola_review = FALSE,
-        reviewed_by_ola = FALSE,
-        finalized = FALSE,
-        attention_to_timeline = FALSE,
-        confirmation_needed = FALSE,
-        content_review_status = 'needs_review'::un80actions.content_review_status
-    WHERE action_id = %s AND (action_sub_id IS NOT DISTINCT FROM %s) AND is_public = FALSE
-    """
-    if status == "no_submission":
-        return """
-    UPDATE un80actions.action_milestones
-    SET no_submission = TRUE,
-        is_draft = TRUE,
         is_approved = FALSE,
         needs_attention = FALSE,
         needs_ola_review = FALSE,
@@ -148,7 +131,6 @@ def sql_for_status(status: str) -> str:
     UPDATE un80actions.action_milestones
     SET finalized = TRUE,
         is_draft = FALSE,
-        no_submission = FALSE,
         is_approved = FALSE,
         needs_attention = FALSE,
         needs_ola_review = FALSE,
@@ -163,7 +145,6 @@ def sql_for_status(status: str) -> str:
     UPDATE un80actions.action_milestones
     SET attention_to_timeline = TRUE,
         is_draft = FALSE,
-        no_submission = FALSE,
         is_approved = FALSE,
         needs_attention = FALSE,
         needs_ola_review = FALSE,
@@ -192,7 +173,6 @@ def sql_for_status(status: str) -> str:
     UPDATE un80actions.action_milestones
     SET needs_attention = TRUE,
         is_draft = FALSE,
-        no_submission = FALSE,
         is_approved = FALSE,
         needs_ola_review = FALSE,
         reviewed_by_ola = FALSE,
@@ -207,7 +187,6 @@ def sql_for_status(status: str) -> str:
     UPDATE un80actions.action_milestones
     SET is_approved = TRUE,
         is_draft = FALSE,
-        no_submission = FALSE,
         needs_attention = FALSE,
         needs_ola_review = FALSE,
         reviewed_by_ola = FALSE,
@@ -222,7 +201,6 @@ def sql_for_status(status: str) -> str:
     UPDATE un80actions.action_milestones
     SET needs_ola_review = TRUE,
         is_draft = FALSE,
-        no_submission = FALSE,
         is_approved = FALSE,
         needs_attention = FALSE,
         reviewed_by_ola = FALSE,
@@ -237,7 +215,6 @@ def sql_for_status(status: str) -> str:
     UPDATE un80actions.action_milestones
     SET reviewed_by_ola = TRUE,
         is_draft = FALSE,
-        no_submission = FALSE,
         is_approved = FALSE,
         needs_attention = FALSE,
         needs_ola_review = FALSE,

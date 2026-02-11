@@ -24,7 +24,7 @@ interface MilestoneCardProps {
   onEdit: () => void;
   onComment: () => void;
   onShowHistory: () => void;
-  onStatusChange?: (status: "draft" | "no_submission" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed") => void;
+  onStatusChange?: (status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed") => void;
   onDocumentSubmittedChange?: (milestoneId: string, submitted: boolean) => void;
   documentSubmitted?: boolean;
   isAdmin?: boolean;
@@ -43,9 +43,6 @@ export function MilestoneCard({
 }: MilestoneCardProps) {
   // Determine display status
   const getDisplayStatus = () => {
-    if (milestone.no_submission) {
-      return { label: "No Submission", className: "bg-slate-100 text-slate-600" };
-    }
     if (milestone.is_draft) {
       return { label: "Draft", className: "bg-slate-100 text-slate-600" };
     }
@@ -76,8 +73,7 @@ export function MilestoneCard({
   const status = getDisplayStatus();
 
   // Determine current status (mutually exclusive)
-  const getCurrentStatus = (): "draft" | "no_submission" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed" | "in_review" => {
-    if (milestone.no_submission) return "no_submission";
+  const getCurrentStatus = (): "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed" | "in_review" => {
     if (milestone.is_draft) return "draft";
     if (milestone.finalized) return "finalized";
     if (milestone.confirmation_needed) return "confirmation_needed";
@@ -183,15 +179,6 @@ export function MilestoneCard({
                             <span className="flex w-full items-center justify-between">
                               Draft
                               {currentStatus === "draft" && <Check className="h-3 w-3" />}
-                            </span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => onStatusChange("no_submission")}
-                            disabled={currentStatus === "no_submission"}
-                          >
-                            <span className="flex w-full items-center justify-between">
-                              No Submission
-                              {currentStatus === "no_submission" && <Check className="h-3 w-3" />}
                             </span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
