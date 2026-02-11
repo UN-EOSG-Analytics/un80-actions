@@ -236,22 +236,29 @@ export default function MilestonesTab({
   const privateMilestones = milestones.filter((m) => !m.is_public);
   
   // Sort each bucket by milestone order
-  const milestoneOrder: MilestoneType[] = ["upcoming", "first", "second", "third", "final"];
+  const milestoneOrder: MilestoneType[] = ["upcoming", "first", "second", "third", "final", "internal"];
   const sortedPublicMilestones = [...publicMilestones].sort(
     (a, b) =>
       milestoneOrder.indexOf(a.milestone_type as MilestoneType) -
       milestoneOrder.indexOf(b.milestone_type as MilestoneType),
   );
   const sortedPrivateMilestones = [...privateMilestones].sort(
-    (a, b) =>
-      milestoneOrder.indexOf(a.milestone_type as MilestoneType) -
-      milestoneOrder.indexOf(b.milestone_type as MilestoneType),
+    (a, b) => {
+      const order =
+        milestoneOrder.indexOf(a.milestone_type as MilestoneType) -
+        milestoneOrder.indexOf(b.milestone_type as MilestoneType);
+      if (order !== 0) return order;
+      // Among internals (or same type), sort by serial_number then deadline
+      const sn = (a.serial_number ?? 0) - (b.serial_number ?? 0);
+      if (sn !== 0) return sn;
+      return (a.deadline ?? "").localeCompare(b.deadline ?? "");
+    },
   );
 
+  // For public milestones only: first/second/third/final each at most once (internal type is unlimited)
   const getAvailableMilestoneTypes = () => {
-    // Exclude 'upcoming' - use is_public flag instead
     const allTypes: MilestoneType[] = ["first", "second", "third", "final"];
-    const existingTypes = milestones.map(m => m.milestone_type);
+    const existingTypes = milestones.filter(m => m.milestone_type !== "internal").map(m => m.milestone_type);
     return allTypes.filter(type => !existingTypes.includes(type));
   };
 
@@ -1467,13 +1474,12 @@ export default function MilestonesTab({
         )}
         {sortedPrivateMilestones.map((milestone) => renderMilestone(milestone))}
         
-        {/* Add Internal Milestone Button / Form */}
-        {isAdmin && !creatingNew && getAvailableMilestoneTypes().length > 0 && (
+        {/* Add Internal Milestone Button - no limit; each new internal uses type "internal" */}
+        {isAdmin && !creatingNew && (
           <button
             onClick={() => {
-              const availableTypes = getAvailableMilestoneTypes();
               setNewMilestoneForm({
-                milestone_type: availableTypes[0] || "first",
+                milestone_type: "internal",
                 is_public: false,
                 description: "",
                 deadline: "",
