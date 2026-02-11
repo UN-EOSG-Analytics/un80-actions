@@ -35,6 +35,7 @@ import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionQuestion, ActionMilestone, ActionNote } from "@/types";
 import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
 import { applyBoldShortcut, applyStrikethroughShortcut, BoldText } from "@/features/shared/markdown-bold";
+import { NoteEditor, isNoteContentEmpty } from "@/features/notes/ui/NoteEditor";
 import { Loader2, MessageCircle, Send, Trash2, Pencil, X, StickyNote, ChevronDown, Bold, Minus } from "lucide-react";
 import { useEffect, useState, useRef, useCallback } from "react";
 
@@ -343,7 +344,7 @@ export default function QuestionsTab({
   const [newQuestion, setNewQuestion] = useState({
     header: "",
     question_date: "",
-    question: "• ",
+    question: "",
     milestone_id: "",
     comment: "",
   });
@@ -410,7 +411,7 @@ export default function QuestionsTab({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newQuestion.header.trim() || !newQuestion.question_date || !newQuestion.question.trim()) {
+    if (!newQuestion.header.trim() || !newQuestion.question_date || isNoteContentEmpty(newQuestion.question)) {
       setError("Please fill in all fields");
       return;
     }
@@ -424,9 +425,9 @@ export default function QuestionsTab({
         action_sub_id: action.sub_id || "",
         header: newQuestion.header.trim(),
         question_date: newQuestion.question_date,
-        question: newQuestion.question.trim(),
+        question: newQuestion.question,
         milestone_id: newQuestion.milestone_id || null,
-        comment: newQuestion.comment?.trim() || null,
+        comment: newQuestion.comment || null,
       });
 
       if (result.success) {
@@ -465,12 +466,10 @@ export default function QuestionsTab({
 
   const startEditing = (q: ActionQuestion) => {
     setEditingId(q.id);
-    // Ensure content starts with bullet point if it doesn't already
-    const question = q.question.trim().startsWith("•") ? q.question : "• " + q.question;
     setEditingQuestion({
       header: q.header || "",
       question_date: q.question_date || "",
-      question: question,
+      question: q.question || "",
       milestone_id: q.milestone_id || "",
     });
     setError(null);
@@ -481,7 +480,7 @@ export default function QuestionsTab({
     setEditingQuestion({
       header: "",
       question_date: "",
-      question: "• ",
+      question: "",
       milestone_id: "",
     });
     setError(null);
@@ -489,7 +488,7 @@ export default function QuestionsTab({
 
   const handleSaveEdit = async () => {
     if (!editingId) return;
-    if (!editingQuestion.header.trim() || !editingQuestion.question_date || !editingQuestion.question.trim()) {
+    if (!editingQuestion.header.trim() || !editingQuestion.question_date || isNoteContentEmpty(editingQuestion.question)) {
       setError("Please fill in all fields");
       return;
     }
@@ -501,7 +500,7 @@ export default function QuestionsTab({
       const result = await updateQuestion(editingId, {
         header: editingQuestion.header.trim(),
         question_date: editingQuestion.question_date,
-        question: editingQuestion.question.trim(),
+        question: editingQuestion.question,
         milestone_id: editingQuestion.milestone_id || null,
       });
 
@@ -620,69 +619,24 @@ export default function QuestionsTab({
           <label className="mb-1 block text-xs font-medium text-slate-600">
             Notes (on questions) (optional)
           </label>
-          <textarea
+          <NoteEditor
             value={newQuestion.comment}
-            onChange={(e) => setNewQuestion({ ...newQuestion, comment: e.target.value })}
+            onChange={(html) => setNewQuestion({ ...newQuestion, comment: html })}
             placeholder="Add any additional context or notes related to these questions..."
-            rows={2}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-y"
             disabled={submitting}
+            minRows={2}
           />
         </div>
         <div>
           <label className="mb-1 block text-xs font-medium text-slate-600">
             Question *
           </label>
-          <textarea
+          <NoteEditor
             value={newQuestion.question}
-            onChange={(e) => setNewQuestion({ ...newQuestion, question: e.target.value })}
-            onKeyDown={(e) => {
-              const bold = applyBoldShortcut(e, newQuestion.question);
-              if (bold) {
-                setNewQuestion({ ...newQuestion, question: bold.newValue });
-                const ta = e.currentTarget;
-                setTimeout(() => {
-                  ta.selectionStart = bold.cursorStart;
-                  ta.selectionEnd = bold.cursorEnd;
-                }, 0);
-                return;
-              }
-              const strikethrough = applyStrikethroughShortcut(e, newQuestion.question);
-              if (strikethrough) {
-                setNewQuestion({ ...newQuestion, question: strikethrough.newValue });
-                const ta = e.currentTarget;
-                setTimeout(() => {
-                  ta.selectionStart = strikethrough.cursorStart;
-                  ta.selectionEnd = strikethrough.cursorEnd;
-                }, 0);
-                return;
-              }
-              if (e.key === "Enter") {
-                const textarea = e.currentTarget;
-                const start = textarea.selectionStart;
-                const end = textarea.selectionEnd;
-                const value = textarea.value;
-                
-                // Insert bullet point at the start of the new line
-                const beforeCursor = value.substring(0, start);
-                const afterCursor = value.substring(end);
-                const newValue = beforeCursor + "\n• " + afterCursor;
-                
-                setNewQuestion({ ...newQuestion, question: newValue });
-                
-                // Set cursor position after the bullet point
-                setTimeout(() => {
-                  textarea.selectionStart = textarea.selectionEnd = start + 3; // 3 = "\n• ".length
-                }, 0);
-                
-                e.preventDefault();
-              }
-            }}
-            placeholder="• "
-            rows={3}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-y"
+            onChange={(html) => setNewQuestion({ ...newQuestion, question: html })}
+            placeholder="Enter your question..."
             disabled={submitting}
-            required
+            minRows={3}
           />
         </div>
         <div>
@@ -718,7 +672,7 @@ export default function QuestionsTab({
         <div className="flex justify-end">
           <Button
             type="submit"
-            disabled={submitting || !newQuestion.header.trim() || !newQuestion.question_date || !newQuestion.question.trim()}
+            disabled={submitting || !newQuestion.header.trim() || !newQuestion.question_date || isNoteContentEmpty(newQuestion.question)}
             className="bg-un-blue hover:bg-un-blue/90"
           >
             {submitting ? (
@@ -801,33 +755,47 @@ export default function QuestionsTab({
                         {q.comment && (
                           <div className="rounded-lg border border-slate-200 bg-slate-50/80 px-4 py-2.5">
                             <p className="text-xs font-medium text-slate-500 mb-1">Notes (on questions)</p>
-                            <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
-                              <BoldText>{q.comment}</BoldText>
-                            </p>
+                            {q.comment.trim().startsWith("<") ? (
+                              <div
+                                className="prose prose-sm max-w-none text-sm leading-relaxed text-slate-700 [&_p]:whitespace-pre-wrap [&_p]:my-1 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6 [&_li]:my-0.5"
+                                dangerouslySetInnerHTML={{ __html: q.comment }}
+                              />
+                            ) : (
+                              <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
+                                <BoldText>{q.comment}</BoldText>
+                              </p>
+                            )}
                           </div>
                         )}
                         {/* Question body */}
                         <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-4 py-3">
-                          <SelectableText
-                            text={q.question}
-                            questionId={q.id}
-                            onUpdate={async (newText) => {
-                              // Optimistic update: show new text immediately
-                              setQuestions((prev) =>
-                                prev.map((qq) =>
-                                  qq.id === q.id ? { ...qq, question: newText } : qq
-                                )
-                              );
-                              // Persist in background (no full refetch)
-                              await updateQuestion(q.id, {
-                                header: q.header || "",
-                                question_date: q.question_date || "",
-                                question: newText,
-                                milestone_id: q.milestone_id || null,
-                              });
-                            }}
-                            isAdmin={isAdmin}
-                          />
+                          {q.question.trim().startsWith("<") ? (
+                            <div
+                              className="prose prose-sm max-w-none text-sm leading-relaxed text-slate-700 [&_p]:whitespace-pre-wrap [&_p]:my-1 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6 [&_li]:my-0.5"
+                              dangerouslySetInnerHTML={{ __html: q.question }}
+                            />
+                          ) : (
+                            <SelectableText
+                              text={q.question}
+                              questionId={q.id}
+                              onUpdate={async (newText) => {
+                                // Optimistic update: show new text immediately
+                                setQuestions((prev) =>
+                                  prev.map((qq) =>
+                                    qq.id === q.id ? { ...qq, question: newText } : qq
+                                  )
+                                );
+                                // Persist in background (no full refetch)
+                                await updateQuestion(q.id, {
+                                  header: q.header || "",
+                                  question_date: q.question_date || "",
+                                  question: newText,
+                                  milestone_id: q.milestone_id || null,
+                                });
+                              }}
+                              isAdmin={isAdmin}
+                            />
+                          )}
                         </div>
                         {q.answer && (
                           <div className="rounded-lg border-l-4 border-green-300 bg-green-50/80 px-4 py-3">
@@ -987,29 +955,12 @@ export default function QuestionsTab({
                         </div>
                         <div>
                           <label className="mb-1 block text-xs font-medium text-slate-600">Question *</label>
-                          <textarea
+                          <NoteEditor
                             value={editingQuestion.question}
-                            onChange={(e) => setEditingQuestion({ ...editingQuestion, question: e.target.value })}
-                            onKeyDown={(e) => {
-                              const bold = applyBoldShortcut(e, editingQuestion.question);
-                              if (bold) {
-                                setEditingQuestion({ ...editingQuestion, question: bold.newValue });
-                                const ta = e.currentTarget;
-                                setTimeout(() => { ta.selectionStart = bold.cursorStart; ta.selectionEnd = bold.cursorEnd; }, 0);
-                                return;
-                              }
-                              const strikethrough = applyStrikethroughShortcut(e, editingQuestion.question);
-                              if (strikethrough) {
-                                setEditingQuestion({ ...editingQuestion, question: strikethrough.newValue });
-                                const ta = e.currentTarget;
-                                setTimeout(() => { ta.selectionStart = strikethrough.cursorStart; ta.selectionEnd = strikethrough.cursorEnd; }, 0);
-                                return;
-                              }
-                            }}
-                            placeholder="• "
-                            rows={3}
-                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue resize-y"
+                            onChange={(html) => setEditingQuestion({ ...editingQuestion, question: html })}
+                            placeholder="Enter your question..."
                             disabled={saving}
+                            minRows={3}
                           />
                         </div>
                         {error && <p className="text-sm text-red-600">{error}</p>}
@@ -1020,7 +971,7 @@ export default function QuestionsTab({
                           <Button
                             type="button"
                             onClick={handleSaveEdit}
-                            disabled={saving || !editingQuestion.header.trim() || !editingQuestion.question_date || !editingQuestion.question.trim()}
+                            disabled={saving || !editingQuestion.header.trim() || !editingQuestion.question_date || isNoteContentEmpty(editingQuestion.question)}
                             className="bg-un-blue hover:bg-un-blue/90"
                           >
                             {saving ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Saving...</> : <><Send className="h-4 w-4 mr-2" /> Save</>}
