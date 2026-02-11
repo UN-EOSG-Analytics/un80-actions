@@ -157,7 +157,10 @@ export function NoteEditor({
           <Minus className="h-4 w-4" />
         </button>
       </div>
-      <div className="rounded-b-md bg-white min-h-[8rem] resize-y overflow-auto border-t border-slate-200">
+      <div
+        className="rounded-b-md bg-white min-h-[8rem] resize-y overflow-auto border-t border-slate-200
+                   [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6 [&_li]:my-0.5"
+      >
         <EditorContent editor={editor} />
       </div>
     </div>
