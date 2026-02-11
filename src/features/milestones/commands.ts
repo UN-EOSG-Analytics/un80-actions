@@ -9,6 +9,7 @@ import { requireAdmin } from "@/features/auth/lib/permissions";
 import { insertActivityEntry } from "@/features/activity/commands";
 
 function getMilestoneStatusLabel(m: ActionMilestone): string {
+  if (m.no_submission) return "No Submission";
   if (m.is_draft) return "Draft";
   if (m.finalized) return "Finalized";
   if (m.confirmation_needed) return "Confirmation needed";
@@ -248,6 +249,7 @@ export async function approveMilestoneContent(
          content_reviewed_at = NOW(),
          is_approved = TRUE,
          is_draft = FALSE,
+         no_submission = FALSE,
          needs_attention = FALSE,
          needs_ola_review = FALSE,
          reviewed_by_ola = FALSE,
@@ -310,6 +312,7 @@ export async function requestMilestoneChanges(
     await query(
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET needs_attention = TRUE,
+         no_submission = FALSE,
          is_approved = FALSE,
          needs_ola_review = FALSE,
          reviewed_by_ola = FALSE,
@@ -375,6 +378,7 @@ export async function setMilestoneToDraft(
     await query(
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET is_draft = TRUE,
+         no_submission = FALSE,
          is_approved = FALSE,
          needs_attention = FALSE,
          needs_ola_review = FALSE,
@@ -402,6 +406,71 @@ export async function setMilestoneToDraft(
       success: false,
       error:
         e instanceof Error ? e.message : "Failed to set milestone to draft",
+    };
+  }
+}
+
+/**
+ * Set milestone to "No Submission".
+ * Admin only. Same as draft but with no_submission flag for display/Excel alignment.
+ */
+export async function setMilestoneNoSubmission(
+  milestoneId: string,
+): Promise<MilestoneResult> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    const adminCheck = await query<{ user_role: string }>(
+      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
+      [user.email],
+    );
+    if (adminCheck[0]?.user_role !== "Admin") {
+      return { success: false, error: "Admin only" };
+    }
+
+    const milestone = await getMilestoneById(milestoneId);
+    if (!milestone) {
+      return { success: false, error: "Milestone not found" };
+    }
+
+    const previousStatus = getMilestoneStatusLabel(milestone);
+
+    await query(
+      `UPDATE ${DB_SCHEMA}.action_milestones
+     SET no_submission = TRUE,
+         is_draft = TRUE,
+         is_approved = FALSE,
+         needs_attention = FALSE,
+         needs_ola_review = FALSE,
+         reviewed_by_ola = FALSE,
+         finalized = FALSE,
+         attention_to_timeline = FALSE,
+         confirmation_needed = FALSE,
+         content_review_status = 'needs_review'
+     WHERE id = $1`,
+      [milestoneId],
+    );
+
+    await insertActivityEntry({
+      type: "milestone_status",
+      action_id: milestone.action_id,
+      action_sub_id: milestone.action_sub_id,
+      milestone_id: milestoneId,
+      title: "Milestone status changed",
+      description: `${previousStatus} → No Submission`,
+      user_id: user.id,
+    });
+
+    const updated = await getMilestoneById(milestoneId);
+    return { success: true, milestone: updated || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error:
+        e instanceof Error ? e.message : "Failed to set No Submission",
     };
   }
 }
@@ -438,6 +507,7 @@ export async function setMilestoneNeedsOlaReview(
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET needs_ola_review = TRUE,
          is_draft = FALSE,
+         no_submission = FALSE,
          is_approved = FALSE,
          needs_attention = FALSE,
          reviewed_by_ola = FALSE,
@@ -502,6 +572,7 @@ export async function setMilestoneReviewedByOla(
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET reviewed_by_ola = TRUE,
          is_draft = FALSE,
+         no_submission = FALSE,
          is_approved = FALSE,
          needs_attention = FALSE,
          needs_ola_review = FALSE,
@@ -564,6 +635,7 @@ export async function setMilestoneFinalized(
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET finalized = TRUE,
          is_draft = FALSE,
+         no_submission = FALSE,
          is_approved = FALSE,
          needs_attention = FALSE,
          needs_ola_review = FALSE,
@@ -627,6 +699,7 @@ export async function setMilestoneAttentionToTimeline(
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET attention_to_timeline = TRUE,
          is_draft = FALSE,
+         no_submission = FALSE,
          is_approved = FALSE,
          needs_attention = FALSE,
          needs_ola_review = FALSE,
@@ -690,6 +763,7 @@ export async function setMilestoneConfirmationNeeded(
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET confirmation_needed = TRUE,
          is_draft = FALSE,
+         no_submission = FALSE,
          is_approved = FALSE,
          needs_attention = FALSE,
          needs_ola_review = FALSE,

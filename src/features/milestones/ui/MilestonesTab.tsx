@@ -26,7 +26,7 @@ import {
   getMilestoneVersions,
   type MilestoneVersion,
 } from "@/features/milestones/queries";
-import { updateMilestone, createMilestone, approveMilestoneContent, requestMilestoneChanges, setMilestoneToDraft, setMilestoneNeedsOlaReview, setMilestoneReviewedByOla, setMilestoneFinalized, setMilestoneAttentionToTimeline, setMilestoneConfirmationNeeded, updateMilestoneDocumentSubmitted } from "@/features/milestones/commands";
+import { updateMilestone, createMilestone, approveMilestoneContent, requestMilestoneChanges, setMilestoneToDraft, setMilestoneNoSubmission, setMilestoneNeedsOlaReview, setMilestoneReviewedByOla, setMilestoneFinalized, setMilestoneAttentionToTimeline, setMilestoneConfirmationNeeded, updateMilestoneDocumentSubmitted } from "@/features/milestones/commands";
 import { MilestoneCard } from "./MilestoneCard";
 import {
   getMilestoneUpdates,
@@ -143,7 +143,7 @@ export default function MilestonesTab({
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     milestoneId: string | null;
-    status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed" | null;
+    status: "draft" | "no_submission" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed" | null;
   }>({ open: false, milestoneId: null, status: null });
   const [milestoneDocumentSubmitted, setMilestoneDocumentSubmitted] = useState<Record<string, boolean>>({});
   const [attachmentComments, setAttachmentComments] = useState<Record<string, AttachmentComment[]>>({});
@@ -347,7 +347,7 @@ export default function MilestonesTab({
     }
   };
 
-  const handleStatusChange = (milestoneId: string, status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed") => {
+  const handleStatusChange = (milestoneId: string, status: "draft" | "no_submission" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed") => {
     setConfirmDialog({ open: true, milestoneId, status });
   };
 
@@ -1984,6 +1984,7 @@ export default function MilestonesTab({
             <DialogTitle>Change Milestone Status</DialogTitle>
             <DialogDescription>
               {confirmDialog.status === "draft" && "Change this milestone to Draft? It will no longer be approved."}
+              {confirmDialog.status === "no_submission" && "Mark this milestone as No Submission?"}
               {confirmDialog.status === "approved" && "Approve this milestone? This will mark it as approved and no longer a draft."}
               {confirmDialog.status === "needs_attention" && "Mark this milestone as needing attention? This will notify the team to make changes."}
               {confirmDialog.status === "needs_ola_review" && "Mark this milestone as needing OLA (Office of Legal Affairs) review?"}
