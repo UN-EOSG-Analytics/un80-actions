@@ -223,7 +223,7 @@ export function MilestoneCard({
                     year: 'numeric' 
                   }) : <span className="italic">No deadline</span>}
                 </span>
-                {isPastDue && (
+                {isPastDue && !documentSubmitted && (
                   <span
                     className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-100 text-xs font-bold text-red-700"
                     title="Past due"
