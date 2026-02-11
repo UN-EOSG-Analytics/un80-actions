@@ -688,22 +688,48 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
            AND delayed_m.deadline < CURRENT_DATE
            AND COALESCE(delayed_m.milestone_document_submitted, false) = false
        )) AS has_overdue_milestone,
-      (SELECT COALESCE(next_m.milestone_document_submitted, false)
-       FROM un80actions.action_milestones next_m
-       WHERE next_m.action_id = a.id
-         AND (next_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND next_m.is_public = false
-         AND next_m.deadline IS NOT NULL
-       ORDER BY (next_m.deadline >= CURRENT_DATE) DESC, (CASE WHEN next_m.deadline >= CURRENT_DATE THEN next_m.deadline END) ASC NULLS LAST, next_m.deadline DESC NULLS LAST
-       LIMIT 1) AS next_upcoming_milestone_document_submitted,
-      (SELECT EXTRACT(MONTH FROM next_m.deadline)::integer
-       FROM un80actions.action_milestones next_m
-       WHERE next_m.action_id = a.id
-         AND (next_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND next_m.is_public = false
-         AND next_m.deadline IS NOT NULL
-       ORDER BY (next_m.deadline >= CURRENT_DATE) DESC, (CASE WHEN next_m.deadline >= CURRENT_DATE THEN next_m.deadline END) ASC NULLS LAST, next_m.deadline DESC NULLS LAST
-       LIMIT 1) AS next_upcoming_milestone_deadline_month,
+      (COALESCE(
+        (SELECT COALESCE(cm.milestone_document_submitted, false)
+         FROM un80actions.action_milestones cm
+         WHERE cm.action_id = a.id
+           AND (cm.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+           AND cm.is_public = false
+           AND cm.deadline IS NOT NULL
+           AND EXTRACT(YEAR FROM cm.deadline) = EXTRACT(YEAR FROM CURRENT_DATE)
+           AND EXTRACT(MONTH FROM cm.deadline) = EXTRACT(MONTH FROM CURRENT_DATE)
+         ORDER BY cm.deadline
+         LIMIT 1),
+        (SELECT COALESCE(lp.milestone_document_submitted, false)
+         FROM un80actions.action_milestones lp
+         WHERE lp.action_id = a.id
+           AND (lp.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+           AND lp.is_public = false
+           AND lp.deadline IS NOT NULL
+           AND lp.deadline < CURRENT_DATE
+         ORDER BY lp.deadline DESC
+         LIMIT 1)
+      )) AS next_upcoming_milestone_document_submitted,
+      (COALESCE(
+        (SELECT EXTRACT(MONTH FROM cm.deadline)::integer
+         FROM un80actions.action_milestones cm
+         WHERE cm.action_id = a.id
+           AND (cm.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+           AND cm.is_public = false
+           AND cm.deadline IS NOT NULL
+           AND EXTRACT(YEAR FROM cm.deadline) = EXTRACT(YEAR FROM CURRENT_DATE)
+           AND EXTRACT(MONTH FROM cm.deadline) = EXTRACT(MONTH FROM CURRENT_DATE)
+         ORDER BY cm.deadline
+         LIMIT 1),
+        (SELECT EXTRACT(MONTH FROM lp.deadline)::integer
+         FROM un80actions.action_milestones lp
+         WHERE lp.action_id = a.id
+           AND (lp.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+           AND lp.is_public = false
+           AND lp.deadline IS NOT NULL
+           AND lp.deadline < CURRENT_DATE
+         ORDER BY lp.deadline DESC
+         LIMIT 1)
+      )) AS next_upcoming_milestone_deadline_month,
       (SELECT ARRAY_AGG(DISTINCT EXTRACT(MONTH FROM all_m.deadline)::integer ORDER BY EXTRACT(MONTH FROM all_m.deadline)::integer)
        FROM un80actions.action_milestones all_m
        WHERE all_m.action_id = a.id
@@ -750,22 +776,48 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
            AND delayed_m.deadline < CURRENT_DATE
            AND COALESCE(delayed_m.milestone_document_submitted, false) = false
        )) AS has_overdue_milestone,
-      (SELECT COALESCE(next_m.milestone_document_submitted, false)
-       FROM un80actions.action_milestones next_m
-       WHERE next_m.action_id = a.id
-         AND (next_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND next_m.is_public = false
-         AND next_m.deadline IS NOT NULL
-       ORDER BY (next_m.deadline >= CURRENT_DATE) DESC, (CASE WHEN next_m.deadline >= CURRENT_DATE THEN next_m.deadline END) ASC NULLS LAST, next_m.deadline DESC NULLS LAST
-       LIMIT 1) AS next_upcoming_milestone_document_submitted,
-      (SELECT EXTRACT(MONTH FROM next_m.deadline)::integer
-       FROM un80actions.action_milestones next_m
-       WHERE next_m.action_id = a.id
-         AND (next_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND next_m.is_public = false
-         AND next_m.deadline IS NOT NULL
-       ORDER BY (next_m.deadline >= CURRENT_DATE) DESC, (CASE WHEN next_m.deadline >= CURRENT_DATE THEN next_m.deadline END) ASC NULLS LAST, next_m.deadline DESC NULLS LAST
-       LIMIT 1) AS next_upcoming_milestone_deadline_month,
+      (COALESCE(
+        (SELECT COALESCE(cm.milestone_document_submitted, false)
+         FROM un80actions.action_milestones cm
+         WHERE cm.action_id = a.id
+           AND (cm.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+           AND cm.is_public = false
+           AND cm.deadline IS NOT NULL
+           AND EXTRACT(YEAR FROM cm.deadline) = EXTRACT(YEAR FROM CURRENT_DATE)
+           AND EXTRACT(MONTH FROM cm.deadline) = EXTRACT(MONTH FROM CURRENT_DATE)
+         ORDER BY cm.deadline
+         LIMIT 1),
+        (SELECT COALESCE(lp.milestone_document_submitted, false)
+         FROM un80actions.action_milestones lp
+         WHERE lp.action_id = a.id
+           AND (lp.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+           AND lp.is_public = false
+           AND lp.deadline IS NOT NULL
+           AND lp.deadline < CURRENT_DATE
+         ORDER BY lp.deadline DESC
+         LIMIT 1)
+      )) AS next_upcoming_milestone_document_submitted,
+      (COALESCE(
+        (SELECT EXTRACT(MONTH FROM cm.deadline)::integer
+         FROM un80actions.action_milestones cm
+         WHERE cm.action_id = a.id
+           AND (cm.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+           AND cm.is_public = false
+           AND cm.deadline IS NOT NULL
+           AND EXTRACT(YEAR FROM cm.deadline) = EXTRACT(YEAR FROM CURRENT_DATE)
+           AND EXTRACT(MONTH FROM cm.deadline) = EXTRACT(MONTH FROM CURRENT_DATE)
+         ORDER BY cm.deadline
+         LIMIT 1),
+        (SELECT EXTRACT(MONTH FROM lp.deadline)::integer
+         FROM un80actions.action_milestones lp
+         WHERE lp.action_id = a.id
+           AND (lp.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+           AND lp.is_public = false
+           AND lp.deadline IS NOT NULL
+           AND lp.deadline < CURRENT_DATE
+         ORDER BY lp.deadline DESC
+         LIMIT 1)
+      )) AS next_upcoming_milestone_deadline_month,
       (SELECT ARRAY_AGG(DISTINCT EXTRACT(MONTH FROM all_m.deadline)::integer ORDER BY EXTRACT(MONTH FROM all_m.deadline)::integer)
        FROM un80actions.action_milestones all_m
        WHERE all_m.action_id = a.id
