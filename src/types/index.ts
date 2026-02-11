@@ -10,7 +10,7 @@ export type ActionTrackingStatus =
   | "No submission"
   | "Confirmation needed";
 
-export type MilestoneType = "first" | "second" | "third" | "upcoming" | "final" | "internal";
+export type MilestoneType = "first" | "second" | "third" | "upcoming" | "final";
 
 export type MilestoneStatus =
   | "draft"

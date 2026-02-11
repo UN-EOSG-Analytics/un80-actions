@@ -236,29 +236,22 @@ export default function MilestonesTab({
   const privateMilestones = milestones.filter((m) => !m.is_public);
   
   // Sort each bucket by milestone order
-  const milestoneOrder: MilestoneType[] = ["upcoming", "first", "second", "third", "final", "internal"];
+  const milestoneOrder: MilestoneType[] = ["upcoming", "first", "second", "third", "final"];
   const sortedPublicMilestones = [...publicMilestones].sort(
     (a, b) =>
       milestoneOrder.indexOf(a.milestone_type as MilestoneType) -
       milestoneOrder.indexOf(b.milestone_type as MilestoneType),
   );
   const sortedPrivateMilestones = [...privateMilestones].sort(
-    (a, b) => {
-      const order =
-        milestoneOrder.indexOf(a.milestone_type as MilestoneType) -
-        milestoneOrder.indexOf(b.milestone_type as MilestoneType);
-      if (order !== 0) return order;
-      // Among internals (or same type), sort by serial_number then deadline
-      const sn = (a.serial_number ?? 0) - (b.serial_number ?? 0);
-      if (sn !== 0) return sn;
-      return (a.deadline ?? "").localeCompare(b.deadline ?? "");
-    },
+    (a, b) =>
+      milestoneOrder.indexOf(a.milestone_type as MilestoneType) -
+      milestoneOrder.indexOf(b.milestone_type as MilestoneType),
   );
 
-  // For public milestones only: first/second/third/final each at most once (internal type is unlimited)
   const getAvailableMilestoneTypes = () => {
+    // Exclude 'upcoming' - use is_public flag instead
     const allTypes: MilestoneType[] = ["first", "second", "third", "final"];
-    const existingTypes = milestones.filter(m => m.milestone_type !== "internal").map(m => m.milestone_type);
+    const existingTypes = milestones.map(m => m.milestone_type);
     return allTypes.filter(type => !existingTypes.includes(type));
   };
 
@@ -744,7 +737,7 @@ export default function MilestonesTab({
             onStatusChange={isAdmin ? (status) => handleStatusChange(milestone.id, status) : undefined}
             isAdmin={isAdmin}
             onDocumentSubmittedChange={
-              isAdmin && !milestone.is_public && (milestone.milestone_type === "first" || milestone.milestone_type === "final")
+              isAdmin && !milestone.is_public
                 ? async (milestoneId, submitted) => {
                     setMilestoneDocumentSubmitted((prev) => ({ ...prev, [milestoneId]: submitted }));
                     // Persist to database
@@ -755,7 +748,7 @@ export default function MilestonesTab({
                 : undefined
             }
             documentSubmitted={
-              !milestone.is_public && (milestone.milestone_type === "first" || milestone.milestone_type === "final")
+              !milestone.is_public
                 ? milestoneDocumentSubmitted[milestone.id] ?? milestone.milestone_document_submitted ?? false
                 : undefined
             }
@@ -1474,12 +1467,13 @@ export default function MilestonesTab({
         )}
         {sortedPrivateMilestones.map((milestone) => renderMilestone(milestone))}
         
-        {/* Add Internal Milestone Button - no limit; each new internal uses type "internal" */}
-        {isAdmin && !creatingNew && (
+        {/* Add Internal Milestone Button / Form */}
+        {isAdmin && !creatingNew && getAvailableMilestoneTypes().length > 0 && (
           <button
             onClick={() => {
+              const availableTypes = getAvailableMilestoneTypes();
               setNewMilestoneForm({
-                milestone_type: "internal",
+                milestone_type: availableTypes[0] || "first",
                 is_public: false,
                 description: "",
                 deadline: "",
