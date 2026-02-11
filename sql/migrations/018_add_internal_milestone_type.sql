@@ -1,13 +1,17 @@
--- Migration: Add 'internal' milestone type and allow multiple internal milestones per action
+-- Migration: Allow multiple internal milestones per action (type 'internal').
 -- Public milestones remain unique per (action_id, action_sub_id, milestone_type).
--- Internal milestones use type 'internal' and are not limited by the uniqueness constraint.
 --
--- Note: If ALTER TYPE fails (e.g. "cannot run inside a transaction block"), run this once manually:
---   SET search_path TO un80actions; ALTER TYPE milestone_type ADD VALUE IF NOT EXISTS 'internal';
+-- PREREQUISITE: The enum value 'internal' must exist on un80actions.milestone_type.
+-- Only the type owner can add enum values. Run this once as the type owner
+-- (e.g. un80actions_schema_owner or postgres):
+--
+--   sql/migrations/018_run_as_type_owner.sql
+--
+-- Or manually: ALTER TYPE un80actions.milestone_type ADD VALUE IF NOT EXISTS 'internal';
+--
+-- Then run this file with your usual migration user.
 
 SET search_path TO un80actions;
-
-ALTER TYPE milestone_type ADD VALUE IF NOT EXISTS 'internal';
 
 -- Drop the existing unique constraint (one milestone type per action)
 ALTER TABLE action_milestones DROP CONSTRAINT IF EXISTS action_milestones_action_type_key;
