@@ -24,7 +24,7 @@ interface MilestoneCardProps {
   onEdit: () => void;
   onComment: () => void;
   onShowHistory: () => void;
-  onStatusChange?: (status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed") => void;
+  onStatusChange?: (status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed" | "no_submission") => void;
   onDocumentSubmittedChange?: (milestoneId: string, submitted: boolean) => void;
   documentSubmitted?: boolean;
   isAdmin?: boolean;
@@ -178,6 +178,15 @@ export function MilestoneCard({
                           >
                             <span className="flex w-full items-center justify-between">
                               Draft
+                              {currentStatus === "draft" && <Check className="h-3 w-3" />}
+                            </span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => onStatusChange("no_submission")}
+                            disabled={currentStatus === "draft"}
+                          >
+                            <span className="flex w-full items-center justify-between">
+                              No Submission
                               {currentStatus === "draft" && <Check className="h-3 w-3" />}
                             </span>
                           </DropdownMenuItem>
