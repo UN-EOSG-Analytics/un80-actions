@@ -2028,13 +2028,13 @@
     "work_package_leads":[
       "USG ODA"
     ],
-    "first_milestone":null,
-    "first_milestone_deadline":null,
-    "final_milestone":null,
-    "final_milestone_deadline":null,
+    "first_milestone":"Initial joint briefing to UNIDIR’s Board of Trustees",
+    "first_milestone_deadline":"2026-01-13",
+    "final_milestone":"Finalize concept note",
+    "final_milestone_deadline":"2026-09-30",
     "doc_text":"We plan to integrate the UN Interregional Crime and Justice Research Institute (UNICRI) into the UN Office on Drugs and Crime (UNODC), embedding UNICRI expertise within a global network. The UN Institute for Disarmament Research (UNIDIR) would be integrated into the Office for disarmament Affairs (ODA) so its analysis informs negotiations and field support. In both cases, research independence would be preserved.",
     "work_package_goal":"Joined up and networked for lasting impact",
-    "action_entities":"ODA",
+    "action_entities":"ODA; UNIDIR",
     "sub_action_details":null,
     "action_leads":[
       "USG ODA"
