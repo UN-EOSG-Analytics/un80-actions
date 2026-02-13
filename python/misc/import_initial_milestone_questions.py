@@ -8,15 +8,19 @@ Source:
 
 Behaviour:
 - Each record is one question. We insert into action_questions with:
-  - action_id from ActionNo, action_sub_id "", header "Unspecified",
+  - action_id from ActionNo, action_sub_id "", header from question_date (see DATE_TO_HEADER),
   - question_date and question from the record, comment from notes.
+
+Header by date (committee type): 21 Jan, 28 Jan, 5/12/18/23 Feb → Task Force; 23 Jan, 25 Feb → Steering Committee.
 
 Idempotent:
 - Uses a WHERE NOT EXISTS guard, so re-running will not create duplicates.
+- Use --clear to delete all existing questions before importing (full refresh).
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 from dataclasses import dataclass
 from datetime import date
@@ -24,6 +28,21 @@ from pathlib import Path
 from typing import List, Optional
 
 from python.db.connection import get_conn
+
+# Committee type (header) by calendar date (month, day). Matches UN80 meeting schedule.
+DATE_TO_HEADER: dict[tuple[int, int], str] = {
+    (12, 17): "Task Force",
+    (1, 7): "Task Force",
+    (1, 14): "Task Force",
+    (1, 21): "Task Force",
+    (1, 23): "Steering Committee",
+    (1, 28): "Task Force",
+    (2, 5): "Task Force",
+    (2, 12): "Task Force",
+    (2, 18): "Task Force",
+    (2, 23): "Task Force",
+    (2, 25): "Steering Committee",
+}
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -68,9 +87,14 @@ def record_to_question(record: dict) -> Optional[QuestionInput]:
   if raw_notes is not None and str(raw_notes).strip():
     notes = str(raw_notes).strip()
 
+  header = "Unspecified"
+  if question_date is not None:
+    key = (question_date.month, question_date.day)
+    header = DATE_TO_HEADER.get(key, "Unspecified")
+
   return QuestionInput(
     action_id=action_id,
-    header="Unspecified",
+    header=header,
     question_date=question_date,
     question=question,
     comment=notes,
@@ -91,6 +115,14 @@ def load_questions_from_json() -> List[QuestionInput]:
 
 
 def main() -> None:
+  parser = argparse.ArgumentParser(description="Import questions from JSON into action_questions.")
+  parser.add_argument(
+    "--clear",
+    action="store_true",
+    help="Delete all existing rows in action_questions before importing (full refresh).",
+  )
+  args = parser.parse_args()
+
   questions = load_questions_from_json()
   if not questions:
     print("No questions parsed from JSON; nothing to import.")
@@ -100,6 +132,11 @@ def main() -> None:
 
   with get_conn() as conn:
     with conn.cursor() as cur:
+      if args.clear:
+        cur.execute("DELETE FROM un80actions.action_questions;")
+        deleted = cur.rowcount
+        print(f"Cleared {deleted} existing question(s) from action_questions.")
+
       # Use first user as the author for all imported questions
       cur.execute("SELECT id FROM un80actions.users LIMIT 1;")
       row = cur.fetchone()

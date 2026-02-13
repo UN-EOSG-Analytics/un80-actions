@@ -13,17 +13,15 @@ Source:
 
 Behaviour:
 - For each record, match ActionNo to actions.id (main action, sub_id = '').
-- Insert a new action_notes row with:
-    header: "Unspecified"
-    note_date: parsed note_date (or NULL)
-    content: content
-  and content_review_status = 'needs_review'.
-- Idempotent: if an identical note already exists (same action_id, header,
-  note_date, content), it will not be inserted again.
+- Insert a new action_notes row with header from note_date (see DATE_TO_HEADER),
+  note_date, content, and content_review_status = 'needs_review'.
+- Idempotent: if an identical note already exists, it will not be inserted again.
+- Use --clear to delete all existing notes before importing (full refresh).
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 from dataclasses import dataclass
 from datetime import date
@@ -31,6 +29,21 @@ from pathlib import Path
 from typing import List, Optional
 
 from python.db.connection import get_conn
+
+# Committee type (header) by calendar date (month, day). Matches UN80 meeting schedule.
+DATE_TO_HEADER: dict[tuple[int, int], str] = {
+    (12, 17): "Task Force",
+    (1, 7): "Task Force",
+    (1, 14): "Task Force",
+    (1, 21): "Task Force",
+    (1, 23): "Steering Committee",
+    (1, 28): "Task Force",
+    (2, 5): "Task Force",
+    (2, 12): "Task Force",
+    (2, 18): "Task Force",
+    (2, 23): "Task Force",
+    (2, 25): "Steering Committee",
+}
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
@@ -74,11 +87,17 @@ def load_notes_from_json() -> List[TaskForceNote]:
         else:
             note_date = None
 
+        header = "Unspecified"
+        if note_date is not None:
+            key = (note_date.month, note_date.day)
+            header = DATE_TO_HEADER.get(key, "Unspecified")
+
         notes.append(
             TaskForceNote(
                 action_id=action_id,
                 note_date=note_date,
                 content=content,
+                header=header,
             )
         )
 
@@ -86,6 +105,16 @@ def load_notes_from_json() -> List[TaskForceNote]:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Import Task Force notes from JSON into action_notes."
+    )
+    parser.add_argument(
+        "--clear",
+        action="store_true",
+        help="Delete all existing rows in action_notes before importing (full refresh).",
+    )
+    args = parser.parse_args()
+
     notes = load_notes_from_json()
     if not notes:
         print("No Task Force notes parsed from JSON; nothing to import.")
@@ -95,6 +124,11 @@ def main() -> None:
 
     with get_conn() as conn:
         with conn.cursor() as cur:
+            if args.clear:
+                cur.execute("DELETE FROM un80actions.action_notes;")
+                deleted = cur.rowcount
+                print(f"Cleared {deleted} existing note(s) from action_notes.")
+
             # Use first user as the author for all imported notes
             cur.execute("SELECT id FROM un80actions.users LIMIT 1;")
             row = cur.fetchone()

@@ -4,11 +4,13 @@ for the Action modal Notes tab.
 
 Source: data/processed/notes_fp_working_team.json
 Same behaviour as import_notes_from_task_force: match ActionNo, insert with
-header "Unspecified", idempotent, skip when action does not exist.
+header from note_date (see DATE_TO_HEADER), idempotent, skip when action does not exist.
+Use --clear to delete all existing notes before importing (full refresh).
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 from dataclasses import dataclass
 from datetime import date
@@ -16,6 +18,21 @@ from pathlib import Path
 from typing import List, Optional
 
 from python.db.connection import get_conn
+
+# Committee type (header) by calendar date (month, day). Matches UN80 meeting schedule.
+DATE_TO_HEADER: dict[tuple[int, int], str] = {
+    (12, 17): "Task Force",
+    (1, 7): "Task Force",
+    (1, 14): "Task Force",
+    (1, 21): "Task Force",
+    (1, 23): "Steering Committee",
+    (1, 28): "Task Force",
+    (2, 5): "Task Force",
+    (2, 12): "Task Force",
+    (2, 18): "Task Force",
+    (2, 23): "Task Force",
+    (2, 25): "Steering Committee",
+}
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
@@ -59,11 +76,17 @@ def load_notes_from_json() -> List[FpWorkingTeamNote]:
         else:
             note_date = None
 
+        header = "Unspecified"
+        if note_date is not None:
+            key = (note_date.month, note_date.day)
+            header = DATE_TO_HEADER.get(key, "Unspecified")
+
         notes.append(
             FpWorkingTeamNote(
                 action_id=action_id,
                 note_date=note_date,
                 content=content,
+                header=header,
             )
         )
 
@@ -71,6 +94,16 @@ def load_notes_from_json() -> List[FpWorkingTeamNote]:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Import FP/working team notes from JSON into action_notes."
+    )
+    parser.add_argument(
+        "--clear",
+        action="store_true",
+        help="Delete all existing rows in action_notes before importing (full refresh).",
+    )
+    args = parser.parse_args()
+
     notes = load_notes_from_json()
     if not notes:
         print("No FP/working team notes parsed from JSON; nothing to import.")
@@ -80,6 +113,11 @@ def main() -> None:
 
     with get_conn() as conn:
         with conn.cursor() as cur:
+            if args.clear:
+                cur.execute("DELETE FROM un80actions.action_notes;")
+                deleted = cur.rowcount
+                print(f"Cleared {deleted} existing note(s) from action_notes.")
+
             cur.execute("SELECT id FROM un80actions.users LIMIT 1;")
             row = cur.fetchone()
             if not row:
