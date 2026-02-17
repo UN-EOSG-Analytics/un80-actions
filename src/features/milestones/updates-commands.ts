@@ -16,6 +16,8 @@ export interface MilestoneUpdateCreateInput {
   reply_to?: string | null;
   /** When true, comment goes to Legal updates & comments; otherwise Team updates & comments */
   is_legal?: boolean;
+  /** When true, comment is admin-only internal comment (internal milestones only; only admins can set) */
+  is_internal?: boolean;
 }
 
 export interface MilestoneUpdateResult {
@@ -40,18 +42,21 @@ export async function createMilestoneUpdate(
     return { success: false, error: "Not authenticated" };
   }
 
+  const adminAuth = await requireAdmin();
+  const isAdmin = adminAuth.authorized;
   const isLegal = input.is_legal ?? false;
+  const isInternal = isAdmin ? (input.is_internal ?? false) : false;
 
   try {
-    const rows = await query<MilestoneUpdate & { is_legal?: boolean }>(
-      `INSERT INTO ${DB_SCHEMA}.milestone_updates (milestone_id, user_id, content, reply_to, is_legal)
-       VALUES ($1, $2, $3, $4, $5)
+    const rows = await query<MilestoneUpdate & { is_legal?: boolean; is_internal?: boolean }>(
+      `INSERT INTO ${DB_SCHEMA}.milestone_updates (milestone_id, user_id, content, reply_to, is_legal, is_internal)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [input.milestone_id, user.id, input.content, input.reply_to || null, isLegal],
+      [input.milestone_id, user.id, input.content, input.reply_to || null, isLegal, isInternal],
     );
 
     const row = rows[0];
-    return { success: true, update: row ? { ...row, is_legal: Boolean(row.is_legal) } : undefined };
+    return { success: true, update: row ? { ...row, is_legal: Boolean(row.is_legal), is_internal: Boolean(row.is_internal) } : undefined };
   } catch (err) {
     return {
       success: false,

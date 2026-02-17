@@ -3,6 +3,7 @@
 import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { getCurrentUser } from "@/features/auth/service";
+import { requireAdmin } from "@/features/auth/lib/permissions";
 
 // =========================================================
 // TYPES
@@ -17,6 +18,7 @@ export interface MilestoneUpdate {
   reply_to: string | null;
   is_resolved: boolean;
   is_legal: boolean;
+  is_internal: boolean;
   created_at: Date;
   updated_at: Date | null;
   content_review_status: "approved" | "needs_review";
@@ -31,7 +33,7 @@ export interface MilestoneUpdate {
 
 /**
  * Fetch all updates for a specific milestone.
- * Any authenticated user can read (for both public and internal milestones).
+ * Any authenticated user can read team/legal updates; only admins see internal (admin-only) comments.
  */
 export async function getMilestoneUpdates(
   milestoneId: string,
@@ -41,7 +43,11 @@ export async function getMilestoneUpdates(
     return [];
   }
 
-  const rows = await query<MilestoneUpdate & { is_legal?: boolean }>(
+  const adminAuth = await requireAdmin();
+  const isAdmin = adminAuth.authorized;
+  const hideInternal = !isAdmin;
+
+  const rows = await query<MilestoneUpdate & { is_legal?: boolean; is_internal?: boolean }>(
     `SELECT
       u.id,
       u.milestone_id,
@@ -51,6 +57,7 @@ export async function getMilestoneUpdates(
       u.reply_to,
       u.is_resolved,
       COALESCE(u.is_legal, false) as is_legal,
+      COALESCE(u.is_internal, false) as is_internal,
       u.created_at,
       u.updated_at,
       COALESCE(u.content_review_status, 'approved')::text as content_review_status,
@@ -61,13 +68,15 @@ export async function getMilestoneUpdates(
     LEFT JOIN ${DB_SCHEMA}.users us ON u.user_id = us.id
     LEFT JOIN ${DB_SCHEMA}.users ru ON u.content_reviewed_by = ru.id
     WHERE u.milestone_id = $1
-    ORDER BY u.is_legal ASC, u.created_at ASC`,
+    ${hideInternal ? "AND (COALESCE(u.is_internal, false) = false)" : ""}
+    ORDER BY u.is_legal ASC, COALESCE(u.is_internal, false) ASC, u.created_at ASC`,
     [milestoneId],
   );
 
   return rows.map((r) => ({
     ...r,
     is_legal: Boolean(r.is_legal),
+    is_internal: Boolean(r.is_internal),
   }));
 }
 
@@ -77,7 +86,7 @@ export async function getMilestoneUpdates(
 export async function getMilestoneUpdateById(
   updateId: string,
 ): Promise<MilestoneUpdate | null> {
-  const rows = await query<MilestoneUpdate & { is_legal?: boolean }>(
+  const rows = await query<MilestoneUpdate & { is_legal?: boolean; is_internal?: boolean }>(
     `SELECT
       u.id,
       u.milestone_id,
@@ -87,6 +96,7 @@ export async function getMilestoneUpdateById(
       u.reply_to,
       u.is_resolved,
       COALESCE(u.is_legal, false) as is_legal,
+      COALESCE(u.is_internal, false) as is_internal,
       u.created_at,
       u.updated_at,
       COALESCE(u.content_review_status, 'approved')::text as content_review_status,
@@ -102,5 +112,5 @@ export async function getMilestoneUpdateById(
 
   const r = rows[0];
   if (!r) return null;
-  return { ...r, is_legal: Boolean(r.is_legal) };
+  return { ...r, is_legal: Boolean(r.is_legal), is_internal: Boolean(r.is_internal) };
 }

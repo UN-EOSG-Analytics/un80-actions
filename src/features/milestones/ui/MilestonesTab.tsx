@@ -123,6 +123,7 @@ export default function MilestonesTab({
   const [addingCommentId, setAddingCommentId] = useState<string | null>(null);
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
   const [commentIsLegal, setCommentIsLegal] = useState(false);
+  const [commentIsInternal, setCommentIsInternal] = useState(false);
   const [showVersionHistoryId, setShowVersionHistoryId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
   const [saving, setSaving] = useState(false);
@@ -448,6 +449,7 @@ export default function MilestonesTab({
     const updates = milestoneUpdates[milestoneId] || [];
     const parentUpdate = replyingToId ? updates.find((u) => u.id === replyingToId) : null;
     const isLegal = parentUpdate ? parentUpdate.is_legal : commentIsLegal;
+    const isInternal = parentUpdate ? parentUpdate.is_internal : commentIsInternal;
 
     setSaving(true);
     setError(null);
@@ -458,12 +460,16 @@ export default function MilestonesTab({
         content: commentText.trim(),
         reply_to: replyingToId,
         is_legal: isLegal,
+        is_internal: isInternal,
       });
 
       if (result.success) {
         setCommentText("");
         setReplyingToId(null);
-        if (!replyingToId) setCommentIsLegal(false);
+        if (!replyingToId) {
+          setCommentIsLegal(false);
+          setCommentIsInternal(false);
+        }
         await loadMilestoneUpdates(milestoneId);
       } else {
         setError(result.error || "Failed to add comment");
@@ -911,7 +917,7 @@ export default function MilestonesTab({
                           Team updates & comments
                         </span>
                         {(() => {
-                          const teamTop = updates.filter(u => !u.reply_to && !u.is_legal);
+                          const teamTop = updates.filter(u => !u.reply_to && !u.is_legal && !u.is_internal);
                           return teamTop.length > 0 ? (
                             <span className="rounded-full bg-un-blue/15 px-2 py-0.5 text-[10px] font-semibold text-un-blue">
                               {teamTop.length}
@@ -920,9 +926,9 @@ export default function MilestonesTab({
                         })()}
                       </div>
                       <div className="p-2">
-                        {updates.filter(u => !u.reply_to && !u.is_legal).length > 0 ? (
+                        {updates.filter(u => !u.reply_to && !u.is_legal && !u.is_internal).length > 0 ? (
                           <div className="space-y-2">
-                            {updates.filter(u => !u.reply_to && !u.is_legal).map((update) => {
+                            {updates.filter(u => !u.reply_to && !u.is_legal && !u.is_internal).map((update) => {
                               const replies = updates.filter(r => r.reply_to === update.id);
                               const replyingTo = replyingToId === update.id;
                               return (
@@ -1117,6 +1123,186 @@ export default function MilestonesTab({
                       </div>
                     </div>
 
+                    {/* Section: Internal comments (internal milestones only, admin only) */}
+                    {!milestone.is_public && isAdmin && (
+                    <div className="rounded-lg border border-violet-200 border-l-4 border-l-violet-500 bg-violet-50/20">
+                      <div className="flex items-center gap-2 border-b border-violet-200 bg-white/80 px-3 py-2">
+                        <MessageSquare className="h-4 w-4 text-violet-600" />
+                        <span className="text-xs font-semibold uppercase tracking-wide text-violet-800/90">
+                          Internal comments
+                        </span>
+                        <span className="text-[10px] text-violet-600/80">(admin only)</span>
+                        {(() => {
+                          const internalTop = updates.filter(u => !u.reply_to && !u.is_legal && u.is_internal);
+                          return internalTop.length > 0 ? (
+                            <span className="rounded-full bg-violet-200/80 px-2 py-0.5 text-[10px] font-semibold text-violet-800">
+                              {internalTop.length}
+                            </span>
+                          ) : null;
+                        })()}
+                      </div>
+                      <div className="p-2">
+                        {updates.filter(u => !u.reply_to && !u.is_legal && u.is_internal).length > 0 ? (
+                          <div className="space-y-2">
+                            {updates.filter(u => !u.reply_to && !u.is_legal && u.is_internal).map((update) => {
+                              const replies = updates.filter(r => r.reply_to === update.id);
+                              const replyingTo = replyingToId === update.id;
+                              return (
+                                <div key={update.id} className="space-y-2">
+                                  <div className={`group relative rounded-lg border transition-all ${
+                                    update.is_resolved ? "border-green-200 bg-green-50/30" : "border-violet-200 bg-white hover:border-violet-400/50 hover:shadow-sm"
+                                  }`}>
+                                    <div className="p-3">
+                                      <div className="mb-2 flex items-start justify-between gap-2">
+                                        <div className="flex items-center gap-2">
+                                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-100 text-[10px] font-semibold text-violet-700">
+                                            {(update.user_email?.[0] || "U").toUpperCase()}
+                                          </div>
+                                          <div className="flex flex-col">
+                                            <span className="text-xs font-medium text-slate-700">
+                                              {update.user_email?.split("@")[0] || "Unknown"}
+                                            </span>
+                                            <span className="text-[10px] text-slate-400">
+                                              {new Date(update.created_at).toLocaleDateString()} at {new Date(update.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                            </span>
+                                          </div>
+                                          {update.is_resolved && (
+                                            <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700">
+                                              <CheckCircle2 className="h-3 w-3" />
+                                              Resolved
+                                            </span>
+                                          )}
+                                        </div>
+                                        <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                                          <button
+                                            onClick={() => startReply(milestone.id, update.id)}
+                                            className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-violet-600"
+                                            title="Reply"
+                                          >
+                                            <CornerDownRight className="h-3 w-3" />
+                                          </button>
+                                          {isAdmin && (
+                                            <button
+                                              onClick={() => handleToggleResolved(milestone.id, update.id)}
+                                              className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-green-600"
+                                              title={update.is_resolved ? "Mark as unresolved" : "Mark as resolved"}
+                                            >
+                                              <CheckCircle2 className="h-3 w-3" />
+                                            </button>
+                                          )}
+                                          {(isAdmin || (currentUserId && update.user_id === currentUserId)) && (
+                                            <>
+                                              <button
+                                                onClick={() => startEditComment(update)}
+                                                className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-violet-600"
+                                                title="Edit"
+                                              >
+                                                <Pencil className="h-3 w-3" />
+                                              </button>
+                                              <button
+                                                onClick={() => handleDeleteComment(milestone.id, update.id)}
+                                                className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600"
+                                                title="Delete"
+                                              >
+                                                <Trash2 className="h-3 w-3" />
+                                              </button>
+                                            </>
+                                          )}
+                                        </div>
+                                      </div>
+                                      {editingUpdateId === update.id ? (
+                                        <div className="space-y-2">
+                                          <textarea
+                                            value={editingContent}
+                                            onChange={(e) => setEditingContent(e.target.value)}
+                                            className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                                            rows={3}
+                                            disabled={saving}
+                                            autoFocus
+                                          />
+                                          <div className="flex justify-end gap-2">
+                                            <Button variant="outline" size="sm" onClick={cancelEditComment} disabled={saving}>Cancel</Button>
+                                            <Button size="sm" onClick={() => handleSaveEditComment(milestone.id, update.id)} disabled={saving || !editingContent.trim()} className="bg-violet-600 hover:bg-violet-700">
+                                              {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">{update.content}</p>
+                                      )}
+                                    </div>
+                                    {replies.length > 0 && (
+                                      <div className="border-t border-violet-100 bg-violet-50/30 px-3 py-2">
+                                        <div className="space-y-2">
+                                          {replies.map((reply) => (
+                                            <div key={reply.id} className="group/reply relative flex gap-2 rounded-md bg-white p-2 hover:bg-violet-50/50">
+                                              <CornerDownRight className="mt-1 h-3 w-3 shrink-0 text-violet-300" />
+                                              <div className="min-w-0 flex-1">
+                                                <div className="mb-1 flex items-center justify-between gap-2">
+                                                  <div className="flex items-center gap-2">
+                                                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-violet-100 text-[9px] font-semibold text-violet-700">
+                                                      {(reply.user_email?.[0] || "U").toUpperCase()}
+                                                    </div>
+                                                    <span className="text-xs font-medium text-slate-600">{reply.user_email?.split("@")[0] || "Unknown"}</span>
+                                                    <span className="text-[10px] text-slate-400">
+                                                      {new Date(reply.created_at).toLocaleDateString()} at {new Date(reply.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                                    </span>
+                                                  </div>
+                                                  {(isAdmin || (currentUserId && reply.user_id === currentUserId)) && (
+                                                    <button
+                                                      onClick={() => handleDeleteComment(milestone.id, reply.id)}
+                                                      className="shrink-0 rounded p-1 text-slate-400 opacity-0 transition-all hover:bg-slate-100 hover:text-red-600 group-hover/reply:opacity-100"
+                                                      title="Delete reply"
+                                                    >
+                                                      <Trash2 className="h-3 w-3" />
+                                                    </button>
+                                                  )}
+                                                </div>
+                                                <p className="text-sm text-slate-700 whitespace-pre-wrap">{reply.content}</p>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {replyingTo && (
+                                      <div className="border-t border-violet-100 bg-violet-50/30 p-3">
+                                        <div className="flex gap-2">
+                                          <CornerDownRight className="mt-2 h-3 w-3 shrink-0 text-violet-400" />
+                                          <div className="flex-1 space-y-2">
+                                            <textarea
+                                              value={commentText}
+                                              onChange={(e) => setCommentText(e.target.value)}
+                                              className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                                              rows={2}
+                                              placeholder="Write a reply..."
+                                              disabled={saving}
+                                              autoFocus
+                                            />
+                                            <div className="flex justify-end gap-2">
+                                              <Button variant="outline" size="sm" onClick={cancelAddingComment} disabled={saving}>Cancel</Button>
+                                              <Button size="sm" onClick={() => handleAddComment(milestone.id)} disabled={saving || !commentText.trim()} className="bg-violet-600 hover:bg-violet-700">
+                                                {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : <CornerDownRight className="h-3 w-3" />}
+                                              </Button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div className="py-4 text-center">
+                            <p className="text-xs text-violet-700/70">No internal comments yet</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    )}
+
                     {/* Section: Legal updates & comments (public milestones, admin only) */}
                     {milestone.is_public && isAdmin && (
                     <div className="rounded-lg border border-amber-200 border-l-4 border-l-amber-500 bg-amber-50/20">
@@ -1294,6 +1480,36 @@ export default function MilestonesTab({
                               >
                                 <Scale className="h-3 w-3" />
                                 Legal updates & comments
+                              </button>
+                            </div>
+                          </div>
+                          )}
+                          {!milestone.is_public && isAdmin && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-slate-600">Post to:</span>
+                            <div className="flex rounded-lg border border-slate-200 bg-white p-0.5">
+                              <button
+                                type="button"
+                                onClick={() => setCommentIsInternal(false)}
+                                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                                  !commentIsInternal
+                                    ? "bg-un-blue text-white"
+                                    : "text-slate-600 hover:bg-slate-100"
+                                }`}
+                              >
+                                Team updates & comments
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setCommentIsInternal(true)}
+                                className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                                  commentIsInternal
+                                    ? "bg-violet-600 text-white"
+                                    : "text-slate-600 hover:bg-slate-100"
+                                }`}
+                              >
+                                <MessageSquare className="h-3 w-3" />
+                                Internal comments
                               </button>
                             </div>
                           </div>
