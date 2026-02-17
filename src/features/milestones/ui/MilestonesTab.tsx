@@ -50,6 +50,7 @@ import {
   createAttachmentComment,
 } from "@/features/attachments/commands";
 
+import { formatUNDate } from "@/lib/format-date";
 import type { Action, ActionMilestone, ActionAttachment, AttachmentComment, MilestoneType } from "@/types";
 import {
   Check,
@@ -886,9 +887,7 @@ export default function MilestonesTab({
                               {version.deadline && (
                                 <p className="mt-1 text-slate-500">
                                   Deadline:{" "}
-                                  {new Date(
-                                    version.deadline,
-                                  ).toLocaleDateString()}
+                                  {formatUNDate(version.deadline)}
                                 </p>
                               )}
                             </div>

@@ -183,9 +183,17 @@ const STATUS_STYLES: Record<string, { badge: string }> = {
   "Approved": { badge: "bg-green-100 text-green-800 border-green-200" },
 };
 
-/** True if milestone has a deadline that has passed */
+/** True if milestone has a deadline that has passed (parse YYYY-MM-DD as local date to avoid timezone shift) */
 function isPastDue(cell: MilestoneViewCell | null): boolean {
   if (!cell?.deadline) return false;
+  const s = cell.deadline.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    const [y, m, d] = s.split("-").map(Number);
+    const deadlineDate = new Date(y, m - 1, d);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return deadlineDate < today;
+  }
   const deadlineDate = new Date(cell.deadline);
   const today = new Date();
   today.setHours(0, 0, 0, 0);

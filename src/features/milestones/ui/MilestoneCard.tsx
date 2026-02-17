@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Calendar, Check, ChevronDown, Clock, MessageSquare, Pencil, Send } from "lucide-react";
+import { formatUNDate } from "@/lib/format-date";
 import type { ActionMilestone } from "@/types";
 import type { MilestoneUpdate } from "@/features/milestones/updates-queries";
 
@@ -92,14 +93,22 @@ export function MilestoneCard({
     ? "Public"
     : milestone.milestone_type.charAt(0).toUpperCase() + milestone.milestone_type.slice(1);
 
-  // Past due: deadline has passed
+  // Past due: deadline has passed (parse YYYY-MM-DD as local date to avoid timezone shift)
   const isPastDue =
     milestone.deadline &&
     (() => {
-      const deadlineDate = new Date(milestone.deadline);
+      const s = milestone.deadline.trim();
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+        const deadlineDate = new Date(milestone.deadline);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        deadlineDate.setHours(0, 0, 0, 0);
+        return deadlineDate < today;
+      }
+      const [y, m, d] = s.split("-").map(Number);
+      const deadlineDate = new Date(y, m - 1, d);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      deadlineDate.setHours(0, 0, 0, 0);
       return deadlineDate < today;
     })();
 
@@ -244,11 +253,7 @@ export function MilestoneCard({
                 )}
                 <span className="flex items-center gap-1.5 text-xs text-slate-500">
                   <Calendar className="h-3 w-3" />
-                  {milestone.deadline ? new Date(milestone.deadline).toLocaleDateString(undefined, { 
-                    month: 'short', 
-                    day: 'numeric',
-                    year: 'numeric' 
-                  }) : <span className="italic">No deadline</span>}
+                  {milestone.deadline ? formatUNDate(milestone.deadline) : <span className="italic">No deadline</span>}
                 </span>
                 {isPastDue && !documentSubmitted && (
                   <span
