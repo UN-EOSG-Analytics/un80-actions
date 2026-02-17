@@ -383,23 +383,15 @@ export default function NotesTab({
                       <label className="mb-1.5 block text-xs font-medium text-slate-600">
                         Header *
                       </label>
-                      <Select
+                      <input
+                        type="text"
                         value={editingNote.header}
-                        onValueChange={(value) => setEditingNote({ ...editingNote, header: value })}
+                        onChange={(e) => setEditingNote({ ...editingNote, header: e.target.value })}
                         disabled={saving}
                         required
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select header..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {HEADER_OPTIONS.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        placeholder="e.g. Task Force, Steering Committee"
+                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue disabled:opacity-50"
+                      />
                     </div>
                     <div>
                       <label className="mb-1.5 block text-xs font-medium text-slate-600">
