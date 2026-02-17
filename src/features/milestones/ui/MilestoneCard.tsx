@@ -248,9 +248,9 @@ export function MilestoneCard({
                       )}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                ) : (
+                ) : isAdmin ? (
                   <Badge className={`${status.className} text-xs font-medium`}>{status.label}</Badge>
-                )}
+                ) : null}
                 <span className="flex items-center gap-1.5 text-xs text-slate-500">
                   <Calendar className="h-3 w-3" />
                   {milestone.deadline ? formatUNDate(milestone.deadline) : <span className="italic">No deadline</span>}
