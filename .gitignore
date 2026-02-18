@@ -268,3 +268,6 @@ uploads/
 !vercel.json
 *.pkl
 *.parquet
+
+# next-agents-md
+# .next-docs/
