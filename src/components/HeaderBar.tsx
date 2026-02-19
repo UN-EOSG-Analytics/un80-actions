@@ -19,6 +19,9 @@ export function Header({ user, isAdmin, children, maxWidth = "7xl" }: Props) {
   const isLoggedIn = !!user;
   const isLoginPage = pathname === "/login";
   const isMilestonePage = pathname?.startsWith("/milestones");
+  const isPublicMilestonePage = pathname?.startsWith("/milestones/public");
+  const isAdminMilestonePage =
+    pathname?.startsWith("/milestones") && !isPublicMilestonePage;
   const widthClass = maxWidth === "6xl" ? "max-w-6xl" : "max-w-7xl";
 
   return (
@@ -44,11 +47,21 @@ export function Header({ user, isAdmin, children, maxWidth = "7xl" }: Props) {
         <div className="flex items-center gap-4">
           {isLoggedIn ? (
             <>
+              <Link
+                href="/milestones/public"
+                className={`text-sm font-medium transition-colors ${
+                  isPublicMilestonePage
+                    ? "text-un-blue"
+                    : "text-gray-600 hover:text-un-blue"
+                }`}
+              >
+                Public milestones
+              </Link>
               {isAdmin && (
                 <Link
                   href="/milestones"
                   className={`text-sm font-medium transition-colors ${
-                    isMilestonePage
+                    isAdminMilestonePage
                       ? "text-un-blue"
                       : "text-gray-600 hover:text-un-blue"
                   }`}

@@ -17,8 +17,30 @@ type SortDirection = "asc" | "desc";
 
 const STATUS_FILTER_OPTIONS = ["Draft", "Needs attention", "Needs OLA review", "Approved"] as const;
 
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
 function actionLabel(actionId: number, subId: string | null): string {
   return subId ? `${actionId}${subId}` : String(actionId);
+}
+
+/** Parse YYYY-MM-DD to YYYY-MM; returns "no_date" if missing/invalid. */
+function getDeadlineMonthKey(deadline: string | null | undefined): string {
+  if (!deadline?.trim()) return "no_date";
+  const match = deadline.trim().match(/^(\d{4})-(\d{2})/);
+  if (!match) return "no_date";
+  return `${match[1]}-${match[2]}`;
+}
+
+/** Format "2026-02" as "February 2026". */
+function formatMonthLabel(key: string): string {
+  if (key === "no_date") return "No date";
+  const [y, m] = key.split("-");
+  const monthNum = parseInt(m, 10);
+  if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) return key;
+  return `${MONTH_NAMES[monthNum - 1]} ${y}`;
 }
 
 /** Get all status labels present in a row (for filtering). */
@@ -257,6 +279,8 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
   const [filterWP, setFilterWP] = useState<number[]>([]);
   const [filterAction, setFilterAction] = useState<string[]>([]);
   const [filterStatus, setFilterStatus] = useState<string[]>([]);
+  const [filterFirstMonth, setFilterFirstMonth] = useState<string[]>([]);
+  const [filterFinalMonth, setFilterFinalMonth] = useState<string[]>([]);
   const [openFilters, setOpenFilters] = useState<Record<string, boolean>>({});
 
   const search = searchInput.trim().toLowerCase();
@@ -275,6 +299,20 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
       if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
       return a.localeCompare(b);
     });
+  }, [rows]);
+
+  const uniqueFirstMonthKeys = useMemo(() => {
+    const set = new Set(rows.map((r) => getDeadlineMonthKey(r.first_milestone?.deadline)));
+    const list = Array.from(set).filter((k) => k !== "no_date").sort();
+    if (set.has("no_date")) list.push("no_date");
+    return list;
+  }, [rows]);
+
+  const uniqueFinalMonthKeys = useMemo(() => {
+    const set = new Set(rows.map((r) => getDeadlineMonthKey(r.final_milestone?.deadline)));
+    const list = Array.from(set).filter((k) => k !== "no_date").sort();
+    if (set.has("no_date")) list.push("no_date");
+    return list;
   }, [rows]);
 
   const filteredRows = useMemo(() => {
@@ -305,8 +343,18 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
         return filterStatus.some((s) => rowLabels.includes(s));
       });
     }
+    if (filterFirstMonth.length > 0) {
+      list = list.filter((r) =>
+        filterFirstMonth.includes(getDeadlineMonthKey(r.first_milestone?.deadline)),
+      );
+    }
+    if (filterFinalMonth.length > 0) {
+      list = list.filter((r) =>
+        filterFinalMonth.includes(getDeadlineMonthKey(r.final_milestone?.deadline)),
+      );
+    }
     return list;
-  }, [rows, hasSearch, search, filterWP, filterAction, filterStatus]);
+  }, [rows, hasSearch, search, filterWP, filterAction, filterStatus, filterFirstMonth, filterFinalMonth]);
 
   const sortedRows = useMemo(() => {
     const dir = sortDirection === "asc" ? 1 : -1;
@@ -335,12 +383,18 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
   };
 
   const hasActiveFilters =
-    filterWP.length > 0 || filterAction.length > 0 || filterStatus.length > 0;
+    filterWP.length > 0 ||
+    filterAction.length > 0 ||
+    filterStatus.length > 0 ||
+    filterFirstMonth.length > 0 ||
+    filterFinalMonth.length > 0;
 
   const clearAllFilters = () => {
     setFilterWP([]);
     setFilterAction([]);
     setFilterStatus([]);
+    setFilterFirstMonth([]);
+    setFilterFinalMonth([]);
   };
 
   const handleRowClick = (actionId: number, actionSubId: string | null) => {
@@ -471,8 +525,48 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                   />
                 </div>
               </th>
-              <th className="px-4 py-3">First milestone</th>
-              <th className="px-4 py-3">Final milestone</th>
+              <th className="px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <span>First milestone</span>
+                  <MultiSelectFilter
+                    filterKey="firstMonth"
+                    options={uniqueFirstMonthKeys}
+                    selected={filterFirstMonth}
+                    onToggle={(key) =>
+                      setFilterFirstMonth((prev) =>
+                        prev.includes(key) ? prev.filter((v) => v !== key) : [...prev, key],
+                      )
+                    }
+                    renderOption={(key) => formatMonthLabel(key)}
+                    isOpen={openFilters.firstMonth ?? false}
+                    onOpenChange={(open) =>
+                      setOpenFilters((prev) => ({ ...prev, firstMonth: open }))
+                    }
+                    maxWidth="w-44"
+                  />
+                </div>
+              </th>
+              <th className="px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <span>Final milestone</span>
+                  <MultiSelectFilter
+                    filterKey="finalMonth"
+                    options={uniqueFinalMonthKeys}
+                    selected={filterFinalMonth}
+                    onToggle={(key) =>
+                      setFilterFinalMonth((prev) =>
+                        prev.includes(key) ? prev.filter((v) => v !== key) : [...prev, key],
+                      )
+                    }
+                    renderOption={(key) => formatMonthLabel(key)}
+                    isOpen={openFilters.finalMonth ?? false}
+                    onOpenChange={(open) =>
+                      setOpenFilters((prev) => ({ ...prev, finalMonth: open }))
+                    }
+                    maxWidth="w-44"
+                  />
+                </div>
+              </th>
               <th className="w-10 px-4 py-3"></th>
             </tr>
           </thead>

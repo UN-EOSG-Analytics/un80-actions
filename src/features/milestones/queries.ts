@@ -444,3 +444,41 @@ export async function getMilestoneViewTableData(): Promise<MilestoneViewRow[]> {
     document_submitted: r.document_submitted,
   }));
 }
+
+// =========================================================
+// PUBLIC MILESTONES VIEW
+// =========================================================
+
+export interface PublicMilestoneViewRow {
+  work_package_id: number;
+  work_package_title: string;
+  action_id: number;
+  action_sub_id: string | null;
+  milestone_description: string | null;
+  milestone_deadline: string | null;
+  public_progress: "in_progress" | "delayed" | "completed" | null;
+}
+
+/**
+ * Fetch all public milestones for the Public Milestone view: one row per public milestone
+ * with WP, action, description and deadline.
+ */
+export async function getPublicMilestonesViewData(): Promise<PublicMilestoneViewRow[]> {
+  const q = `
+    SELECT
+      wp.id AS work_package_id,
+      wp.work_package_title,
+      a.id AS action_id,
+      a.sub_id AS action_sub_id,
+      m.description AS milestone_description,
+      m.deadline::text AS milestone_deadline,
+      m.public_progress
+    FROM ${DB_SCHEMA}.action_milestones m
+    JOIN actions a ON a.id = m.action_id AND (a.sub_id IS NOT DISTINCT FROM m.action_sub_id)
+    JOIN work_packages wp ON wp.id = a.work_package_id
+    WHERE m.is_public = true
+    ORDER BY wp.id, a.id, a.sub_id ASC NULLS FIRST, m.deadline ASC NULLS LAST
+  `;
+  const rows = await query<PublicMilestoneViewRow>(q);
+  return rows;
+}

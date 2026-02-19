@@ -78,17 +78,19 @@ export async function createMilestone(
     );
     const serial_number = nextSerial[0]?.next_serial ?? 1;
 
+    const isPublic = input.is_public ?? false;
     const rows = await query<ActionMilestone>(
       `INSERT INTO ${DB_SCHEMA}.action_milestones 
-       (action_id, action_sub_id, serial_number, milestone_type, is_public, description, deadline, status, submitted_by, submitted_by_entity)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 'draft', $8, $9)
+       (action_id, action_sub_id, serial_number, milestone_type, is_public, public_progress, description, deadline, status, submitted_by, submitted_by_entity)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'draft', $9, $10)
        RETURNING *`,
       [
         input.action_id,
         actionSubId,
         serial_number,
         input.milestone_type,
-        input.is_public ?? false,
+        isPublic,
+        isPublic ? "in_progress" : null,
         input.description || null,
         input.deadline || null,
         user.id,

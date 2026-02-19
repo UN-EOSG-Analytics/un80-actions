@@ -26,8 +26,10 @@ import {
   approveQuestion,
   deleteQuestion,
 } from "@/features/questions/commands";
-import { getActionMilestones } from "@/features/milestones/queries";
-import { getActionNotes } from "@/features/notes/queries";
+import {
+  fetchActionMilestonesForTab,
+  fetchActionNotesForTab,
+} from "@/features/questions/fetch-tab-data";
 import { ReviewStatus } from "@/features/shared/ReviewStatus";
 import { TagSelector } from "@/features/shared/TagSelector";
 import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
@@ -381,7 +383,7 @@ export default function QuestionsTab({
 
   const loadMilestones = async () => {
     try {
-      const data = await getActionMilestones(action.id, action.sub_id);
+      const data = await fetchActionMilestonesForTab(action.id, action.sub_id);
       setMilestones(data);
     } catch {
       // silently fail - milestones are optional
@@ -392,7 +394,7 @@ export default function QuestionsTab({
     if (!isAdmin) return; // Notes are admin-only
     setLoadingNotes(true);
     try {
-      const data = await getActionNotes(action.id, action.sub_id);
+      const data = await fetchActionNotesForTab(action.id, action.sub_id);
       setNotes(data);
     } catch {
       // silently fail - notes are optional
