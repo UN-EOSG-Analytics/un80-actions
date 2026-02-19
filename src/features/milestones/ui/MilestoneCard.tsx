@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar, Check, ChevronDown, Clock, MessageSquare, Pencil, Send } from "lucide-react";
+import { AlertCircle, Calendar, Check, ChevronDown, Circle, Clock, MessageSquare, Pencil, Send } from "lucide-react";
 import { formatUNDate } from "@/lib/format-date";
 import type { ActionMilestone } from "@/types";
 import type { MilestoneUpdate } from "@/features/milestones/updates-queries";
@@ -269,23 +269,42 @@ export function MilestoneCard({
                     !
                   </span>
                 )}
-                {milestone.is_public && onPublicProgressChange != null && (
-                  <span className="inline-flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                    <Select
-                      value={(publicProgress ?? "in_progress") as PublicProgressValue}
-                      onValueChange={(value: PublicProgressValue) => onPublicProgressChange(value)}
-                    >
-                      <SelectTrigger className="inline-flex h-7 min-w-28 items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-0.5 text-xs font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50">
-                        <SelectValue className="text-xs" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="completed">Completed</SelectItem>
-                        <SelectItem value="in_progress">In progress</SelectItem>
-                        <SelectItem value="delayed">Delayed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </span>
-                )}
+                {milestone.is_public && onPublicProgressChange != null && (() => {
+                  const progress = (publicProgress ?? "in_progress") as PublicProgressValue;
+                  const progressStyle = {
+                    completed: "border-green-300 bg-green-50 text-green-800 hover:bg-green-100",
+                    in_progress: "border-blue-200 bg-blue-50/80 text-blue-800 hover:bg-blue-100/80",
+                    delayed: "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100",
+                  }[progress];
+                  return (
+                    <span className="inline-flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                      <Select
+                        value={progress}
+                        onValueChange={(value: PublicProgressValue) => onPublicProgressChange(value)}
+                      >
+                        <SelectTrigger
+                          className={`inline-flex h-7 min-w-32 items-center gap-1.5 rounded-full border px-3 py-0.5 text-xs font-medium shadow-sm transition-colors ${progressStyle}`}
+                        >
+                          <SelectValue className="text-xs" />
+                        </SelectTrigger>
+                        <SelectContent className="min-w-40" align="start">
+                          <SelectItem value="completed" className="flex items-center gap-2 py-2">
+                            <Check className="h-4 w-4 text-green-600" />
+                            <span>Completed</span>
+                          </SelectItem>
+                          <SelectItem value="in_progress" className="flex items-center gap-2 py-2">
+                            <Circle className="h-4 w-4 text-blue-600" />
+                            <span>In progress</span>
+                          </SelectItem>
+                          <SelectItem value="delayed" className="flex items-center gap-2 py-2">
+                            <AlertCircle className="h-4 w-4 text-amber-600" />
+                            <span>Delayed</span>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </span>
+                  );
+                })()}
                 {onDocumentSubmittedChange != null && (
                   <span className="inline-flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                     <Select
