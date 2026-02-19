@@ -750,6 +750,46 @@ export async function updateMilestoneDocumentSubmitted(
   }
 }
 
+export type PublicProgressValue = "completed" | "in_progress" | "delayed";
+
+/**
+ * Update public milestone progress (Completed / In progress / Delayed).
+ * Admin only. Only applies to public milestones.
+ */
+export async function updateMilestonePublicProgress(
+  milestoneId: string,
+  publicProgress: PublicProgressValue,
+): Promise<MilestoneResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
+  try {
+    const milestone = await getMilestoneById(milestoneId);
+    if (!milestone) {
+      return { success: false, error: "Milestone not found" };
+    }
+    if (!milestone.is_public) {
+      return { success: false, error: "Public progress applies only to public milestones" };
+    }
+
+    await query(
+      `UPDATE ${DB_SCHEMA}.action_milestones
+       SET public_progress = $1
+       WHERE id = $2 AND is_public = true`,
+      [publicProgress, milestoneId],
+    );
+
+    const updated = await getMilestoneById(milestoneId);
+    return { success: true, milestone: updated || undefined };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to update public progress",
+    };
+  }
+}
+
 /**
  * Submit a milestone for review.
  * Changes status from 'draft' to 'submitted' and records submission metadata.

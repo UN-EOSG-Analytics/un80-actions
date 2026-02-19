@@ -164,6 +164,8 @@ export interface ActionMilestone {
   reviewed_at: Date | null;
   approved_by: string | null;
   approved_at: Date | null;
+  /** For public milestones only: completed | in_progress | delayed */
+  public_progress: "completed" | "in_progress" | "delayed" | null;
 }
 
 /** Note attached to an action */

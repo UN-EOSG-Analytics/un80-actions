@@ -71,7 +71,8 @@ export async function getActionMilestones(
         m.reviewed_by,
         m.reviewed_at,
         m.approved_by,
-        m.approved_at
+        m.approved_at,
+        m.public_progress
       FROM ${DB_SCHEMA}.action_milestones m
       LEFT JOIN ${DB_SCHEMA}.users ru ON m.content_reviewed_by = ru.id
       ${whereClause.replace("action_id", "m.action_id").replace("action_sub_id", "m.action_sub_id")}
@@ -88,7 +89,7 @@ export async function getActionMilestones(
     );
   } catch (e) {
     const msg = String((e as Error).message ?? "");
-    if (msg.includes("content_review") || msg.includes("does not exist") || msg.includes("milestone_document_submitted") || msg.includes("attention_to_timeline") || msg.includes("confirmation_needed")) {
+    if (msg.includes("content_review") || msg.includes("does not exist") || msg.includes("milestone_document_submitted") || msg.includes("attention_to_timeline") || msg.includes("confirmation_needed") || msg.includes("public_progress")) {
       rows = await query(
         `SELECT
           m.id,
@@ -136,6 +137,7 @@ export async function getActionMilestones(
         content_reviewed_by: null,
         content_reviewed_by_email: null,
         content_reviewed_at: null,
+        public_progress: (r as ActionMilestone).public_progress ?? null,
       }));
     }
     throw e;
@@ -183,7 +185,8 @@ export async function getMilestoneById(
         m.reviewed_by,
         m.reviewed_at,
         m.approved_by,
-        m.approved_at
+        m.approved_at,
+        m.public_progress
       FROM ${DB_SCHEMA}.action_milestones m
       LEFT JOIN ${DB_SCHEMA}.users ru ON m.content_reviewed_by = ru.id
       WHERE m.id = $1`,
@@ -191,7 +194,7 @@ export async function getMilestoneById(
     );
   } catch (e) {
     const msg = String((e as Error).message ?? "");
-    if (msg.includes("content_review") || msg.includes("does not exist") || msg.includes("milestone_document_submitted") || msg.includes("attention_to_timeline") || msg.includes("confirmation_needed")) {
+    if (msg.includes("content_review") || msg.includes("does not exist") || msg.includes("milestone_document_submitted") || msg.includes("attention_to_timeline") || msg.includes("confirmation_needed") || msg.includes("public_progress")) {
       rows = await query(
         `SELECT
           m.id,
@@ -229,6 +232,7 @@ export async function getMilestoneById(
             content_reviewed_by: null,
             content_reviewed_by_email: null,
             content_reviewed_at: null,
+            public_progress: (r as ActionMilestone).public_progress ?? null,
           }
         : null;
     }

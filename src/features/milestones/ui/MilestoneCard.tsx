@@ -19,6 +19,8 @@ import { formatUNDate } from "@/lib/format-date";
 import type { ActionMilestone } from "@/types";
 import type { MilestoneUpdate } from "@/features/milestones/updates-queries";
 
+export type PublicProgressValue = "completed" | "in_progress" | "delayed";
+
 interface MilestoneCardProps {
   milestone: ActionMilestone;
   updates: MilestoneUpdate[];
@@ -28,6 +30,8 @@ interface MilestoneCardProps {
   onStatusChange?: (status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed" | "no_submission") => void;
   onDocumentSubmittedChange?: (milestoneId: string, submitted: boolean) => void;
   documentSubmitted?: boolean;
+  onPublicProgressChange?: (value: PublicProgressValue) => void;
+  publicProgress?: "completed" | "in_progress" | "delayed" | null;
   isAdmin?: boolean;
 }
 
@@ -40,6 +44,8 @@ export function MilestoneCard({
   onStatusChange,
   onDocumentSubmittedChange,
   documentSubmitted = false,
+  onPublicProgressChange,
+  publicProgress = null,
   isAdmin = false,
 }: MilestoneCardProps) {
   // Determine display status
@@ -261,6 +267,23 @@ export function MilestoneCard({
                     title="Past due"
                   >
                     !
+                  </span>
+                )}
+                {milestone.is_public && onPublicProgressChange != null && (
+                  <span className="inline-flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                    <Select
+                      value={(publicProgress ?? "in_progress") as PublicProgressValue}
+                      onValueChange={(value: PublicProgressValue) => onPublicProgressChange(value)}
+                    >
+                      <SelectTrigger className="inline-flex h-7 min-w-28 items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-0.5 text-xs font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50">
+                        <SelectValue className="text-xs" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="in_progress">In progress</SelectItem>
+                        <SelectItem value="delayed">Delayed</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </span>
                 )}
                 {onDocumentSubmittedChange != null && (

@@ -136,6 +136,7 @@ create table un80actions.action_milestones (
         confirmation_needed boolean default false not null,
         document_submitted boolean default false not null,
         milestone_document_submitted boolean default false not null,
+        public_progress text check (public_progress is null or public_progress in ('completed', 'in_progress', 'delayed')),
         constraint action_milestones_action_type_key unique (action_id, action_sub_id, milestone_type),
         foreign key (action_id, action_sub_id) references un80actions.actions (id, sub_id) on delete cascade
 );

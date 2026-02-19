@@ -26,7 +26,7 @@ import {
   getMilestoneVersions,
   type MilestoneVersion,
 } from "@/features/milestones/queries";
-import { updateMilestone, createMilestone, approveMilestoneContent, requestMilestoneChanges, setMilestoneToDraft, setMilestoneNeedsOlaReview, setMilestoneReviewedByOla, setMilestoneFinalized, setMilestoneAttentionToTimeline, setMilestoneConfirmationNeeded, updateMilestoneDocumentSubmitted } from "@/features/milestones/commands";
+import { updateMilestone, createMilestone, approveMilestoneContent, requestMilestoneChanges, setMilestoneToDraft, setMilestoneNeedsOlaReview, setMilestoneReviewedByOla, setMilestoneFinalized, setMilestoneAttentionToTimeline, setMilestoneConfirmationNeeded, updateMilestoneDocumentSubmitted, updateMilestonePublicProgress } from "@/features/milestones/commands";
 import { MilestoneCard } from "./MilestoneCard";
 import {
   getMilestoneUpdates,
@@ -762,6 +762,15 @@ export default function MilestonesTab({
                 ? milestoneDocumentSubmitted[milestone.id] ?? milestone.milestone_document_submitted ?? false
                 : undefined
             }
+            onPublicProgressChange={
+              isAdmin && milestone.is_public
+                ? async (value) => {
+                    const result = await updateMilestonePublicProgress(milestone.id, value);
+                    if (result.success) await loadMilestones();
+                  }
+                : undefined
+            }
+            publicProgress={milestone.is_public ? milestone.public_progress : undefined}
           />
 
             {/* Collapsible Content */}
