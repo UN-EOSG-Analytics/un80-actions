@@ -516,7 +516,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     setFilterBigTicket([]);
     setFilterWorkPackageId("");
     setFilterRisk("");
-    setFilterDeliverablesMonth([]);
+    setFilterDeliverablesMonth(null);
     setFilterIntermediateMilestones(false);
   };
 
