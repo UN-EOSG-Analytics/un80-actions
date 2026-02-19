@@ -130,6 +130,27 @@ function MultiSelectFilter<T extends string | number | boolean>({
         </div>
         <div className="max-h-64 overflow-y-auto">
           <div className="space-y-1">
+            {/* Select all */}
+            {filteredOptions.length > 0 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const toSelect = options.filter(opt => !selected.includes(opt));
+                    toSelect.forEach(opt => onToggle(opt));
+                  }}
+                  className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-gray-100 text-left font-medium text-un-blue"
+                >
+                  <div className="h-4 w-4 border rounded flex items-center justify-center shrink-0 border-un-blue/50">
+                    {options.length > 0 && selected.length === options.length ? (
+                      <Check className="h-3 w-3 text-un-blue" />
+                    ) : null}
+                  </div>
+                  <span className="flex-1">Select all</span>
+                </button>
+                <div className="my-1 border-t border-gray-200" />
+              </>
+            )}
             {filteredOptions.length === 0 ? (
               <div className="px-2 py-2 text-sm text-gray-400 text-center">
                 No results found
