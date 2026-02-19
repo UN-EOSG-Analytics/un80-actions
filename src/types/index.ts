@@ -373,6 +373,8 @@ export interface MilestoneRow {
   updates: string | null;
   status: string;
   attention_to_timeline: boolean;
+  is_public?: boolean;
+  document_submitted?: boolean;
 }
 
 export interface ActionWithMilestones {

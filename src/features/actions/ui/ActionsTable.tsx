@@ -36,8 +36,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getStatusStyles, ACTION_STATUS } from "@/constants/actionStatus";
-import type { ActionsTableData } from "@/types";
-import type { RiskAssessment } from "@/types";
+import type { ActionsTableData, ActionWithMilestones, RiskAssessment } from "@/types";
 import { updateRiskAssessment, updatePublicActionStatus } from "@/features/actions/commands";
 
 type SortField = "work_package_id" | "action_id" | "work_package_title" | "indicative_action" | "risk_assessment" | "deliverables";
@@ -60,6 +59,26 @@ const STATUS_OPTIONS = [
 
 function actionLabel(actionId: number, subId: string | null): string {
   return subId ? `${actionId}${subId}` : String(actionId);
+}
+
+/** Get month (1–12) from ISO date string (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss). */
+function monthFromDeadline(deadline: string | null): number | null {
+  if (!deadline?.trim()) return null;
+  const m = parseInt(deadline.trim().split(/[-T]/)[1], 10);
+  return !isNaN(m) && m >= 1 && m <= 12 ? m : null;
+}
+
+/** Deliverables status for an action, optionally for a specific month (when filter is set). */
+function getDeliverablesStatus(
+  action: ActionWithMilestones,
+  selectedMonth: number | null,
+): "submitted" | "not_submitted" | null {
+  if (!selectedMonth) return action.deliverables_status;
+  const internal = action.milestones?.find(
+    (m) => !m.is_public && monthFromDeadline(m.deadline) === selectedMonth,
+  );
+  if (!internal) return null;
+  return internal.document_submitted ? "submitted" : "not_submitted";
 }
 
 // Multiselect filter component
@@ -234,7 +253,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
   const [filterBigTicket, setFilterBigTicket] = useState<boolean[]>([]);
   const [filterWorkPackageId, setFilterWorkPackageId] = useState<string>("");
   const [filterRisk, setFilterRisk] = useState<string>("");
-  const [filterDeliverablesMonth, setFilterDeliverablesMonth] = useState<number[]>([]);
+  const [filterDeliverablesMonth, setFilterDeliverablesMonth] = useState<number | null>(null);
   const [filterIntermediateMilestones, setFilterIntermediateMilestones] = useState<boolean>(false);
   
   // Track which filter popovers are open
@@ -356,10 +375,8 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     if (filterRisk) {
       list = list.filter((a) => a.risk_assessment === filterRisk);
     }
-    if (filterDeliverablesMonth.length > 0) {
-      list = list.filter((a) => 
-        a.upcoming_milestone_months.some((month) => filterDeliverablesMonth.includes(month))
-      );
+    if (filterDeliverablesMonth != null) {
+      list = list.filter((a) => a.upcoming_milestone_months.includes(filterDeliverablesMonth));
     }
     if (filterIntermediateMilestones) {
       list = list.filter((a) => {
@@ -386,12 +403,14 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     filterIntermediateMilestones,
   ]);
 
-  // Calculate deliverables counter
+  // Calculate deliverables counter (when month filter set, use status for that month)
   const deliverablesCounter = useMemo(() => {
     const total = filteredActions.length;
-    const submitted = filteredActions.filter((a) => a.deliverables_status === "submitted").length;
+    const submitted = filteredActions.filter(
+      (a) => getDeliverablesStatus(a, filterDeliverablesMonth) === "submitted",
+    ).length;
     return { submitted, total };
-  }, [filteredActions]);
+  }, [filteredActions, filterDeliverablesMonth]);
 
   // Calculate intermediate milestones counter
   const intermediateMilestonesCounter = useMemo(() => {
@@ -424,13 +443,13 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
         cmp = (order[av] ?? -1) - (order[bv] ?? -1);
       } else if (sortField === "deliverables") {
         const order: Record<string, number> = { submitted: 0, not_submitted: 1 };
-        const av = a.deliverables_status ?? "";
-        const bv = b.deliverables_status ?? "";
+        const av = getDeliverablesStatus(a, filterDeliverablesMonth) ?? "";
+        const bv = getDeliverablesStatus(b, filterDeliverablesMonth) ?? "";
         cmp = (order[av] ?? 2) - (order[bv] ?? 2);
       }
       return cmp * dir;
     });
-  }, [filteredActions, sortField, sortDirection]);
+  }, [filteredActions, sortField, sortDirection, filterDeliverablesMonth]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -683,22 +702,70 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                       DELIVERABLES
                       <SortIcon column="deliverables" sortField={sortField} sortDirection={sortDirection} />
                     </button>
-                    <MultiSelectFilter
-                      filterKey="deliverablesMonth"
-                      options={uniqueDeliverablesMonths}
-                      selected={filterDeliverablesMonth}
-                      onToggle={(month) => {
-                        setFilterDeliverablesMonth((prev) =>
-                          prev.includes(month) ? prev.filter((v) => v !== month) : [...prev, month]
-                        );
-                      }}
-                      renderOption={(month) => {
-                        const date = new Date(2024, month - 1, 1);
-                        return date.toLocaleString('en-US', { month: 'short' });
-                      }}
-                      isOpen={openFilters.deliverablesMonth || false}
+                    <Popover
+                      open={openFilters.deliverablesMonth || false}
                       onOpenChange={(open) => setOpenFilters((prev) => ({ ...prev, deliverablesMonth: open }))}
-                    />
+                    >
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenFilters((prev) => ({ ...prev, deliverablesMonth: !prev.deliverablesMonth }));
+                          }}
+                          className={`h-6 w-6 p-0 border-0 bg-transparent hover:bg-gray-100 rounded flex items-center justify-center transition-colors ${
+                            filterDeliverablesMonth != null ? "text-un-blue" : "text-gray-400"
+                          }`}
+                        >
+                          <Filter className="h-3.5 w-3.5" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-40 p-2" align="start" onClick={(e) => e.stopPropagation()}>
+                        <div className="max-h-64 overflow-y-auto space-y-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFilterDeliverablesMonth(null);
+                              setOpenFilters((prev) => ({ ...prev, deliverablesMonth: false }));
+                            }}
+                            className={`w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-gray-100 text-left ${
+                              filterDeliverablesMonth === null ? "font-medium text-un-blue" : ""
+                            }`}
+                          >
+                            <div className={`h-4 w-4 border rounded flex items-center justify-center shrink-0 ${
+                              filterDeliverablesMonth === null ? "bg-un-blue border-un-blue" : "border-gray-300"
+                            }`}>
+                              {filterDeliverablesMonth === null && <Check className="h-3 w-3 text-white" />}
+                            </div>
+                            All months
+                          </button>
+                          {uniqueDeliverablesMonths.map((month) => {
+                            const isSelected = filterDeliverablesMonth === month;
+                            const label = new Date(2024, month - 1, 1).toLocaleString("en-US", { month: "short" });
+                            return (
+                              <button
+                                key={month}
+                                type="button"
+                                onClick={() => {
+                                  setFilterDeliverablesMonth(month);
+                                  setOpenFilters((prev) => ({ ...prev, deliverablesMonth: false }));
+                                }}
+                                className={`w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-gray-100 text-left ${
+                                  isSelected ? "font-medium text-un-blue" : ""
+                                }`}
+                              >
+                                <div className={`h-4 w-4 border rounded flex items-center justify-center shrink-0 ${
+                                  isSelected ? "bg-un-blue border-un-blue" : "border-gray-300"
+                                }`}>
+                                  {isSelected && <Check className="h-3 w-3 text-white" />}
+                                </div>
+                                {label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </div>
               </th>
@@ -769,32 +836,36 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                     <span className="line-clamp-2">{a.indicative_action}</span>
                   </td>
                   <td className="px-4 py-3">
-                    {a.deliverables_status ? (
-                      <Badge
-                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          a.deliverables_status === "submitted"
-                            ? "border-green-300 bg-green-50 text-green-800"
-                            : "border-amber-300 bg-amber-50 text-amber-800"
-                        }`}
-                      >
-                        {a.deliverables_status === "submitted" ? (
-                          <>
-                            <Send className="h-3 w-3" />
-                            Submitted
-                          </>
-                        ) : (
-                          <span
-                            className="font-extrabold leading-none"
-                            title="Not submitted"
-                            aria-label="Not submitted"
-                          >
-                            !
-                          </span>
-                        )}
-                      </Badge>
-                    ) : (
-                      <span className="text-gray-400 text-xs">—</span>
-                    )}
+                    {(() => {
+                      const status = getDeliverablesStatus(a, filterDeliverablesMonth);
+                      if (!status) {
+                        return <span className="text-gray-400 text-xs">—</span>;
+                      }
+                      return (
+                        <Badge
+                          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                            status === "submitted"
+                              ? "border-green-300 bg-green-50 text-green-800"
+                              : "border-amber-300 bg-amber-50 text-amber-800"
+                          }`}
+                        >
+                          {status === "submitted" ? (
+                            <>
+                              <Send className="h-3 w-3" />
+                              Submitted
+                            </>
+                          ) : (
+                            <span
+                              className="font-extrabold leading-none"
+                              title="Not submitted"
+                              aria-label="Not submitted"
+                            >
+                              !
+                            </span>
+                          )}
+                        </Badge>
+                      );
+                    })()}
                   </td>
                   {isAdmin && (
                   <td

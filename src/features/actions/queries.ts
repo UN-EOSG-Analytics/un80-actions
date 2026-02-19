@@ -680,6 +680,8 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       m.updates AS milestone_updates,
       m.status AS milestone_status,
       m.attention_to_timeline AS milestone_attention_to_timeline,
+      m.is_public AS milestone_is_public,
+      COALESCE(m.milestone_document_submitted, false) AS milestone_document_submitted,
       (SELECT EXISTS(
          SELECT 1 FROM un80actions.action_milestones delayed_m
          WHERE delayed_m.action_id = a.id
@@ -760,6 +762,8 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       m.updates AS milestone_updates,
       m.status AS milestone_status,
       m.attention_to_timeline AS milestone_attention_to_timeline,
+      m.is_public AS milestone_is_public,
+      COALESCE(m.milestone_document_submitted, false) AS milestone_document_submitted,
       (SELECT EXISTS(
          SELECT 1 FROM un80actions.action_milestones delayed_m
          WHERE delayed_m.action_id = a.id
@@ -852,6 +856,8 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
     milestone_updates: string | null;
     milestone_status: string | null;
     milestone_attention_to_timeline: boolean | null;
+    milestone_is_public?: boolean | null;
+    milestone_document_submitted?: boolean | null;
     has_overdue_milestone: boolean;
   };
 
@@ -995,6 +1001,8 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
           updates: r.milestone_updates,
           status: r.milestone_status!,
           attention_to_timeline: r.milestone_attention_to_timeline ?? false,
+          is_public: r.milestone_is_public ?? false,
+          document_submitted: r.milestone_document_submitted ?? false,
         });
       }
     }
