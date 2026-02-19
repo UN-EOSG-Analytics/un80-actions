@@ -171,9 +171,11 @@ function MultiSelectFilter<T extends string | number>({
   );
 }
 
-/** Priority for a single cell: Needs OLA review > Needs attention > Draft > Approved */
+/** Priority: Finalized > Attention to timeline > Needs OLA review > Needs attention > Draft > Approved */
 function getCellStatusLabel(cell: MilestoneViewCell | null): string | null {
   if (!cell) return null;
+  if (cell.finalized) return "Finalized";
+  if (cell.attention_to_timeline) return "Attention to timeline";
   if (cell.needs_ola_review) return "Needs OLA review";
   if (cell.needs_attention) return "Needs attention";
   if (cell.is_draft) return "Draft";
@@ -199,6 +201,8 @@ function SortIcon({
 }
 
 const STATUS_STYLES: Record<string, { badge: string }> = {
+  "Finalized": { badge: "bg-green-100 text-green-800 border-green-200" },
+  "Attention to timeline": { badge: "bg-amber-100 text-amber-800 border-amber-200" },
   "Needs OLA review": { badge: "bg-amber-100 text-amber-800 border-amber-200" },
   "Needs attention": { badge: "bg-orange-100 text-orange-800 border-orange-200" },
   "Draft": { badge: "bg-slate-100 text-slate-700 border-slate-200" },

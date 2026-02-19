@@ -279,6 +279,10 @@ export interface MilestoneViewCell {
   is_draft?: boolean;
   needs_attention?: boolean;
   needs_ola_review?: boolean;
+  /** Internal milestone: marked complete */
+  finalized?: boolean;
+  /** Internal milestone: needs attention to timeline */
+  attention_to_timeline?: boolean;
 }
 
 export interface MilestoneViewRow {
@@ -307,11 +311,15 @@ type MilestoneViewRowDb = {
   first_is_draft: boolean | null;
   first_needs_attention: boolean | null;
   first_needs_ola_review: boolean | null;
+  first_finalized: boolean | null;
+  first_attention_to_timeline: boolean | null;
   final_description: string | null;
   final_deadline: string | null;
   final_is_draft: boolean | null;
   final_needs_attention: boolean | null;
   final_needs_ola_review: boolean | null;
+  final_finalized: boolean | null;
+  final_attention_to_timeline: boolean | null;
   document_submitted: boolean;
 };
 
@@ -371,6 +379,14 @@ export async function getMilestoneViewTableData(): Promise<MilestoneViewRow[]> {
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
          AND m.milestone_type = 'first'
        LIMIT 1) AS first_needs_ola_review,
+      (SELECT m.finalized FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.milestone_type = 'first'
+       LIMIT 1) AS first_finalized,
+      (SELECT m.attention_to_timeline FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.milestone_type = 'first'
+       LIMIT 1) AS first_attention_to_timeline,
       (SELECT m.description FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
          AND m.milestone_type = 'final'
@@ -391,6 +407,14 @@ export async function getMilestoneViewTableData(): Promise<MilestoneViewRow[]> {
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
          AND m.milestone_type = 'final'
        LIMIT 1) AS final_needs_ola_review,
+      (SELECT m.finalized FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.milestone_type = 'final'
+       LIMIT 1) AS final_finalized,
+      (SELECT m.attention_to_timeline FROM ${DB_SCHEMA}.action_milestones m
+       WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
+         AND m.milestone_type = 'final'
+       LIMIT 1) AS final_attention_to_timeline,
       COALESCE(a.document_submitted, false) AS document_submitted
     FROM work_packages wp
     JOIN actions a ON a.work_package_id = wp.id
@@ -403,8 +427,20 @@ export async function getMilestoneViewTableData(): Promise<MilestoneViewRow[]> {
     isDraft: boolean | null,
     needsAttention: boolean | null,
     needsOlaReview: boolean | null,
+    finalized?: boolean | null,
+    attentionToTimeline?: boolean | null,
   ): MilestoneViewCell | null => {
-    if (desc == null && deadline == null && !isDraft && !needsAttention && !needsOlaReview) {
+    const fin = finalized ?? false;
+    const att = attentionToTimeline ?? false;
+    if (
+      desc == null &&
+      deadline == null &&
+      !isDraft &&
+      !needsAttention &&
+      !needsOlaReview &&
+      !fin &&
+      !att
+    ) {
       return null;
     }
     return {
@@ -413,6 +449,8 @@ export async function getMilestoneViewTableData(): Promise<MilestoneViewRow[]> {
       is_draft: isDraft ?? false,
       needs_attention: needsAttention ?? false,
       needs_ola_review: needsOlaReview ?? false,
+      finalized: fin,
+      attention_to_timeline: att,
     };
   };
   return rows.map((r) => ({
@@ -433,6 +471,8 @@ export async function getMilestoneViewTableData(): Promise<MilestoneViewRow[]> {
       r.first_is_draft,
       r.first_needs_attention,
       r.first_needs_ola_review,
+      r.first_finalized,
+      r.first_attention_to_timeline,
     ),
     final_milestone: toCell(
       r.final_description,
@@ -440,6 +480,8 @@ export async function getMilestoneViewTableData(): Promise<MilestoneViewRow[]> {
       r.final_is_draft,
       r.final_needs_attention,
       r.final_needs_ola_review,
+      r.final_finalized,
+      r.final_attention_to_timeline,
     ),
     document_submitted: r.document_submitted,
   }));
