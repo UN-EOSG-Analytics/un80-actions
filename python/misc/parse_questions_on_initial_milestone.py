@@ -100,9 +100,9 @@ def extract_date_and_body(segment: str) -> Tuple[Optional[str], str]:
 
 
 def find_column(df: pd.DataFrame, target_name: str) -> str:
-    """Find a column by case-insensitive, trimmed name."""
-    normalized = {col: col.strip().lower() for col in df.columns}
-    target_norm = target_name.strip().lower()
+    """Find a column by case-insensitive, trimmed name (ignores trailing dots, e.g. 'Action No.')."""
+    normalized = {col: col.strip().lower().rstrip(".") for col in df.columns}
+    target_norm = target_name.strip().lower().rstrip(".")
     for col, norm in normalized.items():
         if norm == target_norm:
             return col
@@ -126,7 +126,7 @@ def main() -> None:
 
     for _, row in df.iterrows():
         action_no = row.get(action_col)
-        if pd.isna(action_no):
+        if pd.isna(action_no):  # Skip only if empty (Excel should have Action No in every row)
             continue
 
         try:
@@ -135,13 +135,21 @@ def main() -> None:
             continue
 
         questions_cell = row.get(questions_col)
-        if pd.isna(questions_cell) or str(questions_cell).strip() == "":
-            continue
-
         notes_cell = row.get(notes_col)
         notes_value = None if pd.isna(notes_cell) else str(notes_cell).strip()
         if notes_value == "":
             notes_value = None
+
+        if pd.isna(questions_cell) or str(questions_cell).strip() == "":
+            rows.append(
+                {
+                    "ActionNo": action_id,
+                    "question_date": None,
+                    "question": None,
+                    "notes": notes_value,
+                }
+            )
+            continue
 
         for segment in split_segments(str(questions_cell)):
             question_date, body = extract_date_and_body(segment)
