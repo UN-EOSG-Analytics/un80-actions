@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -281,59 +281,142 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     );
   }, [data.workPackages]);
 
-  // Extract unique WP IDs
-  const uniqueWPIds = useMemo(() => {
-    const ids = new Set<number>();
-    allActions.forEach((a) => {
-      ids.add(a.work_package_id);
-    });
-    return Array.from(ids).sort((a, b) => a - b);
-  }, [allActions]);
+  type FilterSkip =
+    | "wp"
+    | "wpTitle"
+    | "action"
+    | "indicativeAction"
+    | "bigTicket"
+    | "deliverablesMonth";
 
-  // Extract unique values for each column filter
+  // Apply all filters except one – used to derive "connected" filter options
+  const applyFiltersExcept = useCallback(
+    (list: typeof allActions, except: FilterSkip) => {
+      let result = list;
+      if (hasSearch) {
+        const matches = (s: string) => s.toLowerCase().includes(search);
+        result = result.filter(
+          (a) =>
+            matches(a.work_package_title ?? "") ||
+            matches(String(a.work_package_id)) ||
+            matches(String(a.action_id)) ||
+            matches(a.indicative_action ?? ""),
+        );
+      }
+      if (except !== "wp" && filterWP.length > 0) {
+        result = result.filter((a) => filterWP.includes(a.work_package_id));
+      }
+      if (except !== "wpTitle" && filterWPTitle.length > 0) {
+        result = result.filter((a) => filterWPTitle.includes(a.work_package_title));
+      }
+      if (except !== "action" && filterAction.length > 0) {
+        result = result.filter((a) =>
+          filterAction.includes(actionLabel(a.action_id, a.action_sub_id)),
+        );
+      }
+      if (except !== "indicativeAction" && filterIndicativeAction.length > 0) {
+        result = result.filter((a) =>
+          filterIndicativeAction.includes(a.indicative_action),
+        );
+      }
+      if (except !== "bigTicket" && filterBigTicket.length > 0) {
+        const hasBigTicket = filterBigTicket.includes(true);
+        const hasNotBigTicket = filterBigTicket.includes(false);
+        if (hasBigTicket && !hasNotBigTicket) {
+          result = result.filter((a) => a.is_big_ticket);
+        } else if (hasNotBigTicket && !hasBigTicket) {
+          result = result.filter((a) => !a.is_big_ticket);
+        }
+      }
+      if (filterWorkPackageId) {
+        result = result.filter((a) =>
+          String(a.work_package_id).includes(filterWorkPackageId),
+        );
+      }
+      if (filterRisk) {
+        result = result.filter((a) => a.risk_assessment === filterRisk);
+      }
+      if (except !== "deliverablesMonth" && filterDeliverablesMonth != null) {
+        result = result.filter((a) =>
+          a.upcoming_milestone_months.includes(filterDeliverablesMonth),
+        );
+      }
+      if (filterIntermediateMilestones) {
+        result = result.filter((a) =>
+          a.milestones.some(
+            (m) =>
+              m.milestone_type === "second" ||
+              m.milestone_type === "third" ||
+              m.milestone_type === "fourth",
+          ),
+        );
+      }
+      return result;
+    },
+    [
+      hasSearch,
+      search,
+      filterWP,
+      filterWPTitle,
+      filterAction,
+      filterIndicativeAction,
+      filterBigTicket,
+      filterWorkPackageId,
+      filterRisk,
+      filterDeliverablesMonth,
+      filterIntermediateMilestones,
+    ],
+  );
+
+  // Connected filter options: each filter only shows values that exist in rows matching the other filters
+  const uniqueWPIds = useMemo(() => {
+    const list = applyFiltersExcept(allActions, "wp");
+    const ids = new Set<number>();
+    list.forEach((a) => ids.add(a.work_package_id));
+    return Array.from(ids).sort((a, b) => a - b);
+  }, [allActions, applyFiltersExcept]);
+
   const uniqueWPTitles = useMemo(() => {
+    const list = applyFiltersExcept(allActions, "wpTitle");
     const titles = new Set<string>();
-    allActions.forEach((a) => {
+    list.forEach((a) => {
       if (a.work_package_title) titles.add(a.work_package_title);
     });
     return Array.from(titles).sort();
-  }, [allActions]);
+  }, [allActions, applyFiltersExcept]);
 
   const uniqueActions = useMemo(() => {
+    const list = applyFiltersExcept(allActions, "action");
     const actions = new Set<string>();
-    allActions.forEach((a) => {
-      const label = actionLabel(a.action_id, a.action_sub_id);
-      actions.add(label);
+    list.forEach((a) => {
+      actions.add(actionLabel(a.action_id, a.action_sub_id));
     });
     return Array.from(actions).sort((a, b) => {
-      // Sort numerically if possible
       const numA = parseInt(a.replace(/[^0-9]/g, ""), 10);
       const numB = parseInt(b.replace(/[^0-9]/g, ""), 10);
       if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
       return a.localeCompare(b);
     });
-  }, [allActions]);
+  }, [allActions, applyFiltersExcept]);
 
   const uniqueIndicativeActions = useMemo(() => {
+    const list = applyFiltersExcept(allActions, "indicativeAction");
     const actions = new Set<string>();
-    allActions.forEach((a) => {
+    list.forEach((a) => {
       if (a.indicative_action) actions.add(a.indicative_action);
     });
     return Array.from(actions).sort();
-  }, [allActions]);
+  }, [allActions, applyFiltersExcept]);
 
   const uniqueDeliverablesMonths = useMemo(() => {
+    const list = applyFiltersExcept(allActions, "deliverablesMonth");
     const months = new Set<number>();
-    allActions.forEach((a) => {
-      // Include all upcoming milestone months
-      a.upcoming_milestone_months.forEach((month) => {
-        months.add(month);
-      });
-      // Also include January 2026 (month 1) if not already present
-      months.add(1);
+    list.forEach((a) => {
+      a.upcoming_milestone_months.forEach((month) => months.add(month));
     });
+    months.add(1);
     return Array.from(months).sort((a, b) => a - b);
-  }, [allActions]);
+  }, [allActions, applyFiltersExcept]);
 
   const filteredActions = useMemo(() => {
     let list = allActions;
