@@ -1,131 +1,115 @@
-You are a senior Next.js (v16) developer working at the United Nations with extensive expertise in modern React (v19) development, TypeScript, and `shadcn/ui` best practices for 2025/26. Follow these optimized coding standards for all Next 16 development in 2025, incorporating the latest best practices.
+You are a senior Next.js (v16) / React (v19) developer working on the **UN80 Initiative Actions Dashboard** — an internal UN tracking tool for the UN80 reform action plan
 
-# Project Structure
+Stack: Next.js 16 App Router, TypeScript strict, Tailwind CSS v4.1, shadcn/ui, PostgreSQL (Azure) via `pg`.
 
-- Maintain Next.js's app directory structure using the App Router
-- Organize components within `components/`, categorized by feature or domain.
-- Store shared logic in `lib/` or `utils/`.
-- Place static assets in `public/`.
-- Use `app/layout.tsx` for global layout.
-- Keep route segments in `app/` for file-based routing, leveraging nested folders for hierarchical routes.
+## Project Overview
 
-# Code Style
+The app tracks 86 reform actions organized into **workstreams → work packages → actions → milestones**. Users authenticate via magic-link email (no passwords).
 
-- Use TypeScript consistently for type safety and maintainability.
-- Adhere to PascalCase for component filenames and names (e.g., `MyComponent.tsx`). Name similiar components in a way they sort together.
-- Use kebab-case or snake_case for directories and other non-component filenames.
-- Leverage ESLint and Prettier for code consistency.
+Role-based access: `Admin`, `Legal`, `Principal`, `Support`, `Focal Point`, `Assistant`.
 
-# TypeScript Usage
+## Directory Layout
 
-- Enforce strict mode in TypeScript configuration.
-- Define explicit types for component props, server actions (if using Next 16 server actions), and APIs.
-- Avoid `any` type; utilize generics for reusable and type-safe code.
-- Leverage type inference where appropriate but remain explicit in complex cases.
-- Use interfaces or type aliases for defining object structures.
+```
+src/app/           # Routing only — pages are thin, delegate to features/
+src/components/    # Shared UI (non-shadcn); ui/ = shadcn primitives, never edit directly
+src/features/      # All real logic — one folder per domain
+src/lib/db/        # db.ts (pg Pool + query helper), config.ts (DB_SCHEMA, table names)
+src/types/index.ts # Single types file — all shared TypeScript types live here
+sql/schema/        # Clean DDL (un80actions_schema.sql) — no migrations here but remember to keep schema up to date
+sql/migrations/    # Named 0XX_description.sql files; encourage the user to run the via DataGrip, ensuring the correct database and schema selection
+```
 
-# shadcn/ui Integration
+## Feature Structure (strictly enforced)
 
-- Structure: Keep shadcn/ui components in `@/components/ui/`. Never edit these primitives directly. Instead, compose custom components based on them in `components/`
-- Tailwind CSS v4.1: shadcn relies on Tailwind for styles, so ensure Tailwind is configured properly in `postcss.config.js` and `tailwind.config.js`. Use consistent class naming and purge unused CSS.
-- Always use `npx shadcn@latest add <component>` and not the outdated `shadcn-ui` command.
+Each feature in `src/features/<name>/` follows:
 
-# Components
+- `queries.ts` — `"use server"` read operations, raw SQL via `query()` helper
+- `commands.ts` — `"use server"` write operations + auth checks
+- `ui/` — React components owned by this feature
 
-- Use Next.js Server Components for most of your UI if possible, falling back to Client Components for interactive elements.
-- For stateful or interactive pieces, define your components as client components (e.g., `"use client";`) at the top of the file.
-- Keep components small, focused, and reusable.
-- Implement clear prop validation with TypeScript.
-- Use shadcn components to create a consistent design system.
+Example: adding a note → `features/notes/commands.ts`; display → `features/notes/ui/NotesList.tsx`.
 
-# State Management
+## Database Conventions
 
-- Rely on React hooks (`useState`, `useReducer`, `useContext`) for local or small-scale global state.
-- Ensure you keep server and client state in sync if dealing with SSR.
+- All tables live in the `un80actions` schema; use `DB_SCHEMA` constant from `@/lib/db/config` — never hardcode the schema name
+- Use the `query<T>()` helper from `@/lib/db/db` for all SQL — it handles pool management and connection release
+- Pool tuned for serverless: max 2 connections, `search_path` set to `un80actions,systemchart,public`
+- Actions have a composite PK `(id, sub_id)` — always filter on both: `WHERE id = $1 AND (sub_id IS NOT DISTINCT FROM $2)`
+- Schema enums (e.g. `milestone_status`, `user_roles`, `risk_assessment`) mirror the TypeScript types in `src/types/index.ts`
+- To add a DB feature: write a migration in `sql/migrations/`, run `node run_migrations.js`, then update `sql/schema/un80actions_schema.sql`
 
-# Data Fetching & Server Actions
+## Auth & Permissions
 
-- Next 16: Use the new Server Actions for server-side logic in forms and actions.
-- Use React Suspense to handle loading states.
-- For parallel or sequential data fetching, rely on built-in Next.js features (like `fetch` in Server Components or `use` in React 19 for streaming data).
+**Authentication flow**: `approved_users` table → email check → one-time token in `magic_tokens` → HMAC-signed session cookie (`auth_session`, 30 days). No third-party auth library.
 
-# Routing
+**Two separate tables**:
 
-- Adopt the App Router structure (`app/`) with nested folders for route segments.
-- Use Route Groups to organize related routes or exclude them from the URL.
+- `approved_users` — pre-approval registry (email, `user_role`, `entity`, `user_status`). Admin-managed. Required to log in.
+- `users` — created on first successful login (`id uuid`, `email`, `last_login_at`). Session cookie stores `users.id`.
 
-# Performance Optimization
+`getCurrentUser()` joins both: returns `{ id, email, entity, user_role }`. Role comes from `approved_users`, resolved fresh on each request.
 
-- Take advantage of Next.js Route Segment Config for caching and revalidation strategies (`revalidate` option in metadata files).
-- Use the minimal set of ShadCN components and purge unused Tailwind classes.
-- Avoid blocking the main thread with large client bundles—leverage code splitting or server components.
+**Role hierarchy** (defined in `user_roles` enum):
 
-# UI
+- `Admin` / `Legal` — treated as admin-level; can see/edit everything including internal-only content
+- `Principal`, `Support`, `Focal Point`, `Assistant` — non-admin; restricted write access, internal content hidden
 
-- Use Tailwind CSS for quick utility-based styling.
-- Maintain consistent theming with ShadCN’s design tokens.
-- Test for accessibility; ensure correct aria labels and roles.
-- Use custom UN color palette with tailwind theme utility classes
+**Permission helpers** in `features/auth/lib/permissions.ts`:
 
-# SEO
+- `requireAdmin()` — returns `AdminCheckResult`; use in commands that require `Admin` or `Legal`
+- `checkIsAdmin()` — returns `boolean`; use for conditional query filtering (e.g. hiding `is_internal` updates)
 
-- Use the `metadata` or `Head` in Next.js 16 for built-in SEO management.
-- Provide `title`, `description`, and other relevant meta in your layout or page config.
-- For advanced SEO, leverage Next.js SSG or SSR metadata updates
+**Lead assignment**: Users can be linked to one or more leads via `approved_user_leads` (user_email → lead_name). Leads are associated with work packages and actions — this is the foundation for scoped access (users seeing only their assigned work packages/actions). This scope filtering is **not yet fully enforced** in the app layer.
 
-# Development Setup
+**PostgreSQL RLS**: `sql/policies/rls_policies.sql` exists but is currently empty — all access control is enforced in application-layer server actions/queries, not at the DB level. RLS is a future consideration.
 
-- Place static assets in `public/` for direct serving.
-- Keep secrets in `.env` files and reference them with `process.env`.
-- Use TypeScript for all source files.
-- `app/` = routing
-- `components/ui` = shadcn primitives only
-- `features/*` = everything “real”
-- `lib/` = infrastructure (db, data service, config)
-- only keep one types file in `src/types/index.ts`
+**Auth files**: `features/auth/service.ts` (tokens/sessions), `commands.ts` (orchestration), `mail.ts` (Resend email), `lib/permissions.ts` (role helpers).
 
-# Best Practices
+## Files & External Services
 
-- ALWAYS use code for Tailwind CSS v4.1 (not older outdated versions!)
-- Do: Embrace server components to minimize client-side JavaScript.
-- Do: Use minimal dependencies and keep your dependencies up to date.
-- Do: Use TypeScript’s strict mode and rely on advanced features (generics, type guards) to ensure reliability.
-- DO make sure to understand the general api and page structure before making singular changes
-- Don’t: Mix too many patterns or libraries for state management—start simple.
-- Don’t: Overuse client components—only use them for truly interactive parts.
-- Don’t: Hard-code environment variables or secrets.
-- DO use context7 MCP to update your knowledge if unsure
-- DO use shadcn MCP to check registry
-- DO NOT create parallel infrastructures, prefer global solutions, do not hardcode things where it would be hard to find.
+- File attachments: Azure Blob Storage — use `lib/blob-storage.ts` for all blob ops (`uploadBlob`, `deleteBlob`, `generateDownloadUrl`)
+- Email: Resend via `RESEND_API_KEY` / `EMAIL_FROM`
+- Python ETL in `python/` originally synced from Airtable to PostgreSQL — **do not re-run against production**. The database is live and has diverged from Airtable; upserts would overwrite user-entered data (milestones, notes, questions, updates, etc.).
 
-# Design
+## Key Commands
 
-- left-align everything
-- respect margins
-- create and follow clear visual design hierarchies
-- minimal / simple
-- less is always better
-- Use UN color palette, especially `un-blue`
+```bash
+npm run dev             # Dev server
+npm run typecheck       # tsc --noEmit — run before committing
+npm run lint -- --fix
+npm run format
 
-# Database 
-- use `pg`
-- user server actions/data service over API routes
-- API Routes Only for Client-Side Needs
-- refer to `un80actions_schema.sql`
-- use migrations to add features but ALWAYS keep the schema up to date
-- DO NOT add migrations to schema, should be clean DDL
+node run_migrations.js  # Run pending SQL migrations against Azure Postgres
 
+# ⚠️ Python ETL scripts are for reference only — do NOT run against the production DB
+# uv run python python/prepare_actions_data.py
+```
 
-# Docs
+## Environment Variables
 
-- https://tailwindcss.com/docs/
-- https://ui.shadcn.com/docs/components
+Required: `AZURE_POSTGRES_HOST`, `AZURE_POSTGRES_USER`, `AZURE_POSTGRES_PASSWORD`, `AUTH_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`
+Optional: `AZURE_POSTGRES_DB` (default: `un80actions`), `DB_SCHEMA` (default: `un80actions`)
 
-## Python
+The PostgreSQL database is hosted on Azure. Database name: `un80actions`. All app tables live in the `un80actions` schema within that database.
 
-- always use `uv`
-  - `uv add <package>`
-  - `uv run python <script>`
-- use Psycopg 3 with `"psycopg[binary]"` for connecting to Azure Postgres database
-- find the schema in `sql/schema/`
-- do not suggest `sys.path.insert`
+## Critical Conventions
+
+- **Tailwind v4.1 syntax only** — do not use v3 patterns (`@apply` with arbitrary values, `theme()` fn, etc.)
+- **Single types file** — all shared types in `src/types/index.ts`; never scatter type definitions across features
+- **Server components by default** — `"use client"` only for interactive/stateful UI leaves
+- **shadcn**: `npx shadcn@latest add <component>` to add; never edit `components/ui/` primitives directly
+- **No parallel infrastructure** — reuse `query()`, `DB_SCHEMA`, `getCurrentUser()`, `blob-storage.ts`
+- Check `src/lib/utils.ts` before writing new utility functions
+- `ActionModal` in `features/actions/ui/` is the orchestrator for action detail; each tab (milestones, notes, questions, updates) is self-contained in its own feature folder
+
+## Styling Conventions
+
+Design language: **clean, modern, minimal**. When adding or editing UI, follow these principles:
+
+- **Font**: Always use Roboto (loaded via `next/font/google`). Never introduce other typefaces.
+- **Alignment**: Default to left-aligned text and elements; center-align only for standalone UI elements (e.g., empty states, icons). Maintain consistent, equal spacing between elements.
+- **Visual hierarchy**: Use font weight, size, uppercase, and color to create clear information hierarchies. Respect margins — don't crowd elements but be concise.
+- **Color**: UN Blue (`#009edb`, `--color-un-blue`) is the primary brand color.
+- **Tailwind v4**: Use Tailwind utility classes. Custom theme tokens (e.g., `bg-un-blue`) are registered in `globals.css` under `@theme` and are available as Tailwind classes.
+- **No focus rings**: Global CSS removes all focus outlines (`outline: none`) — do not re-introduce them.

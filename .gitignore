@@ -270,4 +270,4 @@ uploads/
 *.parquet
 
 # next-agents-md
-# .next-docs/
+.next-docs/
