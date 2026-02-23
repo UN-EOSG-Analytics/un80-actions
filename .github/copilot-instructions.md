@@ -69,7 +69,7 @@ Example: adding a note → `features/notes/commands.ts`; display → `features/n
 ## Files & External Services
 
 - File attachments: Azure Blob Storage — use `lib/blob-storage.ts` for all blob ops (`uploadBlob`, `deleteBlob`, `generateDownloadUrl`)
-- Email: Resend via `RESEND_API_KEY` / `EMAIL_FROM`
+- Email: SMTP via `SMTP_HOST` / `SMTP_USER` / `SMTP_PASS` / `SMTP_FROM`
 - Python ETL in `python/` originally synced from Airtable to PostgreSQL — **do not re-run against production**. The database is live and has diverged from Airtable; upserts would overwrite user-entered data (milestones, notes, questions, updates, etc.).
 
 ## Key Commands
@@ -86,9 +86,15 @@ node run_migrations.js  # Run pending SQL migrations against Azure Postgres
 # uv run python python/prepare_actions_data.py
 ```
 
+## Deployment
+
+- **Production** is the `app` branch, deployed automatically via Vercel on every push
+- API routes have a 10s function timeout (`vercel.json`)
+- `output: "standalone"` in `next.config.ts` produces a self-contained build
+
 ## Environment Variables
 
-Required: `AZURE_POSTGRES_HOST`, `AZURE_POSTGRES_USER`, `AZURE_POSTGRES_PASSWORD`, `AUTH_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`
+Required: `AZURE_POSTGRES_HOST`, `AZURE_POSTGRES_USER`, `AZURE_POSTGRES_PASSWORD`, `AUTH_SECRET`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_FROM`, `SMTP_PASS`, `AZURE_STORAGE_ACCOUNT_NAME`, `AZURE_STORAGE_ACCOUNT_KEY`, `AZURE_STORAGE_CONTAINER_NAME`
 Optional: `AZURE_POSTGRES_DB` (default: `un80actions`), `DB_SCHEMA` (default: `un80actions`)
 
 The PostgreSQL database is hosted on Azure. Database name: `un80actions`. All app tables live in the `un80actions` schema within that database.

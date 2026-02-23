@@ -86,6 +86,12 @@ node run_migrations.js  # Run pending SQL migrations against Azure Postgres
 # uv run python python/prepare_actions_data.py
 ```
 
+## Deployment
+
+- **Production** is the `app` branch, deployed automatically via Vercel on every push
+- API routes have a 10s function timeout (`vercel.json`)
+- `output: "standalone"` in `next.config.ts` produces a self-contained build
+
 ## Environment Variables
 
 Required: `AZURE_POSTGRES_HOST`, `AZURE_POSTGRES_USER`, `AZURE_POSTGRES_PASSWORD`, `AUTH_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`
