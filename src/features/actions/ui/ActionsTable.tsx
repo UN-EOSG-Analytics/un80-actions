@@ -35,6 +35,12 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { getStatusStyles, ACTION_STATUS } from "@/constants/actionStatus";
 import type { ActionsTableData, ActionWithMilestones, RiskAssessment } from "@/types";
 import { updateRiskAssessment, updatePublicActionStatus } from "@/features/actions/commands";
@@ -419,6 +425,23 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     return Array.from(months).sort((a, b) => a - b);
   }, [allActions, applyFiltersExcept]);
 
+  const deliverableMonthStats = useMemo(() => {
+    const list = applyFiltersExcept(allActions, "deliverablesMonth");
+    const stats = new Map<number, { submitted: number; total: number }>();
+    list.forEach((a) => {
+      a.upcoming_milestone_months.forEach((ym) => {
+        const entry = stats.get(ym) ?? { submitted: 0, total: 0 };
+        entry.total += 1;
+        const milestone = a.milestones?.find(
+          (m) => !m.is_public && yearMonthFromDeadline(m.deadline) === ym,
+        );
+        if (milestone?.document_submitted) entry.submitted += 1;
+        stats.set(ym, entry);
+      });
+    });
+    return stats;
+  }, [allActions, applyFiltersExcept]);
+
   const filteredActions = useMemo(() => {
     let list = allActions;
     if (hasSearch) {
@@ -778,14 +801,23 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                     {deliverablesCounter.submitted}/{deliverablesCounter.total} submitted
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleSort("deliverables")}
-                      className="inline-flex items-center hover:text-un-blue"
-                    >
-                      DELIVERABLES
-                      <SortIcon column="deliverables" sortField={sortField} sortDirection={sortDirection} />
-                    </button>
+                    <TooltipProvider delayDuration={200}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            onClick={() => handleSort("deliverables")}
+                            className="inline-flex items-center hover:text-un-blue"
+                          >
+                            DELIVERABLES
+                            <SortIcon column="deliverables" sortField={sortField} sortDirection={sortDirection} />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-64 text-center text-xs">
+                          Whether the action&apos;s deliverable document has been submitted. Use the month filter to scope by milestone deadline.
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <Popover
                       open={openFilters.deliverablesMonth || false}
                       onOpenChange={(open) => setOpenFilters((prev) => ({ ...prev, deliverablesMonth: open }))}
@@ -804,7 +836,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                           <Filter className="h-3.5 w-3.5" />
                         </button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-40 p-2" align="start" onClick={(e) => e.stopPropagation()}>
+                      <PopoverContent className="w-48 p-2" align="start" onClick={(e) => e.stopPropagation()}>
                         <div className="max-h-64 overflow-y-auto space-y-1">
                           <button
                             type="button"
@@ -828,6 +860,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                             const year = Math.floor(month / 100);
                             const monthNum = month % 100;
                             const label = new Date(year, monthNum - 1, 1).toLocaleString("en-US", { month: "short" }) + ` ${year}`;
+                            const stats = deliverableMonthStats.get(month);
                             return (
                               <button
                                 key={month}
@@ -845,7 +878,14 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                                 }`}>
                                   {isSelected && <Check className="h-3 w-3 text-white" />}
                                 </div>
-                                {label}
+                                <span className="flex-1">{label}</span>
+                                {stats && (
+                                  <span className={`text-xs tabular-nums ${
+                                    isSelected ? "text-un-blue" : "text-gray-400"
+                                  }`}>
+                                    {stats.submitted}/{stats.total}
+                                  </span>
+                                )}
                               </button>
                             );
                           })}
