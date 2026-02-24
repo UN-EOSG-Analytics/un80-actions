@@ -2058,7 +2058,7 @@
     ],
     "first_milestone":null,
     "first_milestone_deadline":null,
-    "final_milestone":null,
+    "final_milestone":"Once there is a decision on how to move forward with potential co-location of Regional Commissions and the location of future integrated regional platforms, ODA will launch its internal work to co-locate its own centers",
     "final_milestone_deadline":null,
     "doc_text":"We will begin co-locating special political missions with a regional focus, regional peace and development advisors, with Regional Commissions serving as physical hosts. DPPA and DPO regional divisions will also participate remotely",
     "work_package_goal":"Simplifying access to regional expertise",
@@ -2237,7 +2237,7 @@
     "final_milestone_deadline":"2026-09-17",
     "doc_text":"Environmental issues are growing in importance, and environmental responsibilities are dispersed across UN entities. We will undertake a thorough assessment of current arrangements and make proposals on possible structural changes and programme realignments on environmental issues.",
     "work_package_goal":"Unified knowledge hubs and expertise on demand",
-    "action_entities":"UNDP; DPPA; UNCTAD; IFAD; OHCHR; UNEP; UNFCCC",
+    "action_entities":"UNEP; UNFCCC; UNDP; OHCHR; DPPA; UNCCD; UNESCO; WMO; UN Habitat; UNDRR; ECE; ESCAP; UNU; DESA; DCO; UNCTAD; BRS; MLFP; CBD; IFAD; DOALOS \/ UN Oceans; WHO; Minamata Convention",
     "sub_action_details":null,
     "action_leads":[
       "USG UNEP",
