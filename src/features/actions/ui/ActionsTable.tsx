@@ -61,21 +61,23 @@ function actionLabel(actionId: number, subId: string | null): string {
   return subId ? `${actionId}${subId}` : String(actionId);
 }
 
-/** Get month (1–12) from ISO date string (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss). */
-function monthFromDeadline(deadline: string | null): number | null {
+/** Get YYYYMM-encoded integer from ISO date string (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss). */
+function yearMonthFromDeadline(deadline: string | null): number | null {
   if (!deadline?.trim()) return null;
-  const m = parseInt(deadline.trim().split(/[-T]/)[1], 10);
-  return !isNaN(m) && m >= 1 && m <= 12 ? m : null;
+  const parts = deadline.trim().split(/[-T]/);
+  const y = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10);
+  return !isNaN(y) && !isNaN(m) && m >= 1 && m <= 12 ? y * 100 + m : null;
 }
 
-/** Deliverables status for an action, optionally for a specific month (when filter is set). */
+/** Deliverables status for an action, optionally for a specific YYYYMM (when filter is set). */
 function getDeliverablesStatus(
   action: ActionWithMilestones,
   selectedMonth: number | null,
 ): "submitted" | "not_submitted" | null {
   if (!selectedMonth) return action.deliverables_status;
   const internal = action.milestones?.find(
-    (m) => !m.is_public && monthFromDeadline(m.deadline) === selectedMonth,
+    (m) => !m.is_public && yearMonthFromDeadline(m.deadline) === selectedMonth,
   );
   if (!internal) return null;
   return internal.document_submitted ? "submitted" : "not_submitted";
@@ -414,7 +416,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     list.forEach((a) => {
       a.upcoming_milestone_months.forEach((month) => months.add(month));
     });
-    months.add(1);
     return Array.from(months).sort((a, b) => a - b);
   }, [allActions, applyFiltersExcept]);
 
@@ -824,7 +825,9 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                           </button>
                           {uniqueDeliverablesMonths.map((month) => {
                             const isSelected = filterDeliverablesMonth === month;
-                            const label = new Date(2024, month - 1, 1).toLocaleString("en-US", { month: "short" });
+                            const year = Math.floor(month / 100);
+                            const monthNum = month % 100;
+                            const label = new Date(year, monthNum - 1, 1).toLocaleString("en-US", { month: "short" }) + ` ${year}`;
                             return (
                               <button
                                 key={month}

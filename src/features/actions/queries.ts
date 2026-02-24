@@ -732,13 +732,12 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
          ORDER BY lp.deadline DESC
          LIMIT 1)
       )) AS next_upcoming_milestone_deadline_month,
-      (SELECT ARRAY_AGG(DISTINCT EXTRACT(MONTH FROM all_m.deadline)::integer ORDER BY EXTRACT(MONTH FROM all_m.deadline)::integer)
+      (SELECT ARRAY_AGG(DISTINCT (EXTRACT(YEAR FROM all_m.deadline)::integer * 100 + EXTRACT(MONTH FROM all_m.deadline)::integer) ORDER BY (EXTRACT(YEAR FROM all_m.deadline)::integer * 100 + EXTRACT(MONTH FROM all_m.deadline)::integer))
        FROM un80actions.action_milestones all_m
        WHERE all_m.action_id = a.id
          AND (all_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
          AND all_m.is_public = false
-         AND all_m.deadline IS NOT NULL
-         AND (all_m.deadline >= CURRENT_DATE OR (EXTRACT(YEAR FROM all_m.deadline) = 2026 AND EXTRACT(MONTH FROM all_m.deadline) = 1))) AS all_upcoming_milestone_months
+         AND all_m.deadline IS NOT NULL) AS all_upcoming_milestone_months
     FROM work_packages wp
     JOIN actions a ON a.work_package_id = wp.id
     LEFT JOIN action_milestones m ON m.action_id = a.id
@@ -822,13 +821,12 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
          ORDER BY lp.deadline DESC
          LIMIT 1)
       )) AS next_upcoming_milestone_deadline_month,
-      (SELECT ARRAY_AGG(DISTINCT EXTRACT(MONTH FROM all_m.deadline)::integer ORDER BY EXTRACT(MONTH FROM all_m.deadline)::integer)
+      (SELECT ARRAY_AGG(DISTINCT (EXTRACT(YEAR FROM all_m.deadline)::integer * 100 + EXTRACT(MONTH FROM all_m.deadline)::integer) ORDER BY (EXTRACT(YEAR FROM all_m.deadline)::integer * 100 + EXTRACT(MONTH FROM all_m.deadline)::integer))
        FROM un80actions.action_milestones all_m
        WHERE all_m.action_id = a.id
          AND (all_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
          AND all_m.is_public = false
-         AND all_m.deadline IS NOT NULL
-         AND (all_m.deadline >= CURRENT_DATE OR (EXTRACT(YEAR FROM all_m.deadline) = 2026 AND EXTRACT(MONTH FROM all_m.deadline) = 1))) AS all_upcoming_milestone_months
+         AND all_m.deadline IS NOT NULL) AS all_upcoming_milestone_months
     FROM work_packages wp
     JOIN actions a ON a.work_package_id = wp.id
     LEFT JOIN action_milestones m ON m.action_id = a.id

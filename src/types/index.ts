@@ -388,7 +388,7 @@ export interface ActionWithMilestones {
   document_submitted: boolean;
   deliverables_status: "submitted" | "not_submitted" | null; // From next upcoming internal milestone
   deliverables_deadline_month: number | null; // Month (1-12) of next upcoming milestone deadline for display
-  upcoming_milestone_months: number[]; // All months (1-12) of upcoming milestones for filtering
+  upcoming_milestone_months: number[]; // YYYYMM-encoded (e.g. 202601 = Jan 2026) of upcoming milestones for filtering
   milestones: MilestoneRow[];
   has_delayed_milestone?: boolean; // True if any milestone has a past deadline and is not submitted
 }
