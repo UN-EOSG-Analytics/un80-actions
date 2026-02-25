@@ -110,19 +110,20 @@ export function SidebarCharts({
     }),
   );
 
-  // Format upcoming milestones with dates and urgency, filter for January only
+  // Format upcoming milestones with dates and urgency, filter for January & February
   const now = new Date();
   const currentYear = now.getFullYear();
   const januaryStart = new Date(currentYear, 0, 1); // January 1st of current year
-  const januaryEnd = new Date(currentYear, 0, 31, 23, 59, 59); // January 31st of current year
+  // Last moment of February in the current year (day 0 of March is last day of Feb)
+  const februaryEnd = new Date(currentYear, 2, 0, 23, 59, 59);
 
   const upcomingMilestonesChartEntries: SidebarChartEntry[] =
     upcomingMilestonesData
       .filter((entry) => {
-        // Only show milestones with delivery dates in January
+        // Only show milestones with delivery dates in January or February
         if (!entry.deliveryDate) return false;
         const deliveryDate = new Date(entry.deliveryDate);
-        return deliveryDate >= januaryStart && deliveryDate <= januaryEnd;
+        return deliveryDate >= januaryStart && deliveryDate <= februaryEnd;
       })
       .sort((a, b) => {
         const an = a.actionNumber != null ? Number(a.actionNumber) : Infinity;
