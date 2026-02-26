@@ -365,7 +365,7 @@ export default function QuestionsTab({
   const [tagsByQuestionId, setTagsByQuestionId] = useState<
     Record<string, Tag[]>
   >({});
-  const HEADER_OPTIONS = ["Task Force", "Steering Committee", "Check-ins", "Unspecified"];
+  const HEADER_OPTIONS = ["Task Force", "Steering Committee", "Check-ins", "Unspecified", "Other"];
   const MILESTONE_NONE_VALUE = "__none__";
 
   const loadQuestions = async () => {
@@ -595,7 +595,7 @@ export default function QuestionsTab({
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select header..." />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-56">
               {HEADER_OPTIONS.map((option) => (
                 <SelectItem key={option} value={option}>
                   {option}
@@ -914,7 +914,7 @@ export default function QuestionsTab({
                             <SelectTrigger className="w-full">
                               <SelectValue placeholder="Select header..." />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="max-h-56">
                               {HEADER_OPTIONS.map((option) => (
                                 <SelectItem key={option} value={option}>{option}</SelectItem>
                               ))}

@@ -78,18 +78,29 @@ export async function updateNote(
       return { success: false, error: "Note not found" };
     }
 
+    if (!input.header || input.header.trim().length === 0) {
+      return { success: false, error: "Header cannot be empty" };
+    }
+    if (!input.note_date) {
+      return { success: false, error: "Date is required" };
+    }
     if (!input.content || input.content.trim().length === 0) {
       return { success: false, error: "Note content cannot be empty" };
     }
 
     await query(
       `UPDATE ${DB_SCHEMA}.action_notes
-     SET content = $1, updated_at = NOW(),
+     SET header = $1, note_date = $2, content = $3, updated_at = NOW(),
          content_review_status = 'needs_review',
          content_reviewed_by = NULL,
          content_reviewed_at = NULL
-     WHERE id = $2`,
-      [input.content.trim(), noteId],
+     WHERE id = $4`,
+      [
+        input.header.trim(),
+        input.note_date,
+        input.content.trim(),
+        noteId,
+      ],
     );
 
     const updated = await getNoteById(noteId);

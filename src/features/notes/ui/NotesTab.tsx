@@ -58,7 +58,7 @@ export default function NotesTab({
   isAdmin?: boolean;
   exportProps?: { onExport: (format: "word" | "pdf" | "markdown") => void; exporting: boolean };
 }) {
-  const HEADER_OPTIONS = ["Task Force", "Steering Committee", "Check-ins", "Unspecified"];
+  const HEADER_OPTIONS = ["Task Force", "Steering Committee", "Check-ins", "Unspecified", "Other"];
   const [notes, setNotes] = useState<ActionNote[]>([]);
   const [questions, setQuestions] = useState<ActionQuestion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -302,7 +302,7 @@ export default function NotesTab({
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select header..." />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-56">
               {HEADER_OPTIONS.map((option) => (
                 <SelectItem key={option} value={option}>
                   {option}
