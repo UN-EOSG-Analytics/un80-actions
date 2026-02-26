@@ -7,6 +7,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Progress } from "@/components/ui/progress";
+import { isDecisionTaken } from "@/constants/actionStatus";
 import { formatGoalText } from "@/lib/utils";
 import type { WorkPackage, WorkPackageAction } from "@/types";
 import { ChevronDown, Menu } from "lucide-react";
@@ -191,6 +192,11 @@ export function WorkPackageItem({
   // Use the original total count if provided, otherwise use current actions length
   const totalActionsCount = originalActionsCount ?? wp.actions.length;
 
+  // Count actions by status for dot coloring
+  const decisionTakenCount = wp.actions.filter((a) =>
+    isDecisionTaken(a.actionStatus),
+  ).length;
+
   // Calculate matched actions for filter display
   const hasActiveSearch = searchQuery.trim().length > 0;
   const hasActiveStatusFilter = selectedActionStatus.length > 0;
@@ -335,17 +341,20 @@ export function WorkPackageItem({
                     ? `${matchedActionsCount}/${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`
                     : `${totalActionsCount} Indicative ${totalActionsCount === 1 ? "Action" : "Actions"}`}
                 </div>
-                <div className="flex -space-x-1.5">
-                  {Array.from({ length: totalActionsCount }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="h-4 w-4 rounded-full border-2 border-slate-100 bg-un-blue transition-colors group-hover:border-[#E0F5FF]"
-                      style={{
-                        opacity: Math.max(0.3, 1 - i * 0.08),
-                        zIndex: totalActionsCount - i,
-                      }}
-                    />
-                  ))}
+                <div className="flex -space-x-1">
+                  {Array.from({ length: totalActionsCount }).map((_, i) => {
+                    const dotColor =
+                      i < decisionTakenCount
+                        ? "bg-green-500"
+                        : "bg-amber-400";
+                    return (
+                      <div
+                        key={i}
+                        className={`h-3.5 w-3.5 rounded-full border-2 border-slate-100 transition-colors group-hover:border-[#E0F5FF] ${dotColor}`}
+                        style={{ zIndex: totalActionsCount - i }}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             </div>
