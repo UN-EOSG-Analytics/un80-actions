@@ -44,7 +44,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
       } else {
         setError("Invalid email or password. Please try again.");
       }
-    } catch (err) {
+    } catch {
       setError("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);

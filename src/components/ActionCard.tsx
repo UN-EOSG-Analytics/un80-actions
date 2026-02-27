@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
 import {
   ActionLeadsBadge,
   DecisionStatusBadge,
@@ -9,11 +8,7 @@ import {
   ShowMoreBadge,
 } from "@/components/Badges";
 import { CheckCircle2 } from "lucide-react";
-import {
-  buildCleanQueryString,
-  normalizeTeamMemberForDisplay,
-  encodeUrlParam,
-} from "@/lib/utils";
+import { normalizeTeamMemberForDisplay, encodeUrlParam } from "@/lib/utils";
 import { isDecisionTaken } from "@/constants/actionStatus";
 import type { WorkPackageAction } from "@/types";
 
@@ -75,7 +70,6 @@ export function HighlightedText({
  * Shows the action text, leads, document references, and optional doc text.
  */
 export function ActionItem({ action, searchQuery = "" }: ActionItemProps) {
-  const searchParams = useSearchParams();
   const [showAllTeamMembers, setShowAllTeamMembers] = useState(false);
 
   // Parse team members from actionEntities (sorting handled by TeamBadge)

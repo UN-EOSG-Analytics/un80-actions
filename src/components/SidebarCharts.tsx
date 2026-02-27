@@ -1,19 +1,19 @@
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-    ACTION_STATUS,
-    getStatusStyles,
-    isDecisionTaken,
+  ACTION_STATUS,
+  getStatusStyles,
+  isDecisionTaken,
 } from "@/constants/actionStatus";
 import type {
-    Action,
-    LeadChartEntry,
-    UpcomingMilestoneChartEntry,
-    WorkPackageChartEntry,
-    WorkstreamChartEntry,
+  Action,
+  LeadChartEntry,
+  UpcomingMilestoneChartEntry,
+  WorkPackageChartEntry,
+  WorkstreamChartEntry,
 } from "@/types";
 import { Activity, CalendarDays, Flag, Layers, Users } from "lucide-react";
 import { SidebarChart, SidebarChartEntry } from "./SidebarChart";

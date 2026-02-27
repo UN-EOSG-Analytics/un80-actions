@@ -38,7 +38,9 @@ export function ExpandCollapseToggle({
         ) : (
           <ChevronsDown className="h-3.5 w-3.5 shrink-0" />
         )}
-        <span className="truncate">{allExpanded ? "Collapse All" : "Expand All"}</span>
+        <span className="truncate">
+          {allExpanded ? "Collapse All" : "Expand All"}
+        </span>
       </button>
     );
   }
@@ -54,7 +56,9 @@ export function ExpandCollapseToggle({
       ) : (
         <ChevronsDown className="h-4 w-4 shrink-0" />
       )}
-      <span className="truncate">{allExpanded ? "Collapse All" : "Expand All"}</span>
+      <span className="truncate">
+        {allExpanded ? "Collapse All" : "Expand All"}
+      </span>
     </button>
   );
 }

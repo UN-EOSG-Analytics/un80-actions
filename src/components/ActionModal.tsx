@@ -157,27 +157,27 @@ export default function ActionModal({
 
   // Render header content based on state
   const renderHeader = () => {
-  if (loading) {
-    return (
+    if (loading) {
+      return (
         <div className="flex items-center gap-3 text-lg text-slate-500">
           Loading...
-      </div>
-    );
-  }
+        </div>
+      );
+    }
 
-  if (!action) {
-    return (
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-lg text-slate-500">Action not found</p>
-            <button
-              onClick={handleClose}
-              className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-            >
-              <X size={24} />
-            </button>
-      </div>
-    );
-  }
+    if (!action) {
+      return (
+        <div className="flex items-center justify-between gap-4">
+          <p className="text-lg text-slate-500">Action not found</p>
+          <button
+            onClick={handleClose}
+            className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+          >
+            <X size={24} />
+          </button>
+        </div>
+      );
+    }
 
     // Merge leads + team, dedupe; then take first N for one line, rest in "+x more"
     const teamMembers =
@@ -202,27 +202,27 @@ export default function ActionModal({
       : allChips.slice(0, CHIPS_PER_LINE);
     const hasMore = allChips.length > CHIPS_PER_LINE;
 
-  return (
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0 flex-1">
-              {/* Breadcrumb */}
+    return (
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          {/* Breadcrumb */}
           <div className="mb-2 flex flex-wrap items-center gap-x-1 gap-y-1 sm:mb-3 sm:gap-x-1.5 sm:gap-y-0.5">
-                <Link
-                  href={`/?ws=${action.report}`}
-                  onClick={handleClose}
-                  className={breadcrumbLinkClass}
-                >
-                  {action.report}
-                </Link>
-                <ChevronRight className={chevronClass} />
-                <Link
-                  href={`/?wp=${action.work_package_number}`}
-                  onClick={handleClose}
-                  className={breadcrumbLinkClass}
-                >
+            <Link
+              href={`/?ws=${action.report}`}
+              onClick={handleClose}
+              className={breadcrumbLinkClass}
+            >
+              {action.report}
+            </Link>
+            <ChevronRight className={chevronClass} />
+            <Link
+              href={`/?wp=${action.work_package_number}`}
+              onClick={handleClose}
+              className={breadcrumbLinkClass}
+            >
               WORK PACKAGE {action.work_package_number}
-                </Link>
-                <ChevronRight className={chevronClass} />
+            </Link>
+            <ChevronRight className={chevronClass} />
             <Tooltip open={copied ? true : undefined}>
               <TooltipTrigger asChild>
                 <button
@@ -248,18 +248,18 @@ export default function ActionModal({
                 </p>
               </TooltipContent>
             </Tooltip>
-              </div>
+          </div>
           <h2 className="text-base leading-snug font-semibold text-slate-900 sm:text-lg">
-                {action.indicative_activity}
-                {action.sub_action_details && (
+            {action.indicative_activity}
+            {action.sub_action_details && (
               <>
-                    {" "}
+                {" "}
                 <span className="font-semibold text-slate-600">
-                    – {action.sub_action_details}
-                  </span>
+                  – {action.sub_action_details}
+                </span>
               </>
-                )}
-              </h2>
+            )}
+          </h2>
           {/* Action Leads and Team Members - one line, rest in "+x more" */}
           {allChips.length > 0 && (
             <div className="mt-2 flex flex-wrap items-center gap-1">
@@ -282,15 +282,15 @@ export default function ActionModal({
               )}
             </div>
           )}
-            </div>
-            <button
-              onClick={handleClose}
+        </div>
+        <button
+          onClick={handleClose}
           className="shrink-0 rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-              aria-label="Close modal"
-            >
+          aria-label="Close modal"
+        >
           <X size={24} />
-            </button>
-          </div>
+        </button>
+      </div>
     );
   };
 
@@ -464,7 +464,7 @@ export default function ActionModal({
             {/* Header */}
             <div className="border-b border-slate-200 bg-white px-4 pt-4 pb-3 shadow-sm sm:px-6 sm:pt-5 sm:pb-4 md:px-8 md:pt-6 md:pb-5">
               {renderHeader()}
-          </div>
+            </div>
 
             {/* Body */}
             <div className="flex-1 bg-slate-50 px-4 pt-6 pb-8 sm:px-6 sm:pt-8 sm:pb-12 md:px-8">

@@ -7,7 +7,11 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Progress } from "@/components/ui/progress";
-import { ACTION_STATUS, getStatusStyles, isDecisionTaken } from "@/constants/actionStatus";
+import {
+  ACTION_STATUS,
+  getStatusStyles,
+  isDecisionTaken,
+} from "@/constants/actionStatus";
 import { formatGoalText } from "@/lib/utils";
 import type { WorkPackage, WorkPackageAction } from "@/types";
 import { ChevronDown, Menu } from "lucide-react";
@@ -345,8 +349,10 @@ export function WorkPackageItem({
                   {Array.from({ length: totalActionsCount }).map((_, i) => {
                     const dotColor =
                       i < decisionTakenCount
-                        ? getStatusStyles(ACTION_STATUS.DECISION_TAKEN).sidebar.selectedBar
-                        : getStatusStyles(ACTION_STATUS.FURTHER_WORK_ONGOING).sidebar.selectedBar;
+                        ? getStatusStyles(ACTION_STATUS.DECISION_TAKEN).sidebar
+                            .selectedBar
+                        : getStatusStyles(ACTION_STATUS.FURTHER_WORK_ONGOING)
+                            .sidebar.selectedBar;
                     return (
                       <div
                         key={i}

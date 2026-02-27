@@ -189,7 +189,7 @@ export function FilterControls({
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                  className={`flex h-10 touch-manipulation items-center gap-2 rounded-lg border px-3 text-sm transition-colors ${
+                    className={`flex h-10 touch-manipulation items-center gap-2 rounded-lg border px-3 text-sm transition-colors ${
                       sortOption !== "number-asc"
                         ? "border-un-blue bg-un-blue/10 text-un-blue hover:border-un-blue"
                         : "border-gray-300 bg-white text-gray-900 hover:border-un-blue hover:bg-un-blue/10 hover:text-un-blue"
@@ -310,13 +310,13 @@ export function FilterControls({
         <div className="hidden flex-1 sm:flex" />
 
         {/* Advanced Filtering Collapsible - Mobile */}
-        <div className="sm:hidden flex-1">
+        <div className="flex-1 sm:hidden">
           <Collapsible
             open={isAdvancedFilterOpen}
             onOpenChange={onAdvancedFilterOpenChange}
           >
             <CollapsibleTrigger
-              className={`w-full flex h-10 touch-manipulation items-center justify-center gap-2 rounded-lg border px-3 text-sm transition-colors ${
+              className={`flex h-10 w-full touch-manipulation items-center justify-center gap-2 rounded-lg border px-3 text-sm transition-colors ${
                 hasActiveAdvancedFilters
                   ? "border-un-blue bg-un-blue/10 text-un-blue hover:border-un-blue"
                   : "border-gray-300 bg-white text-gray-900 hover:border-un-blue hover:bg-un-blue/10 hover:text-un-blue"

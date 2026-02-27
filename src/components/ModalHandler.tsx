@@ -57,7 +57,7 @@ export default function ModalHandler() {
         } else {
           setAction(foundAction);
         }
-      } catch (err) {
+      } catch {
         setError("Failed to load action");
         setAction(null);
       } finally {

@@ -6,7 +6,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { abbreviationMap } from "@/constants/abbreviations";
 import { cn, naturalSort } from "@/lib/utils";
-import { SquareCheckBig, Clock } from "lucide-react";
 
 /**
  * Badge variants (visual hierarchy):

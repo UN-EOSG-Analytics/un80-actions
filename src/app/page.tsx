@@ -97,7 +97,6 @@ export function WorkPackagesPageContent() {
     uniqueLeads,
     uniqueWorkstreams,
     uniqueActions,
-    uniqueActionTexts,
     uniqueTeamMembers,
     availableBigTicketOptions,
     chartData,
