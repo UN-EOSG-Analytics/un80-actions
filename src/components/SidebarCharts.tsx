@@ -2,7 +2,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@/components/Tooltip";
 import {
   ACTION_STATUS,
   getStatusStyles,

@@ -3,7 +3,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@/components/Tooltip";
 import { Search } from "lucide-react";
 import React from "react";
 

@@ -1,13 +1,12 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useRef } from "react";
 import { DataCard } from "@/components/DataCard";
 import { ExplainerText } from "@/components/ExplainerText";
 import { FilterControls } from "@/components/FilterControls";
 import { Header } from "@/components/HeaderBar";
-import { SidebarCharts } from "@/components/SidebarCharts";
 import { WorkPackageList } from "@/components/ListContainer";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { SidebarCharts } from "@/components/SidebarCharts";
+import { TooltipProvider } from "@/components/Tooltip";
 import { ACTION_STATUS } from "@/constants/actionStatus";
 import { useActions } from "@/hooks/useActions";
 import { useChartSearch } from "@/hooks/useChartSearch";
@@ -16,17 +15,17 @@ import { useFilters, useFilterSync } from "@/hooks/useFilters";
 import { useWorkPackageData } from "@/hooks/useWorkPackageData";
 import { normalizeTeamMemberForDisplay } from "@/lib/utils";
 import {
-  Briefcase as BriefcaseIcon,
-  Layers,
-  ListTodo,
-  Users,
-  User,
+    Briefcase as BriefcaseIcon,
+    Building,
+    Layers,
+    ListTodo,
+    Users,
 } from "lucide-react";
+import { Suspense, useCallback, useEffect, useRef } from "react";
 
 export function WorkPackagesPageContent() {
   // Custom hooks for state management
   const { actions } = useActions();
-  const showProgress = false;
 
   const {
     filters,
@@ -402,7 +401,7 @@ export function WorkPackagesPageContent() {
 
             {/* DataCards Section */}
             <section className="mb-6 sm:mb-10">
-              <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
+              <div className="grid grid-cols-2 gap-1.5 sm:gap-3 lg:grid-cols-3 xl:grid-cols-5">
                 {/* Check if any advanced filter is active */}
                 {(() => {
                   const hasActiveFilters =
@@ -445,46 +444,31 @@ export function WorkPackagesPageContent() {
                         title="Workstreams"
                         value={totalWorkstreams}
                         icon={Layers}
-                        showProgress={showProgress}
-                        completed={0}
-                        showFiltered={hasActiveFilters}
-                        filteredCount={statsData.workstreams}
+                        filteredCount={hasActiveFilters ? statsData.workstreams : undefined}
                       />
                       <DataCard
                         title="Work Packages"
                         value={workPackages.length}
                         icon={BriefcaseIcon}
-                        showProgress={showProgress}
-                        completed={0}
-                        showFiltered={hasActiveFilters}
-                        filteredCount={statsData.workpackages}
+                        filteredCount={hasActiveFilters ? statsData.workpackages : undefined}
                       />
                       <DataCard
                         title="Actions"
                         value={totalActions}
                         icon={ListTodo}
-                        showProgress={showProgress}
-                        completed={0}
-                        showFiltered={hasActiveFilters}
-                        filteredCount={statsData.actions}
+                        filteredCount={hasActiveFilters ? statsData.actions : undefined}
                       />
                       <DataCard
                         title="UN System Leaders"
                         value={totalLeads}
                         icon={Users}
-                        showProgress={showProgress}
-                        completed={0}
-                        showFiltered={hasActiveFilters}
-                        filteredCount={statsData.leads}
+                        filteredCount={hasActiveFilters ? statsData.leads : undefined}
                       />
                       <DataCard
                         title="UN System Entities"
                         value={totalTeamMembers}
-                        icon={User}
-                        showProgress={showProgress}
-                        completed={0}
-                        showFiltered={hasActiveFilters}
-                        filteredCount={statsData.teamMembers}
+                        icon={Building}
+                        filteredCount={hasActiveFilters ? statsData.teamMembers : undefined}
                       />
                     </>
                   );
@@ -558,7 +542,7 @@ export function WorkPackagesPageContent() {
                     selectedTeamMembers={selectedTeamMember}
                     selectedActionStatus={selectedActionStatus}
                     selectedMilestoneMonth={selectedMilestoneMonth}
-                    showProgress={showProgress}
+                    showProgress={false}
                     searchQuery={searchQuery}
                   />
                 </div>

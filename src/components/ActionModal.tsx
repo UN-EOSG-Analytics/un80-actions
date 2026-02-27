@@ -14,7 +14,7 @@ import {
   TooltipCollisionBoundaryProvider,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@/components/Tooltip";
 import { ACTION_STATUS } from "@/constants/actionStatus";
 import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
 import { normalizeTeamMemberForDisplay, encodeUrlParam } from "@/lib/utils";

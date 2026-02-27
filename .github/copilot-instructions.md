@@ -15,7 +15,7 @@ UN80 Actions Dashboard — a static Next.js site tracking UN80 Initiative work p
 
 - **Next.js 16** App Router, static export — no route handlers or server actions
 - **Tailwind CSS v4.1** — syntax differs significantly from v3; always consult docs
-- **shadcn/ui** — install via `npx shadcn@latest add <component>`; never edit `src/components/ui/` directly, create wrapper components instead
+- **shadcn/ui** — install via `npx shadcn@latest add <component>`; **never edit `src/components/ui/` directly**, create wrapper components instead. This applies unconditionally — no exceptions for styling fixes.
 
 ## Developer Commands
 
