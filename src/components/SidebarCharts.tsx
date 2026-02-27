@@ -213,6 +213,12 @@ export function SidebarCharts({
     }
   });
 
+  // TODO: replace with real data — hardcoded for now
+  const decisionTakenPerMonthMap = new Map<number, number>([
+    [0, 8], // January 2026
+    [1, 2], // February 2026
+  ]);
+
   const milestonesPerMonthEntries: SidebarChartEntry[] = Array.from(
     milestonesPerMonthMap.entries(),
   )
@@ -230,6 +236,7 @@ export function SidebarCharts({
       label: monthNames[monthIndex],
       count: count,
       value: monthNames[monthIndex],
+      secondaryCount: decisionTakenPerMonthMap.get(monthIndex),
     }));
 
   return (

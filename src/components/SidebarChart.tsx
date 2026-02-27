@@ -10,6 +10,7 @@ import React from "react";
 export interface SidebarChartEntry {
   label: string;
   count: number;
+  secondaryCount?: number;
   value: string;
   tooltip?: string;
   deliveryDate?: string | null;
@@ -88,6 +89,10 @@ export function SidebarChart({
           <tbody>
             {data.map((entry, index) => {
               const percentage = (entry.count / maxCount) * 100;
+              const secondaryPercentage =
+                entry.secondaryCount !== undefined
+                  ? (entry.secondaryCount / maxCount) * 100
+                  : undefined;
               const isSelected = selectedValue.includes(entry.value);
               const isFiltered =
                 selectedValue.length > 0 &&
@@ -213,6 +218,14 @@ export function SidebarChart({
                             }`}
                             style={{ width: `${percentage}%` }}
                           />
+                          {secondaryPercentage !== undefined &&
+                            !isUrgent &&
+                            !isUpcoming && (
+                              <div
+                                className="absolute top-0 left-0 h-full rounded-full bg-un-blue transition-all"
+                                style={{ width: `${secondaryPercentage}%` }}
+                              />
+                            )}
                         </div>
                         <span
                           className={`mr-1 w-9 text-right text-[14px] font-semibold tabular-nums ${
