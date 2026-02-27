@@ -1,7 +1,7 @@
 import type { Action, Actions } from "@/types";
 import { normalizeLeaderName } from "./utils";
 // Import JSON directly - data is bundled at build time (no network request)
-import actionsData from "../../public/data/actions.json";
+import actionsData from "@data/actions.json";
 
 /**
  * Get filtered actions data

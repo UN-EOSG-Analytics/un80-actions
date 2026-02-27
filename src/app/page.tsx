@@ -9,6 +9,7 @@ import { SidebarCharts } from "@/components/SidebarCharts";
 import { TooltipProvider } from "@/components/Tooltip";
 import { ACTION_STATUS } from "@/constants/actionStatus";
 import { useActions } from "@/hooks/useActions";
+import { useAutoExpand } from "@/hooks/useAutoExpand";
 import { useChartSearch } from "@/hooks/useChartSearch";
 import { useCollapsibles } from "@/hooks/useCollapsibles";
 import { useFilters, useFilterSync } from "@/hooks/useFilters";
@@ -21,7 +22,7 @@ import {
     ListTodo,
     Users,
 } from "lucide-react";
-import { Suspense, useCallback, useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 
 export function WorkPackagesPageContent() {
   // Custom hooks for state management
@@ -138,236 +139,84 @@ export function WorkPackagesPageContent() {
     setSelectedActionStatus,
   );
 
-  // Track the last selectedAction we processed to avoid infinite loops
-  const lastProcessedActionsRef = useRef<string>("");
-  // Track the last selectedWorkPackage we processed to avoid infinite loops
-  const lastProcessedWorkPackagesRef = useRef<string>("");
-  // Track the last search query we processed to avoid infinite loops
-  const lastProcessedSearchRef = useRef<string>("");
-
-  // Auto-expand work package collapsibles when work packages are selected via URL
-  useEffect(() => {
-    const selectedWpKey = selectedWorkPackage.sort().join(",");
-
-    // Skip if we've already processed this selection
-    if (selectedWpKey === lastProcessedWorkPackagesRef.current) {
-      return;
-    }
-
-    if (selectedWorkPackage.length > 0 && filteredWorkPackages.length > 0) {
-      const collapsibleKeysToExpand: string[] = [];
-
-      filteredWorkPackages.forEach((wp, index) => {
-        // Check if this work package is in the selectedWorkPackage filter
-        const wpNumberStr = String(wp.number);
-        const isSelected = selectedWorkPackage.some((selected) => {
-          // Handle both "1: Name" format and plain number format
-          const match = selected.match(/^(\d+):/);
-          const selectedNumber = match ? match[1] : selected;
-          return wpNumberStr === selectedNumber;
-        });
-
-        if (isSelected) {
-          const collapsibleKey = `${wp.report.join("-")}-${wp.number || "empty"}-${index}`;
-          // Only add if not already open
-          if (!openCollapsibles.has(collapsibleKey)) {
-            collapsibleKeysToExpand.push(collapsibleKey);
-          }
-        }
-      });
-
-      if (collapsibleKeysToExpand.length > 0) {
-        expandCollapsibles(collapsibleKeysToExpand);
-      }
-
-      // Mark this selection as processed
-      lastProcessedWorkPackagesRef.current = selectedWpKey;
-    } else if (selectedWorkPackage.length === 0) {
-      // Reset when no work packages are selected
-      lastProcessedWorkPackagesRef.current = "";
-    }
-  }, [
-    selectedWorkPackage,
+  // Auto-expand collapsibles when a work package number filter is selected
+  useAutoExpand(
+    selectedWorkPackage.sort().join(","),
+    selectedWorkPackage.length > 0,
     filteredWorkPackages,
     openCollapsibles,
     expandCollapsibles,
-  ]);
+    (wp) =>
+      selectedWorkPackage.some((selected) => {
+        const match = selected.match(/^(\d+):/);
+        const selectedNumber = match ? match[1] : selected;
+        return String(wp.number) === selectedNumber;
+      }),
+  );
 
-  // Auto-expand work package collapsibles when actions are selected
+  // Auto-expand collapsibles when a specific action number is selected
+  useAutoExpand(
+    selectedAction.sort().join(","),
+    selectedAction.length > 0,
+    filteredWorkPackages,
+    openCollapsibles,
+    expandCollapsibles,
+    (wp) =>
+      wp.actions.some((action) =>
+        selectedAction.some(
+          (sel) => String(action.actionNumber) === sel.trim(),
+        ),
+      ),
+  );
+
+  // Auto-expand collapsibles when a search query matches action text
+  useAutoExpand(
+    searchQuery.trim().toLowerCase(),
+    searchQuery.trim().length > 0,
+    filteredWorkPackages,
+    openCollapsibles,
+    expandCollapsibles,
+    (wp) => {
+      const q = searchQuery.trim().toLowerCase();
+      return wp.actions.some(
+        (action) =>
+          (action.text?.toLowerCase() ?? "").includes(q) ||
+          (action.subActionDetails?.toLowerCase() ?? "").includes(q),
+      );
+    },
+  );
+
+  // Auto-expand collapsibles when an action status filter is selected;
+  // collapse all when the filter is cleared
+  useAutoExpand(
+    selectedActionStatus.sort().join(","),
+    selectedActionStatus.length > 0,
+    filteredWorkPackages,
+    openCollapsibles,
+    expandCollapsibles,
+    (wp) =>
+      wp.actions.some((action) =>
+        selectedActionStatus.some(
+          (status) =>
+            status.toLowerCase() === (action.actionStatus?.toLowerCase() ?? ""),
+        ),
+      ),
+    collapseAllWorkPackages,
+  );
+
+  // Collapse all work packages when every auto-expand filter is cleared at once
+  const prevHadAutoExpandFiltersRef = useRef<boolean>(false);
   useEffect(() => {
-    const selectedActionKey = selectedAction.sort().join(",");
-
-    // Skip if we've already processed this selection
-    if (selectedActionKey === lastProcessedActionsRef.current) {
-      return;
-    }
-
-    if (selectedAction.length > 0 && filteredWorkPackages.length > 0) {
-      const collapsibleKeysToExpand: string[] = [];
-
-      filteredWorkPackages.forEach((wp, index) => {
-        // Check if this work package contains any of the selected actions
-        const hasSelectedAction = wp.actions.some((action) => {
-          const actionNumber = String(action.actionNumber || "");
-          return selectedAction.some((selected) => {
-            const selectedTrimmed = selected.trim();
-            return actionNumber === selectedTrimmed;
-          });
-        });
-
-        if (hasSelectedAction) {
-          const collapsibleKey = `${wp.report.join("-")}-${wp.number || "empty"}-${index}`;
-          // Only add if not already open
-          if (!openCollapsibles.has(collapsibleKey)) {
-            collapsibleKeysToExpand.push(collapsibleKey);
-          }
-        }
-      });
-
-      if (collapsibleKeysToExpand.length > 0) {
-        expandCollapsibles(collapsibleKeysToExpand);
-      }
-
-      // Mark this selection as processed
-      lastProcessedActionsRef.current = selectedActionKey;
-    } else if (selectedAction.length === 0) {
-      // Reset when no actions are selected
-      lastProcessedActionsRef.current = "";
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedAction]); // Only depend on selectedAction to avoid infinite loops
-
-  // Auto-expand work package collapsibles when search query matches action text
-  useEffect(() => {
-    const trimmedQuery = searchQuery.trim().toLowerCase();
-
-    // Skip if we've already processed this search query
-    if (trimmedQuery === lastProcessedSearchRef.current) {
-      return;
-    }
-
-    if (trimmedQuery && filteredWorkPackages.length > 0) {
-      const collapsibleKeysToExpand: string[] = [];
-
-      filteredWorkPackages.forEach((wp, index) => {
-        // Check if this work package has any actions matching the search query
-        const hasMatchingAction = wp.actions.some((action) => {
-          const actionText = action.text ? action.text.toLowerCase() : "";
-          const subActionText = action.subActionDetails
-            ? action.subActionDetails.toLowerCase()
-            : "";
-          return (
-            actionText.includes(trimmedQuery) ||
-            subActionText.includes(trimmedQuery)
-          );
-        });
-
-        if (hasMatchingAction) {
-          const collapsibleKey = `${wp.report.join("-")}-${wp.number || "empty"}-${index}`;
-          // Only add if not already open
-          if (!openCollapsibles.has(collapsibleKey)) {
-            collapsibleKeysToExpand.push(collapsibleKey);
-          }
-        }
-      });
-
-      if (collapsibleKeysToExpand.length > 0) {
-        expandCollapsibles(collapsibleKeysToExpand);
-      }
-
-      // Mark this search query as processed
-      lastProcessedSearchRef.current = trimmedQuery;
-    } else if (!trimmedQuery) {
-      // Reset when search is cleared
-      lastProcessedSearchRef.current = "";
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, filteredWorkPackages]); // Depend on searchQuery and filteredWorkPackages
-
-  // Track the last selectedActionStatus we processed to avoid infinite loops
-  const lastProcessedActionStatusRef = useRef<string>("");
-  // Track if we've processed the initial data load for action status
-  const hasProcessedInitialActionStatusRef = useRef<boolean>(false);
-
-  // Auto-expand work package collapsibles when action status filter is selected
-  useEffect(() => {
-    const selectedStatusKey = selectedActionStatus.sort().join(",");
-
-    // Build a unique key that includes both the status and whether data is loaded
-    const dataKey = `${selectedStatusKey}:${filteredWorkPackages.length > 0}`;
-
-    // Skip if we've already processed this exact combination
-    // But always process if we have data and haven't processed initial load yet
-    const shouldProcess =
-      selectedActionStatus.length > 0 &&
-      filteredWorkPackages.length > 0 &&
-      (dataKey !== lastProcessedActionStatusRef.current ||
-        !hasProcessedInitialActionStatusRef.current);
-
-    if (shouldProcess) {
-      const collapsibleKeysToExpand: string[] = [];
-
-      filteredWorkPackages.forEach((wp, index) => {
-        // Check if this work package has any actions matching the status filter
-        const hasMatchingAction = wp.actions.some((action) => {
-          const actionStatusLower = action.actionStatus?.toLowerCase() || "";
-          return selectedActionStatus.some(
-            (status) => status.toLowerCase() === actionStatusLower,
-          );
-        });
-
-        if (hasMatchingAction) {
-          const collapsibleKey = `${wp.report.join("-")}-${wp.number || "empty"}-${index}`;
-          // Only add if not already open
-          if (!openCollapsibles.has(collapsibleKey)) {
-            collapsibleKeysToExpand.push(collapsibleKey);
-          }
-        }
-      });
-
-      if (collapsibleKeysToExpand.length > 0) {
-        expandCollapsibles(collapsibleKeysToExpand);
-      }
-
-      // Mark this selection as processed
-      lastProcessedActionStatusRef.current = dataKey;
-      hasProcessedInitialActionStatusRef.current = true;
-    } else if (
-      selectedActionStatus.length === 0 &&
-      hasProcessedInitialActionStatusRef.current
-    ) {
-      // Collapse all work packages when action status filter is cleared
-      collapseAllWorkPackages();
-      // Reset tracking refs
-      lastProcessedActionStatusRef.current = "";
-      hasProcessedInitialActionStatusRef.current = false;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedActionStatus, filteredWorkPackages, collapseAllWorkPackages]); // Depend on selectedActionStatus and filteredWorkPackages
-
-  // Track previous filter state to detect when filters are cleared
-  const prevHadFiltersRef = useRef<boolean>(false);
-
-  // Collapse work packages when all filters are cleared
-  useEffect(() => {
-    const hasActiveFilters =
+    const hasAutoExpandFilters =
       searchQuery.trim().length > 0 ||
       selectedAction.length > 0 ||
       selectedActionStatus.length > 0 ||
       selectedWorkPackage.length > 0;
 
-    // If we previously had filters and now we don't, collapse all
-    if (prevHadFiltersRef.current && !hasActiveFilters) {
+    if (prevHadAutoExpandFiltersRef.current && !hasAutoExpandFilters) {
       collapseAllWorkPackages();
-      // Reset all tracking refs
-      lastProcessedActionsRef.current = "";
-      lastProcessedWorkPackagesRef.current = "";
-      lastProcessedSearchRef.current = "";
-      lastProcessedActionStatusRef.current = "";
-      hasProcessedInitialActionStatusRef.current = false;
     }
-
-    prevHadFiltersRef.current = hasActiveFilters;
+    prevHadAutoExpandFiltersRef.current = hasAutoExpandFilters;
   }, [
     searchQuery,
     selectedAction,
@@ -376,22 +225,50 @@ export function WorkPackagesPageContent() {
     collapseAllWorkPackages,
   ]);
 
-  // Wrapper for reset that also collapses work packages
-  const handleResetFiltersWithCollapse = useCallback(() => {
-    handleResetFilters();
-    // Collapse will happen via the effect above when URL state updates
-  }, [handleResetFilters]);
+  // DataCard totals — computed from the full (unfiltered) data
+  const hasAnyActiveFilter =
+    selectedLead.length > 0 ||
+    selectedWorkstream.length > 0 ||
+    selectedWorkPackage.length > 0 ||
+    selectedBigTicket.length > 0 ||
+    selectedAction.length > 0 ||
+    selectedTeamMember.length > 0 ||
+    searchQuery.trim().length > 0;
 
-  const handleResetAllWithCollapse = useCallback(() => {
-    handleResetAll();
-    // Collapse will happen via the effect above when URL state updates
-  }, [handleResetAll]);
+  const totalWorkstreams = new Set(workPackages.flatMap((wp) => wp.report))
+    .size;
+
+  // Include all actions except subaction entries (is_subaction + sub_action_details);
+  // main actions with sub_action_details (e.g. "Harmonized in-country logistics") are counted.
+  const totalActions = actions.filter(
+    (a) => !(a.sub_action_details && a.is_subaction),
+  ).length;
+
+  const totalLeads = new Set(workPackages.flatMap((wp) => wp.leads)).size;
+
+  const allTeamMembers = new Set<string>();
+  actions.forEach((action) => {
+    if (action.action_entities) {
+      action.action_entities
+        .split(";")
+        .map((e) => normalizeTeamMemberForDisplay(e.trim()))
+        .filter((e) => e && e.trim().length > 0)
+        .forEach((member) => allTeamMembers.add(member));
+    }
+  });
+  const totalTeamMembers = allTeamMembers.size;
+
+  const expandedWorkPackagesCount = filteredWorkPackages.filter((wp, index) =>
+    openCollapsibles.has(
+      `${wp.report.join("-")}-${wp.number || "empty"}-${index}`,
+    ),
+  ).length;
 
   return (
     <TooltipProvider delayDuration={200}>
       <div className="min-h-dvh bg-white">
         {/* Fixed Header */}
-        <Header onReset={handleResetAllWithCollapse} showLogin={false} />
+        <Header onReset={handleResetAll} showLogin={false} />
 
         {/* Main Container */}
         <main className="mx-auto w-full max-w-4xl px-[max(1rem,env(safe-area-inset-left))] pt-3 pr-[max(1rem,env(safe-area-inset-right))] sm:px-8 sm:pt-8 md:px-12 lg:max-w-6xl lg:px-16 xl:max-w-7xl">
@@ -402,77 +279,46 @@ export function WorkPackagesPageContent() {
             {/* DataCards Section */}
             <section className="mb-6 sm:mb-10">
               <div className="grid grid-cols-2 gap-1.5 sm:gap-3 lg:grid-cols-3 xl:grid-cols-5">
-                {/* Check if any advanced filter is active */}
-                {(() => {
-                  const hasActiveFilters =
-                    selectedLead.length > 0 ||
-                    selectedWorkstream.length > 0 ||
-                    selectedWorkPackage.length > 0 ||
-                    selectedBigTicket.length > 0 ||
-                    selectedAction.length > 0 ||
-                    selectedTeamMember.length > 0 ||
-                    searchQuery.trim().length > 0;
-
-                  // Calculate total counts (unfiltered) - use all workPackages and actions
-                  const totalWorkstreams = new Set(
-                    workPackages.flatMap((wp) => wp.report),
-                  ).size;
-                  // Include all actions except subaction entries (is_subaction + sub_action_details);
-                  // main actions with sub_action_details (e.g. "Harmonized in-country logistics") are counted.
-                  const totalActions = actions.filter(
-                    (a) => !(a.sub_action_details && a.is_subaction),
-                  ).length;
-                  const totalLeads = new Set(
-                    workPackages.flatMap((wp) => wp.leads),
-                  ).size;
-                  // Get unique team members from all actions (normalized)
-                  const allTeamMembers = new Set<string>();
-                  actions.forEach((action) => {
-                    if (action.action_entities) {
-                      action.action_entities
-                        .split(";")
-                        .map((e) => normalizeTeamMemberForDisplay(e.trim()))
-                        .filter((e) => e && e.trim().length > 0)
-                        .forEach((member) => allTeamMembers.add(member));
-                    }
-                  });
-                  const totalTeamMembers = allTeamMembers.size;
-
-                  return (
-                    <>
-                      <DataCard
-                        title="Workstreams"
-                        value={totalWorkstreams}
-                        icon={Layers}
-                        filteredCount={hasActiveFilters ? statsData.workstreams : undefined}
-                      />
-                      <DataCard
-                        title="Work Packages"
-                        value={workPackages.length}
-                        icon={BriefcaseIcon}
-                        filteredCount={hasActiveFilters ? statsData.workpackages : undefined}
-                      />
-                      <DataCard
-                        title="Actions"
-                        value={totalActions}
-                        icon={ListTodo}
-                        filteredCount={hasActiveFilters ? statsData.actions : undefined}
-                      />
-                      <DataCard
-                        title="UN System Leaders"
-                        value={totalLeads}
-                        icon={Users}
-                        filteredCount={hasActiveFilters ? statsData.leads : undefined}
-                      />
-                      <DataCard
-                        title="UN System Entities"
-                        value={totalTeamMembers}
-                        icon={Building}
-                        filteredCount={hasActiveFilters ? statsData.teamMembers : undefined}
-                      />
-                    </>
-                  );
-                })()}
+                <DataCard
+                  title="Workstreams"
+                  value={totalWorkstreams}
+                  icon={Layers}
+                  filteredCount={
+                    hasAnyActiveFilter ? statsData.workstreams : undefined
+                  }
+                />
+                <DataCard
+                  title="Work Packages"
+                  value={workPackages.length}
+                  icon={BriefcaseIcon}
+                  filteredCount={
+                    hasAnyActiveFilter ? statsData.workpackages : undefined
+                  }
+                />
+                <DataCard
+                  title="Actions"
+                  value={totalActions}
+                  icon={ListTodo}
+                  filteredCount={
+                    hasAnyActiveFilter ? statsData.actions : undefined
+                  }
+                />
+                <DataCard
+                  title="UN System Leaders"
+                  value={totalLeads}
+                  icon={Users}
+                  filteredCount={
+                    hasAnyActiveFilter ? statsData.leads : undefined
+                  }
+                />
+                <DataCard
+                  title="UN System Entities"
+                  value={totalTeamMembers}
+                  icon={Building}
+                  filteredCount={
+                    hasAnyActiveFilter ? statsData.teamMembers : undefined
+                  }
+                />
               </div>
             </section>
 
@@ -512,7 +358,7 @@ export function WorkPackagesPageContent() {
                     uniqueActions={uniqueActions}
                     uniqueTeamMembers={uniqueTeamMembers}
                     availableBigTicketOptions={availableBigTicketOptions}
-                    onResetFilters={handleResetFiltersWithCollapse}
+                    onResetFilters={handleResetFilters}
                     onExpandAll={() => {
                       const allKeys = filteredWorkPackages.map(
                         (wp, index) =>
@@ -522,14 +368,7 @@ export function WorkPackagesPageContent() {
                     }}
                     onCollapseAll={collapseAllWorkPackages}
                     totalWorkPackages={filteredWorkPackages.length}
-                    expandedWorkPackages={(() => {
-                      let count = 0;
-                      filteredWorkPackages.forEach((wp, index) => {
-                        const key = `${wp.report.join("-")}-${wp.number || "empty"}-${index}`;
-                        if (openCollapsibles.has(key)) count++;
-                      });
-                      return count;
-                    })()}
+                    expandedWorkPackages={expandedWorkPackagesCount}
                   />
 
                   <WorkPackageList
