@@ -120,8 +120,7 @@ export async function getAttachmentComments(
     attachment_id: string;
     user_id: string | null;
     user_email: string | null;
-    body: string | null;
-    comment: string | null;
+    comment: string;
     is_legal?: boolean;
     created_at: Date;
   }>(
@@ -130,7 +129,6 @@ export async function getAttachmentComments(
       c.attachment_id,
       c.user_id,
       u.email as user_email,
-      c.body,
       c.comment,
       COALESCE(c.is_legal, false) as is_legal,
       c.created_at
@@ -146,7 +144,7 @@ export async function getAttachmentComments(
     attachment_id: r.attachment_id,
     user_id: r.user_id,
     user_email: r.user_email,
-    comment: r.comment ?? r.body ?? "",
+    comment: r.comment,
     is_legal: Boolean(r.is_legal),
     created_at: new Date(r.created_at),
   }));

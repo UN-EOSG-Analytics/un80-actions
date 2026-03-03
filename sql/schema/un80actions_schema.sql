@@ -59,6 +59,8 @@ create table if not exists un80actions.magic_tokens (
     expires_at timestamp with time zone not null,
     used_at timestamp with time zone
 );
+create index if not exists idx_magic_tokens_email on un80actions.magic_tokens (email);
+create index if not exists idx_magic_tokens_expires_at on un80actions.magic_tokens (expires_at);
 create table if not exists un80actions.workstreams (
     id text not null primary key,
     workstream_title text,
@@ -109,22 +111,23 @@ create table if not exists un80actions.action_milestones (
     content_reviewed_by uuid references un80actions.users on delete
     set null,
         content_reviewed_at timestamp with time zone,
-        submitted_by uuid references un80actions.users on delete cascade,
+        submitted_by uuid references un80actions.users on delete
+    set null,
         submitted_by_entity text references systemchart.entities on delete
     set null,
         submitted_at timestamp with time zone,
-        reviewed_by uuid references un80actions.users on delete cascade,
+        reviewed_by uuid references un80actions.users on delete
+    set null,
         reviewed_at timestamp with time zone,
-        approved_by uuid references un80actions.users on delete cascade,
+        approved_by uuid references un80actions.users on delete
+    set null,
         approved_at timestamp with time zone,
         serial_number integer not null,
         needs_ola_review boolean default false not null,
-        documents_submitted boolean default false not null,
         reviewed_by_ola boolean default false not null,
         finalized boolean default false not null,
         attention_to_timeline boolean default false not null,
         confirmation_needed boolean default false not null,
-        document_submitted boolean default false not null,
         milestone_document_submitted boolean default false not null,
         public_progress text constraint action_milestones_public_progress_check check (
             (public_progress IS NULL)
@@ -233,6 +236,7 @@ create table if not exists un80actions.action_notes (
         content_reviewed_at timestamp with time zone,
         foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
 );
+create index if not exists idx_action_notes_action on un80actions.action_notes (action_id, action_sub_id);
 create table if not exists un80actions.action_questions (
     id uuid default gen_random_uuid() not null primary key,
     action_id integer not null,
@@ -257,6 +261,7 @@ create table if not exists un80actions.action_questions (
         comment text,
         foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
 );
+create index if not exists idx_action_questions_action on un80actions.action_questions (action_id, action_sub_id);
 create table if not exists un80actions.tags (
     id uuid default gen_random_uuid() not null primary key,
     name text not null unique,
@@ -315,6 +320,7 @@ create table if not exists un80actions.action_updates (
         content_reviewed_at timestamp with time zone,
         foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
 );
+create index if not exists idx_action_updates_action on un80actions.action_updates (action_id, action_sub_id);
 create table if not exists un80actions.milestone_updates (
     id uuid default gen_random_uuid() not null primary key,
     milestone_id uuid not null references un80actions.action_milestones on delete cascade,
@@ -363,8 +369,10 @@ create table if not exists un80actions.activity_entries (
 );
 create index if not exists idx_activity_entries_created_at on un80actions.activity_entries (created_at desc);
 create index if not exists idx_activity_entries_action on un80actions.activity_entries (action_id, action_sub_id);
+create index if not exists idx_activity_entries_milestone_id on un80actions.activity_entries (milestone_id)
+where (milestone_id IS NOT NULL);
 create table if not exists un80actions.activity_read (
-    activity_id text not null,
+    activity_id uuid not null references un80actions.activity_entries on delete cascade,
     user_id uuid not null references un80actions.users on delete cascade,
     read_at timestamp with time zone default now() not null,
     primary key (activity_id, user_id)
@@ -373,11 +381,8 @@ create index if not exists idx_activity_read_user_id on un80actions.activity_rea
 create table if not exists un80actions.attachment_comments (
     id uuid default gen_random_uuid() not null primary key,
     attachment_id uuid not null references un80actions.action_attachments on delete cascade,
-    author_id uuid references un80actions.users on delete
-    set null,
-        body text not null,
-        created_at timestamp with time zone default now() not null,
-        user_id uuid references un80actions.users on delete
+    created_at timestamp with time zone default now() not null,
+    user_id uuid references un80actions.users on delete
     set null,
         comment text not null,
         is_legal boolean default false not null

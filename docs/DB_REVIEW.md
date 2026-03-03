@@ -36,7 +36,7 @@ alter table un80actions.action_milestones
 
 ---
 
-### 2. `attachment_comments`: duplicate/conflicting columns
+### 2. `attachment_comments`: duplicate/conflicting columns ✅ `003_drop_attachment_comments_dead_columns.sql`
 
 ```sql
 author_id uuid references un80actions.users on delete set null,
@@ -53,7 +53,7 @@ The table has **two user-identity columns** (`author_id`, `user_id`) and **two c
 
 ---
 
-### 3. `activity_read.activity_id` is `text` with no FK to `activity_entries`
+### 3. `activity_read.activity_id` is `text` with no FK to `activity_entries` ✅ `004_fix_activity_read_id_type.sql`
 
 ```sql
 create table if not exists un80actions.activity_read (
@@ -77,31 +77,36 @@ alter table un80actions.activity_read
 
 ## 🟠 High — Design Flaws / Silent Bugs
 
-### 4. `action_milestones`: boolean flags duplicate the `status` enum — can become inconsistent
+### 4. `action_milestones`: 8 mutually-exclusive boolean flags should be a single enum ⏸ parked
+
+Investigation revealed these are **two separate workflows**, not duplicates:
+
+- **Boolean flags** (`is_draft`, `is_approved`, `needs_attention`, `needs_ola_review`, `reviewed_by_ola`, `finalized`, `attention_to_timeline`, `confirmation_needed`) — the admin/operational state machine. Drives all status badges in the UI.
+- **`status` enum** (`draft → submitted → under_review → approved → rejected`) — the content submission pipeline only. Used by submit/approve/reject commands and guards against double-submission.
+
+The real problem is 8 mutually-exclusive booleans with no DB-level constraint enforcing that exactly one is true. The correct fix is a single `milestone_operational_status` enum:
 
 ```sql
-is_draft    boolean default true  not null,
-is_approved boolean default false not null,
-status      un80actions.milestone_status default 'draft' not null,
+create type un80actions.milestone_operational_status as enum (
+  'draft', 'in_review', 'needs_attention', 'needs_ola_review',
+  'reviewed_by_ola', 'approved', 'finalized',
+  'attention_to_timeline', 'confirmation_needed'
+);
 ```
 
-`is_draft` mirrors `status = 'draft'` and `is_approved` mirrors `status = 'approved'`. A write that updates `status` but not the boolean (or vice versa) silently creates an inconsistent record. The booleans appear to be legacy fields that were retained when the `status` enum was added.
-
-**Fix:** Drop `is_draft` and `is_approved`; derive state from `status` alone.
+This is a significant refactor (many commands + UI). **Parked until business logic for the operational states is fully confirmed.**
 
 ---
 
-### 5. `action_milestones`: three similar document-submission flags
+### 5. `action_milestones`: three similar document-submission flags ✅ `005_drop_milestone_dead_doc_flags.sql`
 
 ```sql
-document_submitted          boolean default false not null,
-documents_submitted         boolean default false not null,
-milestone_document_submitted boolean default false not null,
+document_submitted          boolean default false not null,  -- dead: 0/303 true, never referenced in app
+documents_submitted         boolean default false not null,  -- dead: 0/303 true, never referenced in app
+milestone_document_submitted boolean default false not null, -- live: 52/303 true, canonical
 ```
 
-It is unclear which flag is read by the application. This appears to be migration accumulation. There is also `document_submitted` on the `actions` table, adding further ambiguity.
-
-**Fix:** Audit application code for reads/writes to each column. Consolidate to one canonical flag and drop the others.
+Data confirmed `milestone_document_submitted` is the canonical column. The other two on `action_milestones` are dropped. `actions.document_submitted` is kept — it is actively read by the app even though no rows are true yet.
 
 ---
 

@@ -284,14 +284,13 @@ export async function createAttachmentComment(
       id: string;
       attachment_id: string;
       user_id: string | null;
-      body: string;
       comment: string;
       is_legal?: boolean;
       created_at: Date;
     }>(
-      `INSERT INTO un80actions.attachment_comments (attachment_id, user_id, body, comment, is_legal)
-       VALUES ($1, $2, $3, $3, $4)
-       RETURNING id, attachment_id, user_id, body, comment, is_legal, created_at`,
+      `INSERT INTO un80actions.attachment_comments (attachment_id, user_id, comment, is_legal)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, attachment_id, user_id, comment, is_legal, created_at`,
       [attachmentId, user.id, trimmed, isLegal],
     );
 
@@ -300,7 +299,7 @@ export async function createAttachmentComment(
       row.created_at instanceof Date
         ? row.created_at
         : new Date(row.created_at);
-    const text = row.comment ?? row.body;
+    const text = row.comment;
 
     revalidatePath("/");
 
