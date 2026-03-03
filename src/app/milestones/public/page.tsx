@@ -22,7 +22,7 @@ export default async function PublicMilestonesPage() {
           </Link>
           <span>/</span>
           <Link href="/milestones/public" className="font-medium text-gray-700">
-            Public milestones
+            Public Milestones
           </Link>
         </div>
         <PublicMilestonesTable rows={rows} />

@@ -60,7 +60,6 @@ export function UserMenu({ email, entity, isAdmin }: Props) {
         onClick={handleLogout}
         className="flex items-center gap-1 text-sm text-gray-500 transition-colors hover:text-gray-900"
       >
-        Logout
         <LogOut className="h-4 w-4" />
       </button>
     </div>

@@ -55,7 +55,7 @@ export function Header({ user, isAdmin, children, maxWidth = "7xl" }: Props) {
                     : "text-gray-600 hover:text-un-blue"
                 }`}
               >
-                Public milestones
+                Public Milestones
               </Link>
               {isAdmin && (
                 <Link

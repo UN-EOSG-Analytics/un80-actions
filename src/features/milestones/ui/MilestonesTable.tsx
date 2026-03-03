@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -335,14 +335,75 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
   const search = searchInput.trim().toLowerCase();
   const hasSearch = search.length > 0;
 
+  type FilterSkip = "wp" | "action" | "status" | "firstMonth" | "finalMonth";
+
+  // Apply all filters except one — used for cascading (Excel-style) filter options
+  const applyFiltersExcept = useCallback(
+    (list: MilestoneViewRow[], except: FilterSkip) => {
+      let result = list;
+      if (hasSearch) {
+        const matches = (s: string) => s.toLowerCase().includes(search);
+        result = result.filter(
+          (r) =>
+            matches(String(r.work_package_id)) ||
+            matches(r.work_package_title) ||
+            matches(actionLabel(r.action_id, r.action_sub_id)) ||
+            matches(r.public_milestone?.description ?? "") ||
+            matches(r.first_milestone?.description ?? "") ||
+            matches(r.final_milestone?.description ?? ""),
+        );
+      }
+      if (except !== "wp" && filterWP.length > 0) {
+        result = result.filter((r) => filterWP.includes(r.work_package_id));
+      }
+      if (except !== "action" && filterAction.length > 0) {
+        result = result.filter((r) =>
+          filterAction.includes(actionLabel(r.action_id, r.action_sub_id)),
+        );
+      }
+      if (except !== "status" && filterStatus.length > 0) {
+        result = result.filter((r) => {
+          const rowLabels = getRowStatusLabels(r);
+          return filterStatus.some((s) => rowLabels.includes(s));
+        });
+      }
+      if (except !== "firstMonth" && filterFirstMonth.length > 0) {
+        result = result.filter((r) =>
+          filterFirstMonth.includes(
+            getDeadlineMonthKey(r.first_milestone?.deadline),
+          ),
+        );
+      }
+      if (except !== "finalMonth" && filterFinalMonth.length > 0) {
+        result = result.filter((r) =>
+          filterFinalMonth.includes(
+            getDeadlineMonthKey(r.final_milestone?.deadline),
+          ),
+        );
+      }
+      return result;
+    },
+    [
+      hasSearch,
+      search,
+      filterWP,
+      filterAction,
+      filterStatus,
+      filterFirstMonth,
+      filterFinalMonth,
+    ],
+  );
+
   const uniqueWPIds = useMemo(() => {
-    const ids = new Set(rows.map((r) => r.work_package_id));
+    const list = applyFiltersExcept(rows, "wp");
+    const ids = new Set(list.map((r) => r.work_package_id));
     return Array.from(ids).sort((a, b) => a - b);
-  }, [rows]);
+  }, [rows, applyFiltersExcept]);
 
   const uniqueActions = useMemo(() => {
+    const list = applyFiltersExcept(rows, "action");
     const actions = new Set(
-      rows.map((r) => actionLabel(r.action_id, r.action_sub_id)),
+      list.map((r) => actionLabel(r.action_id, r.action_sub_id)),
     );
     return Array.from(actions).sort((a, b) => {
       const numA = parseInt(a.replace(/[^0-9]/g, ""), 10);
@@ -350,29 +411,31 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
       if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
       return a.localeCompare(b);
     });
-  }, [rows]);
+  }, [rows, applyFiltersExcept]);
 
   const uniqueFirstMonthKeys = useMemo(() => {
+    const list = applyFiltersExcept(rows, "firstMonth");
     const set = new Set(
-      rows.map((r) => getDeadlineMonthKey(r.first_milestone?.deadline)),
+      list.map((r) => getDeadlineMonthKey(r.first_milestone?.deadline)),
     );
-    const list = Array.from(set)
+    const sorted = Array.from(set)
       .filter((k) => k !== "no_date")
       .sort();
-    if (set.has("no_date")) list.push("no_date");
-    return list;
-  }, [rows]);
+    if (set.has("no_date")) sorted.push("no_date");
+    return sorted;
+  }, [rows, applyFiltersExcept]);
 
   const uniqueFinalMonthKeys = useMemo(() => {
+    const list = applyFiltersExcept(rows, "finalMonth");
     const set = new Set(
-      rows.map((r) => getDeadlineMonthKey(r.final_milestone?.deadline)),
+      list.map((r) => getDeadlineMonthKey(r.final_milestone?.deadline)),
     );
-    const list = Array.from(set)
+    const sorted = Array.from(set)
       .filter((k) => k !== "no_date")
       .sort();
-    if (set.has("no_date")) list.push("no_date");
-    return list;
-  }, [rows]);
+    if (set.has("no_date")) sorted.push("no_date");
+    return sorted;
+  }, [rows, applyFiltersExcept]);
 
   const filteredRows = useMemo(() => {
     let list = rows;
@@ -533,11 +596,11 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
         )}
       </div>
 
-      <div className="overflow-hidden overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      <div className="overflow-hidden overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
         <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-              <th className="w-14 px-3 py-3 whitespace-nowrap">
+          <thead className="sticky top-0 z-10">
+            <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+              <th className="w-14 px-4 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -575,9 +638,9 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                   <button
                     type="button"
                     onClick={() => handleSort("action_id")}
-                    className="inline-flex items-center uppercase hover:text-un-blue"
+                    className="inline-flex items-center hover:text-un-blue"
                   >
-                    Action
+                    ACTION
                     <SortIcon
                       column="action_id"
                       sortField={sortField}
@@ -605,7 +668,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
               </th>
               <th className="px-4 py-3">
                 <div className="flex items-center gap-2">
-                  <span>First milestone</span>
+                  <span>FIRST MILESTONE</span>
                   <MultiSelectFilter
                     filterKey="firstMonth"
                     options={uniqueFirstMonthKeys}
@@ -628,7 +691,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
               </th>
               <th className="px-4 py-3">
                 <div className="flex items-center gap-2">
-                  <span>Final milestone</span>
+                  <span>FINAL MILESTONE</span>
                   <MultiSelectFilter
                     filterKey="finalMonth"
                     options={uniqueFinalMonthKeys}
@@ -652,7 +715,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
               <th className="w-10 px-4 py-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-200">
             {sortedRows.length === 0 ? (
               <tr>
                 <td
@@ -667,9 +730,9 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                 <tr
                   key={`${r.action_id}-${r.action_sub_id ?? ""}`}
                   onClick={() => handleRowClick(r.action_id, r.action_sub_id)}
-                  className="cursor-pointer transition-colors hover:bg-gray-50"
+                  className="cursor-pointer transition-colors hover:bg-sky-50/50"
                 >
-                  <td className="px-3 py-3 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <span className="inline-flex items-center justify-center rounded bg-gray-100 px-1.5 py-0.5 text-sm font-medium text-gray-700 tabular-nums">
                       {r.work_package_id}
                     </span>

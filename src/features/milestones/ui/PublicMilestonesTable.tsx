@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import {
   ArrowUpDown,
@@ -249,14 +249,46 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
   );
   const [openFilters, setOpenFilters] = useState<Record<string, boolean>>({});
 
+  type FilterSkip = "wp" | "action" | "month" | "publicProgress";
+
+  // Apply all filters except one — used for cascading (Excel-style) filter options
+  const applyFiltersExcept = useCallback(
+    (list: PublicMilestoneViewRow[], except: FilterSkip) => {
+      let result = list;
+      if (except !== "wp" && filterWP.length > 0) {
+        result = result.filter((r) => filterWP.includes(r.work_package_id));
+      }
+      if (except !== "action" && filterAction.length > 0) {
+        result = result.filter((r) =>
+          filterAction.includes(actionLabel(r.action_id, r.action_sub_id)),
+        );
+      }
+      if (except !== "month" && filterMonth.length > 0) {
+        result = result.filter((r) =>
+          filterMonth.includes(getDeadlineMonthKey(r.milestone_deadline)),
+        );
+      }
+      if (except !== "publicProgress" && filterPublicProgress.length > 0) {
+        result = result.filter((r) => {
+          const v = r.public_progress ?? "in_progress";
+          return filterPublicProgress.includes(v);
+        });
+      }
+      return result;
+    },
+    [filterWP, filterAction, filterMonth, filterPublicProgress],
+  );
+
   const uniqueWPIds = useMemo(() => {
-    const ids = new Set(rows.map((r) => r.work_package_id));
+    const list = applyFiltersExcept(rows, "wp");
+    const ids = new Set(list.map((r) => r.work_package_id));
     return Array.from(ids).sort((a, b) => a - b);
-  }, [rows]);
+  }, [rows, applyFiltersExcept]);
 
   const uniqueActions = useMemo(() => {
+    const list = applyFiltersExcept(rows, "action");
     const set = new Set(
-      rows.map((r) => actionLabel(r.action_id, r.action_sub_id)),
+      list.map((r) => actionLabel(r.action_id, r.action_sub_id)),
     );
     return Array.from(set).sort((a, b) => {
       const numA = parseInt(a.replace(/\D/g, ""), 10);
@@ -264,18 +296,19 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
       if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
       return a.localeCompare(b);
     });
-  }, [rows]);
+  }, [rows, applyFiltersExcept]);
 
   const uniqueMonthKeys = useMemo(() => {
+    const list = applyFiltersExcept(rows, "month");
     const set = new Set(
-      rows.map((r) => getDeadlineMonthKey(r.milestone_deadline)),
+      list.map((r) => getDeadlineMonthKey(r.milestone_deadline)),
     );
-    const list = Array.from(set)
+    const sorted = Array.from(set)
       .filter((k) => k !== "no_date")
       .sort();
-    if (set.has("no_date")) list.push("no_date");
-    return list;
-  }, [rows]);
+    if (set.has("no_date")) sorted.push("no_date");
+    return sorted;
+  }, [rows, applyFiltersExcept]);
 
   const filteredRows = useMemo(() => {
     let list = rows;
@@ -363,11 +396,11 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
           </button>
         </div>
       )}
-      <div className="overflow-hidden overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      <div className="overflow-hidden overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
         <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-              <th className="w-24 px-3 py-3 whitespace-nowrap">
+          <thead className="sticky top-0 z-10">
+            <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+              <th className="w-14 px-4 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -406,7 +439,7 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
                     onClick={() => handleSort("action_id")}
                     className="inline-flex items-center hover:text-un-blue"
                   >
-                    Action
+                    ACTION
                     <SortIcon
                       column="action_id"
                       sortField={sortField}
@@ -438,7 +471,7 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
                     onClick={() => handleSort("milestone_deadline")}
                     className="inline-flex items-center hover:text-un-blue"
                   >
-                    Public Milestone
+                    PUBLIC MILESTONE
                     <SortIcon
                       column="milestone_deadline"
                       sortField={sortField}
@@ -471,7 +504,7 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
                     onClick={() => handleSort("public_progress")}
                     className="inline-flex items-center hover:text-un-blue"
                   >
-                    Public progress
+                    PUBLIC PROGRESS
                     <SortIcon
                       column="public_progress"
                       sortField={sortField}
@@ -502,7 +535,7 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-200">
             {sortedRows.length === 0 ? (
               <tr>
                 <td
@@ -518,9 +551,9 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
               sortedRows.map((r, idx) => (
                 <tr
                   key={`${r.work_package_id}-${r.action_id}-${r.action_sub_id ?? ""}-${idx}`}
-                  className="transition-colors hover:bg-gray-50"
+                  className="transition-colors hover:bg-sky-50/50"
                 >
-                  <td className="px-3 py-3 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <span className="inline-flex items-center justify-center rounded bg-gray-100 px-1.5 py-0.5 text-sm font-medium text-gray-700 tabular-nums">
                       {r.work_package_id}
                     </span>

@@ -761,11 +761,11 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
       </div>
 
       {/* Simple Table */}
-      <div className="overflow-hidden overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      <div className="overflow-hidden overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
         <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-              <th className="w-14 px-2 py-3 whitespace-nowrap">
+          <thead className="sticky top-0 z-10">
+            <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+              <th className="w-14 px-4 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -833,7 +833,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   />
                 </div>
               </th>
-              <th className="w-16 px-2 py-3 whitespace-nowrap">
+              <th className="w-16 px-3 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -1101,7 +1101,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
               <th className="w-10 px-4 py-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-200">
             {sortedActions.length === 0 ? (
               <tr>
                 <td
@@ -1118,9 +1118,9 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   onClick={() =>
                     handleActionClick(a.action_id, a.action_sub_id)
                   }
-                  className="cursor-pointer transition-colors hover:bg-gray-50"
+                  className="cursor-pointer transition-colors hover:bg-sky-50/50"
                 >
-                  <td className="px-3 py-3 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <span className="inline-flex items-center justify-center rounded bg-gray-100 px-1.5 py-0.5 text-sm font-medium text-gray-700 tabular-nums">
                       {a.work_package_id}
                     </span>
@@ -1128,7 +1128,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   <td className="px-4 py-3 text-gray-600">
                     <span className="line-clamp-2">{a.work_package_title}</span>
                   </td>
-                  <td className="px-3 py-3 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <span className="inline-flex items-center justify-center rounded bg-un-blue/10 px-1.5 py-0.5 text-sm font-semibold text-un-blue tabular-nums">
                       {actionLabel(a.action_id, a.action_sub_id)}
                     </span>
