@@ -94,8 +94,8 @@ node run_migrations.js  # Run pending SQL migrations against Azure Postgres
 
 ## Environment Variables
 
-Required: `AZURE_POSTGRES_HOST`, `AZURE_POSTGRES_USER`, `AZURE_POSTGRES_PASSWORD`, `AUTH_SECRET`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_FROM`, `SMTP_PASS`, `AZURE_STORAGE_ACCOUNT_NAME`, `AZURE_STORAGE_ACCOUNT_KEY`, `AZURE_STORAGE_CONTAINER_NAME`
-Optional: `AZURE_POSTGRES_DB` (default: `un80actions`), `DB_SCHEMA` (default: `un80actions`)
+Required: `DATABASE_URL`, `AUTH_SECRET`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_FROM`, `SMTP_PASS`, `AZURE_STORAGE_ACCOUNT_NAME`, `AZURE_STORAGE_ACCOUNT_KEY`, `AZURE_STORAGE_CONTAINER_NAME`
+Optional: `DB_SCHEMA` (default: `un80actions`)
 
 The PostgreSQL database is hosted on Azure. Database name: `un80actions`. All app tables live in the `un80actions` schema within that database.
 

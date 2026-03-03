@@ -2,35 +2,29 @@ import { Pool } from "pg";
 
 const globalForDb = global as unknown as { pool: Pool | undefined };
 
-// Build connection string from Azure Postgres environment variables
+// Build connection config from DATABASE_URL
 function getConnectionConfig() {
-  const host = process.env.AZURE_POSTGRES_HOST;
-  const user = process.env.AZURE_POSTGRES_USER;
-  const password = process.env.AZURE_POSTGRES_PASSWORD;
-  const database = process.env.AZURE_POSTGRES_DB || "postgres";
-  const port = parseInt(process.env.AZURE_POSTGRES_PORT || "5432", 10);
+  const connectionString = process.env.DATABASE_URL;
 
-  if (!host || !user || !password) {
-    throw new Error(
-      "Missing required environment variables: AZURE_POSTGRES_HOST, AZURE_POSTGRES_USER, AZURE_POSTGRES_PASSWORD",
-    );
+  if (!connectionString) {
+    throw new Error("Missing required environment variable: DATABASE_URL");
   }
 
   return {
-    host,
-    user,
-    password,
-    database,
-    port,
-    ssl: { rejectUnauthorized: false },
+    connectionString,
     max: 2, // Lower for serverless to avoid connection exhaustion
-    idleTimeoutMillis: 10000,
+    idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 15000, // 15s for slow/cold connections (e.g. Azure, VPN)
-    options: "-c search_path=un80actions,systemchart,public",
+    keepAlive: true, // Prevent Azure network layer from resetting idle TCP connections
   };
 }
 
 export const pool = globalForDb.pool || new Pool(getConnectionConfig());
+
+// Prevent unhandled ECONNRESET errors from idle clients being dropped by Azure's network layer
+pool.on("error", (err) => {
+  console.error("Unexpected pg pool error:", err.message);
+});
 
 if (process.env.NODE_ENV !== "production") globalForDb.pool = pool;
 
