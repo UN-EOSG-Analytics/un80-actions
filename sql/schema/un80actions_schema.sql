@@ -27,7 +27,7 @@ create type un80actions.content_review_status as enum ('approved', 'needs_review
 create table if not exists systemchart.entities (
     entity varchar(255) not null primary key,
     entity_long text
-) using ? ? ?;
+);
 create table if not exists un80actions.approved_users (
     email text not null primary key,
     full_name text,
@@ -35,42 +35,42 @@ create table if not exists un80actions.approved_users (
     user_status un80actions.user_status,
     user_role un80actions.user_roles,
     created_at timestamp with time zone default now() not null
-) using ? ? ?;
+);
 comment on table un80actions.approved_users is 'Pre-approval registry. Users must have an entry here to authenticate. Email links to users table.';
 create table if not exists un80actions.leads (
     name text not null primary key,
     entity text references systemchart.entities on delete restrict
-) using ? ? ?;
+);
 create table if not exists un80actions.approved_user_leads (
     user_email text not null references un80actions.approved_users on delete cascade,
     lead_name text not null references un80actions.leads on delete restrict,
     primary key (user_email, lead_name)
-) using ? ? ?;
+);
 create table if not exists un80actions.users (
     id uuid default gen_random_uuid() not null primary key,
     email text not null unique references un80actions.approved_users,
     created_at timestamp with time zone default now(),
     updated_at timestamp with time zone default now(),
     last_login_at timestamp with time zone
-) using ? ? ?;
+);
 create table if not exists un80actions.magic_tokens (
     token text not null primary key,
     email text not null,
     expires_at timestamp with time zone not null,
     used_at timestamp with time zone
-) using ? ? ?;
+);
 create table if not exists un80actions.workstreams (
     id text not null primary key,
     workstream_title text,
     report_title text,
     report_document_symbol text
-) using ? ? ?;
+);
 create table if not exists un80actions.work_packages (
     id integer not null primary key,
     workstream_id text not null references un80actions.workstreams on delete restrict,
     work_package_title text not null,
     work_package_goal text
-) using ? ? ?;
+);
 create table if not exists un80actions.actions (
     id integer not null,
     sub_id text not null,
@@ -91,7 +91,7 @@ create table if not exists un80actions.actions (
     action_record_id text,
     document_submitted boolean default false not null,
     primary key (id, sub_id)
-) using ? ? ?;
+);
 create table if not exists un80actions.action_milestones (
     id uuid default gen_random_uuid() not null primary key,
     action_id integer not null,
@@ -136,7 +136,7 @@ create table if not exists un80actions.action_milestones (
         ),
         constraint action_milestones_action_type_key unique (action_id, action_sub_id, milestone_type),
         foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
-) using ? ? ?;
+);
 create table if not exists un80actions.milestone_versions (
     id uuid default gen_random_uuid() not null primary key,
     milestone_id uuid not null references un80actions.action_milestones on delete cascade,
@@ -148,9 +148,9 @@ create table if not exists un80actions.milestone_versions (
     set null,
         changed_at timestamp with time zone default now() not null,
         change_type text not null
-) using ? ? ?;
-create index if not exists idx_milestone_versions_milestone_id on un80actions.milestone_versions using ? ? ? (milestone_id);
-create index if not exists idx_milestone_versions_changed_at on un80actions.milestone_versions using ? ? ? (changed_at desc);
+);
+create index if not exists idx_milestone_versions_milestone_id on un80actions.milestone_versions (milestone_id);
+create index if not exists idx_milestone_versions_changed_at on un80actions.milestone_versions (changed_at desc);
 create table if not exists un80actions.action_attachments (
     id uuid default gen_random_uuid() not null primary key,
     action_id integer not null,
@@ -168,55 +168,55 @@ create table if not exists un80actions.action_attachments (
     set null,
         uploaded_at timestamp with time zone default now() not null,
         foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
-) using ? ? ?;
-create index if not exists idx_action_attachments_action on un80actions.action_attachments using ? ? ? (action_id, action_sub_id);
-create index if not exists idx_action_attachments_milestone on un80actions.action_attachments using ? ? ? (milestone_id)
+);
+create index if not exists idx_action_attachments_action on un80actions.action_attachments (action_id, action_sub_id);
+create index if not exists idx_action_attachments_milestone on un80actions.action_attachments (milestone_id)
 where (milestone_id IS NOT NULL);
 create table if not exists un80actions.work_package_leads (
     work_package_id integer not null references un80actions.work_packages on delete cascade,
     lead_name text not null references un80actions.leads on delete restrict,
     primary key (work_package_id, lead_name)
-) using ? ? ?;
+);
 create table if not exists un80actions.work_package_focal_points (
     work_package_id integer not null references un80actions.work_packages on delete cascade,
     user_email text not null references un80actions.approved_users on delete cascade,
     primary key (work_package_id, user_email)
-) using ? ? ?;
+);
 create table if not exists un80actions.action_leads (
     action_id integer not null,
     action_sub_id text default ''::text not null,
     lead_name text not null references un80actions.leads on delete restrict,
     unique (action_id, action_sub_id, lead_name),
     foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
-) using ? ? ?;
+);
 create table if not exists un80actions.action_focal_points (
     action_id integer not null,
     action_sub_id text default ''::text not null,
     user_email text not null references un80actions.approved_users on delete cascade,
     unique (action_id, action_sub_id, user_email),
     foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
-) using ? ? ?;
+);
 create table if not exists un80actions.action_member_persons (
     action_id integer not null,
     action_sub_id text default ''::text not null,
     user_email text not null references un80actions.approved_users on delete cascade,
     unique (action_id, action_sub_id, user_email),
     foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
-) using ? ? ?;
+);
 create table if not exists un80actions.action_support_persons (
     action_id integer not null,
     action_sub_id text default ''::text not null,
     user_email text not null references un80actions.approved_users on delete cascade,
     unique (action_id, action_sub_id, user_email),
     foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
-) using ? ? ?;
+);
 create table if not exists un80actions.action_member_entities (
     action_id integer not null,
     action_sub_id text default ''::text not null,
     entity text not null references systemchart.entities on delete restrict,
     unique (action_id, action_sub_id, entity),
     foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
-) using ? ? ?;
+);
 create table if not exists un80actions.action_notes (
     id uuid default gen_random_uuid() not null primary key,
     action_id integer not null,
@@ -232,7 +232,7 @@ create table if not exists un80actions.action_notes (
     set null,
         content_reviewed_at timestamp with time zone,
         foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
-) using ? ? ?;
+);
 create table if not exists un80actions.action_questions (
     id uuid default gen_random_uuid() not null primary key,
     action_id integer not null,
@@ -256,26 +256,26 @@ create table if not exists un80actions.action_questions (
     set null,
         comment text,
         foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
-) using ? ? ?;
+);
 create table if not exists un80actions.tags (
     id uuid default gen_random_uuid() not null primary key,
     name text not null unique,
     created_at timestamp with time zone default now() not null
-) using ? ? ?;
+);
 create table if not exists un80actions.note_tags (
     note_id uuid not null references un80actions.action_notes on delete cascade,
     tag_id uuid not null references un80actions.tags on delete cascade,
     primary key (note_id, tag_id)
-) using ? ? ?;
-create index if not exists idx_note_tags_note_id on un80actions.note_tags using ? ? ? (note_id);
-create index if not exists idx_note_tags_tag_id on un80actions.note_tags using ? ? ? (tag_id);
+);
+create index if not exists idx_note_tags_note_id on un80actions.note_tags (note_id);
+create index if not exists idx_note_tags_tag_id on un80actions.note_tags (tag_id);
 create table if not exists un80actions.question_tags (
     question_id uuid not null references un80actions.action_questions on delete cascade,
     tag_id uuid not null references un80actions.tags on delete cascade,
     primary key (question_id, tag_id)
-) using ? ? ?;
-create index if not exists idx_question_tags_question_id on un80actions.question_tags using ? ? ? (question_id);
-create index if not exists idx_question_tags_tag_id on un80actions.question_tags using ? ? ? (tag_id);
+);
+create index if not exists idx_question_tags_question_id on un80actions.question_tags (question_id);
+create index if not exists idx_question_tags_tag_id on un80actions.question_tags (tag_id);
 create table if not exists un80actions.action_legal_comments (
     id uuid default gen_random_uuid() not null primary key,
     action_id integer not null,
@@ -290,17 +290,17 @@ create table if not exists un80actions.action_legal_comments (
     set null,
         content_reviewed_at timestamp with time zone,
         foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
-) using ? ? ?;
-create index if not exists idx_action_legal_comments_action on un80actions.action_legal_comments using ? ? ? (action_id, action_sub_id);
-create index if not exists idx_action_legal_comments_reply_to on un80actions.action_legal_comments using ? ? ? (reply_to)
+);
+create index if not exists idx_action_legal_comments_action on un80actions.action_legal_comments (action_id, action_sub_id);
+create index if not exists idx_action_legal_comments_reply_to on un80actions.action_legal_comments (reply_to)
 where (reply_to IS NOT NULL);
 create table if not exists un80actions.legal_comment_tags (
     legal_comment_id uuid not null references un80actions.action_legal_comments on delete cascade,
     tag_id uuid not null references un80actions.tags on delete cascade,
     primary key (legal_comment_id, tag_id)
-) using ? ? ?;
-create index if not exists idx_legal_comment_tags_comment_id on un80actions.legal_comment_tags using ? ? ? (legal_comment_id);
-create index if not exists idx_legal_comment_tags_tag_id on un80actions.legal_comment_tags using ? ? ? (tag_id);
+);
+create index if not exists idx_legal_comment_tags_comment_id on un80actions.legal_comment_tags (legal_comment_id);
+create index if not exists idx_legal_comment_tags_tag_id on un80actions.legal_comment_tags (tag_id);
 create table if not exists un80actions.action_updates (
     id uuid default gen_random_uuid() not null primary key,
     action_id integer not null,
@@ -314,7 +314,7 @@ create table if not exists un80actions.action_updates (
     set null,
         content_reviewed_at timestamp with time zone,
         foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
-) using ? ? ?;
+);
 create table if not exists un80actions.milestone_updates (
     id uuid default gen_random_uuid() not null primary key,
     milestone_id uuid not null references un80actions.action_milestones on delete cascade,
@@ -331,10 +331,10 @@ create table if not exists un80actions.milestone_updates (
         content_reviewed_at timestamp with time zone,
         is_legal boolean default false not null,
         is_internal boolean default false not null
-) using ? ? ?;
-create index if not exists idx_milestone_updates_milestone_id on un80actions.milestone_updates using ? ? ? (milestone_id);
-create index if not exists idx_milestone_updates_created_at on un80actions.milestone_updates using ? ? ? (created_at desc);
-create index if not exists idx_milestone_updates_reply_to on un80actions.milestone_updates using ? ? ? (reply_to)
+);
+create index if not exists idx_milestone_updates_milestone_id on un80actions.milestone_updates (milestone_id);
+create index if not exists idx_milestone_updates_created_at on un80actions.milestone_updates (created_at desc);
+create index if not exists idx_milestone_updates_reply_to on un80actions.milestone_updates (reply_to)
 where (reply_to IS NOT NULL);
 create table if not exists un80actions.milestone_attachments (
     id uuid default gen_random_uuid() not null primary key,
@@ -346,8 +346,8 @@ create table if not exists un80actions.milestone_attachments (
     uploaded_by uuid references un80actions.users on delete
     set null,
         uploaded_at timestamp with time zone default now() not null
-) using ? ? ?;
-create index if not exists idx_milestone_attachments_milestone_id on un80actions.milestone_attachments using ? ? ? (milestone_id);
+);
+create index if not exists idx_milestone_attachments_milestone_id on un80actions.milestone_attachments (milestone_id);
 create table if not exists un80actions.activity_entries (
     id uuid default gen_random_uuid() not null primary key,
     type text not null,
@@ -360,16 +360,16 @@ create table if not exists un80actions.activity_entries (
         user_id uuid references un80actions.users on delete
     set null,
         created_at timestamp with time zone default now() not null
-) using ? ? ?;
-create index if not exists idx_activity_entries_created_at on un80actions.activity_entries using ? ? ? (created_at desc);
-create index if not exists idx_activity_entries_action on un80actions.activity_entries using ? ? ? (action_id, action_sub_id);
+);
+create index if not exists idx_activity_entries_created_at on un80actions.activity_entries (created_at desc);
+create index if not exists idx_activity_entries_action on un80actions.activity_entries (action_id, action_sub_id);
 create table if not exists un80actions.activity_read (
     activity_id text not null,
     user_id uuid not null references un80actions.users on delete cascade,
     read_at timestamp with time zone default now() not null,
     primary key (activity_id, user_id)
-) using ? ? ?;
-create index if not exists idx_activity_read_user_id on un80actions.activity_read using ? ? ? (user_id);
+);
+create index if not exists idx_activity_read_user_id on un80actions.activity_read (user_id);
 create table if not exists un80actions.attachment_comments (
     id uuid default gen_random_uuid() not null primary key,
     attachment_id uuid not null references un80actions.action_attachments on delete cascade,
@@ -381,6 +381,6 @@ create table if not exists un80actions.attachment_comments (
     set null,
         comment text not null,
         is_legal boolean default false not null
-) using ? ? ?;
-create index if not exists idx_attachment_comments_attachment_id on un80actions.attachment_comments using ? ? ? (attachment_id);
-create index if not exists idx_attachment_comments_created_at on un80actions.attachment_comments using ? ? ? (created_at);
+);
+create index if not exists idx_attachment_comments_attachment_id on un80actions.attachment_comments (attachment_id);
+create index if not exists idx_attachment_comments_created_at on un80actions.attachment_comments (created_at);

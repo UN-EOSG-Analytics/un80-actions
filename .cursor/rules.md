@@ -37,7 +37,7 @@ Example: adding a note → `features/notes/commands.ts`; display → `features/n
 - Pool tuned for serverless: max 2 connections, `search_path` set to `un80actions,systemchart,public`
 - Actions have a composite PK `(id, sub_id)` — always filter on both: `WHERE id = $1 AND (sub_id IS NOT DISTINCT FROM $2)`
 - Schema enums (e.g. `milestone_status`, `user_roles`, `risk_assessment`) mirror the TypeScript types in `src/types/index.ts`
-- To add a DB feature: write a migration in `sql/migrations/`, run `node run_migrations.js`, then update `sql/schema/un80actions_schema.sql`
+- To add a DB feature: write a migration in `sql/migrations/` then update `sql/schema/un80actions_schema.sql`
 
 ## Auth & Permissions
 
