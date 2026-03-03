@@ -1,30 +1,7 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Search,
-  X,
-  ChevronRight,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
-  Filter,
-  Check,
-  Send,
-} from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -33,24 +10,47 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { getStatusStyles, ACTION_STATUS } from "@/constants/actionStatus";
+import { ACTION_STATUS } from "@/constants/actionStatus";
+import {
+  updatePublicActionStatus,
+  updateRiskAssessment,
+} from "@/features/actions/commands";
 import type {
   ActionsTableData,
   ActionWithMilestones,
   RiskAssessment,
 } from "@/types";
 import {
-  updateRiskAssessment,
-  updatePublicActionStatus,
-} from "@/features/actions/commands";
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Check,
+  ChevronRight,
+  Filter,
+  Search,
+  Send,
+  X,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
 
 type SortField =
   | "work_package_id"
@@ -69,11 +69,6 @@ const RISK_OPTIONS: {
   { value: "low_risk", label: "Low", indicatorClass: "bg-green-500" },
   { value: "medium_risk", label: "Medium", indicatorClass: "bg-amber-400" },
   { value: "at_risk", label: "High", indicatorClass: "bg-red-500" },
-];
-
-const STATUS_OPTIONS = [
-  { value: ACTION_STATUS.DECISION_TAKEN, label: "Decision taken" },
-  { value: ACTION_STATUS.FURTHER_WORK_ONGOING, label: "Further work ongoing" },
 ];
 
 function actionLabel(actionId: number, subId: string | null): string {
@@ -168,7 +163,7 @@ function MultiSelectFilter<T extends string | number | boolean>({
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-8 w-full rounded border border-gray-200 px-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+            className="h-8 w-full rounded border border-gray-200 px-2 text-sm"
             onClick={(e) => e.stopPropagation()}
           />
         </div>
@@ -221,7 +216,7 @@ function MultiSelectFilter<T extends string | number | boolean>({
                     >
                       {isSelected && <Check className="h-3 w-3 text-white" />}
                     </div>
-                    <span className="flex-1 wrap-break-word">
+                    <span className="flex-1 break-words">
                       {renderOption(option)}
                     </span>
                   </button>
@@ -639,14 +634,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     }
   };
 
-  const handleStatusChange = async (
-    actionId: number,
-    actionSubId: string | null,
-    value: string | null,
-  ) => {
-    setConfirmDialog({ open: true, actionId, actionSubId, status: value });
-  };
-
   const confirmStatusChange = async () => {
     if (confirmDialog.actionId === null || confirmDialog.status === null)
       return;
@@ -678,6 +665,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     filterBigTicket.length > 0 ||
     filterWorkPackageId.length > 0 ||
     filterRisk.length > 0 ||
+    filterDeliverablesMonth != null ||
     filterIntermediateMilestones;
 
   const clearAllFilters = () => {
@@ -688,7 +676,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     setFilterBigTicket([]);
     setFilterWorkPackageId("");
     setFilterRisk("");
-    // TODO: readd setFilterDeliverablesMonth(null) when fixing type
+    setFilterDeliverablesMonth(null);
     setFilterIntermediateMilestones(false);
   };
 
@@ -703,7 +691,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
             placeholder="Search actions..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="h-9 w-80 rounded-md border border-input bg-background px-3 pl-9 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+            className="h-9 w-80 rounded-md border border-input bg-background px-3 pl-9 text-sm"
           />
           {searchInput && (
             <button
@@ -833,7 +821,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   />
                 </div>
               </th>
-              <th className="w-16 px-3 py-3 whitespace-nowrap">
+              <th className="w-16 px-4 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -905,12 +893,8 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   />
                 </div>
               </th>
-              <th className="px-4 py-3 align-top whitespace-nowrap">
+              <th className="px-4 py-3 whitespace-nowrap">
                 <div className="flex flex-col gap-1">
-                  <div className="text-xs font-normal text-gray-500 tabular-nums">
-                    {deliverablesCounter.submitted}/{deliverablesCounter.total}{" "}
-                    submitted
-                  </div>
                   <div className="flex items-center gap-2">
                     <TooltipProvider delayDuration={200}>
                       <Tooltip>
@@ -1056,6 +1040,10 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                       </PopoverContent>
                     </Popover>
                   </div>
+                  <div className="text-xs font-normal tracking-normal text-gray-400 normal-case tabular-nums">
+                    {deliverablesCounter.submitted}/{deliverablesCounter.total}{" "}
+                    submitted
+                  </div>
                 </div>
               </th>
               {isAdmin && (
@@ -1159,13 +1147,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                               Submitted
                             </>
                           ) : (
-                            <span
-                              className="leading-none font-extrabold"
-                              title="Not submitted"
-                              aria-label="Not submitted"
-                            >
-                              !
-                            </span>
+                            <>Not submitted</>
                           )}
                         </Badge>
                       );
