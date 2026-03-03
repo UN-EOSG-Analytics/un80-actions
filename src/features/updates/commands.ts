@@ -175,9 +175,7 @@ export async function updateUpdate(
 /**
  * Approve an update's content (admin/reviewer only).
  */
-export async function approveUpdate(
-  updateId: string,
-): Promise<UpdateResult> {
+export async function approveUpdate(updateId: string): Promise<UpdateResult> {
   const user = await getCurrentUser();
   if (!user) {
     return { success: false, error: "Not authenticated" };

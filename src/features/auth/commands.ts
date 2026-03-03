@@ -77,7 +77,9 @@ export async function logout(): Promise<void> {
 /**
  * Returns the current user's id for client-side use (e.g. to show edit/delete on own comments).
  */
-export async function getCurrentUserIdForClient(): Promise<{ userId: string | null }> {
+export async function getCurrentUserIdForClient(): Promise<{
+  userId: string | null;
+}> {
   const user = await getCurrentUser();
   return { userId: user?.id ?? null };
 }

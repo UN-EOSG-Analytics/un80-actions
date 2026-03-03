@@ -48,15 +48,33 @@ export async function createMilestoneUpdate(
   const isInternal = isAdmin ? (input.is_internal ?? false) : false;
 
   try {
-    const rows = await query<MilestoneUpdate & { is_legal?: boolean; is_internal?: boolean }>(
+    const rows = await query<
+      MilestoneUpdate & { is_legal?: boolean; is_internal?: boolean }
+    >(
       `INSERT INTO ${DB_SCHEMA}.milestone_updates (milestone_id, user_id, content, reply_to, is_legal, is_internal)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [input.milestone_id, user.id, input.content, input.reply_to || null, isLegal, isInternal],
+      [
+        input.milestone_id,
+        user.id,
+        input.content,
+        input.reply_to || null,
+        isLegal,
+        isInternal,
+      ],
     );
 
     const row = rows[0];
-    return { success: true, update: row ? { ...row, is_legal: Boolean(row.is_legal), is_internal: Boolean(row.is_internal) } : undefined };
+    return {
+      success: true,
+      update: row
+        ? {
+            ...row,
+            is_legal: Boolean(row.is_legal),
+            is_internal: Boolean(row.is_internal),
+          }
+        : undefined,
+    };
   } catch (err) {
     return {
       success: false,
@@ -88,7 +106,8 @@ export async function toggleMilestoneUpdateResolved(
   } catch (err) {
     return {
       success: false,
-      error: err instanceof Error ? err.message : "Failed to toggle resolved status",
+      error:
+        err instanceof Error ? err.message : "Failed to toggle resolved status",
     };
   }
 }
@@ -122,10 +141,9 @@ export async function deleteMilestoneUpdate(
       return { success: false, error: "You can only delete your own comments" };
     }
 
-    await query(
-      `DELETE FROM ${DB_SCHEMA}.milestone_updates WHERE id = $1`,
-      [updateId],
-    );
+    await query(`DELETE FROM ${DB_SCHEMA}.milestone_updates WHERE id = $1`, [
+      updateId,
+    ]);
 
     return { success: true };
   } catch (err) {
@@ -175,7 +193,10 @@ export async function updateMilestoneUpdate(
     );
 
     const row = rows[0];
-    return { success: true, update: row ? { ...row, is_legal: Boolean(row.is_legal) } : undefined };
+    return {
+      success: true,
+      update: row ? { ...row, is_legal: Boolean(row.is_legal) } : undefined,
+    };
   } catch (err) {
     return {
       success: false,

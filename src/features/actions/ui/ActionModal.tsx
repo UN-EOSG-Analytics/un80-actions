@@ -143,7 +143,7 @@ export default function ActionModal({
 
   const handleTabChange = (newTab: string) => {
     setActiveTab(newTab);
-    
+
     // Update URL with the new tab, preserving the current pathname
     const params = new URLSearchParams(searchParams);
     if (newTab !== "overview") {
@@ -151,7 +151,7 @@ export default function ActionModal({
     } else {
       params.delete("tab");
     }
-    
+
     // Preserve the current pathname (e.g., /milestones or /)
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
@@ -181,7 +181,10 @@ export default function ActionModal({
             : [];
 
         const safeName = `Action-${action.action_display_id.replace(/[^a-zA-Z0-9-]/g, "-")}`;
-        const tabSuffix = exportTab === "all" ? "All" : exportTab.charAt(0).toUpperCase() + exportTab.slice(1);
+        const tabSuffix =
+          exportTab === "all"
+            ? "All"
+            : exportTab.charAt(0).toUpperCase() + exportTab.slice(1);
 
         if (format === "word") {
           const blob = await exportActionToWord(
@@ -252,7 +255,9 @@ export default function ActionModal({
           {/* Header */}
           <div className="shrink-0 border-b border-slate-200 bg-white px-6 py-4">
             <div className="flex items-start justify-between gap-4">
-              <p className="text-base font-semibold text-slate-700">Loading...</p>
+              <p className="text-base font-semibold text-slate-700">
+                Loading...
+              </p>
               <button
                 onClick={handleClose}
                 className="shrink-0 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
@@ -304,12 +309,12 @@ export default function ActionModal({
           {/* Content */}
           <div className="flex min-h-0 flex-1 items-center justify-center px-6">
             <div className="text-center">
-              <p className="text-lg text-slate-500 mb-4">
+              <p className="mb-4 text-lg text-slate-500">
                 {error || "Action not found"}
               </p>
               <button
                 onClick={handleClose}
-                className="px-4 py-2 rounded-md bg-un-blue text-white text-sm font-medium hover:bg-un-blue/90"
+                className="rounded-md bg-un-blue px-4 py-2 text-sm font-medium text-white hover:bg-un-blue/90"
               >
                 Go back
               </button>
@@ -360,8 +365,13 @@ export default function ActionModal({
                   className={`${breadcrumbActionClass} cursor-pointer`}
                   title={copied ? "Copied!" : "Click to copy link"}
                 >
-                  <span>Action&nbsp;</span><span className="normal-case">{action.action_display_id}</span>
-                  {copied && <Check className="inline ml-1.5 h-4 w-4 text-un-blue" />}
+                  <span>Action&nbsp;</span>
+                  <span className="normal-case">
+                    {action.action_display_id}
+                  </span>
+                  {copied && (
+                    <Check className="ml-1.5 inline h-4 w-4 text-un-blue" />
+                  )}
                 </button>
               </div>
               {/* Title */}
@@ -418,10 +428,8 @@ export default function ActionModal({
 
           {/* Tab Content - only mount the active tab to avoid loading all tab data on open */}
           <div className="min-h-0 flex-1 overflow-hidden">
-            <div className="h-full overflow-y-auto p-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-              {activeTab === "overview" && (
-                <OverviewTab action={action} />
-              )}
+            <div className="h-full overflow-y-auto p-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {activeTab === "overview" && <OverviewTab action={action} />}
               {activeTab === "milestones" && (
                 <MilestonesTab action={action} isAdmin={isAdmin} />
               )}

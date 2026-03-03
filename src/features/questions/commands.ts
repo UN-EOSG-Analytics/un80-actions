@@ -4,7 +4,11 @@ import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { getQuestionById } from "./queries";
 import { requireAdmin } from "@/features/auth/lib/permissions";
-import type { QuestionCreateInput, QuestionUpdateInput, QuestionResult } from "./types";
+import type {
+  QuestionCreateInput,
+  QuestionUpdateInput,
+  QuestionResult,
+} from "./types";
 
 // =========================================================
 // MUTATIONS
@@ -56,8 +60,7 @@ export async function createQuestion(
   } catch (e) {
     return {
       success: false,
-      error:
-        e instanceof Error ? e.message : "Failed to submit question",
+      error: e instanceof Error ? e.message : "Failed to submit question",
     };
   }
 }

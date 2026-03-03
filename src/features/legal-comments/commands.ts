@@ -19,7 +19,10 @@ export async function createLegalComment(
   try {
     const user = await getCurrentUser();
     if (!user) {
-      return { success: false, error: "You must be logged in to add legal comments" };
+      return {
+        success: false,
+        error: "You must be logged in to add legal comments",
+      };
     }
 
     if (!input.content || input.content.trim().length === 0) {
@@ -106,9 +109,10 @@ export async function deleteLegalComment(
       return { success: false, error: "Comment not found" };
     }
 
-    await query(`DELETE FROM ${DB_SCHEMA}.action_legal_comments WHERE id = $1`, [
-      commentId,
-    ]);
+    await query(
+      `DELETE FROM ${DB_SCHEMA}.action_legal_comments WHERE id = $1`,
+      [commentId],
+    );
 
     return { success: true };
   } catch (e) {

@@ -5,6 +5,7 @@ This feature provides file attachment capabilities for actions using Azure Blob 
 ## Overview
 
 Attachments are stored in Azure Blob Storage and tracked in the database. Each attachment:
+
 - **Required**: Links to an action (via `action_id` and `action_sub_id`)
 - **Optional**: Links to a specific milestone (via `milestone_id`)
 - If `milestone_id` is NULL, the attachment is considered "general" to the action
@@ -50,6 +51,7 @@ Unified interface for all blob storage operations:
 ### 2. Attachment Queries (`features/attachments/queries.ts`)
 
 Read operations:
+
 - `getActionAttachments(actionId, actionSubId)` - Get all attachments for an action
 - `getActionAttachmentCount(actionId, actionSubId)` - Count attachments
 - `getAttachmentById(attachmentId)` - Get specific attachment
@@ -57,6 +59,7 @@ Read operations:
 ### 3. Attachment Commands (`features/attachments/commands.ts`)
 
 Write operations:
+
 - `uploadActionAttachment(actionId, actionSubId, milestoneId, formData)` - Upload file
 - `deleteActionAttachment(attachmentId)` - Delete file (uploader or admin only)
 - `getAttachmentDownloadUrl(attachmentId)` - Generate temporary download URL
@@ -91,11 +94,13 @@ const attachments = await getActionAttachments(action.id, action.sub_id);
 <form onSubmit={handleUpload}>
   <select name="milestone_id">
     <option value="">General (all milestones)</option>
-    {milestones.map(m => <option value={m.id}>{m.name}</option>)}
+    {milestones.map((m) => (
+      <option value={m.id}>{m.name}</option>
+    ))}
   </select>
   <input type="file" name="file" />
   <button type="submit">Upload</button>
-</form>
+</form>;
 ```
 
 ## File Constraints
@@ -113,6 +118,7 @@ const attachments = await getActionAttachments(action.id, action.sub_id);
 ## Display
 
 Attachments appear in a unified section below all milestones, showing:
+
 - Original filename
 - File size
 - Download link (generates temporary URL)

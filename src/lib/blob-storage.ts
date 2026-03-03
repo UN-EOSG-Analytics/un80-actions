@@ -10,14 +10,19 @@ import {
   BlobSASPermissions,
 } from "@azure/storage-blob";
 
-let _containerClient: ReturnType<BlobServiceClient["getContainerClient"]> | null =
-  null;
+let _containerClient: ReturnType<
+  BlobServiceClient["getContainerClient"]
+> | null = null;
 let _sharedKeyCredential: StorageSharedKeyCredential | null = null;
 let _containerName: string | null = null;
 
 function getClients() {
   if (_containerClient && _sharedKeyCredential && _containerName) {
-    return { containerClient: _containerClient, sharedKeyCredential: _sharedKeyCredential, containerName: _containerName };
+    return {
+      containerClient: _containerClient,
+      sharedKeyCredential: _sharedKeyCredential,
+      containerName: _containerName,
+    };
   }
   const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
   const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
@@ -25,14 +30,21 @@ function getClients() {
   if (!accountName || !accountKey || !containerName) {
     throw new Error("Azure Storage credentials not configured");
   }
-  _sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
+  _sharedKeyCredential = new StorageSharedKeyCredential(
+    accountName,
+    accountKey,
+  );
   const blobServiceClient = new BlobServiceClient(
     `https://${accountName}.blob.core.windows.net`,
     _sharedKeyCredential,
   );
   _containerClient = blobServiceClient.getContainerClient(containerName);
   _containerName = containerName;
-  return { containerClient: _containerClient, sharedKeyCredential: _sharedKeyCredential, containerName };
+  return {
+    containerClient: _containerClient,
+    sharedKeyCredential: _sharedKeyCredential,
+    containerName,
+  };
 }
 
 /**

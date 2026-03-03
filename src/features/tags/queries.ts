@@ -26,9 +26,7 @@ export async function getAllTags(): Promise<Tag[]> {
 /**
  * Fetch tags for a milestone.
  */
-export async function getTagsForMilestone(
-  milestoneId: string,
-): Promise<Tag[]> {
+export async function getTagsForMilestone(milestoneId: string): Promise<Tag[]> {
   try {
     const rows = await query<Tag>(
       `SELECT t.id, t.name
@@ -66,9 +64,7 @@ export async function getTagsForNote(noteId: string): Promise<Tag[]> {
 /**
  * Fetch tags for a question.
  */
-export async function getTagsForQuestion(
-  questionId: string,
-): Promise<Tag[]> {
+export async function getTagsForQuestion(questionId: string): Promise<Tag[]> {
   try {
     const rows = await query<Tag>(
       `SELECT t.id, t.name

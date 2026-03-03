@@ -95,12 +95,7 @@ export async function updateNote(
          content_reviewed_by = NULL,
          content_reviewed_at = NULL
      WHERE id = $4`,
-      [
-        input.header.trim(),
-        input.note_date,
-        input.content.trim(),
-        noteId,
-      ],
+      [input.header.trim(), input.note_date, input.content.trim(), noteId],
     );
 
     const updated = await getNoteById(noteId);

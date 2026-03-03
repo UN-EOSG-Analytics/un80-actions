@@ -21,7 +21,7 @@ export default async function PublicMilestonesPage() {
             Actions
           </Link>
           <span>/</span>
-          <Link href="/milestones/public" className="text-gray-700 font-medium">
+          <Link href="/milestones/public" className="font-medium text-gray-700">
             Public milestones
           </Link>
         </div>

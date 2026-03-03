@@ -89,7 +89,14 @@ export async function getActionMilestones(
     );
   } catch (e) {
     const msg = String((e as Error).message ?? "");
-    if (msg.includes("content_review") || msg.includes("does not exist") || msg.includes("milestone_document_submitted") || msg.includes("attention_to_timeline") || msg.includes("confirmation_needed") || msg.includes("public_progress")) {
+    if (
+      msg.includes("content_review") ||
+      msg.includes("does not exist") ||
+      msg.includes("milestone_document_submitted") ||
+      msg.includes("attention_to_timeline") ||
+      msg.includes("confirmation_needed") ||
+      msg.includes("public_progress")
+    ) {
       rows = await query(
         `SELECT
           m.id,
@@ -130,9 +137,12 @@ export async function getActionMilestones(
         needs_ola_review: (r as ActionMilestone).needs_ola_review ?? false,
         reviewed_by_ola: (r as ActionMilestone).reviewed_by_ola ?? false,
         finalized: (r as ActionMilestone).finalized ?? false,
-        attention_to_timeline: (r as ActionMilestone).attention_to_timeline ?? false,
-        confirmation_needed: (r as ActionMilestone).confirmation_needed ?? false,
-        milestone_document_submitted: (r as ActionMilestone).milestone_document_submitted ?? false,
+        attention_to_timeline:
+          (r as ActionMilestone).attention_to_timeline ?? false,
+        confirmation_needed:
+          (r as ActionMilestone).confirmation_needed ?? false,
+        milestone_document_submitted:
+          (r as ActionMilestone).milestone_document_submitted ?? false,
         content_review_status: "approved" as const,
         content_reviewed_by: null,
         content_reviewed_by_email: null,
@@ -194,7 +204,14 @@ export async function getMilestoneById(
     );
   } catch (e) {
     const msg = String((e as Error).message ?? "");
-    if (msg.includes("content_review") || msg.includes("does not exist") || msg.includes("milestone_document_submitted") || msg.includes("attention_to_timeline") || msg.includes("confirmation_needed") || msg.includes("public_progress")) {
+    if (
+      msg.includes("content_review") ||
+      msg.includes("does not exist") ||
+      msg.includes("milestone_document_submitted") ||
+      msg.includes("attention_to_timeline") ||
+      msg.includes("confirmation_needed") ||
+      msg.includes("public_progress")
+    ) {
       rows = await query(
         `SELECT
           m.id,
@@ -505,7 +522,9 @@ export interface PublicMilestoneViewRow {
  * Fetch all public milestones for the Public Milestone view: one row per public milestone
  * with WP, action, description and deadline.
  */
-export async function getPublicMilestonesViewData(): Promise<PublicMilestoneViewRow[]> {
+export async function getPublicMilestonesViewData(): Promise<
+  PublicMilestoneViewRow[]
+> {
   const q = `
     SELECT
       wp.id AS work_package_id,

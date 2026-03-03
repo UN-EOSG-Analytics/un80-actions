@@ -2,7 +2,18 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Search, X, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, Filter, Check, Send, Clock } from "lucide-react";
+import {
+  Search,
+  X,
+  ChevronRight,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Filter,
+  Check,
+  Send,
+  Clock,
+} from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -10,16 +21,34 @@ import {
 } from "@/components/ui/popover";
 import { formatUNDate } from "@/lib/format-date";
 import { Badge } from "@/components/ui/badge";
-import type { MilestoneViewRow, MilestoneViewCell } from "@/features/milestones/queries";
+import type {
+  MilestoneViewRow,
+  MilestoneViewCell,
+} from "@/features/milestones/queries";
 
 type SortField = "work_package_id" | "action_id" | "work_package_title";
 type SortDirection = "asc" | "desc";
 
-const STATUS_FILTER_OPTIONS = ["Draft", "Needs attention", "Needs OLA review", "Approved"] as const;
+const STATUS_FILTER_OPTIONS = [
+  "Draft",
+  "Needs attention",
+  "Needs OLA review",
+  "Approved",
+] as const;
 
 const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 function actionLabel(actionId: number, subId: string | null): string {
@@ -46,7 +75,11 @@ function formatMonthLabel(key: string): string {
 /** Get all status labels present in a row (for filtering). */
 function getRowStatusLabels(row: MilestoneViewRow): string[] {
   const labels: string[] = [];
-  for (const cell of [row.public_milestone, row.first_milestone, row.final_milestone]) {
+  for (const cell of [
+    row.public_milestone,
+    row.first_milestone,
+    row.final_milestone,
+  ]) {
     const label = cell ? getCellStatusLabel(cell) : null;
     if (label && !labels.includes(label)) labels.push(label);
   }
@@ -97,7 +130,7 @@ function MultiSelectFilter<T extends string | number>({
             e.stopPropagation();
             onOpenChange(!isOpen);
           }}
-          className={`h-6 w-6 p-0 border-0 bg-transparent hover:bg-gray-100 rounded flex items-center justify-center transition-colors ${
+          className={`flex h-6 w-6 items-center justify-center rounded border-0 bg-transparent p-0 transition-colors hover:bg-gray-100 ${
             hasFilter ? "text-un-blue" : "text-gray-400"
           }`}
         >
@@ -115,14 +148,14 @@ function MultiSelectFilter<T extends string | number>({
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-8 px-2 text-sm border border-gray-200 rounded outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+            className="h-8 w-full rounded border border-gray-200 px-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
             onClick={(e) => e.stopPropagation()}
           />
         </div>
         <div className="max-h-64 overflow-y-auto">
           <div className="space-y-1">
             {filteredOptions.length === 0 ? (
-              <div className="px-2 py-2 text-sm text-gray-400 text-center">
+              <div className="px-2 py-2 text-center text-sm text-gray-400">
                 No results found
               </div>
             ) : (
@@ -133,11 +166,13 @@ function MultiSelectFilter<T extends string | number>({
                     key={String(option)}
                     type="button"
                     onClick={() => onToggle(option)}
-                    className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-gray-100 text-left"
+                    className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-gray-100"
                   >
                     <div
-                      className={`h-4 w-4 border rounded flex items-center justify-center shrink-0 ${
-                        isSelected ? "bg-un-blue border-un-blue" : "border-gray-300"
+                      className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                        isSelected
+                          ? "border-un-blue bg-un-blue"
+                          : "border-gray-300"
                       }`}
                     >
                       {isSelected && <Check className="h-3 w-3 text-white" />}
@@ -152,7 +187,7 @@ function MultiSelectFilter<T extends string | number>({
           </div>
         </div>
         {hasFilter && (
-          <div className="mt-2 pt-2 border-t">
+          <div className="mt-2 border-t pt-2">
             <button
               type="button"
               onClick={() => {
@@ -201,12 +236,16 @@ function SortIcon({
 }
 
 const STATUS_STYLES: Record<string, { badge: string }> = {
-  "Finalized": { badge: "bg-green-100 text-green-800 border-green-200" },
-  "Attention to timeline": { badge: "bg-amber-100 text-amber-800 border-amber-200" },
+  Finalized: { badge: "bg-green-100 text-green-800 border-green-200" },
+  "Attention to timeline": {
+    badge: "bg-amber-100 text-amber-800 border-amber-200",
+  },
   "Needs OLA review": { badge: "bg-amber-100 text-amber-800 border-amber-200" },
-  "Needs attention": { badge: "bg-orange-100 text-orange-800 border-orange-200" },
-  "Draft": { badge: "bg-slate-100 text-slate-700 border-slate-200" },
-  "Approved": { badge: "bg-green-100 text-green-800 border-green-200" },
+  "Needs attention": {
+    badge: "bg-orange-100 text-orange-800 border-orange-200",
+  },
+  Draft: { badge: "bg-slate-100 text-slate-700 border-slate-200" },
+  Approved: { badge: "bg-green-100 text-green-800 border-green-200" },
 };
 
 /** True if milestone has a deadline that has passed (parse YYYY-MM-DD as local date to avoid timezone shift) */
@@ -243,10 +282,16 @@ function MilestoneCell({ cell }: { cell: MilestoneViewCell | null }) {
     <div className="space-y-2">
       <div className="space-y-0.5">
         {hasDesc && (
-          <p className="text-gray-700 text-sm line-clamp-2">{cell.description}</p>
+          <p className="line-clamp-2 text-sm text-gray-700">
+            {cell.description}
+          </p>
         )}
         {hasDeadline && cell.deadline && (
-          <p className={`text-xs ${pastDue ? 'text-red-600 font-medium' : 'text-gray-500'}`}>{formatUNDate(cell.deadline)}</p>
+          <p
+            className={`text-xs ${pastDue ? "font-medium text-red-600" : "text-gray-500"}`}
+          >
+            {formatUNDate(cell.deadline)}
+          </p>
         )}
       </div>
       <div className="flex items-center gap-2">
@@ -296,7 +341,9 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
   }, [rows]);
 
   const uniqueActions = useMemo(() => {
-    const actions = new Set(rows.map((r) => actionLabel(r.action_id, r.action_sub_id)));
+    const actions = new Set(
+      rows.map((r) => actionLabel(r.action_id, r.action_sub_id)),
+    );
     return Array.from(actions).sort((a, b) => {
       const numA = parseInt(a.replace(/[^0-9]/g, ""), 10);
       const numB = parseInt(b.replace(/[^0-9]/g, ""), 10);
@@ -306,15 +353,23 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
   }, [rows]);
 
   const uniqueFirstMonthKeys = useMemo(() => {
-    const set = new Set(rows.map((r) => getDeadlineMonthKey(r.first_milestone?.deadline)));
-    const list = Array.from(set).filter((k) => k !== "no_date").sort();
+    const set = new Set(
+      rows.map((r) => getDeadlineMonthKey(r.first_milestone?.deadline)),
+    );
+    const list = Array.from(set)
+      .filter((k) => k !== "no_date")
+      .sort();
     if (set.has("no_date")) list.push("no_date");
     return list;
   }, [rows]);
 
   const uniqueFinalMonthKeys = useMemo(() => {
-    const set = new Set(rows.map((r) => getDeadlineMonthKey(r.final_milestone?.deadline)));
-    const list = Array.from(set).filter((k) => k !== "no_date").sort();
+    const set = new Set(
+      rows.map((r) => getDeadlineMonthKey(r.final_milestone?.deadline)),
+    );
+    const list = Array.from(set)
+      .filter((k) => k !== "no_date")
+      .sort();
     if (set.has("no_date")) list.push("no_date");
     return list;
   }, [rows]);
@@ -349,16 +404,29 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
     }
     if (filterFirstMonth.length > 0) {
       list = list.filter((r) =>
-        filterFirstMonth.includes(getDeadlineMonthKey(r.first_milestone?.deadline)),
+        filterFirstMonth.includes(
+          getDeadlineMonthKey(r.first_milestone?.deadline),
+        ),
       );
     }
     if (filterFinalMonth.length > 0) {
       list = list.filter((r) =>
-        filterFinalMonth.includes(getDeadlineMonthKey(r.final_milestone?.deadline)),
+        filterFinalMonth.includes(
+          getDeadlineMonthKey(r.final_milestone?.deadline),
+        ),
       );
     }
     return list;
-  }, [rows, hasSearch, search, filterWP, filterAction, filterStatus, filterFirstMonth, filterFinalMonth]);
+  }, [
+    rows,
+    hasSearch,
+    search,
+    filterWP,
+    filterAction,
+    filterStatus,
+    filterFirstMonth,
+    filterFinalMonth,
+  ]);
 
   const sortedRows = useMemo(() => {
     const dir = sortDirection === "asc" ? 1 : -1;
@@ -403,8 +471,12 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
 
   const handleRowClick = (actionId: number, actionSubId: string | null) => {
     sessionStorage.setItem("actionModalReturnUrl", "/milestones");
-    const actionParam = actionSubId ? `${actionId}${actionSubId}` : `${actionId}`;
-    router.push(`/milestones?action=${actionParam}&tab=milestones`, { scroll: false });
+    const actionParam = actionSubId
+      ? `${actionId}${actionSubId}`
+      : `${actionId}`;
+    router.push(`/milestones?action=${actionParam}&tab=milestones`, {
+      scroll: false,
+    });
   };
 
   return (
@@ -461,11 +533,11 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
         )}
       </div>
 
-      <div className="overflow-x-auto overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <div className="overflow-hidden overflow-x-auto rounded-lg border border-gray-200 bg-white">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-              <th className="px-3 py-3 whitespace-nowrap w-14">
+              <th className="w-14 px-3 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -485,7 +557,9 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                     selected={filterWP}
                     onToggle={(id) =>
                       setFilterWP((prev) =>
-                        prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id],
+                        prev.includes(id)
+                          ? prev.filter((v) => v !== id)
+                          : [...prev, id],
                       )
                     }
                     renderOption={(id) => `WP ${id}`}
@@ -501,7 +575,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                   <button
                     type="button"
                     onClick={() => handleSort("action_id")}
-                    className="inline-flex items-center hover:text-un-blue uppercase"
+                    className="inline-flex items-center uppercase hover:text-un-blue"
                   >
                     Action
                     <SortIcon
@@ -538,7 +612,9 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                     selected={filterFirstMonth}
                     onToggle={(key) =>
                       setFilterFirstMonth((prev) =>
-                        prev.includes(key) ? prev.filter((v) => v !== key) : [...prev, key],
+                        prev.includes(key)
+                          ? prev.filter((v) => v !== key)
+                          : [...prev, key],
                       )
                     }
                     renderOption={(key) => formatMonthLabel(key)}
@@ -559,7 +635,9 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                     selected={filterFinalMonth}
                     onToggle={(key) =>
                       setFilterFinalMonth((prev) =>
-                        prev.includes(key) ? prev.filter((v) => v !== key) : [...prev, key],
+                        prev.includes(key)
+                          ? prev.filter((v) => v !== key)
+                          : [...prev, key],
                       )
                     }
                     renderOption={(key) => formatMonthLabel(key)}
@@ -586,36 +664,36 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
               </tr>
             ) : (
               sortedRows.map((r) => (
-              <tr
-                key={`${r.action_id}-${r.action_sub_id ?? ""}`}
-                onClick={() => handleRowClick(r.action_id, r.action_sub_id)}
-                className="cursor-pointer transition-colors hover:bg-gray-50"
-              >
-                <td className="px-3 py-3 whitespace-nowrap">
-                  <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 font-medium text-sm tabular-nums">
-                    {r.work_package_id}
-                  </span>
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                  <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-un-blue/10 text-un-blue font-semibold text-sm tabular-nums">
-                    {actionLabel(r.action_id, r.action_sub_id)}
-                  </span>
-                </td>
-                <td className="px-4 py-3 align-top">
-                  <MilestoneCell cell={r.first_milestone} />
-                </td>
-                <td className="px-4 py-3 align-top">
-                  <MilestoneCell cell={r.final_milestone} />
-                </td>
-                <td className="px-4 py-3 text-gray-400">
-                  <ChevronRight className="h-4 w-4" />
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
+                <tr
+                  key={`${r.action_id}-${r.action_sub_id ?? ""}`}
+                  onClick={() => handleRowClick(r.action_id, r.action_sub_id)}
+                  className="cursor-pointer transition-colors hover:bg-gray-50"
+                >
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <span className="inline-flex items-center justify-center rounded bg-gray-100 px-1.5 py-0.5 text-sm font-medium text-gray-700 tabular-nums">
+                      {r.work_package_id}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className="inline-flex items-center justify-center rounded bg-un-blue/10 px-1.5 py-0.5 text-sm font-semibold text-un-blue tabular-nums">
+                      {actionLabel(r.action_id, r.action_sub_id)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 align-top">
+                    <MilestoneCell cell={r.first_milestone} />
+                  </td>
+                  <td className="px-4 py-3 align-top">
+                    <MilestoneCell cell={r.final_milestone} />
+                  </td>
+                  <td className="px-4 py-3 text-gray-400">
+                    <ChevronRight className="h-4 w-4" />
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

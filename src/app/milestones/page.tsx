@@ -27,7 +27,7 @@ export default async function MilestonesPage() {
             Actions
           </Link>
           <span>/</span>
-          <span className="text-gray-700 font-medium">Milestones</span>
+          <span className="font-medium text-gray-700">Milestones</span>
         </div>
         <MilestonesTable rows={rows} />
       </div>

@@ -24,7 +24,10 @@ function toTipTapHtml(value: string): string {
     .replace(/>/g, "&gt;");
   const withBold = escaped.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
   const withStrike = withBold.replace(/~~(.+?)~~/g, "<s>$1</s>");
-  const paragraphs = withStrike.split(/\n/).map((p) => `<p>${p}</p>`).join("");
+  const paragraphs = withStrike
+    .split(/\n/)
+    .map((p) => `<p>${p}</p>`)
+    .join("");
   return paragraphs || "<p></p>";
 }
 
@@ -35,7 +38,10 @@ const DEFAULT_HTML = "<p></p>";
 
 /** Strip HTML tags and trim; use to detect empty content. */
 export function isNoteContentEmpty(html: string): boolean {
-  const text = html.replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").trim();
+  const text = html
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .trim();
   return !text;
 }
 
@@ -157,10 +163,7 @@ export function NoteEditor({
           <Minus className="h-4 w-4" />
         </button>
       </div>
-      <div
-        className="rounded-b-md bg-white min-h-[8rem] resize-y overflow-auto border-t border-slate-200
-                   [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6 [&_li]:my-0.5"
-      >
+      <div className="min-h-[8rem] resize-y overflow-auto rounded-b-md border-t border-slate-200 bg-white [&_li]:my-0.5 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6">
         <EditorContent editor={editor} />
       </div>
     </div>

@@ -35,7 +35,7 @@ export default function ModalHandler({
     // Parse action number from query param (e.g., "94" or "94(a)")
     // Extract id and optional sub_id using regex
     const actionMatch = actionParam.match(/^(\d+)(\([a-z]\))?$/i);
-    
+
     if (!actionMatch) {
       setError("Invalid action format");
       setLoading(false);
@@ -44,7 +44,7 @@ export default function ModalHandler({
 
     const actionId = parseInt(actionMatch[1], 10);
     // Keep parentheses in sub_id as they're stored in the database (e.g., "(a)")
-    const actionSubId = actionMatch[2] || '';
+    const actionSubId = actionMatch[2] || "";
     const firstMilestone = milestoneParam
       ? decodeUrlParam(milestoneParam)
       : null;

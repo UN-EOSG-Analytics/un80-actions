@@ -25,7 +25,17 @@ import type { Action, ActionNote, ActionQuestion } from "@/types";
 import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
 import { BoldText } from "@/features/shared/markdown-bold";
 import { NoteEditor, isNoteContentEmpty } from "@/features/notes/ui/NoteEditor";
-import { Loader2, Plus, StickyNote, Trash2, Pencil, X, Send, MessageCircle, ChevronDown } from "lucide-react";
+import {
+  Loader2,
+  Plus,
+  StickyNote,
+  Trash2,
+  Pencil,
+  X,
+  Send,
+  MessageCircle,
+  ChevronDown,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { updateNote } from "@/features/notes/commands";
 
@@ -56,9 +66,18 @@ export default function NotesTab({
 }: {
   action: Action;
   isAdmin?: boolean;
-  exportProps?: { onExport: (format: "word" | "pdf" | "markdown") => void; exporting: boolean };
+  exportProps?: {
+    onExport: (format: "word" | "pdf" | "markdown") => void;
+    exporting: boolean;
+  };
 }) {
-  const HEADER_OPTIONS = ["Task Force", "Steering Committee", "Check-ins", "Unspecified", "Other"];
+  const HEADER_OPTIONS = [
+    "Task Force",
+    "Steering Committee",
+    "Check-ins",
+    "Unspecified",
+    "Other",
+  ];
   const [notes, setNotes] = useState<ActionNote[]>([]);
   const [questions, setQuestions] = useState<ActionQuestion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -116,7 +135,11 @@ export default function NotesTab({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newNote.header.trim() || !newNote.note_date || isNoteContentEmpty(newNote.content)) {
+    if (
+      !newNote.header.trim() ||
+      !newNote.note_date ||
+      isNoteContentEmpty(newNote.content)
+    ) {
       setError("Please fill in all fields");
       return;
     }
@@ -186,7 +209,11 @@ export default function NotesTab({
 
   const handleSaveEdit = async () => {
     if (!editingId) return;
-    if (!editingNote.header.trim() || !editingNote.note_date || isNoteContentEmpty(editingNote.content)) {
+    if (
+      !editingNote.header.trim() ||
+      !editingNote.note_date ||
+      isNoteContentEmpty(editingNote.content)
+    ) {
       setError("Please fill in all fields");
       return;
     }
@@ -261,18 +288,19 @@ export default function NotesTab({
                       </span>
                     )}
                   </div>
-                  <p className="whitespace-pre-wrap text-sm text-slate-600 line-clamp-3">
+                  <p className="line-clamp-3 text-sm whitespace-pre-wrap text-slate-600">
                     <BoldText>{question.question}</BoldText>
                   </p>
                   {question.answer && (
                     <div className="mt-2 rounded border-l-2 border-green-300 bg-green-50/50 pl-2">
-                      <p className="whitespace-pre-wrap text-xs text-slate-600 line-clamp-2">
+                      <p className="line-clamp-2 text-xs whitespace-pre-wrap text-slate-600">
                         <BoldText>{question.answer}</BoldText>
                       </p>
                     </div>
                   )}
                   <p className="mt-1 text-xs text-slate-400">
-                    {formatUNDateTime(question.created_at)} · {question.user_email}
+                    {formatUNDateTime(question.created_at)} ·{" "}
+                    {question.user_email}
                   </p>
                 </div>
               ))}
@@ -284,7 +312,7 @@ export default function NotesTab({
       {/* Add Note Form */}
       <form
         onSubmit={handleSubmit}
-        className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-4"
+        className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
       >
         <label className="block text-base font-semibold text-slate-800">
           Add a note
@@ -318,7 +346,9 @@ export default function NotesTab({
           <input
             type="date"
             value={newNote.note_date}
-            onChange={(e) => setNewNote({ ...newNote, note_date: e.target.value })}
+            onChange={(e) =>
+              setNewNote({ ...newNote, note_date: e.target.value })
+            }
             className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
             disabled={submitting}
             required
@@ -340,7 +370,12 @@ export default function NotesTab({
         <div className="flex justify-end">
           <Button
             type="submit"
-            disabled={submitting || !newNote.header.trim() || !newNote.note_date || isNoteContentEmpty(newNote.content)}
+            disabled={
+              submitting ||
+              !newNote.header.trim() ||
+              !newNote.note_date ||
+              isNoteContentEmpty(newNote.content)
+            }
             className="bg-un-blue hover:bg-un-blue/90"
           >
             {submitting ? (
@@ -386,7 +421,12 @@ export default function NotesTab({
                       <input
                         type="text"
                         value={editingNote.header}
-                        onChange={(e) => setEditingNote({ ...editingNote, header: e.target.value })}
+                        onChange={(e) =>
+                          setEditingNote({
+                            ...editingNote,
+                            header: e.target.value,
+                          })
+                        }
                         disabled={saving}
                         required
                         placeholder="e.g. Task Force, Steering Committee"
@@ -400,7 +440,12 @@ export default function NotesTab({
                       <input
                         type="date"
                         value={editingNote.note_date}
-                        onChange={(e) => setEditingNote({ ...editingNote, note_date: e.target.value })}
+                        onChange={(e) =>
+                          setEditingNote({
+                            ...editingNote,
+                            note_date: e.target.value,
+                          })
+                        }
                         className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
                         disabled={saving}
                         required
@@ -413,7 +458,9 @@ export default function NotesTab({
                       <NoteEditor
                         key={editingId}
                         value={editingNote.content}
-                        onChange={(html) => setEditingNote({ ...editingNote, content: html })}
+                        onChange={(html) =>
+                          setEditingNote({ ...editingNote, content: html })
+                        }
                         placeholder=""
                         disabled={saving}
                         minRows={4}
@@ -426,23 +473,28 @@ export default function NotesTab({
                         onClick={cancelEditing}
                         disabled={saving}
                       >
-                        <X className="h-4 w-4 mr-2" />
+                        <X className="mr-2 h-4 w-4" />
                         Cancel
                       </Button>
                       <Button
                         type="button"
                         onClick={handleSaveEdit}
-                        disabled={saving || !editingNote.header.trim() || !editingNote.note_date || isNoteContentEmpty(editingNote.content)}
+                        disabled={
+                          saving ||
+                          !editingNote.header.trim() ||
+                          !editingNote.note_date ||
+                          isNoteContentEmpty(editingNote.content)
+                        }
                         className="bg-un-blue hover:bg-un-blue/90"
                       >
                         {saving ? (
                           <>
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             Saving...
                           </>
                         ) : (
                           <>
-                            <Send className="h-4 w-4 mr-2" />
+                            <Send className="mr-2 h-4 w-4" />
                             Save
                           </>
                         )}
@@ -476,11 +528,11 @@ export default function NotesTab({
                         <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-4 py-3">
                           {note.content.trim().startsWith("<") ? (
                             <div
-                              className="prose prose-sm max-w-none text-[15px] leading-relaxed text-slate-700 [&_p]:whitespace-pre-wrap [&_p]:my-1 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6 [&_li]:my-0.5"
+                              className="prose prose-sm max-w-none text-[15px] leading-relaxed text-slate-700 [&_li]:my-0.5 [&_p]:my-1 [&_p]:whitespace-pre-wrap [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6"
                               dangerouslySetInnerHTML={{ __html: note.content }}
                             />
                           ) : (
-                            <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-slate-700">
+                            <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-slate-700">
                               <BoldText>{note.content}</BoldText>
                             </p>
                           )}
@@ -488,7 +540,9 @@ export default function NotesTab({
                         {/* Footer: meta + actions */}
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-slate-100 pt-3">
                           <p className="text-xs text-slate-500">
-                            <span className="font-medium text-slate-600">{formatUNDateTime(note.created_at)}</span>
+                            <span className="font-medium text-slate-600">
+                              {formatUNDateTime(note.created_at)}
+                            </span>
                             <span className="mx-1.5">·</span>
                             <span>{note.user_email}</span>
                           </p>
@@ -559,7 +613,10 @@ export default function NotesTab({
                           isAdmin={isAdmin}
                           initialTags={[]}
                           onTagsChange={(tags) =>
-                            setTagsByNoteId((prev) => ({ ...prev, [note.id]: tags }))
+                            setTagsByNoteId((prev) => ({
+                              ...prev,
+                              [note.id]: tags,
+                            }))
                           }
                           hideInlineTags
                         />

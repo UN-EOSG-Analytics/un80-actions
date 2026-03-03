@@ -2,21 +2,21 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
 import { formatUNDateTime } from "@/lib/format-date";
 import {
-    Bell,
-    CheckSquare,
-    FileText,
-    Flag,
-    HelpCircle,
-    MessageSquare,
-    Square,
-    Tag,
-    X,
+  Bell,
+  CheckSquare,
+  FileText,
+  Flag,
+  HelpCircle,
+  MessageSquare,
+  Square,
+  Tag,
+  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -135,8 +135,8 @@ export function ActivityFeed() {
   };
 
   const unreadCount = activities.filter((a) => !a.read_at).length;
-  const displayedActivities = showUnreadOnly 
-    ? activities.filter((a) => !a.read_at) 
+  const displayedActivities = showUnreadOnly
+    ? activities.filter((a) => !a.read_at)
     : activities;
 
   return (
@@ -165,9 +165,9 @@ export function ActivityFeed() {
             <button
               type="button"
               onClick={() => setShowUnreadOnly(!showUnreadOnly)}
-              className={`text-xs px-2 py-1 rounded transition-colors ${
-                showUnreadOnly 
-                  ? "bg-un-blue text-white" 
+              className={`rounded px-2 py-1 text-xs transition-colors ${
+                showUnreadOnly
+                  ? "bg-un-blue text-white"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >

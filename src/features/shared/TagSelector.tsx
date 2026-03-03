@@ -56,10 +56,10 @@ export function TagSelector({
   const [newTagInput, setNewTagInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Ref to avoid dependency issues in effects
   const onTagsChangeRef = useRef(onTagsChange);
-  
+
   // Keep ref up to date
   useEffect(() => {
     onTagsChangeRef.current = onTagsChange;
@@ -280,9 +280,7 @@ export function TagSelector({
               </div>
             </div>
 
-            {error && (
-              <p className="text-xs text-red-600">{error}</p>
-            )}
+            {error && <p className="text-xs text-red-600">{error}</p>}
           </div>
         </PopoverContent>
       </Popover>

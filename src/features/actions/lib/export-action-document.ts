@@ -37,19 +37,28 @@ function formatDate(d: Date | string | null | undefined): string {
 /** Format question date for export: "5 February 2025, 7 p.m." (date-only gets default 7 p.m.). */
 function formatQuestionDate(d: Date | string | null | undefined): string {
   if (d == null) return "—";
-  const dateStr = typeof d === "string" ? d : (d as Date).toISOString?.() ?? String(d);
-  const dateOnly = /^\d{4}-\d{2}-\d{2}/.test(dateStr) ? dateStr.split("T")[0] : null;
+  const dateStr =
+    typeof d === "string" ? d : ((d as Date).toISOString?.() ?? String(d));
+  const dateOnly = /^\d{4}-\d{2}-\d{2}/.test(dateStr)
+    ? dateStr.split("T")[0]
+    : null;
   if (dateOnly) return `${formatUNDate(dateOnly)}, 7 p.m.`;
   return formatUNDateTime(d);
 }
 
 /** If comment starts with "5 Feb:" or "21 Jan:", return { notesDateLabel, notesBody }; else { notesBody }. */
-function splitNotesOnQuestions(comment: string | null): { notesDateLabel: string; notesBody: string } {
+function splitNotesOnQuestions(comment: string | null): {
+  notesDateLabel: string;
+  notesBody: string;
+} {
   if (!comment || !comment.trim()) return { notesDateLabel: "", notesBody: "" };
   const trimmed = comment.trim();
   const match = trimmed.match(/^(\d{1,2}\s+[A-Za-z]{3,}\s*:)\s*/);
   if (match) {
-    return { notesDateLabel: match[1].trim(), notesBody: trimmed.slice(match[0].length).trim() };
+    return {
+      notesDateLabel: match[1].trim(),
+      notesBody: trimmed.slice(match[0].length).trim(),
+    };
   }
   return { notesDateLabel: "", notesBody: trimmed };
 }
@@ -57,7 +66,9 @@ function splitNotesOnQuestions(comment: string | null): { notesDateLabel: string
 function wrapPdfText(doc: jsPDF, text: string, maxWidth: number): string[] {
   const trimmed = (text || "").trim();
   if (!trimmed) return [];
-  return trimmed.split(/\r?\n/).flatMap((line) => doc.splitTextToSize(line, maxWidth));
+  return trimmed
+    .split(/\r?\n/)
+    .flatMap((line) => doc.splitTextToSize(line, maxWidth));
 }
 
 // =========================================================
@@ -71,7 +82,7 @@ function buildWordDocument(
   notes: ActionNote[],
   legalComments: ActionLegalComment[],
 ): Document {
-  const children: (Paragraph)[] = [];
+  const children: Paragraph[] = [];
 
   // Title
   children.push(
@@ -121,7 +132,9 @@ function buildWordDocument(
     if (questions.length === 0) {
       children.push(
         new Paragraph({
-          children: [new TextRun({ text: "No questions recorded.", italics: true })],
+          children: [
+            new TextRun({ text: "No questions recorded.", italics: true }),
+          ],
           spacing: { after: 120 },
         }),
       );
@@ -131,7 +144,9 @@ function buildWordDocument(
         const indent = { left: 360 };
 
         // Block: "1. Notes on Questions: 5 Feb:" (bold) then notes content — only if comment exists
-        const { notesDateLabel, notesBody } = splitNotesOnQuestions(q.comment ?? null);
+        const { notesDateLabel, notesBody } = splitNotesOnQuestions(
+          q.comment ?? null,
+        );
         if (q.comment && q.comment.trim()) {
           const notesHeaderLine =
             notesDateLabel !== ""
@@ -170,7 +185,9 @@ function buildWordDocument(
         );
 
         // "- " + question text
-        const questionPrefix = q.question.trimStart().startsWith("-") ? "" : "- ";
+        const questionPrefix = q.question.trimStart().startsWith("-")
+          ? ""
+          : "- ";
         children.push(
           new Paragraph({
             children: [new TextRun({ text: questionPrefix + q.question })],
@@ -181,7 +198,9 @@ function buildWordDocument(
         if (q.subtext) {
           children.push(
             new Paragraph({
-              children: [new TextRun({ text: q.subtext, italics: true, size: 20 })],
+              children: [
+                new TextRun({ text: q.subtext, italics: true, size: 20 }),
+              ],
               indent,
               spacing: { after: 40 },
             }),
@@ -243,7 +262,9 @@ function buildWordDocument(
     if (notes.length === 0) {
       children.push(
         new Paragraph({
-          children: [new TextRun({ text: "No notes recorded.", italics: true })],
+          children: [
+            new TextRun({ text: "No notes recorded.", italics: true }),
+          ],
           spacing: { after: 120 },
         }),
       );
@@ -284,7 +305,9 @@ function buildWordDocument(
     if (legalComments.length === 0) {
       children.push(
         new Paragraph({
-          children: [new TextRun({ text: "No legal comments recorded.", italics: true })],
+          children: [
+            new TextRun({ text: "No legal comments recorded.", italics: true }),
+          ],
           spacing: { after: 120 },
         }),
       );
@@ -377,7 +400,10 @@ export function exportActionToPdf(
   // Title
   addText(`Action ${action.action_display_id}`, PDF_TITLE, true);
   addSpace(2);
-  addText(`${action.report} · Work package ${action.work_package_number}`, PDF_BODY);
+  addText(
+    `${action.report} · Work package ${action.work_package_number}`,
+    PDF_BODY,
+  );
   addText(action.indicative_activity, PDF_BODY);
   addSpace(8);
 
@@ -390,7 +416,9 @@ export function exportActionToPdf(
     } else {
       questions.forEach((q, i) => {
         const num = i + 1;
-        const { notesDateLabel, notesBody } = splitNotesOnQuestions(q.comment ?? null);
+        const { notesDateLabel, notesBody } = splitNotesOnQuestions(
+          q.comment ?? null,
+        );
         if (q.comment && q.comment.trim()) {
           const notesHeader =
             notesDateLabel !== ""
@@ -405,7 +433,9 @@ export function exportActionToPdf(
             ? `${num}. ${headerLabel} · ${formatQuestionDate(q.question_date)}`
             : `${headerLabel} · ${formatQuestionDate(q.question_date)}`;
         addText(questionHeader, PDF_BODY, true);
-        const questionPrefix = q.question.trimStart().startsWith("-") ? "" : "- ";
+        const questionPrefix = q.question.trimStart().startsWith("-")
+          ? ""
+          : "- ";
         addText(questionPrefix + q.question, PDF_BODY);
         if (q.subtext) addText(q.subtext, PDF_SMALL);
         if (q.answer) {
@@ -417,7 +447,10 @@ export function exportActionToPdf(
             );
           }
         }
-        addText(`${formatDate(q.created_at)} · ${q.user_email ?? "—"}`, PDF_SMALL);
+        addText(
+          `${formatDate(q.created_at)} · ${q.user_email ?? "—"}`,
+          PDF_SMALL,
+        );
         addSpace(4);
       });
     }
@@ -432,7 +465,11 @@ export function exportActionToPdf(
       addText("No notes recorded.", PDF_BODY);
     } else {
       notes.forEach((n, i) => {
-        addText(`Note ${i + 1} · ${formatDate(n.created_at)}${n.user_email ? ` · ${n.user_email}` : ""}`, PDF_BODY, true);
+        addText(
+          `Note ${i + 1} · ${formatDate(n.created_at)}${n.user_email ? ` · ${n.user_email}` : ""}`,
+          PDF_BODY,
+          true,
+        );
         addText(n.content, PDF_BODY);
         addSpace(4);
       });
@@ -448,7 +485,11 @@ export function exportActionToPdf(
       addText("No legal comments recorded.", PDF_BODY);
     } else {
       legalComments.forEach((c, i) => {
-        addText(`Comment ${i + 1} · ${formatDate(c.created_at)}${c.user_email ? ` · ${c.user_email}` : ""}`, PDF_BODY, true);
+        addText(
+          `Comment ${i + 1} · ${formatDate(c.created_at)}${c.user_email ? ` · ${c.user_email}` : ""}`,
+          PDF_BODY,
+          true,
+        );
         addText(c.content, PDF_BODY);
         addSpace(4);
       });
@@ -485,7 +526,9 @@ export function exportActionToMarkdown(
     } else {
       questions.forEach((q, i) => {
         const num = i + 1;
-        const { notesDateLabel, notesBody } = splitNotesOnQuestions(q.comment ?? null);
+        const { notesDateLabel, notesBody } = splitNotesOnQuestions(
+          q.comment ?? null,
+        );
         if (q.comment && q.comment.trim()) {
           const notesHeader =
             notesDateLabel !== ""
@@ -500,7 +543,9 @@ export function exportActionToMarkdown(
             ? `**${num}. ${headerLabel} · ${formatQuestionDate(q.question_date)}**`
             : `**${headerLabel} · ${formatQuestionDate(q.question_date)}**`;
         markdown += `${questionHeader}\n\n`;
-        const questionPrefix = q.question.trimStart().startsWith("-") ? "" : "- ";
+        const questionPrefix = q.question.trimStart().startsWith("-")
+          ? ""
+          : "- ";
         markdown += `${questionPrefix}${q.question}\n\n`;
         if (q.subtext) markdown += `_${q.subtext}_\n\n`;
         if (q.answer) {

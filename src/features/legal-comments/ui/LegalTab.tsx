@@ -14,7 +14,14 @@ import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionLegalComment } from "@/types";
 import { formatUNDateTime } from "@/lib/format-date";
-import { CornerDownRight, Loader2, MessageSquare, Plus, Scale, Trash2 } from "lucide-react";
+import {
+  CornerDownRight,
+  Loader2,
+  MessageSquare,
+  Plus,
+  Scale,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -45,7 +52,10 @@ export default function LegalTab({
 }: {
   action: Action;
   isAdmin?: boolean;
-  exportProps?: { onExport: (format: "word" | "pdf" | "markdown") => void; exporting: boolean };
+  exportProps?: {
+    onExport: (format: "word" | "pdf" | "markdown") => void;
+    exporting: boolean;
+  };
 }) {
   const [comments, setComments] = useState<ActionLegalComment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,7 +66,9 @@ export default function LegalTab({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
-  const [tagsByCommentId, setTagsByCommentId] = useState<Record<string, Tag[]>>({});
+  const [tagsByCommentId, setTagsByCommentId] = useState<Record<string, Tag[]>>(
+    {},
+  );
 
   const loadComments = async () => {
     setLoading(true);
@@ -96,9 +108,7 @@ export default function LegalTab({
         setError(result.error || "Failed to add comment");
       }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to add comment",
-      );
+      setError(err instanceof Error ? err.message : "Failed to add comment");
     } finally {
       setSubmitting(false);
     }
@@ -221,8 +231,7 @@ export default function LegalTab({
       ) : (
         <div className="space-y-3">
           {topLevelComments.map((comment) => {
-            const isApproved =
-              comment.content_review_status === "approved";
+            const isApproved = comment.content_review_status === "approved";
             const replies = repliesByParent[comment.id] ?? [];
             const replyingTo = replyingToId === comment.id;
             return (
@@ -254,12 +263,8 @@ export default function LegalTab({
                             {comment.user_email && ` by ${comment.user_email}`}
                           </p>
                           <ReviewStatus
-                            status={
-                              comment.content_review_status ?? "approved"
-                            }
-                            reviewedByEmail={
-                              comment.content_reviewed_by_email
-                            }
+                            status={comment.content_review_status ?? "approved"}
+                            reviewedByEmail={comment.content_reviewed_by_email}
                             reviewedAt={comment.content_reviewed_at}
                             isAdmin={isAdmin}
                             onApprove={async () => {
@@ -388,8 +393,9 @@ export default function LegalTab({
                                   onApprove={async () => {
                                     setApprovingId(reply.id);
                                     try {
-                                      const result =
-                                        await approveLegalComment(reply.id);
+                                      const result = await approveLegalComment(
+                                        reply.id,
+                                      );
                                       if (result.success) await loadComments();
                                     } finally {
                                       setApprovingId(null);
@@ -401,7 +407,7 @@ export default function LegalTab({
                                   type="button"
                                   variant="ghost"
                                   size="icon"
-                                  className="h-7 w-7 text-slate-400 opacity-0 hover:text-red-600 group-hover/reply:opacity-100"
+                                  className="h-7 w-7 text-slate-400 opacity-0 group-hover/reply:opacity-100 hover:text-red-600"
                                   onClick={() => handleDelete(reply.id)}
                                   disabled={deletingId === reply.id}
                                   aria-label="Delete reply"

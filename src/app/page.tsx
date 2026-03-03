@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/features/auth/service";
 
 export default async function Home() {
   const user = await getCurrentUser();
-  
+
   if (!user) {
     redirect("/login");
   }

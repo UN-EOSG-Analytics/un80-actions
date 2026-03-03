@@ -129,7 +129,6 @@ export async function deleteActionAttachment(
     return { success: false, error: auth.error };
   }
   try {
-
     // Get attachment details
     const rows = await query<{
       blob_name: string;
@@ -150,10 +149,9 @@ export async function deleteActionAttachment(
     await deleteBlob(attachment.blob_name);
 
     // Delete from database
-    await query(
-      `DELETE FROM un80actions.action_attachments WHERE id = $1`,
-      [attachmentId],
-    );
+    await query(`DELETE FROM un80actions.action_attachments WHERE id = $1`, [
+      attachmentId,
+    ]);
 
     revalidatePath("/");
 
@@ -179,7 +177,6 @@ export async function updateAttachmentMetadata(
     return { success: false, error: auth.error };
   }
   try {
-
     await query(
       `UPDATE un80actions.action_attachments 
        SET title = $1, description = $2
@@ -299,7 +296,10 @@ export async function createAttachmentComment(
     );
 
     const row = rows[0];
-    const createdAt = row.created_at instanceof Date ? row.created_at : new Date(row.created_at);
+    const createdAt =
+      row.created_at instanceof Date
+        ? row.created_at
+        : new Date(row.created_at);
     const text = row.comment ?? row.body;
 
     revalidatePath("/");

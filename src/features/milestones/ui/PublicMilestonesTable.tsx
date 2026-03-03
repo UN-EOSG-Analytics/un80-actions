@@ -2,7 +2,14 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { ArrowUpDown, ArrowUp, ArrowDown, Filter, Check, X } from "lucide-react";
+import {
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Filter,
+  Check,
+  X,
+} from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -12,7 +19,11 @@ import { formatUNDate } from "@/lib/format-date";
 import { Badge } from "@/components/ui/badge";
 import type { PublicMilestoneViewRow } from "@/features/milestones/queries";
 
-type SortField = "work_package_id" | "action_id" | "milestone_deadline" | "public_progress";
+type SortField =
+  | "work_package_id"
+  | "action_id"
+  | "milestone_deadline"
+  | "public_progress";
 type SortDirection = "asc" | "desc";
 
 function actionLabel(actionId: number, subId: string | null): string {
@@ -35,11 +46,17 @@ const PUBLIC_PROGRESS_STYLES: Record<string, string> = {
   completed: "bg-green-100 text-green-800 border-green-200",
 };
 
-function PublicProgressBadge({ value }: { value: PublicMilestoneViewRow["public_progress"] }) {
+function PublicProgressBadge({
+  value,
+}: {
+  value: PublicMilestoneViewRow["public_progress"];
+}) {
   // Default for all public milestones is "In progress"
   const displayValue = value ?? "in_progress";
   const label = PUBLIC_PROGRESS_LABELS[displayValue] ?? displayValue;
-  const style = PUBLIC_PROGRESS_STYLES[displayValue] ?? "bg-gray-100 text-gray-700 border-gray-200";
+  const style =
+    PUBLIC_PROGRESS_STYLES[displayValue] ??
+    "bg-gray-100 text-gray-700 border-gray-200";
   return (
     <Badge variant="outline" className={`text-xs font-medium ${style}`}>
       {label}
@@ -105,27 +122,33 @@ function MultiSelectFilter<T extends string | number>({
             e.stopPropagation();
             onOpenChange(!isOpen);
           }}
-          className={`h-6 w-6 p-0 border-0 bg-transparent hover:bg-gray-100 rounded flex items-center justify-center transition-colors ${
+          className={`flex h-6 w-6 items-center justify-center rounded border-0 bg-transparent p-0 transition-colors hover:bg-gray-100 ${
             hasFilter ? "text-un-blue" : "text-gray-400"
           }`}
         >
           <Filter className="h-3.5 w-3.5" />
         </button>
       </PopoverTrigger>
-      <PopoverContent className={`${maxWidth} p-2`} align="start" onClick={(e) => e.stopPropagation()}>
+      <PopoverContent
+        className={`${maxWidth} p-2`}
+        align="start"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="mb-2">
           <input
             type="text"
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-8 px-2 text-sm border border-gray-200 rounded outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+            className="h-8 w-full rounded border border-gray-200 px-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
             onClick={(e) => e.stopPropagation()}
           />
         </div>
-        <div className="max-h-64 overflow-y-auto space-y-1">
+        <div className="max-h-64 space-y-1 overflow-y-auto">
           {filteredOptions.length === 0 ? (
-            <div className="px-2 py-2 text-sm text-gray-400 text-center">No results found</div>
+            <div className="px-2 py-2 text-center text-sm text-gray-400">
+              No results found
+            </div>
           ) : (
             filteredOptions.map((option) => {
               const isSelected = selected.includes(option);
@@ -134,26 +157,34 @@ function MultiSelectFilter<T extends string | number>({
                   key={String(option)}
                   type="button"
                   onClick={() => onToggle(option)}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-gray-100 text-left"
+                  className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-gray-100"
                 >
                   <div
-                    className={`h-4 w-4 border rounded flex items-center justify-center shrink-0 ${
-                      isSelected ? "bg-un-blue border-un-blue" : "border-gray-300"
+                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                      isSelected
+                        ? "border-un-blue bg-un-blue"
+                        : "border-gray-300"
                     }`}
                   >
                     {isSelected && <Check className="h-3 w-3 text-white" />}
                   </div>
-                  <span className="flex-1 truncate">{renderOption(option)}</span>
+                  <span className="flex-1 truncate">
+                    {renderOption(option)}
+                  </span>
                 </button>
               );
             })
           )}
         </div>
         {hasFilter && (
-          <div className="mt-2 pt-2 border-t">
+          <div className="mt-2 border-t pt-2">
             <button
               type="button"
-              onClick={() => options.forEach((opt) => selected.includes(opt) && onToggle(opt))}
+              onClick={() =>
+                options.forEach(
+                  (opt) => selected.includes(opt) && onToggle(opt),
+                )
+              }
               className="w-full text-xs text-un-blue hover:underline"
             >
               Clear ({selected.length})
@@ -165,11 +196,25 @@ function MultiSelectFilter<T extends string | number>({
   );
 }
 
-const PUBLIC_PROGRESS_OPTIONS = ["in_progress", "delayed", "completed"] as const;
+const PUBLIC_PROGRESS_OPTIONS = [
+  "in_progress",
+  "delayed",
+  "completed",
+] as const;
 
 const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 /** Parse YYYY-MM-DD to YYYY-MM; returns "no_date" if missing/invalid. */
@@ -199,7 +244,9 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
   const [filterWP, setFilterWP] = useState<number[]>([]);
   const [filterAction, setFilterAction] = useState<string[]>([]);
   const [filterMonth, setFilterMonth] = useState<string[]>([]);
-  const [filterPublicProgress, setFilterPublicProgress] = useState<string[]>([]);
+  const [filterPublicProgress, setFilterPublicProgress] = useState<string[]>(
+    [],
+  );
   const [openFilters, setOpenFilters] = useState<Record<string, boolean>>({});
 
   const uniqueWPIds = useMemo(() => {
@@ -208,7 +255,9 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
   }, [rows]);
 
   const uniqueActions = useMemo(() => {
-    const set = new Set(rows.map((r) => actionLabel(r.action_id, r.action_sub_id)));
+    const set = new Set(
+      rows.map((r) => actionLabel(r.action_id, r.action_sub_id)),
+    );
     return Array.from(set).sort((a, b) => {
       const numA = parseInt(a.replace(/\D/g, ""), 10);
       const numB = parseInt(b.replace(/\D/g, ""), 10);
@@ -218,8 +267,12 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
   }, [rows]);
 
   const uniqueMonthKeys = useMemo(() => {
-    const set = new Set(rows.map((r) => getDeadlineMonthKey(r.milestone_deadline)));
-    const list = Array.from(set).filter((k) => k !== "no_date").sort();
+    const set = new Set(
+      rows.map((r) => getDeadlineMonthKey(r.milestone_deadline)),
+    );
+    const list = Array.from(set)
+      .filter((k) => k !== "no_date")
+      .sort();
     if (set.has("no_date")) list.push("no_date");
     return list;
   }, [rows]);
@@ -264,8 +317,10 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
         cmp = da.localeCompare(db);
       } else if (sortField === "public_progress") {
         const order = { completed: 0, in_progress: 1, delayed: 2 };
-        const va = a.public_progress == null ? 1 : order[a.public_progress] ?? 1;
-        const vb = b.public_progress == null ? 1 : order[b.public_progress] ?? 1;
+        const va =
+          a.public_progress == null ? 1 : (order[a.public_progress] ?? 1);
+        const vb =
+          b.public_progress == null ? 1 : (order[b.public_progress] ?? 1);
         cmp = va - vb;
       }
       return cmp * dir;
@@ -308,7 +363,7 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
           </button>
         </div>
       )}
-      <div className="overflow-x-auto overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <div className="overflow-hidden overflow-x-auto rounded-lg border border-gray-200 bg-white">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
@@ -331,7 +386,9 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
                     selected={filterWP}
                     onToggle={(id) =>
                       setFilterWP((prev) =>
-                        prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id],
+                        prev.includes(id)
+                          ? prev.filter((v) => v !== id)
+                          : [...prev, id],
                       )
                     }
                     renderOption={(id) => `WP ${id}`}
@@ -393,7 +450,9 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
                     selected={filterMonth}
                     onToggle={(key) =>
                       setFilterMonth((prev) =>
-                        prev.includes(key) ? prev.filter((v) => v !== key) : [...prev, key],
+                        prev.includes(key)
+                          ? prev.filter((v) => v !== key)
+                          : [...prev, key],
                       )
                     }
                     renderOption={(key) => formatMonthLabel(key)}
@@ -432,7 +491,10 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
                     renderOption={(v) => PUBLIC_PROGRESS_LABELS[v] ?? v}
                     isOpen={openFilters.publicProgress ?? false}
                     onOpenChange={(open) =>
-                      setOpenFilters((prev) => ({ ...prev, publicProgress: open }))
+                      setOpenFilters((prev) => ({
+                        ...prev,
+                        publicProgress: open,
+                      }))
                     }
                     maxWidth="w-40"
                   />
@@ -440,61 +502,61 @@ export function PublicMilestonesTable({ rows }: PublicMilestonesTableProps) {
               </th>
             </tr>
           </thead>
-        <tbody className="divide-y divide-gray-100">
-          {sortedRows.length === 0 ? (
-            <tr>
-              <td
-                colSpan={4}
-                className="px-4 py-12 text-center text-gray-400"
-              >
-                {hasActiveFilters
-                  ? "No public milestones match the filters"
-                  : "No public milestones found"}
-              </td>
-            </tr>
-          ) : (
-            sortedRows.map((r, idx) => (
-              <tr
-                key={`${r.work_package_id}-${r.action_id}-${r.action_sub_id ?? ""}-${idx}`}
-                className="transition-colors hover:bg-gray-50"
-              >
-                <td className="px-3 py-3 whitespace-nowrap">
-                  <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 font-medium text-sm tabular-nums">
-                    {r.work_package_id}
-                  </span>
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                  <Link
-                    href={`/?action=${actionParam(r.action_id, r.action_sub_id)}`}
-                    className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-un-blue/10 text-un-blue font-semibold text-sm tabular-nums hover:bg-un-blue/20"
-                  >
-                    {actionLabel(r.action_id, r.action_sub_id)}
-                  </Link>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="space-y-0.5">
-                    {r.milestone_description?.trim() ? (
-                      <p className="text-gray-700 text-sm">
-                        {r.milestone_description}
-                      </p>
-                    ) : null}
-                    {r.milestone_deadline?.trim() ? (
-                      <p className="text-xs text-gray-500">
-                        {formatUNDate(r.milestone_deadline)}
-                      </p>
-                    ) : r.milestone_description?.trim() ? null : (
-                      <span className="text-gray-400">—</span>
-                    )}
-                  </div>
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                  <PublicProgressBadge value={r.public_progress} />
+          <tbody className="divide-y divide-gray-100">
+            {sortedRows.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={4}
+                  className="px-4 py-12 text-center text-gray-400"
+                >
+                  {hasActiveFilters
+                    ? "No public milestones match the filters"
+                    : "No public milestones found"}
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              sortedRows.map((r, idx) => (
+                <tr
+                  key={`${r.work_package_id}-${r.action_id}-${r.action_sub_id ?? ""}-${idx}`}
+                  className="transition-colors hover:bg-gray-50"
+                >
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <span className="inline-flex items-center justify-center rounded bg-gray-100 px-1.5 py-0.5 text-sm font-medium text-gray-700 tabular-nums">
+                      {r.work_package_id}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <Link
+                      href={`/?action=${actionParam(r.action_id, r.action_sub_id)}`}
+                      className="inline-flex items-center justify-center rounded bg-un-blue/10 px-1.5 py-0.5 text-sm font-semibold text-un-blue tabular-nums hover:bg-un-blue/20"
+                    >
+                      {actionLabel(r.action_id, r.action_sub_id)}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="space-y-0.5">
+                      {r.milestone_description?.trim() ? (
+                        <p className="text-sm text-gray-700">
+                          {r.milestone_description}
+                        </p>
+                      ) : null}
+                      {r.milestone_deadline?.trim() ? (
+                        <p className="text-xs text-gray-500">
+                          {formatUNDate(r.milestone_deadline)}
+                        </p>
+                      ) : r.milestone_description?.trim() ? null : (
+                        <span className="text-gray-400">—</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <PublicProgressBadge value={r.public_progress} />
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );

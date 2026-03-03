@@ -47,7 +47,9 @@ export async function getMilestoneUpdates(
   const isAdmin = adminAuth.authorized;
   const hideInternal = !isAdmin;
 
-  const rows = await query<MilestoneUpdate & { is_legal?: boolean; is_internal?: boolean }>(
+  const rows = await query<
+    MilestoneUpdate & { is_legal?: boolean; is_internal?: boolean }
+  >(
     `SELECT
       u.id,
       u.milestone_id,
@@ -86,7 +88,9 @@ export async function getMilestoneUpdates(
 export async function getMilestoneUpdateById(
   updateId: string,
 ): Promise<MilestoneUpdate | null> {
-  const rows = await query<MilestoneUpdate & { is_legal?: boolean; is_internal?: boolean }>(
+  const rows = await query<
+    MilestoneUpdate & { is_legal?: boolean; is_internal?: boolean }
+  >(
     `SELECT
       u.id,
       u.milestone_id,
@@ -112,5 +116,9 @@ export async function getMilestoneUpdateById(
 
   const r = rows[0];
   if (!r) return null;
-  return { ...r, is_legal: Boolean(r.is_legal), is_internal: Boolean(r.is_internal) };
+  return {
+    ...r,
+    is_legal: Boolean(r.is_legal),
+    is_internal: Boolean(r.is_internal),
+  };
 }

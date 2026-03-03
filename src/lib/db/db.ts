@@ -2,26 +2,23 @@ import { Pool } from "pg";
 
 const globalForDb = global as unknown as { pool: Pool | undefined };
 
-// Build connection config from DATABASE_URL
-function getConnectionConfig() {
-  const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString)
+  throw new Error("Missing required environment variable: DATABASE_URL");
 
-  if (!connectionString) {
-    throw new Error("Missing required environment variable: DATABASE_URL");
-  }
-
-  return {
+// Connects via PgBouncer (port 6432, transaction mode) on Azure PostgreSQL Flexible Server.
+// max:1 — PgBouncer handles server-side pooling; one client per Vercel function instance is enough.
+// allowExitOnIdle — lets the serverless process terminate without waiting on idle pool connections.
+export const pool =
+  globalForDb.pool ||
+  new Pool({
     connectionString,
-    max: 2, // Lower for serverless to avoid connection exhaustion
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 15000, // 15s for slow/cold connections (e.g. Azure, VPN)
-    keepAlive: true, // Prevent Azure network layer from resetting idle TCP connections
-  };
-}
+    max: 1,
+    idleTimeoutMillis: 10000,
+    connectionTimeoutMillis: 5000,
+    allowExitOnIdle: true,
+  });
 
-export const pool = globalForDb.pool || new Pool(getConnectionConfig());
-
-// Prevent unhandled ECONNRESET errors from idle clients being dropped by Azure's network layer
 pool.on("error", (err) => {
   console.error("Unexpected pg pool error:", err.message);
 });

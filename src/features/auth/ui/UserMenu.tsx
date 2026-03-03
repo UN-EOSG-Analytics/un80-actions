@@ -41,13 +41,17 @@ export function UserMenu({ email, entity, isAdmin }: Props) {
             isAdmin
               ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
               : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-          } ${isPending ? "opacity-50 cursor-wait" : "cursor-pointer"}`}
+          } ${isPending ? "cursor-wait opacity-50" : "cursor-pointer"}`}
           title={isAdmin ? "Click to remove Admin" : "Click to become Admin"}
         >
           {isAdmin ? (
-            <><ShieldCheck className="h-3 w-3" /> Admin</>
+            <>
+              <ShieldCheck className="h-3 w-3" /> Admin
+            </>
           ) : (
-            <><ShieldOff className="h-3 w-3" /> User</>
+            <>
+              <ShieldOff className="h-3 w-3" /> User
+            </>
           )}
         </button>
       </div>

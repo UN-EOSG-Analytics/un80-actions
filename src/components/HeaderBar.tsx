@@ -70,7 +70,11 @@ export function Header({ user, isAdmin, children, maxWidth = "7xl" }: Props) {
                 </Link>
               )}
               <ActivityFeed />
-              <UserMenu email={user.email} entity={user.entity} isAdmin={isAdmin} />
+              <UserMenu
+                email={user.email}
+                entity={user.entity}
+                isAdmin={isAdmin}
+              />
             </>
           ) : !isLoginPage ? (
             <Link

@@ -14,7 +14,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AlertCircle, Calendar, Check, ChevronDown, Circle, Clock, MessageSquare, Pencil, Send } from "lucide-react";
+import {
+  AlertCircle,
+  Calendar,
+  Check,
+  ChevronDown,
+  Circle,
+  Clock,
+  MessageSquare,
+  Pencil,
+  Send,
+} from "lucide-react";
 import { formatUNDate } from "@/lib/format-date";
 import type { ActionMilestone } from "@/types";
 import type { MilestoneUpdate } from "@/features/milestones/updates-queries";
@@ -27,7 +37,18 @@ interface MilestoneCardProps {
   onEdit: () => void;
   onComment: () => void;
   onShowHistory: () => void;
-  onStatusChange?: (status: "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed" | "no_submission") => void;
+  onStatusChange?: (
+    status:
+      | "draft"
+      | "approved"
+      | "needs_attention"
+      | "needs_ola_review"
+      | "reviewed_by_ola"
+      | "finalized"
+      | "attention_to_timeline"
+      | "confirmation_needed"
+      | "no_submission",
+  ) => void;
   onDocumentSubmittedChange?: (milestoneId: string, submitted: boolean) => void;
   documentSubmitted?: boolean;
   onPublicProgressChange?: (value: PublicProgressValue) => void;
@@ -57,22 +78,37 @@ export function MilestoneCard({
       return { label: "Finalized", className: "bg-green-100 text-green-700" };
     }
     if (milestone.confirmation_needed) {
-      return { label: "Confirmation needed", className: "bg-orange-100 text-orange-700" };
+      return {
+        label: "Confirmation needed",
+        className: "bg-orange-100 text-orange-700",
+      };
     }
     if (milestone.attention_to_timeline) {
-      return { label: "Attention to timeline", className: "bg-yellow-100 text-yellow-700" };
+      return {
+        label: "Attention to timeline",
+        className: "bg-yellow-100 text-yellow-700",
+      };
     }
     if (milestone.reviewed_by_ola) {
-      return { label: "Reviewed by OLA", className: "bg-blue-100 text-blue-700" };
+      return {
+        label: "Reviewed by OLA",
+        className: "bg-blue-100 text-blue-700",
+      };
     }
     if (milestone.is_approved) {
       return { label: "Approved", className: "bg-green-100 text-green-700" };
     }
     if (milestone.needs_attention) {
-      return { label: "Needs Attention", className: "bg-amber-100 text-amber-700" };
+      return {
+        label: "Needs Attention",
+        className: "bg-amber-100 text-amber-700",
+      };
     }
     if (milestone.needs_ola_review) {
-      return { label: "Needs OLA review", className: "bg-violet-100 text-violet-700" };
+      return {
+        label: "Needs OLA review",
+        className: "bg-violet-100 text-violet-700",
+      };
     }
     return { label: "In Review", className: "bg-blue-100 text-blue-700" };
   };
@@ -80,7 +116,16 @@ export function MilestoneCard({
   const status = getDisplayStatus();
 
   // Determine current status (mutually exclusive)
-  const getCurrentStatus = (): "draft" | "approved" | "needs_attention" | "needs_ola_review" | "reviewed_by_ola" | "finalized" | "attention_to_timeline" | "confirmation_needed" | "in_review" => {
+  const getCurrentStatus = ():
+    | "draft"
+    | "approved"
+    | "needs_attention"
+    | "needs_ola_review"
+    | "reviewed_by_ola"
+    | "finalized"
+    | "attention_to_timeline"
+    | "confirmation_needed"
+    | "in_review" => {
     if (milestone.is_draft) return "draft";
     if (milestone.finalized) return "finalized";
     if (milestone.confirmation_needed) return "confirmation_needed";
@@ -97,7 +142,8 @@ export function MilestoneCard({
   // Display label: Public, First, Second, Third, or Final (as before serial numbering)
   const milestoneLabel = milestone.is_public
     ? "Public"
-    : milestone.milestone_type.charAt(0).toUpperCase() + milestone.milestone_type.slice(1);
+    : milestone.milestone_type.charAt(0).toUpperCase() +
+      milestone.milestone_type.slice(1);
 
   // Past due: deadline has passed (parse YYYY-MM-DD as local date to avoid timezone shift)
   const isPastDue =
@@ -130,15 +176,21 @@ export function MilestoneCard({
               {milestoneLabel}
             </span>
             <div className="min-w-0 flex-1 space-y-1.5">
-              <p className="font-medium leading-snug text-slate-900">
-                {milestone.description || <span className="italic font-normal text-slate-400">No description</span>}
+              <p className="leading-snug font-medium text-slate-900">
+                {milestone.description || (
+                  <span className="font-normal text-slate-400 italic">
+                    No description
+                  </span>
+                )}
               </p>
               {/* Meta row: Badge + Deadline - aligned with title */}
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                 {isAdmin && onStatusChange ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className={`inline-flex items-center gap-1 rounded-full ${status.className} px-2.5 py-0.5 text-xs font-medium transition-colors hover:opacity-80`}>
+                      <button
+                        className={`inline-flex items-center gap-1 rounded-full ${status.className} px-2.5 py-0.5 text-xs font-medium transition-colors hover:opacity-80`}
+                      >
                         {status.label}
                         <ChevronDown className="h-3 w-3" />
                       </button>
@@ -153,7 +205,9 @@ export function MilestoneCard({
                           >
                             <span className="flex w-full items-center justify-between">
                               Draft
-                              {currentStatus === "draft" && <Check className="h-3 w-3" />}
+                              {currentStatus === "draft" && (
+                                <Check className="h-3 w-3" />
+                              )}
                             </span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
@@ -162,7 +216,9 @@ export function MilestoneCard({
                           >
                             <span className="flex w-full items-center justify-between">
                               Needs OLA review
-                              {currentStatus === "needs_ola_review" && <Check className="h-3 w-3" />}
+                              {currentStatus === "needs_ola_review" && (
+                                <Check className="h-3 w-3" />
+                              )}
                             </span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
@@ -171,7 +227,9 @@ export function MilestoneCard({
                           >
                             <span className="flex w-full items-center justify-between">
                               Reviewed by OLA
-                              {currentStatus === "reviewed_by_ola" && <Check className="h-3 w-3" />}
+                              {currentStatus === "reviewed_by_ola" && (
+                                <Check className="h-3 w-3" />
+                              )}
                             </span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
@@ -180,7 +238,9 @@ export function MilestoneCard({
                           >
                             <span className="flex w-full items-center justify-between">
                               Finalized
-                              {currentStatus === "finalized" && <Check className="h-3 w-3" />}
+                              {currentStatus === "finalized" && (
+                                <Check className="h-3 w-3" />
+                              )}
                             </span>
                           </DropdownMenuItem>
                         </>
@@ -193,7 +253,9 @@ export function MilestoneCard({
                           >
                             <span className="flex w-full items-center justify-between">
                               Draft
-                              {currentStatus === "draft" && <Check className="h-3 w-3" />}
+                              {currentStatus === "draft" && (
+                                <Check className="h-3 w-3" />
+                              )}
                             </span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
@@ -202,7 +264,9 @@ export function MilestoneCard({
                           >
                             <span className="flex w-full items-center justify-between">
                               No Submission
-                              {currentStatus === "draft" && <Check className="h-3 w-3" />}
+                              {currentStatus === "draft" && (
+                                <Check className="h-3 w-3" />
+                              )}
                             </span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
@@ -211,25 +275,35 @@ export function MilestoneCard({
                           >
                             <span className="flex w-full items-center justify-between">
                               Needs Attention
-                              {currentStatus === "needs_attention" && <Check className="h-3 w-3" />}
+                              {currentStatus === "needs_attention" && (
+                                <Check className="h-3 w-3" />
+                              )}
                             </span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => onStatusChange("attention_to_timeline")}
+                            onClick={() =>
+                              onStatusChange("attention_to_timeline")
+                            }
                             disabled={currentStatus === "attention_to_timeline"}
                           >
                             <span className="flex w-full items-center justify-between">
                               Attention to timeline
-                              {currentStatus === "attention_to_timeline" && <Check className="h-3 w-3" />}
+                              {currentStatus === "attention_to_timeline" && (
+                                <Check className="h-3 w-3" />
+                              )}
                             </span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => onStatusChange("confirmation_needed")}
+                            onClick={() =>
+                              onStatusChange("confirmation_needed")
+                            }
                             disabled={currentStatus === "confirmation_needed"}
                           >
                             <span className="flex w-full items-center justify-between">
                               Confirmation needed
-                              {currentStatus === "confirmation_needed" && <Check className="h-3 w-3" />}
+                              {currentStatus === "confirmation_needed" && (
+                                <Check className="h-3 w-3" />
+                              )}
                             </span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
@@ -238,7 +312,9 @@ export function MilestoneCard({
                           >
                             <span className="flex w-full items-center justify-between">
                               Approved
-                              {currentStatus === "approved" && <Check className="h-3 w-3" />}
+                              {currentStatus === "approved" && (
+                                <Check className="h-3 w-3" />
+                              )}
                             </span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
@@ -247,7 +323,9 @@ export function MilestoneCard({
                           >
                             <span className="flex w-full items-center justify-between">
                               Finalized
-                              {currentStatus === "finalized" && <Check className="h-3 w-3" />}
+                              {currentStatus === "finalized" && (
+                                <Check className="h-3 w-3" />
+                              )}
                             </span>
                           </DropdownMenuItem>
                         </>
@@ -255,11 +333,17 @@ export function MilestoneCard({
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : isAdmin ? (
-                  <Badge className={`${status.className} text-xs font-medium`}>{status.label}</Badge>
+                  <Badge className={`${status.className} text-xs font-medium`}>
+                    {status.label}
+                  </Badge>
                 ) : null}
                 <span className="flex items-center gap-1.5 text-xs text-slate-500">
                   <Calendar className="h-3 w-3" />
-                  {milestone.deadline ? formatUNDate(milestone.deadline) : <span className="italic">No deadline</span>}
+                  {milestone.deadline ? (
+                    formatUNDate(milestone.deadline)
+                  ) : (
+                    <span className="italic">No deadline</span>
+                  )}
                 </span>
                 {isPastDue && !documentSubmitted && (
                   <span
@@ -269,48 +353,74 @@ export function MilestoneCard({
                     !
                   </span>
                 )}
-                {milestone.is_public && onPublicProgressChange != null && (() => {
-                  const progress = (publicProgress ?? "in_progress") as PublicProgressValue;
-                  const progressStyle = {
-                    completed: "border-green-300 bg-green-50 text-green-800 hover:bg-green-100",
-                    in_progress: "border-blue-200 bg-blue-50/80 text-blue-800 hover:bg-blue-100/80",
-                    delayed: "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100",
-                  }[progress];
-                  return (
-                    <span className="inline-flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                      <Select
-                        value={progress}
-                        onValueChange={(value: PublicProgressValue) => onPublicProgressChange(value)}
+                {milestone.is_public &&
+                  onPublicProgressChange != null &&
+                  (() => {
+                    const progress = (publicProgress ??
+                      "in_progress") as PublicProgressValue;
+                    const progressStyle = {
+                      completed:
+                        "border-green-300 bg-green-50 text-green-800 hover:bg-green-100",
+                      in_progress:
+                        "border-blue-200 bg-blue-50/80 text-blue-800 hover:bg-blue-100/80",
+                      delayed:
+                        "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100",
+                    }[progress];
+                    return (
+                      <span
+                        className="inline-flex items-center gap-1.5"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        <SelectTrigger
-                          className={`inline-flex h-7 min-w-32 items-center gap-1.5 rounded-full border px-3 py-0.5 text-xs font-medium shadow-sm transition-colors ${progressStyle}`}
+                        <Select
+                          value={progress}
+                          onValueChange={(value: PublicProgressValue) =>
+                            onPublicProgressChange(value)
+                          }
                         >
-                          <SelectValue className="text-xs" />
-                        </SelectTrigger>
-                        <SelectContent className="min-w-40" align="start">
-                          <SelectItem value="completed" className="flex items-center gap-2 py-2">
-                            <Check className="h-4 w-4 text-green-600" />
-                            <span>Completed</span>
-                          </SelectItem>
-                          <SelectItem value="in_progress" className="flex items-center gap-2 py-2">
-                            <Circle className="h-4 w-4 text-blue-600" />
-                            <span>In progress</span>
-                          </SelectItem>
-                          <SelectItem value="delayed" className="flex items-center gap-2 py-2">
-                            <AlertCircle className="h-4 w-4 text-amber-600" />
-                            <span>Delayed</span>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </span>
-                  );
-                })()}
+                          <SelectTrigger
+                            className={`inline-flex h-7 min-w-32 items-center gap-1.5 rounded-full border px-3 py-0.5 text-xs font-medium shadow-sm transition-colors ${progressStyle}`}
+                          >
+                            <SelectValue className="text-xs" />
+                          </SelectTrigger>
+                          <SelectContent className="min-w-40" align="start">
+                            <SelectItem
+                              value="completed"
+                              className="flex items-center gap-2 py-2"
+                            >
+                              <Check className="h-4 w-4 text-green-600" />
+                              <span>Completed</span>
+                            </SelectItem>
+                            <SelectItem
+                              value="in_progress"
+                              className="flex items-center gap-2 py-2"
+                            >
+                              <Circle className="h-4 w-4 text-blue-600" />
+                              <span>In progress</span>
+                            </SelectItem>
+                            <SelectItem
+                              value="delayed"
+                              className="flex items-center gap-2 py-2"
+                            >
+                              <AlertCircle className="h-4 w-4 text-amber-600" />
+                              <span>Delayed</span>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </span>
+                    );
+                  })()}
                 {onDocumentSubmittedChange != null && (
-                  <span className="inline-flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                  <span
+                    className="inline-flex items-center gap-1.5"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <Select
                       value={documentSubmitted ? "submitted" : "not_submitted"}
                       onValueChange={(value: "submitted" | "not_submitted") => {
-                        onDocumentSubmittedChange(milestone.id, value === "submitted");
+                        onDocumentSubmittedChange(
+                          milestone.id,
+                          value === "submitted",
+                        );
                       }}
                     >
                       <SelectTrigger
@@ -328,7 +438,9 @@ export function MilestoneCard({
                         <SelectValue className="text-xs" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="not_submitted">Not submitted</SelectItem>
+                        <SelectItem value="not_submitted">
+                          Not submitted
+                        </SelectItem>
                         <SelectItem value="submitted">Submitted</SelectItem>
                       </SelectContent>
                     </Select>
@@ -361,7 +473,7 @@ export function MilestoneCard({
           >
             <MessageSquare className="h-4 w-4" />
             {updates.length > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-un-blue text-[9px] font-semibold text-white">
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-un-blue text-[9px] font-semibold text-white">
                 {updates.length}
               </span>
             )}

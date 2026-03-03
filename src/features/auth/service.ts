@@ -6,7 +6,9 @@ import { query } from "../../lib/db/db";
 const getSecret = () => {
   const secret = process.env.AUTH_SECRET;
   if (!secret) {
-    throw new Error("AUTH_SECRET must be set in environment variables. Generate one with: openssl rand -base64 32");
+    throw new Error(
+      "AUTH_SECRET must be set in environment variables. Generate one with: openssl rand -base64 32",
+    );
   }
   return secret;
 };
@@ -139,7 +141,10 @@ export async function getCurrentUser() {
     };
   } catch (err) {
     // Connection timeout / ECONNRESET / DB unreachable: treat as no user so app still renders
-    console.error("[auth] getCurrentUser DB error:", err instanceof Error ? err.message : err);
+    console.error(
+      "[auth] getCurrentUser DB error:",
+      err instanceof Error ? err.message : err,
+    );
     return null;
   }
 }

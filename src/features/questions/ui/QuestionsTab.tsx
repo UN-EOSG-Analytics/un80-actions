@@ -34,11 +34,31 @@ import { ReviewStatus } from "@/features/shared/ReviewStatus";
 import { TagSelector } from "@/features/shared/TagSelector";
 import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
-import type { Action, ActionQuestion, ActionMilestone, ActionNote } from "@/types";
+import type {
+  Action,
+  ActionQuestion,
+  ActionMilestone,
+  ActionNote,
+} from "@/types";
 import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
-import { applyBoldShortcut, applyStrikethroughShortcut, BoldText } from "@/features/shared/markdown-bold";
+import {
+  applyBoldShortcut,
+  applyStrikethroughShortcut,
+  BoldText,
+} from "@/features/shared/markdown-bold";
 import { NoteEditor, isNoteContentEmpty } from "@/features/notes/ui/NoteEditor";
-import { Loader2, MessageCircle, Send, Trash2, Pencil, X, StickyNote, ChevronDown, Bold, Minus } from "lucide-react";
+import {
+  Loader2,
+  MessageCircle,
+  Send,
+  Trash2,
+  Pencil,
+  X,
+  StickyNote,
+  ChevronDown,
+  Bold,
+  Minus,
+} from "lucide-react";
 import { useEffect, useState, useRef, useCallback } from "react";
 
 // =========================================================
@@ -98,7 +118,10 @@ function SelectableText({
       const range = selection.getRangeAt(0);
       const selectedText = selection.toString().trim();
 
-      if (selectedText.length === 0 || !textRef.current?.contains(range.commonAncestorContainer)) {
+      if (
+        selectedText.length === 0 ||
+        !textRef.current?.contains(range.commonAncestorContainer)
+      ) {
         setSelection(null);
         setPopoverOpen(false);
         return;
@@ -106,16 +129,18 @@ function SelectableText({
 
       // Get plain text (without markdown formatting) to find positions
       const plainText = textRef.current.textContent || "";
-      
+
       // Create a mapping: for each character in plainText, find its position in original text
       let plainIndex = 0;
       const plainToOriginal: number[] = [];
-      
+
       for (let i = 0; i < text.length; i++) {
         const char = text[i];
         // Skip markdown markers
-        if (char === "*" && (text[i + 1] === "*" || text[i - 1] === "*")) continue;
-        if (char === "~" && (text[i + 1] === "~" || text[i - 1] === "~")) continue;
+        if (char === "*" && (text[i + 1] === "*" || text[i - 1] === "*"))
+          continue;
+        if (char === "~" && (text[i + 1] === "~" || text[i - 1] === "~"))
+          continue;
         plainToOriginal[plainIndex] = i;
         plainIndex++;
       }
@@ -124,7 +149,7 @@ function SelectableText({
       let selectionStartInPlain = -1;
       // Try to find exact match first
       selectionStartInPlain = plainText.indexOf(selectedText);
-      
+
       // If not found, try without trimming
       if (selectionStartInPlain === -1) {
         const untrimmed = selection.toString();
@@ -138,10 +163,12 @@ function SelectableText({
       }
 
       const selectionEndInPlain = selectionStartInPlain + selectedText.length;
-      const startPos = plainToOriginal[selectionStartInPlain] ?? selectionStartInPlain;
-      const endPos = plainToOriginal[selectionEndInPlain - 1] !== undefined 
-        ? plainToOriginal[selectionEndInPlain - 1] + 1 
-        : selectionEndInPlain;
+      const startPos =
+        plainToOriginal[selectionStartInPlain] ?? selectionStartInPlain;
+      const endPos =
+        plainToOriginal[selectionEndInPlain - 1] !== undefined
+          ? plainToOriginal[selectionEndInPlain - 1] + 1
+          : selectionEndInPlain;
 
       // Get the bounding rect of the selection (kept for any future use)
       const rect = range.getBoundingClientRect();
@@ -171,56 +198,65 @@ function SelectableText({
     }, 50); // Small debounce for smoother experience
   }, [text]);
 
-  const handleDoubleClick = useCallback((e: React.MouseEvent) => {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
+  const handleDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return;
 
-    const range = selection.getRangeAt(0);
-    
-    // Expand selection to word boundaries on double-click
-    try {
-      // Try using modify method (non-standard but widely supported)
-      const selectionWithModify = selection as Selection & { modify?: (alter: string, direction: string, granularity: string) => void };
-      if (selectionWithModify.modify) {
-        selectionWithModify.modify("extend", "forward", "word");
-        selectionWithModify.modify("extend", "backward", "word");
-      } else {
-        // Fallback: manually find word boundaries
-        const textNode = range.startContainer;
-        if (textNode.nodeType === Node.TEXT_NODE) {
-          const text = textNode.textContent || "";
-          const offset = range.startOffset;
-          
-          // Find word start (backward)
-          let start = offset;
-          while (start > 0 && /\w/.test(text[start - 1])) {
-            start--;
+      const range = selection.getRangeAt(0);
+
+      // Expand selection to word boundaries on double-click
+      try {
+        // Try using modify method (non-standard but widely supported)
+        const selectionWithModify = selection as Selection & {
+          modify?: (
+            alter: string,
+            direction: string,
+            granularity: string,
+          ) => void;
+        };
+        if (selectionWithModify.modify) {
+          selectionWithModify.modify("extend", "forward", "word");
+          selectionWithModify.modify("extend", "backward", "word");
+        } else {
+          // Fallback: manually find word boundaries
+          const textNode = range.startContainer;
+          if (textNode.nodeType === Node.TEXT_NODE) {
+            const text = textNode.textContent || "";
+            const offset = range.startOffset;
+
+            // Find word start (backward)
+            let start = offset;
+            while (start > 0 && /\w/.test(text[start - 1])) {
+              start--;
+            }
+
+            // Find word end (forward)
+            let end = offset;
+            while (end < text.length && /\w/.test(text[end])) {
+              end++;
+            }
+
+            // Create new range for the word
+            const newRange = document.createRange();
+            newRange.setStart(textNode, start);
+            newRange.setEnd(textNode, end);
+            selection.removeAllRanges();
+            selection.addRange(newRange);
           }
-          
-          // Find word end (forward)
-          let end = offset;
-          while (end < text.length && /\w/.test(text[end])) {
-            end++;
-          }
-          
-          // Create new range for the word
-          const newRange = document.createRange();
-          newRange.setStart(textNode, start);
-          newRange.setEnd(textNode, end);
-          selection.removeAllRanges();
-          selection.addRange(newRange);
         }
+      } catch (err) {
+        // If expansion fails, use current selection
+        console.warn("Could not expand selection to word:", err);
       }
-    } catch (err) {
-      // If expansion fails, use current selection
-      console.warn("Could not expand selection to word:", err);
-    }
-    
-    // Trigger selection handler after a brief delay to ensure selection is set
-    setTimeout(() => {
-      handleSelection();
-    }, 10);
-  }, [handleSelection]);
+
+      // Trigger selection handler after a brief delay to ensure selection is set
+      setTimeout(() => {
+        handleSelection();
+      }, 10);
+    },
+    [handleSelection],
+  );
 
   useEffect(() => {
     const handleMouseUp = () => {
@@ -229,7 +265,7 @@ function SelectableText({
 
     document.addEventListener("mouseup", handleMouseUp);
     document.addEventListener("selectionchange", handleSelection);
-    
+
     return () => {
       document.removeEventListener("mouseup", handleMouseUp);
       document.removeEventListener("selectionchange", handleSelection);
@@ -269,7 +305,10 @@ function SelectableText({
 
   if (!isAdmin) {
     return (
-      <p ref={textRef} className="whitespace-pre-wrap text-[15px] leading-relaxed text-slate-700">
+      <p
+        ref={textRef}
+        className="text-[15px] leading-relaxed whitespace-pre-wrap text-slate-700"
+      >
         <BoldText>{text}</BoldText>
       </p>
     );
@@ -281,9 +320,9 @@ function SelectableText({
         <PopoverAnchor asChild>
           <span ref={anchorRef} className="pointer-events-none" />
         </PopoverAnchor>
-        <PopoverContent 
-          className="w-auto p-1.5 shadow-lg z-50" 
-          align="center" 
+        <PopoverContent
+          className="z-50 w-auto p-1.5 shadow-lg"
+          align="center"
           side="top"
           sideOffset={0}
           alignOffset={0}
@@ -297,7 +336,7 @@ function SelectableText({
               onClick={() => applyFormatting("bold")}
               className="h-8 px-2.5 text-xs font-medium hover:bg-slate-50"
             >
-              <Bold className="h-3.5 w-3.5 mr-1.5" />
+              <Bold className="mr-1.5 h-3.5 w-3.5" />
               Bold
             </Button>
             <Button
@@ -306,15 +345,15 @@ function SelectableText({
               onClick={() => applyFormatting("strikethrough")}
               className="h-8 px-2.5 text-xs font-medium hover:bg-slate-50"
             >
-              <Minus className="h-3.5 w-3.5 mr-1.5" />
+              <Minus className="mr-1.5 h-3.5 w-3.5" />
               Strikethrough
             </Button>
           </div>
         </PopoverContent>
       </Popover>
-      <p 
-        ref={textRef} 
-        className="whitespace-pre-wrap text-[15px] leading-relaxed text-slate-700 select-text cursor-text"
+      <p
+        ref={textRef}
+        className="cursor-text text-[15px] leading-relaxed whitespace-pre-wrap text-slate-700 select-text"
         onMouseUp={handleSelection}
         onDoubleClick={handleDoubleClick}
       >
@@ -335,7 +374,10 @@ export default function QuestionsTab({
 }: {
   action: Action;
   isAdmin?: boolean;
-  exportProps?: { onExport: (format: "word" | "pdf" | "markdown") => void; exporting: boolean };
+  exportProps?: {
+    onExport: (format: "word" | "pdf" | "markdown") => void;
+    exporting: boolean;
+  };
 }) {
   const [questions, setQuestions] = useState<ActionQuestion[]>([]);
   const [milestones, setMilestones] = useState<ActionMilestone[]>([]);
@@ -365,7 +407,13 @@ export default function QuestionsTab({
   const [tagsByQuestionId, setTagsByQuestionId] = useState<
     Record<string, Tag[]>
   >({});
-  const HEADER_OPTIONS = ["Task Force", "Steering Committee", "Check-ins", "Unspecified", "Other"];
+  const HEADER_OPTIONS = [
+    "Task Force",
+    "Steering Committee",
+    "Check-ins",
+    "Unspecified",
+    "Other",
+  ];
   const MILESTONE_NONE_VALUE = "__none__";
 
   const loadQuestions = async () => {
@@ -413,7 +461,11 @@ export default function QuestionsTab({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newQuestion.header.trim() || !newQuestion.question_date || isNoteContentEmpty(newQuestion.question)) {
+    if (
+      !newQuestion.header.trim() ||
+      !newQuestion.question_date ||
+      isNoteContentEmpty(newQuestion.question)
+    ) {
       setError("Please fill in all fields");
       return;
     }
@@ -422,7 +474,7 @@ export default function QuestionsTab({
     setError(null);
 
     try {
-      const         result = await createQuestion({
+      const result = await createQuestion({
         action_id: action.id,
         action_sub_id: action.sub_id || "",
         header: newQuestion.header.trim(),
@@ -445,7 +497,9 @@ export default function QuestionsTab({
         setError(result.error || "Failed to submit question");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to submit question");
+      setError(
+        err instanceof Error ? err.message : "Failed to submit question",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -490,7 +544,11 @@ export default function QuestionsTab({
 
   const handleSaveEdit = async () => {
     if (!editingId) return;
-    if (!editingQuestion.header.trim() || !editingQuestion.question_date || isNoteContentEmpty(editingQuestion.question)) {
+    if (
+      !editingQuestion.header.trim() ||
+      !editingQuestion.question_date ||
+      isNoteContentEmpty(editingQuestion.question)
+    ) {
       setError("Please fill in all fields");
       return;
     }
@@ -513,7 +571,9 @@ export default function QuestionsTab({
         setError(result.error || "Failed to update question");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update question");
+      setError(
+        err instanceof Error ? err.message : "Failed to update question",
+      );
     } finally {
       setSaving(false);
     }
@@ -561,7 +621,7 @@ export default function QuestionsTab({
                       </span>
                     )}
                   </div>
-                  <p className="whitespace-pre-wrap text-sm text-slate-600 line-clamp-3">
+                  <p className="line-clamp-3 text-sm whitespace-pre-wrap text-slate-600">
                     <BoldText>{note.content}</BoldText>
                   </p>
                   <p className="mt-1 text-xs text-slate-400">
@@ -577,7 +637,7 @@ export default function QuestionsTab({
       {/* Ask Question Form */}
       <form
         onSubmit={handleSubmit}
-        className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-4"
+        className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
       >
         <label className="block text-base font-semibold text-slate-800">
           Ask a question
@@ -588,7 +648,9 @@ export default function QuestionsTab({
           </label>
           <Select
             value={newQuestion.header}
-            onValueChange={(value) => setNewQuestion({ ...newQuestion, header: value })}
+            onValueChange={(value) =>
+              setNewQuestion({ ...newQuestion, header: value })
+            }
             disabled={submitting}
             required
           >
@@ -611,7 +673,9 @@ export default function QuestionsTab({
           <input
             type="date"
             value={newQuestion.question_date}
-            onChange={(e) => setNewQuestion({ ...newQuestion, question_date: e.target.value })}
+            onChange={(e) =>
+              setNewQuestion({ ...newQuestion, question_date: e.target.value })
+            }
             className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
             disabled={submitting}
             required
@@ -623,7 +687,9 @@ export default function QuestionsTab({
           </label>
           <NoteEditor
             value={newQuestion.comment}
-            onChange={(html) => setNewQuestion({ ...newQuestion, comment: html })}
+            onChange={(html) =>
+              setNewQuestion({ ...newQuestion, comment: html })
+            }
             placeholder="Add any additional context or notes related to these questions..."
             disabled={submitting}
             minRows={2}
@@ -635,7 +701,9 @@ export default function QuestionsTab({
           </label>
           <NoteEditor
             value={newQuestion.question}
-            onChange={(html) => setNewQuestion({ ...newQuestion, question: html })}
+            onChange={(html) =>
+              setNewQuestion({ ...newQuestion, question: html })
+            }
             placeholder="Enter your question..."
             disabled={submitting}
             minRows={3}
@@ -647,7 +715,12 @@ export default function QuestionsTab({
           </label>
           <Select
             value={newQuestion.milestone_id || MILESTONE_NONE_VALUE}
-            onValueChange={(value) => setNewQuestion({ ...newQuestion, milestone_id: value === MILESTONE_NONE_VALUE ? "" : value })}
+            onValueChange={(value) =>
+              setNewQuestion({
+                ...newQuestion,
+                milestone_id: value === MILESTONE_NONE_VALUE ? "" : value,
+              })
+            }
             disabled={submitting}
           >
             <SelectTrigger className="w-full">
@@ -656,11 +729,11 @@ export default function QuestionsTab({
             <SelectContent>
               <SelectItem value={MILESTONE_NONE_VALUE}>None</SelectItem>
               {milestones.map((milestone) => {
-                const milestoneId = milestone.action_sub_id 
-                  ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}` 
+                const milestoneId = milestone.action_sub_id
+                  ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
                   : `${milestone.action_id}.${milestone.serial_number}`;
-                const label = milestone.description 
-                  ? `${milestoneId}: ${milestone.description.substring(0, 50)}${milestone.description.length > 50 ? '...' : ''}`
+                const label = milestone.description
+                  ? `${milestoneId}: ${milestone.description.substring(0, 50)}${milestone.description.length > 50 ? "..." : ""}`
                   : milestoneId;
                 return (
                   <SelectItem key={milestone.id} value={milestone.id}>
@@ -674,17 +747,22 @@ export default function QuestionsTab({
         <div className="flex justify-end">
           <Button
             type="submit"
-            disabled={submitting || !newQuestion.header.trim() || !newQuestion.question_date || isNoteContentEmpty(newQuestion.question)}
+            disabled={
+              submitting ||
+              !newQuestion.header.trim() ||
+              !newQuestion.question_date ||
+              isNoteContentEmpty(newQuestion.question)
+            }
             className="bg-un-blue hover:bg-un-blue/90"
           >
             {submitting ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Submitting...
               </>
             ) : (
               <>
-                <Send className="h-4 w-4 mr-2" />
+                <Send className="mr-2 h-4 w-4" />
                 Submit Question
               </>
             )}
@@ -712,203 +790,219 @@ export default function QuestionsTab({
           {questions.map((q) => {
             const isEditing = editingId === q.id;
             return (
-              <Collapsible
-                key={q.id}
-                open={editingId === q.id}
-              >
+              <Collapsible key={q.id} open={editingId === q.id}>
                 <div className="rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md">
-                {!isEditing && (
-                  <>
-                    <div className="flex items-start justify-between gap-4 p-5">
-                      <div className="min-w-0 flex-1 space-y-4">
-                        {/* Header: category, date, milestone */}
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                          {q.header && (
-                            <div className="flex items-center gap-2">
-                              <span className="flex h-8 items-center justify-center rounded-lg bg-un-blue/10 px-2.5">
-                                <MessageCircle className="h-4 w-4 text-un-blue" />
+                  {!isEditing && (
+                    <>
+                      <div className="flex items-start justify-between gap-4 p-5">
+                        <div className="min-w-0 flex-1 space-y-4">
+                          {/* Header: category, date, milestone */}
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                            {q.header && (
+                              <div className="flex items-center gap-2">
+                                <span className="flex h-8 items-center justify-center rounded-lg bg-un-blue/10 px-2.5">
+                                  <MessageCircle className="h-4 w-4 text-un-blue" />
+                                </span>
+                                <h4 className="text-base font-semibold tracking-tight text-slate-800">
+                                  {q.header}
+                                </h4>
+                              </div>
+                            )}
+                            {q.question_date && (
+                              <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                                {formatUNDate(q.question_date)}
                               </span>
-                              <h4 className="text-base font-semibold tracking-tight text-slate-800">
-                                {q.header}
-                              </h4>
+                            )}
+                            {q.milestone_id &&
+                              (() => {
+                                const milestone = milestones.find(
+                                  (m) => m.id === q.milestone_id,
+                                );
+                                if (milestone) {
+                                  const milestoneId = milestone.action_sub_id
+                                    ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
+                                    : `${milestone.action_id}.${milestone.serial_number}`;
+                                  return (
+                                    <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                                      Milestone {milestoneId}
+                                    </span>
+                                  );
+                                }
+                                return null;
+                              })()}
+                          </div>
+                          {/* Notes on questions (if any) */}
+                          {q.comment && (
+                            <div className="rounded-lg border border-slate-200 bg-slate-50/80 px-4 py-2.5">
+                              <p className="mb-1 text-xs font-medium text-slate-500">
+                                Notes (on questions)
+                              </p>
+                              {q.comment.trim().startsWith("<") ? (
+                                <div
+                                  className="prose prose-sm max-w-none text-sm leading-relaxed text-slate-700 [&_li]:my-0.5 [&_p]:my-1 [&_p]:whitespace-pre-wrap [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6"
+                                  dangerouslySetInnerHTML={{
+                                    __html: q.comment,
+                                  }}
+                                />
+                              ) : (
+                                <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
+                                  <BoldText>{q.comment}</BoldText>
+                                </p>
+                              )}
                             </div>
                           )}
-                          {q.question_date && (
-                            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                              {formatUNDate(q.question_date)}
-                            </span>
-                          )}
-                          {q.milestone_id && (() => {
-                            const milestone = milestones.find(m => m.id === q.milestone_id);
-                            if (milestone) {
-                              const milestoneId = milestone.action_sub_id 
-                                ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}` 
-                                : `${milestone.action_id}.${milestone.serial_number}`;
-                              return (
-                                <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                                  Milestone {milestoneId}
-                                </span>
-                              );
-                            }
-                            return null;
-                          })()}
-                        </div>
-                        {/* Notes on questions (if any) */}
-                        {q.comment && (
-                          <div className="rounded-lg border border-slate-200 bg-slate-50/80 px-4 py-2.5">
-                            <p className="text-xs font-medium text-slate-500 mb-1">Notes (on questions)</p>
-                            {q.comment.trim().startsWith("<") ? (
+                          {/* Question body */}
+                          <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-4 py-3">
+                            {q.question.trim().startsWith("<") ? (
                               <div
-                                className="prose prose-sm max-w-none text-sm leading-relaxed text-slate-700 [&_p]:whitespace-pre-wrap [&_p]:my-1 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6 [&_li]:my-0.5"
-                                dangerouslySetInnerHTML={{ __html: q.comment }}
+                                className="prose prose-sm max-w-none text-sm leading-relaxed text-slate-700 [&_li]:my-0.5 [&_p]:my-1 [&_p]:whitespace-pre-wrap [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6"
+                                dangerouslySetInnerHTML={{ __html: q.question }}
                               />
                             ) : (
-                              <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
-                                <BoldText>{q.comment}</BoldText>
-                              </p>
+                              <SelectableText
+                                text={q.question}
+                                questionId={q.id}
+                                onUpdate={async (newText) => {
+                                  // Optimistic update: show new text immediately
+                                  setQuestions((prev) =>
+                                    prev.map((qq) =>
+                                      qq.id === q.id
+                                        ? { ...qq, question: newText }
+                                        : qq,
+                                    ),
+                                  );
+                                  // Persist in background (no full refetch)
+                                  await updateQuestion(q.id, {
+                                    header: q.header || "",
+                                    question_date: q.question_date || "",
+                                    question: newText,
+                                    milestone_id: q.milestone_id || null,
+                                  });
+                                }}
+                                isAdmin={isAdmin}
+                              />
                             )}
                           </div>
-                        )}
-                        {/* Question body */}
-                        <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-4 py-3">
-                          {q.question.trim().startsWith("<") ? (
-                            <div
-                              className="prose prose-sm max-w-none text-sm leading-relaxed text-slate-700 [&_p]:whitespace-pre-wrap [&_p]:my-1 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6 [&_li]:my-0.5"
-                              dangerouslySetInnerHTML={{ __html: q.question }}
-                            />
-                          ) : (
-                            <SelectableText
-                              text={q.question}
-                              questionId={q.id}
-                              onUpdate={async (newText) => {
-                                // Optimistic update: show new text immediately
-                                setQuestions((prev) =>
-                                  prev.map((qq) =>
-                                    qq.id === q.id ? { ...qq, question: newText } : qq
-                                  )
-                                );
-                                // Persist in background (no full refetch)
-                                await updateQuestion(q.id, {
-                                  header: q.header || "",
-                                  question_date: q.question_date || "",
-                                  question: newText,
-                                  milestone_id: q.milestone_id || null,
-                                });
-                              }}
-                              isAdmin={isAdmin}
-                            />
+                          {q.answer && (
+                            <div className="rounded-lg border-l-4 border-green-300 bg-green-50/80 px-4 py-3">
+                              <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
+                                <BoldText>{q.answer}</BoldText>
+                              </p>
+                              {q.answered_at && (
+                                <p className="mt-2 text-xs font-medium text-slate-500">
+                                  Answered {formatUNDateTime(q.answered_at)}
+                                  {q.answered_by_email &&
+                                    ` by ${q.answered_by_email}`}
+                                </p>
+                              )}
+                            </div>
                           )}
-                        </div>
-                        {q.answer && (
-                          <div className="rounded-lg border-l-4 border-green-300 bg-green-50/80 px-4 py-3">
-                            <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
-                              <BoldText>{q.answer}</BoldText>
+                          {/* Footer: meta + actions */}
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-slate-100 pt-3">
+                            <p className="text-xs text-slate-500">
+                              <span className="font-medium text-slate-600">
+                                {formatUNDateTime(q.created_at)}
+                              </span>
+                              <span className="mx-1.5">·</span>
+                              <span>{q.user_email}</span>
                             </p>
-                            {q.answered_at && (
-                              <p className="mt-2 text-xs font-medium text-slate-500">
-                                Answered {formatUNDateTime(q.answered_at)}
-                                {q.answered_by_email && ` by ${q.answered_by_email}`}
-                              </p>
-                            )}
-                          </div>
-                        )}
-                        {/* Footer: meta + actions */}
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-slate-100 pt-3">
-                          <p className="text-xs text-slate-500">
-                            <span className="font-medium text-slate-600">{formatUNDateTime(q.created_at)}</span>
-                            <span className="mx-1.5">·</span>
-                            <span>{q.user_email}</span>
-                          </p>
-                          <ReviewStatus
-                            status={q.content_review_status ?? "approved"}
-                            reviewedByEmail={q.content_reviewed_by_email}
-                            reviewedAt={q.content_reviewed_at}
-                            isAdmin={isAdmin}
-                            onApprove={async () => {
-                              setApprovingId(q.id);
-                              try {
-                                const result = await approveQuestion(q.id);
-                                if (result.success) {
-                                  await loadQuestions();
+                            <ReviewStatus
+                              status={q.content_review_status ?? "approved"}
+                              reviewedByEmail={q.content_reviewed_by_email}
+                              reviewedAt={q.content_reviewed_at}
+                              isAdmin={isAdmin}
+                              onApprove={async () => {
+                                setApprovingId(q.id);
+                                try {
+                                  const result = await approveQuestion(q.id);
+                                  if (result.success) {
+                                    await loadQuestions();
+                                  }
+                                } finally {
+                                  setApprovingId(null);
                                 }
-                              } finally {
-                                setApprovingId(null);
-                              }
-                            }}
-                            approving={approvingId === q.id}
-                          />
-                          {!q.answer && (
+                              }}
+                              approving={approvingId === q.id}
+                            />
+                            {!q.answer && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 gap-1.5 text-slate-500 hover:bg-slate-100 hover:text-un-blue"
+                                onClick={() => startEditing(q)}
+                                aria-label="Edit question"
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                                Edit
+                              </Button>
+                            )}
                             <Button
                               type="button"
                               variant="ghost"
                               size="sm"
-                              className="h-8 gap-1.5 text-slate-500 hover:bg-slate-100 hover:text-un-blue"
-                              onClick={() => startEditing(q)}
-                              aria-label="Edit question"
+                              className="h-8 gap-1.5 text-slate-500 hover:bg-red-50 hover:text-red-600"
+                              onClick={() => handleDelete(q.id)}
+                              disabled={deletingId === q.id}
+                              aria-label="Delete question"
                             >
-                              <Pencil className="h-3.5 w-3.5" />
-                              Edit
+                              {deletingId === q.id ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-3.5 w-3.5" />
+                              )}
+                              Delete
                             </Button>
+                          </div>
+                        </div>
+                        <div className="flex shrink-0 flex-col items-end gap-2">
+                          {(tagsByQuestionId[q.id] ?? []).length > 0 && (
+                            <span className="flex flex-wrap justify-end gap-1.5">
+                              {(tagsByQuestionId[q.id] ?? []).map((t) => (
+                                <Badge
+                                  key={t.id}
+                                  variant="secondary"
+                                  className="border-0 bg-un-blue/10 text-un-blue hover:bg-un-blue/20"
+                                >
+                                  {t.name}
+                                </Badge>
+                              ))}
+                            </span>
                           )}
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 gap-1.5 text-slate-500 hover:bg-red-50 hover:text-red-600"
-                            onClick={() => handleDelete(q.id)}
-                            disabled={deletingId === q.id}
-                            aria-label="Delete question"
-                          >
-                            {deletingId === q.id ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            ) : (
-                              <Trash2 className="h-3.5 w-3.5" />
-                            )}
-                            Delete
-                          </Button>
+                          <TagSelector
+                            entityId={q.id}
+                            entityType="question"
+                            isAdmin={isAdmin}
+                            initialTags={[]}
+                            onTagsChange={(tags) =>
+                              setTagsByQuestionId((prev) => ({
+                                ...prev,
+                                [q.id]: tags,
+                              }))
+                            }
+                            hideInlineTags
+                          />
                         </div>
                       </div>
-                      <div className="flex shrink-0 flex-col items-end gap-2">
-                        {(tagsByQuestionId[q.id] ?? []).length > 0 && (
-                          <span className="flex flex-wrap justify-end gap-1.5">
-                            {(tagsByQuestionId[q.id] ?? []).map((t) => (
-                              <Badge
-                                key={t.id}
-                                variant="secondary"
-                                className="border-0 bg-un-blue/10 text-un-blue hover:bg-un-blue/20"
-                              >
-                                {t.name}
-                              </Badge>
-                            ))}
-                          </span>
-                        )}
-                        <TagSelector
-                          entityId={q.id}
-                          entityType="question"
-                          isAdmin={isAdmin}
-                          initialTags={[]}
-                          onTagsChange={(tags) =>
-                            setTagsByQuestionId((prev) => ({
-                              ...prev,
-                              [q.id]: tags,
-                            }))
-                          }
-                          hideInlineTags
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
+                    </>
+                  )}
                 </div>
                 <CollapsibleContent>
                   <div className="border-t border-slate-200 p-4">
                     {isEditing ? (
                       <div className="space-y-4">
                         <div>
-                          <label className="mb-1.5 block text-xs font-medium text-slate-600">Header *</label>
+                          <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                            Header *
+                          </label>
                           <Select
                             value={editingQuestion.header}
-                            onValueChange={(value) => setEditingQuestion({ ...editingQuestion, header: value })}
+                            onValueChange={(value) =>
+                              setEditingQuestion({
+                                ...editingQuestion,
+                                header: value,
+                              })
+                            }
                             disabled={saving}
                           >
                             <SelectTrigger className="w-full">
@@ -916,33 +1010,55 @@ export default function QuestionsTab({
                             </SelectTrigger>
                             <SelectContent className="max-h-56">
                               {HEADER_OPTIONS.map((option) => (
-                                <SelectItem key={option} value={option}>{option}</SelectItem>
+                                <SelectItem key={option} value={option}>
+                                  {option}
+                                </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs font-medium text-slate-600">Date *</label>
+                          <label className="mb-1 block text-xs font-medium text-slate-600">
+                            Date *
+                          </label>
                           <input
                             type="date"
                             value={editingQuestion.question_date}
-                            onChange={(e) => setEditingQuestion({ ...editingQuestion, question_date: e.target.value })}
+                            onChange={(e) =>
+                              setEditingQuestion({
+                                ...editingQuestion,
+                                question_date: e.target.value,
+                              })
+                            }
                             className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
                             disabled={saving}
                           />
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs font-medium text-slate-600">Milestone (optional)</label>
+                          <label className="mb-1 block text-xs font-medium text-slate-600">
+                            Milestone (optional)
+                          </label>
                           <Select
-                            value={editingQuestion.milestone_id || MILESTONE_NONE_VALUE}
-                            onValueChange={(value) => setEditingQuestion({ ...editingQuestion, milestone_id: value === MILESTONE_NONE_VALUE ? "" : value })}
+                            value={
+                              editingQuestion.milestone_id ||
+                              MILESTONE_NONE_VALUE
+                            }
+                            onValueChange={(value) =>
+                              setEditingQuestion({
+                                ...editingQuestion,
+                                milestone_id:
+                                  value === MILESTONE_NONE_VALUE ? "" : value,
+                              })
+                            }
                             disabled={saving}
                           >
                             <SelectTrigger className="w-full">
                               <SelectValue placeholder="Select milestone..." />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value={MILESTONE_NONE_VALUE}>None</SelectItem>
+                              <SelectItem value={MILESTONE_NONE_VALUE}>
+                                None
+                              </SelectItem>
                               {milestones.map((milestone) => {
                                 const milestoneId = milestone.action_sub_id
                                   ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
@@ -950,40 +1066,75 @@ export default function QuestionsTab({
                                 const label = milestone.description
                                   ? `${milestoneId}: ${milestone.description.substring(0, 50)}${milestone.description.length > 50 ? "..." : ""}`
                                   : milestoneId;
-                                return <SelectItem key={milestone.id} value={milestone.id}>{label}</SelectItem>;
+                                return (
+                                  <SelectItem
+                                    key={milestone.id}
+                                    value={milestone.id}
+                                  >
+                                    {label}
+                                  </SelectItem>
+                                );
                               })}
                             </SelectContent>
                           </Select>
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs font-medium text-slate-600">Question *</label>
+                          <label className="mb-1 block text-xs font-medium text-slate-600">
+                            Question *
+                          </label>
                           <NoteEditor
                             value={editingQuestion.question}
-                            onChange={(html) => setEditingQuestion({ ...editingQuestion, question: html })}
+                            onChange={(html) =>
+                              setEditingQuestion({
+                                ...editingQuestion,
+                                question: html,
+                              })
+                            }
                             placeholder="Enter your question..."
                             disabled={saving}
                             minRows={3}
                           />
                         </div>
-                        {error && <p className="text-sm text-red-600">{error}</p>}
+                        {error && (
+                          <p className="text-sm text-red-600">{error}</p>
+                        )}
                         <div className="flex justify-end gap-2">
-                          <Button type="button" variant="outline" onClick={cancelEditing} disabled={saving}>
-                            <X className="h-4 w-4 mr-2" /> Cancel
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={cancelEditing}
+                            disabled={saving}
+                          >
+                            <X className="mr-2 h-4 w-4" /> Cancel
                           </Button>
                           <Button
                             type="button"
                             onClick={handleSaveEdit}
-                            disabled={saving || !editingQuestion.header.trim() || !editingQuestion.question_date || isNoteContentEmpty(editingQuestion.question)}
+                            disabled={
+                              saving ||
+                              !editingQuestion.header.trim() ||
+                              !editingQuestion.question_date ||
+                              isNoteContentEmpty(editingQuestion.question)
+                            }
                             className="bg-un-blue hover:bg-un-blue/90"
                           >
-                            {saving ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Saving...</> : <><Send className="h-4 w-4 mr-2" /> Save</>}
+                            {saving ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                                Saving...
+                              </>
+                            ) : (
+                              <>
+                                <Send className="mr-2 h-4 w-4" /> Save
+                              </>
+                            )}
                           </Button>
                         </div>
                       </div>
                     ) : null}
                   </div>
                 </CollapsibleContent>
-            </Collapsible>
+              </Collapsible>
             );
           })}
         </div>

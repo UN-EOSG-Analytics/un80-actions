@@ -6,7 +6,13 @@ import { getCurrentUser } from "@/features/auth/service";
 
 export interface ActivityItem {
   id: string;
-  type: "note" | "question" | "milestone" | "milestone_status" | "tag" | "milestone_update";
+  type:
+    | "note"
+    | "question"
+    | "milestone"
+    | "milestone_status"
+    | "tag"
+    | "milestone_update";
   action_id: number;
   action_sub_id: string | null;
   title: string;
@@ -23,7 +29,9 @@ export interface ActivityItem {
  * Returns changes from notes, questions, milestones, milestone status changes, tags, and milestone updates.
  * If user is logged in, includes read_at for each item.
  */
-export async function getRecentActivity(limit: number = 50): Promise<ActivityItem[]> {
+export async function getRecentActivity(
+  limit: number = 50,
+): Promise<ActivityItem[]> {
   const activities: ActivityItem[] = [];
   const currentUser = await getCurrentUser();
 
@@ -94,7 +102,8 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
   );
 
   for (const question of questions) {
-    const isUpdated = question.updated_at && question.updated_at > question.created_at;
+    const isUpdated =
+      question.updated_at && question.updated_at > question.created_at;
     activities.push({
       id: `question-${question.id}`,
       type: "question",
@@ -148,9 +157,21 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
 
   for (const milestone of milestones) {
     const timestamps = [
-      { time: milestone.approved_at, type: "approved", email: milestone.approved_by_email },
-      { time: milestone.reviewed_at, type: "reviewed", email: milestone.reviewed_by_email },
-      { time: milestone.submitted_at, type: "submitted", email: milestone.submitted_by_email },
+      {
+        time: milestone.approved_at,
+        type: "approved",
+        email: milestone.approved_by_email,
+      },
+      {
+        time: milestone.reviewed_at,
+        type: "reviewed",
+        email: milestone.reviewed_by_email,
+      },
+      {
+        time: milestone.submitted_at,
+        type: "submitted",
+        email: milestone.submitted_by_email,
+      },
     ].filter((t) => t.time !== null);
 
     if (timestamps.length > 0) {
@@ -198,14 +219,17 @@ export async function getRecentActivity(limit: number = 50): Promise<ActivityIte
   );
 
   for (const update of milestoneUpdates) {
-    const isUpdated = update.updated_at && update.updated_at > update.created_at;
+    const isUpdated =
+      update.updated_at && update.updated_at > update.created_at;
     activities.push({
       id: `milestone-update-${update.id}`,
       type: "milestone_update",
       action_id: update.action_id,
       action_sub_id: update.action_sub_id,
       title: "Milestone update",
-      description: isUpdated ? "Milestone update modified" : "Milestone update added",
+      description: isUpdated
+        ? "Milestone update modified"
+        : "Milestone update added",
       user_email: update.user_email,
       timestamp: isUpdated ? update.updated_at! : update.created_at,
       change_type: isUpdated ? "updated" : "created",

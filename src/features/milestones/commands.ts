@@ -110,9 +110,9 @@ export async function createMilestone(
   } catch (e) {
     const msg = String((e as Error).message ?? "");
     if (msg.includes("unique") || msg.includes("duplicate")) {
-      return { 
-        success: false, 
-        error: "A milestone of this type already exists for this action" 
+      return {
+        success: false,
+        error: "A milestone of this type already exists for this action",
       };
     }
     return {
@@ -466,8 +466,7 @@ export async function setMilestoneNeedsOlaReview(
   } catch (e) {
     return {
       success: false,
-      error:
-        e instanceof Error ? e.message : "Failed to set Needs OLA review",
+      error: e instanceof Error ? e.message : "Failed to set Needs OLA review",
     };
   }
 }
@@ -528,8 +527,7 @@ export async function setMilestoneReviewedByOla(
   } catch (e) {
     return {
       success: false,
-      error:
-        e instanceof Error ? e.message : "Failed to set Reviewed by OLA",
+      error: e instanceof Error ? e.message : "Failed to set Reviewed by OLA",
     };
   }
 }
@@ -655,7 +653,8 @@ export async function setMilestoneAttentionToTimeline(
   } catch (e) {
     return {
       success: false,
-      error: e instanceof Error ? e.message : "Failed to set Attention to timeline",
+      error:
+        e instanceof Error ? e.message : "Failed to set Attention to timeline",
     };
   }
 }
@@ -718,7 +717,8 @@ export async function setMilestoneConfirmationNeeded(
   } catch (e) {
     return {
       success: false,
-      error: e instanceof Error ? e.message : "Failed to set Confirmation needed",
+      error:
+        e instanceof Error ? e.message : "Failed to set Confirmation needed",
     };
   }
 }
@@ -747,7 +747,10 @@ export async function updateMilestoneDocumentSubmitted(
   } catch (e) {
     return {
       success: false,
-      error: e instanceof Error ? e.message : "Failed to update milestone document status",
+      error:
+        e instanceof Error
+          ? e.message
+          : "Failed to update milestone document status",
     };
   }
 }
@@ -772,7 +775,10 @@ export async function updateMilestonePublicProgress(
       return { success: false, error: "Milestone not found" };
     }
     if (!milestone.is_public) {
-      return { success: false, error: "Public progress applies only to public milestones" };
+      return {
+        success: false,
+        error: "Public progress applies only to public milestones",
+      };
     }
 
     await query(
@@ -787,7 +793,8 @@ export async function updateMilestonePublicProgress(
   } catch (e) {
     return {
       success: false,
-      error: e instanceof Error ? e.message : "Failed to update public progress",
+      error:
+        e instanceof Error ? e.message : "Failed to update public progress",
     };
   }
 }
@@ -866,7 +873,10 @@ export async function approveMilestone(
       return { success: false, error: "Milestone not found" };
     }
 
-    if (milestone.status !== "submitted" && milestone.status !== "under_review") {
+    if (
+      milestone.status !== "submitted" &&
+      milestone.status !== "under_review"
+    ) {
       return { success: false, error: "Milestone is not pending approval" };
     }
 
@@ -902,7 +912,10 @@ export async function rejectMilestone(
       return { success: false, error: "Milestone not found" };
     }
 
-    if (milestone.status !== "submitted" && milestone.status !== "under_review") {
+    if (
+      milestone.status !== "submitted" &&
+      milestone.status !== "under_review"
+    ) {
       return { success: false, error: "Milestone is not pending approval" };
     }
 

@@ -376,7 +376,7 @@ export async function getActionByNumber(
      WHERE a.id = $1
        AND a.sub_id = $2
      LIMIT 1`,
-    [actionId, actionSubId ?? ''],
+    [actionId, actionSubId ?? ""],
   );
 
   if (rows.length === 0) return null;
@@ -977,14 +977,27 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
           action_id: r.action_id,
           action_sub_id: r.action_sub_id,
           indicative_action: r.indicative_action,
-          tracking_status: r.tracking_status as ActionWithMilestones["tracking_status"],
-          public_action_status: r.public_action_status as ActionWithMilestones["public_action_status"],
+          tracking_status:
+            r.tracking_status as ActionWithMilestones["tracking_status"],
+          public_action_status:
+            r.public_action_status as ActionWithMilestones["public_action_status"],
           is_big_ticket: r.is_big_ticket,
-          risk_assessment: (r.risk_assessment ?? null) as ActionWithMilestones["risk_assessment"],
+          risk_assessment: (r.risk_assessment ??
+            null) as ActionWithMilestones["risk_assessment"],
           document_submitted: r.document_submitted ?? false,
-          deliverables_status: r.next_upcoming_milestone_document_submitted === true ? "submitted" : r.next_upcoming_milestone_document_submitted === false ? "not_submitted" : null,
-          deliverables_deadline_month: r.next_upcoming_milestone_deadline_month ?? null,
-          upcoming_milestone_months: Array.isArray(r.all_upcoming_milestone_months) ? r.all_upcoming_milestone_months : [],
+          deliverables_status:
+            r.next_upcoming_milestone_document_submitted === true
+              ? "submitted"
+              : r.next_upcoming_milestone_document_submitted === false
+                ? "not_submitted"
+                : null,
+          deliverables_deadline_month:
+            r.next_upcoming_milestone_deadline_month ?? null,
+          upcoming_milestone_months: Array.isArray(
+            r.all_upcoming_milestone_months,
+          )
+            ? r.all_upcoming_milestone_months
+            : [],
           milestones: [],
           has_delayed_milestone: r.has_overdue_milestone,
         };

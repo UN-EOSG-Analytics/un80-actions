@@ -37,9 +37,9 @@ function isAdminRole(role: string | null | undefined): role is AdminRole {
 /**
  * Server-side check that requires admin access.
  * Use this at the start of any admin-only server action or query.
- * 
+ *
  * @returns AuthorizedResult with user info if authorized, UnauthorizedResult with error if not
- * 
+ *
  * @example
  * ```ts
  * const auth = await requireAdmin();
@@ -51,7 +51,7 @@ function isAdminRole(role: string | null | undefined): role is AdminRole {
  */
 export async function requireAdmin(): Promise<AdminCheckResult> {
   const user = await getCurrentUser();
-  
+
   if (!user) {
     return { authorized: false, error: "Not authenticated" };
   }
@@ -63,7 +63,7 @@ export async function requireAdmin(): Promise<AdminCheckResult> {
   );
 
   const role = approved?.user_role;
-  
+
   if (!isAdminRole(role)) {
     return { authorized: false, error: "Admin access required" };
   }
@@ -77,7 +77,7 @@ export async function requireAdmin(): Promise<AdminCheckResult> {
 /**
  * Check if current user has admin access without throwing.
  * Useful for conditional logic in queries.
- * 
+ *
  * @returns true if user is Admin or Legal, false otherwise
  */
 export async function checkIsAdmin(): Promise<boolean> {

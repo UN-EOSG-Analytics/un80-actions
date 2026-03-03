@@ -42,10 +42,23 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getStatusStyles, ACTION_STATUS } from "@/constants/actionStatus";
-import type { ActionsTableData, ActionWithMilestones, RiskAssessment } from "@/types";
-import { updateRiskAssessment, updatePublicActionStatus } from "@/features/actions/commands";
+import type {
+  ActionsTableData,
+  ActionWithMilestones,
+  RiskAssessment,
+} from "@/types";
+import {
+  updateRiskAssessment,
+  updatePublicActionStatus,
+} from "@/features/actions/commands";
 
-type SortField = "work_package_id" | "action_id" | "work_package_title" | "indicative_action" | "risk_assessment" | "deliverables";
+type SortField =
+  | "work_package_id"
+  | "action_id"
+  | "work_package_title"
+  | "indicative_action"
+  | "risk_assessment"
+  | "deliverables";
 type SortDirection = "asc" | "desc";
 
 const RISK_OPTIONS: {
@@ -110,16 +123,16 @@ function MultiSelectFilter<T extends string | number | boolean>({
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const hasFilter = selected.length > 0;
-  
+
   // Filter options based on search query
   const filteredOptions = useMemo(() => {
     if (!searchQuery.trim()) return options;
     const query = searchQuery.toLowerCase();
-    return options.filter(option => 
-      renderOption(option).toLowerCase().includes(query)
+    return options.filter((option) =>
+      renderOption(option).toLowerCase().includes(query),
     );
   }, [options, searchQuery, renderOption]);
-  
+
   // Reset search when popover closes
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -127,7 +140,7 @@ function MultiSelectFilter<T extends string | number | boolean>({
     }
     onOpenChange(open);
   };
-  
+
   return (
     <Popover open={isOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
@@ -137,21 +150,25 @@ function MultiSelectFilter<T extends string | number | boolean>({
             e.stopPropagation();
             onOpenChange(!isOpen);
           }}
-          className={`h-6 w-6 p-0 border-0 bg-transparent hover:bg-gray-100 rounded flex items-center justify-center transition-colors ${
+          className={`flex h-6 w-6 items-center justify-center rounded border-0 bg-transparent p-0 transition-colors hover:bg-gray-100 ${
             hasFilter ? "text-un-blue" : "text-gray-400"
           }`}
         >
           <Filter className="h-3.5 w-3.5" />
         </button>
       </PopoverTrigger>
-      <PopoverContent className={`${maxWidth} p-2`} align="start" onClick={(e) => e.stopPropagation()}>
+      <PopoverContent
+        className={`${maxWidth} p-2`}
+        align="start"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="mb-2">
           <input
             type="text"
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-8 px-2 text-sm border border-gray-200 rounded outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+            className="h-8 w-full rounded border border-gray-200 px-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
             onClick={(e) => e.stopPropagation()}
           />
         </div>
@@ -163,13 +180,16 @@ function MultiSelectFilter<T extends string | number | boolean>({
                 <button
                   type="button"
                   onClick={() => {
-                    const toSelect = options.filter(opt => !selected.includes(opt));
-                    toSelect.forEach(opt => onToggle(opt));
+                    const toSelect = options.filter(
+                      (opt) => !selected.includes(opt),
+                    );
+                    toSelect.forEach((opt) => onToggle(opt));
                   }}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-gray-100 text-left font-medium text-un-blue"
+                  className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm font-medium text-un-blue hover:bg-gray-100"
                 >
-                  <div className="h-4 w-4 border rounded flex items-center justify-center shrink-0 border-un-blue/50">
-                    {options.length > 0 && selected.length === options.length ? (
+                  <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded border border-un-blue/50">
+                    {options.length > 0 &&
+                    selected.length === options.length ? (
                       <Check className="h-3 w-3 text-un-blue" />
                     ) : null}
                   </div>
@@ -179,7 +199,7 @@ function MultiSelectFilter<T extends string | number | boolean>({
               </>
             )}
             {filteredOptions.length === 0 ? (
-              <div className="px-2 py-2 text-sm text-gray-400 text-center">
+              <div className="px-2 py-2 text-center text-sm text-gray-400">
                 No results found
               </div>
             ) : (
@@ -190,14 +210,20 @@ function MultiSelectFilter<T extends string | number | boolean>({
                     key={String(option)}
                     type="button"
                     onClick={() => onToggle(option)}
-                    className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-gray-100 text-left"
+                    className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-gray-100"
                   >
-                    <div className={`h-4 w-4 border rounded flex items-center justify-center shrink-0 ${
-                      isSelected ? "bg-un-blue border-un-blue" : "border-gray-300"
-                    }`}>
+                    <div
+                      className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                        isSelected
+                          ? "border-un-blue bg-un-blue"
+                          : "border-gray-300"
+                      }`}
+                    >
                       {isSelected && <Check className="h-3 w-3 text-white" />}
                     </div>
-                    <span className="flex-1 wrap-break-word">{renderOption(option)}</span>
+                    <span className="flex-1 wrap-break-word">
+                      {renderOption(option)}
+                    </span>
                   </button>
                 );
               })
@@ -205,11 +231,11 @@ function MultiSelectFilter<T extends string | number | boolean>({
           </div>
         </div>
         {hasFilter && (
-          <div className="mt-2 pt-2 border-t">
+          <div className="mt-2 border-t pt-2">
             <button
               type="button"
               onClick={() => {
-                options.forEach(opt => {
+                options.forEach((opt) => {
                   if (selected.includes(opt)) onToggle(opt);
                 });
               }}
@@ -225,16 +251,17 @@ function MultiSelectFilter<T extends string | number | boolean>({
 }
 
 // Sort icon component (must be outside render to satisfy React 19)
-function SortIcon({ 
-  column, 
-  sortField, 
-  sortDirection 
-}: { 
-  column: SortField; 
-  sortField: SortField; 
-  sortDirection: SortDirection 
+function SortIcon({
+  column,
+  sortField,
+  sortDirection,
+}: {
+  column: SortField;
+  sortField: SortField;
+  sortDirection: SortDirection;
 }) {
-  if (sortField !== column) return <ArrowUpDown className="ml-1 h-3.5 w-3.5 text-gray-400" />;
+  if (sortField !== column)
+    return <ArrowUpDown className="ml-1 h-3.5 w-3.5 text-gray-400" />;
   return sortDirection === "asc" ? (
     <ArrowUp className="ml-1 h-3.5 w-3.5 text-un-blue" />
   ) : (
@@ -252,21 +279,26 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
   const [searchInput, setSearchInput] = useState("");
   const [sortField, setSortField] = useState<SortField>("action_id");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-  
+
   // Column filters (multiselect - arrays)
   const [filterWP, setFilterWP] = useState<number[]>([]);
   const [filterWPTitle, setFilterWPTitle] = useState<string[]>([]);
   const [filterAction, setFilterAction] = useState<string[]>([]);
-  const [filterIndicativeAction, setFilterIndicativeAction] = useState<string[]>([]);
+  const [filterIndicativeAction, setFilterIndicativeAction] = useState<
+    string[]
+  >([]);
   const [filterBigTicket, setFilterBigTicket] = useState<boolean[]>([]);
   const [filterWorkPackageId, setFilterWorkPackageId] = useState<string>("");
   const [filterRisk, setFilterRisk] = useState<string>("");
-  const [filterDeliverablesMonth, setFilterDeliverablesMonth] = useState<number | null>(null);
-  const [filterIntermediateMilestones, setFilterIntermediateMilestones] = useState<boolean>(false);
-  
+  const [filterDeliverablesMonth, setFilterDeliverablesMonth] = useState<
+    number | null
+  >(null);
+  const [filterIntermediateMilestones, setFilterIntermediateMilestones] =
+    useState<boolean>(false);
+
   // Track which filter popovers are open
   const [openFilters, setOpenFilters] = useState<Record<string, boolean>>({});
-  
+
   // Status change confirmation
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
@@ -315,7 +347,9 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
         result = result.filter((a) => filterWP.includes(a.work_package_id));
       }
       if (except !== "wpTitle" && filterWPTitle.length > 0) {
-        result = result.filter((a) => filterWPTitle.includes(a.work_package_title));
+        result = result.filter((a) =>
+          filterWPTitle.includes(a.work_package_title),
+        );
       }
       if (except !== "action" && filterAction.length > 0) {
         result = result.filter((a) =>
@@ -461,10 +495,14 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
       list = list.filter((a) => filterWPTitle.includes(a.work_package_title));
     }
     if (filterAction.length > 0) {
-      list = list.filter((a) => filterAction.includes(actionLabel(a.action_id, a.action_sub_id)));
+      list = list.filter((a) =>
+        filterAction.includes(actionLabel(a.action_id, a.action_sub_id)),
+      );
     }
     if (filterIndicativeAction.length > 0) {
-      list = list.filter((a) => filterIndicativeAction.includes(a.indicative_action));
+      list = list.filter((a) =>
+        filterIndicativeAction.includes(a.indicative_action),
+      );
     }
     if (filterBigTicket.length > 0) {
       const hasBigTicket = filterBigTicket.includes(true);
@@ -477,20 +515,25 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
       // If both are selected, show all (no filter)
     }
     if (filterWorkPackageId) {
-      list = list.filter((a) => String(a.work_package_id).includes(filterWorkPackageId));
+      list = list.filter((a) =>
+        String(a.work_package_id).includes(filterWorkPackageId),
+      );
     }
     if (filterRisk) {
       list = list.filter((a) => a.risk_assessment === filterRisk);
     }
     if (filterDeliverablesMonth != null) {
-      list = list.filter((a) => a.upcoming_milestone_months.includes(filterDeliverablesMonth));
+      list = list.filter((a) =>
+        a.upcoming_milestone_months.includes(filterDeliverablesMonth),
+      );
     }
     if (filterIntermediateMilestones) {
       list = list.filter((a) => {
-        return a.milestones.some((m) => 
-          m.milestone_type === "second" || 
-          m.milestone_type === "third" || 
-          m.milestone_type === "fourth"
+        return a.milestones.some(
+          (m) =>
+            m.milestone_type === "second" ||
+            m.milestone_type === "third" ||
+            m.milestone_type === "fourth",
         );
       });
     }
@@ -522,10 +565,11 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
   // Calculate intermediate milestones counter
   const intermediateMilestonesCounter = useMemo(() => {
     const actionsWithIntermediate = filteredActions.filter((a) => {
-      return a.milestones.some((m) => 
-        m.milestone_type === "second" || 
-        m.milestone_type === "third" || 
-        m.milestone_type === "fourth"
+      return a.milestones.some(
+        (m) =>
+          m.milestone_type === "second" ||
+          m.milestone_type === "third" ||
+          m.milestone_type === "fourth",
       );
     });
     return actionsWithIntermediate.length;
@@ -538,18 +582,27 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
       if (sortField === "work_package_id") {
         cmp = a.work_package_id - b.work_package_id;
       } else if (sortField === "action_id") {
-        cmp = a.action_id - b.action_id || (a.action_sub_id ?? "").localeCompare(b.action_sub_id ?? "");
+        cmp =
+          a.action_id - b.action_id ||
+          (a.action_sub_id ?? "").localeCompare(b.action_sub_id ?? "");
       } else if (sortField === "work_package_title") {
         cmp = a.work_package_title.localeCompare(b.work_package_title);
       } else if (sortField === "indicative_action") {
         cmp = a.indicative_action.localeCompare(b.indicative_action);
       } else if (sortField === "risk_assessment") {
-        const order: Record<string, number> = { low_risk: 0, medium_risk: 1, at_risk: 2 };
+        const order: Record<string, number> = {
+          low_risk: 0,
+          medium_risk: 1,
+          at_risk: 2,
+        };
         const av = a.risk_assessment ?? "";
         const bv = b.risk_assessment ?? "";
         cmp = (order[av] ?? -1) - (order[bv] ?? -1);
       } else if (sortField === "deliverables") {
-        const order: Record<string, number> = { submitted: 0, not_submitted: 1 };
+        const order: Record<string, number> = {
+          submitted: 0,
+          not_submitted: 1,
+        };
         const av = getDeliverablesStatus(a, filterDeliverablesMonth) ?? "";
         const bv = getDeliverablesStatus(b, filterDeliverablesMonth) ?? "";
         cmp = (order[av] ?? 2) - (order[bv] ?? 2);
@@ -569,7 +622,9 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
 
   const handleActionClick = (actionId: number, actionSubId: string | null) => {
     sessionStorage.setItem("actionModalReturnUrl", window.location.href);
-    const actionParam = actionSubId ? `${actionId}${actionSubId}` : `${actionId}`;
+    const actionParam = actionSubId
+      ? `${actionId}${actionSubId}`
+      : `${actionId}`;
     router.push(`/?action=${actionParam}`, { scroll: false });
   };
 
@@ -593,12 +648,22 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
   };
 
   const confirmStatusChange = async () => {
-    if (confirmDialog.actionId === null || confirmDialog.status === null) return;
+    if (confirmDialog.actionId === null || confirmDialog.status === null)
+      return;
 
     const { actionId, actionSubId, status } = confirmDialog;
-    setConfirmDialog({ open: false, actionId: null, actionSubId: null, status: null });
+    setConfirmDialog({
+      open: false,
+      actionId: null,
+      actionSubId: null,
+      status: null,
+    });
 
-    const result = await updatePublicActionStatus(actionId, actionSubId, status);
+    const result = await updatePublicActionStatus(
+      actionId,
+      actionSubId,
+      status,
+    );
     if (result.success) {
       router.refresh();
     }
@@ -654,7 +719,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
           <button
             type="button"
             onClick={clearAllFilters}
-            className="ml-auto text-sm text-un-blue hover:underline flex items-center gap-1"
+            className="ml-auto flex items-center gap-1 text-sm text-un-blue hover:underline"
           >
             <X className="h-3.5 w-3.5" />
             Clear all filters
@@ -664,16 +729,22 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
 
       {/* Intermediate Milestones Counter */}
       <div className="flex items-center gap-2 text-sm text-gray-600">
-        <span className="font-medium">Actions with intermediate milestones:</span>
+        <span className="font-medium">
+          Actions with intermediate milestones:
+        </span>
         <button
           type="button"
           onClick={() => setFilterIntermediateMilestones((prev) => !prev)}
           className={`font-semibold transition-colors hover:underline ${
-            filterIntermediateMilestones 
-              ? "text-un-blue underline" 
+            filterIntermediateMilestones
+              ? "text-un-blue underline"
               : "text-un-blue hover:text-un-blue/80"
           }`}
-          title={filterIntermediateMilestones ? "Click to show all actions" : "Click to filter to actions with intermediate milestones"}
+          title={
+            filterIntermediateMilestones
+              ? "Click to show all actions"
+              : "Click to filter to actions with intermediate milestones"
+          }
         >
           {intermediateMilestonesCounter}
         </button>
@@ -681,7 +752,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
           <button
             type="button"
             onClick={() => setFilterIntermediateMilestones(false)}
-            className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
+            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600"
             title="Clear filter"
           >
             <X className="h-3 w-3" />
@@ -690,11 +761,11 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
       </div>
 
       {/* Simple Table */}
-      <div className="overflow-x-auto overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <div className="overflow-hidden overflow-x-auto rounded-lg border border-gray-200 bg-white">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-              <th className="px-2 py-3 whitespace-nowrap w-14">
+              <th className="w-14 px-2 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -702,7 +773,11 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                     className="inline-flex items-center hover:text-un-blue"
                   >
                     WP
-                    <SortIcon column="work_package_id" sortField={sortField} sortDirection={sortDirection} />
+                    <SortIcon
+                      column="work_package_id"
+                      sortField={sortField}
+                      sortDirection={sortDirection}
+                    />
                   </button>
                   <MultiSelectFilter
                     filterKey="wp"
@@ -710,12 +785,16 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                     selected={filterWP}
                     onToggle={(id) => {
                       setFilterWP((prev) =>
-                        prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]
+                        prev.includes(id)
+                          ? prev.filter((v) => v !== id)
+                          : [...prev, id],
                       );
                     }}
                     renderOption={(id) => `WP ${id}`}
                     isOpen={openFilters.wp || false}
-                    onOpenChange={(open) => setOpenFilters((prev) => ({ ...prev, wp: open }))}
+                    onOpenChange={(open) =>
+                      setOpenFilters((prev) => ({ ...prev, wp: open }))
+                    }
                   />
                 </div>
               </th>
@@ -727,7 +806,11 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                     className="inline-flex items-center hover:text-un-blue"
                   >
                     WP TITLE
-                    <SortIcon column="work_package_title" sortField={sortField} sortDirection={sortDirection} />
+                    <SortIcon
+                      column="work_package_title"
+                      sortField={sortField}
+                      sortDirection={sortDirection}
+                    />
                   </button>
                   <MultiSelectFilter
                     filterKey="wpTitle"
@@ -735,16 +818,22 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                     selected={filterWPTitle}
                     onToggle={(title) => {
                       setFilterWPTitle((prev) =>
-                        prev.includes(title) ? prev.filter((v) => v !== title) : [...prev, title]
+                        prev.includes(title)
+                          ? prev.filter((v) => v !== title)
+                          : [...prev, title],
                       );
                     }}
-                    renderOption={(title) => title.length > 40 ? title.slice(0, 40) + "…" : title}
+                    renderOption={(title) =>
+                      title.length > 40 ? title.slice(0, 40) + "…" : title
+                    }
                     isOpen={openFilters.wpTitle || false}
-                    onOpenChange={(open) => setOpenFilters((prev) => ({ ...prev, wpTitle: open }))}
+                    onOpenChange={(open) =>
+                      setOpenFilters((prev) => ({ ...prev, wpTitle: open }))
+                    }
                   />
                 </div>
               </th>
-              <th className="px-2 py-3 whitespace-nowrap w-16">
+              <th className="w-16 px-2 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -752,7 +841,11 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                     className="inline-flex items-center hover:text-un-blue"
                   >
                     ACTION
-                    <SortIcon column="action_id" sortField={sortField} sortDirection={sortDirection} />
+                    <SortIcon
+                      column="action_id"
+                      sortField={sortField}
+                      sortDirection={sortDirection}
+                    />
                   </button>
                   <MultiSelectFilter
                     filterKey="action"
@@ -760,12 +853,16 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                     selected={filterAction}
                     onToggle={(action) => {
                       setFilterAction((prev) =>
-                        prev.includes(action) ? prev.filter((v) => v !== action) : [...prev, action]
+                        prev.includes(action)
+                          ? prev.filter((v) => v !== action)
+                          : [...prev, action],
                       );
                     }}
                     renderOption={(action) => `Action ${action}`}
                     isOpen={openFilters.action || false}
-                    onOpenChange={(open) => setOpenFilters((prev) => ({ ...prev, action: open }))}
+                    onOpenChange={(open) =>
+                      setOpenFilters((prev) => ({ ...prev, action: open }))
+                    }
                   />
                 </div>
               </th>
@@ -777,7 +874,11 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                     className="inline-flex items-center hover:text-un-blue"
                   >
                     INDICATIVE ACTION
-                    <SortIcon column="indicative_action" sortField={sortField} sortDirection={sortDirection} />
+                    <SortIcon
+                      column="indicative_action"
+                      sortField={sortField}
+                      sortDirection={sortDirection}
+                    />
                   </button>
                   <MultiSelectFilter
                     filterKey="indicativeAction"
@@ -785,20 +886,30 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                     selected={filterIndicativeAction}
                     onToggle={(action) => {
                       setFilterIndicativeAction((prev) =>
-                        prev.includes(action) ? prev.filter((v) => v !== action) : [...prev, action]
+                        prev.includes(action)
+                          ? prev.filter((v) => v !== action)
+                          : [...prev, action],
                       );
                     }}
-                    renderOption={(action) => action.length > 60 ? action.slice(0, 60) + "…" : action}
+                    renderOption={(action) =>
+                      action.length > 60 ? action.slice(0, 60) + "…" : action
+                    }
                     isOpen={openFilters.indicativeAction || false}
-                    onOpenChange={(open) => setOpenFilters((prev) => ({ ...prev, indicativeAction: open }))}
+                    onOpenChange={(open) =>
+                      setOpenFilters((prev) => ({
+                        ...prev,
+                        indicativeAction: open,
+                      }))
+                    }
                     maxWidth="w-96"
                   />
                 </div>
               </th>
-              <th className="px-4 py-3 whitespace-nowrap align-top">
+              <th className="px-4 py-3 align-top whitespace-nowrap">
                 <div className="flex flex-col gap-1">
                   <div className="text-xs font-normal text-gray-500 tabular-nums">
-                    {deliverablesCounter.submitted}/{deliverablesCounter.total} submitted
+                    {deliverablesCounter.submitted}/{deliverablesCounter.total}{" "}
+                    submitted
                   </div>
                   <div className="flex items-center gap-2">
                     <TooltipProvider delayDuration={200}>
@@ -810,56 +921,95 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                             className="inline-flex items-center hover:text-un-blue"
                           >
                             DELIVERABLES
-                            <SortIcon column="deliverables" sortField={sortField} sortDirection={sortDirection} />
+                            <SortIcon
+                              column="deliverables"
+                              sortField={sortField}
+                              sortDirection={sortDirection}
+                            />
                           </button>
                         </TooltipTrigger>
-                        <TooltipContent side="top" className="max-w-64 text-center text-xs">
-                          Whether the action&apos;s deliverable document has been submitted. Use the month filter to scope by milestone deadline.
+                        <TooltipContent
+                          side="top"
+                          className="max-w-64 text-center text-xs"
+                        >
+                          Whether the action&apos;s deliverable document has
+                          been submitted. Use the month filter to scope by
+                          milestone deadline.
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                     <Popover
                       open={openFilters.deliverablesMonth || false}
-                      onOpenChange={(open) => setOpenFilters((prev) => ({ ...prev, deliverablesMonth: open }))}
+                      onOpenChange={(open) =>
+                        setOpenFilters((prev) => ({
+                          ...prev,
+                          deliverablesMonth: open,
+                        }))
+                      }
                     >
                       <PopoverTrigger asChild>
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setOpenFilters((prev) => ({ ...prev, deliverablesMonth: !prev.deliverablesMonth }));
+                            setOpenFilters((prev) => ({
+                              ...prev,
+                              deliverablesMonth: !prev.deliverablesMonth,
+                            }));
                           }}
-                          className={`h-6 w-6 p-0 border-0 bg-transparent hover:bg-gray-100 rounded flex items-center justify-center transition-colors ${
-                            filterDeliverablesMonth != null ? "text-un-blue" : "text-gray-400"
+                          className={`flex h-6 w-6 items-center justify-center rounded border-0 bg-transparent p-0 transition-colors hover:bg-gray-100 ${
+                            filterDeliverablesMonth != null
+                              ? "text-un-blue"
+                              : "text-gray-400"
                           }`}
                         >
                           <Filter className="h-3.5 w-3.5" />
                         </button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-48 p-2" align="start" onClick={(e) => e.stopPropagation()}>
-                        <div className="max-h-64 overflow-y-auto space-y-1">
+                      <PopoverContent
+                        className="w-48 p-2"
+                        align="start"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="max-h-64 space-y-1 overflow-y-auto">
                           <button
                             type="button"
                             onClick={() => {
                               setFilterDeliverablesMonth(null);
-                              setOpenFilters((prev) => ({ ...prev, deliverablesMonth: false }));
+                              setOpenFilters((prev) => ({
+                                ...prev,
+                                deliverablesMonth: false,
+                              }));
                             }}
-                            className={`w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-gray-100 text-left ${
-                              filterDeliverablesMonth === null ? "font-medium text-un-blue" : ""
+                            className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-gray-100 ${
+                              filterDeliverablesMonth === null
+                                ? "font-medium text-un-blue"
+                                : ""
                             }`}
                           >
-                            <div className={`h-4 w-4 border rounded flex items-center justify-center shrink-0 ${
-                              filterDeliverablesMonth === null ? "bg-un-blue border-un-blue" : "border-gray-300"
-                            }`}>
-                              {filterDeliverablesMonth === null && <Check className="h-3 w-3 text-white" />}
+                            <div
+                              className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                                filterDeliverablesMonth === null
+                                  ? "border-un-blue bg-un-blue"
+                                  : "border-gray-300"
+                              }`}
+                            >
+                              {filterDeliverablesMonth === null && (
+                                <Check className="h-3 w-3 text-white" />
+                              )}
                             </div>
                             All months
                           </button>
                           {uniqueDeliverablesMonths.map((month) => {
-                            const isSelected = filterDeliverablesMonth === month;
+                            const isSelected =
+                              filterDeliverablesMonth === month;
                             const year = Math.floor(month / 100);
                             const monthNum = month % 100;
-                            const label = new Date(year, monthNum - 1, 1).toLocaleString("en-US", { month: "short" }) + ` ${year}`;
+                            const label =
+                              new Date(year, monthNum - 1, 1).toLocaleString(
+                                "en-US",
+                                { month: "short" },
+                              ) + ` ${year}`;
                             const stats = deliverableMonthStats.get(month);
                             return (
                               <button
@@ -867,22 +1017,35 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                                 type="button"
                                 onClick={() => {
                                   setFilterDeliverablesMonth(month);
-                                  setOpenFilters((prev) => ({ ...prev, deliverablesMonth: false }));
+                                  setOpenFilters((prev) => ({
+                                    ...prev,
+                                    deliverablesMonth: false,
+                                  }));
                                 }}
-                                className={`w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded hover:bg-gray-100 text-left ${
+                                className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-gray-100 ${
                                   isSelected ? "font-medium text-un-blue" : ""
                                 }`}
                               >
-                                <div className={`h-4 w-4 border rounded flex items-center justify-center shrink-0 ${
-                                  isSelected ? "bg-un-blue border-un-blue" : "border-gray-300"
-                                }`}>
-                                  {isSelected && <Check className="h-3 w-3 text-white" />}
+                                <div
+                                  className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                                    isSelected
+                                      ? "border-un-blue bg-un-blue"
+                                      : "border-gray-300"
+                                  }`}
+                                >
+                                  {isSelected && (
+                                    <Check className="h-3 w-3 text-white" />
+                                  )}
                                 </div>
                                 <span className="flex-1">{label}</span>
                                 {stats && (
-                                  <span className={`text-xs tabular-nums ${
-                                    isSelected ? "text-un-blue" : "text-gray-400"
-                                  }`}>
+                                  <span
+                                    className={`text-xs tabular-nums ${
+                                      isSelected
+                                        ? "text-un-blue"
+                                        : "text-gray-400"
+                                    }`}
+                                  >
                                     {stats.submitted}/{stats.total}
                                   </span>
                                 )}
@@ -896,16 +1059,20 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                 </div>
               </th>
               {isAdmin && (
-              <th className="px-4 py-3 whitespace-nowrap">
-                <button
-                  type="button"
-                  onClick={() => handleSort("risk_assessment")}
-                  className="inline-flex items-center hover:text-un-blue"
-                >
-                  RISK
-                  <SortIcon column="risk_assessment" sortField={sortField} sortDirection={sortDirection} />
-                </button>
-              </th>
+                <th className="px-4 py-3 whitespace-nowrap">
+                  <button
+                    type="button"
+                    onClick={() => handleSort("risk_assessment")}
+                    className="inline-flex items-center hover:text-un-blue"
+                  >
+                    RISK
+                    <SortIcon
+                      column="risk_assessment"
+                      sortField={sortField}
+                      sortDirection={sortDirection}
+                    />
+                  </button>
+                </th>
               )}
               <th className="px-4 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-2">
@@ -916,12 +1083,18 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                     selected={filterBigTicket}
                     onToggle={(value) => {
                       setFilterBigTicket((prev) =>
-                        prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+                        prev.includes(value)
+                          ? prev.filter((v) => v !== value)
+                          : [...prev, value],
                       );
                     }}
-                    renderOption={(value) => value ? "Big Ticket" : "Not Big Ticket"}
+                    renderOption={(value) =>
+                      value ? "Big Ticket" : "Not Big Ticket"
+                    }
                     isOpen={openFilters.bigTicket || false}
-                    onOpenChange={(open) => setOpenFilters((prev) => ({ ...prev, bigTicket: open }))}
+                    onOpenChange={(open) =>
+                      setOpenFilters((prev) => ({ ...prev, bigTicket: open }))
+                    }
                   />
                 </div>
               </th>
@@ -942,11 +1115,13 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
               sortedActions.map((a) => (
                 <tr
                   key={`${a.action_id}-${a.action_sub_id ?? ""}`}
-                  onClick={() => handleActionClick(a.action_id, a.action_sub_id)}
+                  onClick={() =>
+                    handleActionClick(a.action_id, a.action_sub_id)
+                  }
                   className="cursor-pointer transition-colors hover:bg-gray-50"
                 >
                   <td className="px-3 py-3 whitespace-nowrap">
-                    <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 font-medium text-sm tabular-nums">
+                    <span className="inline-flex items-center justify-center rounded bg-gray-100 px-1.5 py-0.5 text-sm font-medium text-gray-700 tabular-nums">
                       {a.work_package_id}
                     </span>
                   </td>
@@ -954,7 +1129,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                     <span className="line-clamp-2">{a.work_package_title}</span>
                   </td>
                   <td className="px-3 py-3 whitespace-nowrap">
-                    <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-un-blue/10 text-un-blue font-semibold text-sm tabular-nums">
+                    <span className="inline-flex items-center justify-center rounded bg-un-blue/10 px-1.5 py-0.5 text-sm font-semibold text-un-blue tabular-nums">
                       {actionLabel(a.action_id, a.action_sub_id)}
                     </span>
                   </td>
@@ -963,9 +1138,12 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   </td>
                   <td className="px-4 py-3">
                     {(() => {
-                      const status = getDeliverablesStatus(a, filterDeliverablesMonth);
+                      const status = getDeliverablesStatus(
+                        a,
+                        filterDeliverablesMonth,
+                      );
                       if (!status) {
-                        return <span className="text-gray-400 text-xs">—</span>;
+                        return <span className="text-xs text-gray-400">—</span>;
                       }
                       return (
                         <Badge
@@ -982,7 +1160,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                             </>
                           ) : (
                             <span
-                              className="font-extrabold leading-none"
+                              className="leading-none font-extrabold"
                               title="Not submitted"
                               aria-label="Not submitted"
                             >
@@ -994,46 +1172,48 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                     })()}
                   </td>
                   {isAdmin && (
-                  <td
-                    className="px-4 py-3 text-gray-400"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Select
-                      value={a.risk_assessment ?? ""}
-                      onValueChange={(value) =>
-                        handleRiskChange(
-                          a.action_id,
-                          a.action_sub_id,
-                          (value as RiskAssessment) || null,
-                        )
-                      }
+                    <td
+                      className="px-4 py-3 text-gray-400"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      <SelectTrigger className="h-8 w-32 border-gray-200 bg-white text-gray-700">
-                        <SelectValue placeholder="Select..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {RISK_OPTIONS.map((opt) => (
-                          <SelectItem
-                            key={opt.value}
-                            value={opt.value}
-                            className="text-gray-700"
-                          >
-                            <span className="flex items-center gap-2">
-                              <span
-                                className={`h-2 w-2 shrink-0 rounded-full ${opt.indicatorClass}`}
-                                aria-hidden
-                              />
-                              {opt.label}
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </td>
+                      <Select
+                        value={a.risk_assessment ?? ""}
+                        onValueChange={(value) =>
+                          handleRiskChange(
+                            a.action_id,
+                            a.action_sub_id,
+                            (value as RiskAssessment) || null,
+                          )
+                        }
+                      >
+                        <SelectTrigger className="h-8 w-32 border-gray-200 bg-white text-gray-700">
+                          <SelectValue placeholder="Select..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {RISK_OPTIONS.map((opt) => (
+                            <SelectItem
+                              key={opt.value}
+                              value={opt.value}
+                              className="text-gray-700"
+                            >
+                              <span className="flex items-center gap-2">
+                                <span
+                                  className={`h-2 w-2 shrink-0 rounded-full ${opt.indicatorClass}`}
+                                  aria-hidden
+                                />
+                                {opt.label}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </td>
                   )}
                   <td className="px-4 py-3 text-center">
                     {a.is_big_ticket && (
-                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-un-blue text-white text-xs font-bold">!</span>
+                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-un-blue text-xs font-bold text-white">
+                        !
+                      </span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-gray-400">
@@ -1047,27 +1227,63 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
       </div>
 
       {/* Status Change Confirmation Dialog */}
-      <Dialog open={confirmDialog.open} onOpenChange={(open) => !open && setConfirmDialog({ open: false, actionId: null, actionSubId: null, status: null })}>
+      <Dialog
+        open={confirmDialog.open}
+        onOpenChange={(open) =>
+          !open &&
+          setConfirmDialog({
+            open: false,
+            actionId: null,
+            actionSubId: null,
+            status: null,
+          })
+        }
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Change Action Status</DialogTitle>
             <DialogDescription>
-              {confirmDialog.actionId !== null && confirmDialog.status === ACTION_STATUS.DECISION_TAKEN && (
-                <>
-                  Change <span className="font-medium text-slate-700">Action {actionLabel(confirmDialog.actionId, confirmDialog.actionSubId)}</span>'s status to 'Decision taken'?
-                </>
-              )}
-              {confirmDialog.actionId !== null && confirmDialog.status === ACTION_STATUS.FURTHER_WORK_ONGOING && (
-                <>
-                  Change <span className="font-medium text-slate-700">Action {actionLabel(confirmDialog.actionId, confirmDialog.actionSubId)}</span>'s status to 'Further work ongoing'?
-                </>
-              )}
+              {confirmDialog.actionId !== null &&
+                confirmDialog.status === ACTION_STATUS.DECISION_TAKEN && (
+                  <>
+                    Change{" "}
+                    <span className="font-medium text-slate-700">
+                      Action{" "}
+                      {actionLabel(
+                        confirmDialog.actionId,
+                        confirmDialog.actionSubId,
+                      )}
+                    </span>
+                    's status to 'Decision taken'?
+                  </>
+                )}
+              {confirmDialog.actionId !== null &&
+                confirmDialog.status === ACTION_STATUS.FURTHER_WORK_ONGOING && (
+                  <>
+                    Change{" "}
+                    <span className="font-medium text-slate-700">
+                      Action{" "}
+                      {actionLabel(
+                        confirmDialog.actionId,
+                        confirmDialog.actionSubId,
+                      )}
+                    </span>
+                    's status to 'Further work ongoing'?
+                  </>
+                )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setConfirmDialog({ open: false, actionId: null, actionSubId: null, status: null })}
+              onClick={() =>
+                setConfirmDialog({
+                  open: false,
+                  actionId: null,
+                  actionSubId: null,
+                  status: null,
+                })
+              }
             >
               Cancel
             </Button>

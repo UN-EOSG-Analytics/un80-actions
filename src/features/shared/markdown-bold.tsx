@@ -62,16 +62,20 @@ export function BoldText({
 }) {
   // First split by strikethrough markers (~~), then process bold within each part
   const strikethroughParts = children.split("~~");
-  
+
   return (
     <span className={className}>
       {strikethroughParts.map((strikePart, strikeIndex) => {
         // Process bold within each strikethrough segment
         const boldParts = strikePart.split("**");
         const processedBold = boldParts.map((part, boldIndex) =>
-          boldIndex % 2 === 1 ? <strong key={`bold-${boldIndex}`}>{part}</strong> : part,
+          boldIndex % 2 === 1 ? (
+            <strong key={`bold-${boldIndex}`}>{part}</strong>
+          ) : (
+            part
+          ),
         );
-        
+
         // Apply strikethrough to odd-indexed segments (between ~~ markers)
         if (strikeIndex % 2 === 1) {
           return <del key={`strike-${strikeIndex}`}>{processedBold}</del>;
