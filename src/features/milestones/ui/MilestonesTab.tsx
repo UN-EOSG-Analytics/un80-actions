@@ -1089,7 +1089,7 @@ export default function MilestonesTab({
                                         </div>
                                         <div className="flex flex-col">
                                           <span className="text-xs font-medium text-slate-700">
-                                            {update.user_email?.split("@")[0] ||
+                                            {update.user_email ||
                                               "Unknown"}
                                           </span>
                                           <span className="text-[10px] text-slate-400">
@@ -1243,9 +1243,7 @@ export default function MilestonesTab({
                                                     ).toUpperCase()}
                                                   </div>
                                                   <span className="text-xs font-medium text-slate-600">
-                                                    {reply.user_email?.split(
-                                                      "@",
-                                                    )[0] || "Unknown"}
+                                                    {reply.user_email || "Unknown"}
                                                   </span>
                                                   <span className="text-[10px] text-slate-400">
                                                     {new Date(
@@ -1406,9 +1404,7 @@ export default function MilestonesTab({
                                           </div>
                                           <div className="flex flex-col">
                                             <span className="text-xs font-medium text-slate-700">
-                                              {update.user_email?.split(
-                                                "@",
-                                              )[0] || "Unknown"}
+                                              {update.user_email || "Unknown"}
                                             </span>
                                             <span className="text-[10px] text-slate-400">
                                               {new Date(
@@ -1558,9 +1554,7 @@ export default function MilestonesTab({
                                                       ).toUpperCase()}
                                                     </div>
                                                     <span className="text-xs font-medium text-slate-600">
-                                                      {reply.user_email?.split(
-                                                        "@",
-                                                      )[0] || "Unknown"}
+                                                      {reply.user_email || "Unknown"}
                                                     </span>
                                                     <span className="text-[10px] text-slate-400">
                                                       {new Date(
@@ -1713,9 +1707,7 @@ export default function MilestonesTab({
                                           </div>
                                           <div className="flex flex-col">
                                             <span className="text-xs font-medium text-slate-700">
-                                              {update.user_email?.split(
-                                                "@",
-                                              )[0] || "Unknown"}
+                                              {update.user_email || "Unknown"}
                                             </span>
                                             <span className="text-[10px] text-slate-400">
                                               {new Date(
@@ -1865,9 +1857,7 @@ export default function MilestonesTab({
                                                       ).toUpperCase()}
                                                     </div>
                                                     <span className="text-xs font-medium text-slate-600">
-                                                      {reply.user_email?.split(
-                                                        "@",
-                                                      )[0] || "Unknown"}
+                                                      {reply.user_email || "Unknown"}
                                                     </span>
                                                     <span className="text-[10px] text-slate-400">
                                                       {new Date(
