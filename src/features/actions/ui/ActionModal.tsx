@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // =========================================================
 // CONSTANTS
@@ -77,6 +77,29 @@ export default function ActionModal({
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [exporting, setExporting] = useState(false);
+  const [panelWidth, setPanelWidth] = useState(672); // 42rem ≈ max-w-2xl
+  const isResizing = useRef(false);
+
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isResizing.current = true;
+    const startX = e.clientX;
+    const startWidth = panelWidth;
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isResizing.current) return;
+      const delta = startX - e.clientX;
+      const next = Math.min(Math.max(startWidth + delta, 400), window.innerWidth - 64);
+      setPanelWidth(next);
+    };
+    const onMouseUp = () => {
+      isResizing.current = false;
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  }, [panelWidth]);
 
   // Initialize tab from URL or default to overview
   useEffect(() => {
@@ -248,10 +271,16 @@ export default function ActionModal({
       >
         {/* Slide-in panel */}
         <div
-          className={`flex h-full w-full max-w-2xl flex-col bg-slate-50 shadow-xl transition-transform duration-300 ${
+          style={{ width: panelWidth }}
+          className={`relative flex h-full w-full flex-col bg-slate-50 shadow-xl transition-transform duration-300 ${
             isVisible && !isClosing ? "translate-x-0" : "translate-x-full"
           }`}
         >
+          {/* Resize handle */}
+          <div
+            onMouseDown={handleResizeStart}
+            className="absolute top-0 left-0 h-full w-1 cursor-col-resize hover:bg-un-blue/30 active:bg-un-blue/50"
+          />
           {/* Header */}
           <div className="shrink-0 border-b border-slate-200 bg-white px-6 py-4">
             <div className="flex items-start justify-between gap-4">
@@ -288,10 +317,16 @@ export default function ActionModal({
       >
         {/* Slide-in panel */}
         <div
-          className={`flex h-full w-full max-w-2xl flex-col bg-slate-50 shadow-xl transition-transform duration-300 ${
+          style={{ width: panelWidth }}
+          className={`relative flex h-full w-full flex-col bg-slate-50 shadow-xl transition-transform duration-300 ${
             isVisible && !isClosing ? "translate-x-0" : "translate-x-full"
           }`}
         >
+          {/* Resize handle */}
+          <div
+            onMouseDown={handleResizeStart}
+            className="absolute top-0 left-0 h-full w-1 cursor-col-resize hover:bg-un-blue/30 active:bg-un-blue/50"
+          />
           {/* Header */}
           <div className="shrink-0 border-b border-slate-200 bg-white px-6 py-4">
             <div className="flex items-start justify-between gap-4">
@@ -334,10 +369,16 @@ export default function ActionModal({
     >
       {/* Slide-in panel */}
       <div
-        className={`flex h-full w-full max-w-2xl flex-col bg-slate-50 shadow-xl transition-transform duration-300 ${
+        style={{ width: panelWidth }}
+        className={`relative flex h-full w-full flex-col bg-slate-50 shadow-xl transition-transform duration-300 ${
           isVisible && !isClosing ? "translate-x-0" : "translate-x-full"
         }`}
       >
+        {/* Resize handle */}
+        <div
+          onMouseDown={handleResizeStart}
+          className="absolute top-0 left-0 h-full w-1 cursor-col-resize hover:bg-un-blue/30 active:bg-un-blue/50"
+        />
         {/* Header */}
         <div className="shrink-0 border-b border-slate-200 bg-white px-6 py-4">
           <div className="flex items-start justify-between gap-4">
