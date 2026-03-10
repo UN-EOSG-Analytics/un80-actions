@@ -28,6 +28,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  verification: {
+    google: "0Xl9bViDi09crVXboSinuzUgRMHHETveHfT4uTwEyco",
+  },
   openGraph: {
     title: "UN80 Initiative Actions Dashboard",
     description,
