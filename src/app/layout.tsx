@@ -17,9 +17,24 @@ const roboto = Roboto({
   variable: "--font-roboto",
 });
 
+const siteUrl = "https://un80actions.un.org";
+const description =
+  "This Dashboard complements the UN80 Initiative Action Plan. It provides a consolidated reference of the work packages across the three UN80 Initiative workstreams. The Dashboard shows the designated leads for each work package, along with the corresponding indicative actions, as drawn from the Secretary-General's reports on the UN80 Initiative [and the Action Plan and its annex].";
+
 export const metadata: Metadata = {
   title: "UN80 Initiative Actions Dashboard",
-  description: "",
+  description,
+  metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "UN80 Initiative Actions Dashboard",
+    description,
+    url: siteUrl,
+    siteName: "UN80 Initiative Actions Dashboard",
+    type: "website",
+  },
 };
 
 export const viewport = {
