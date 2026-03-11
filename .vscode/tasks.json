@@ -2,58 +2,58 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"type": "npm",
-			"script": "dev",
-			"label": "dev [npm]",
+			"type": "shell",
+			"command": "pnpm dev",
+			"label": "dev",
 			"detail": "next dev",
 			"problemMatcher": [],
 			"isBackground": true
 		},
 		{
-			"type": "npm",
-			"script": "build",
-			"label": "build [npm]",
+			"type": "shell",
+			"command": "pnpm build",
+			"label": "build",
 			"detail": "next build",
 			"problemMatcher": []
 		},
 		{
-			"type": "npm",
-			"script": "install",
-			"label": "install [npm]",
-			"detail": "npm install",
+			"type": "shell",
+			"command": "pnpm install",
+			"label": "install",
+			"detail": "pnpm install",
 			"problemMatcher": [],
 			"isBackground": true
 		},
 		{
-			"type": "npm",
-			"script": "start",
-			"label": "start [npm]",
+			"type": "shell",
+			"command": "pnpm start",
+			"label": "start",
 			"detail": "next start",
 			"problemMatcher": [],
 			"isBackground": true
 		},
 		{
-			"type": "npm",
-			"script": "lint",
-			"label": "lint [npm]",
+			"type": "shell",
+			"command": "pnpm lint",
+			"label": "lint",
 			"detail": "eslint",
 			"problemMatcher": [
 				"$eslint-stylish"
 			]
 		},
 		{
-			"type": "npm",
-			"script": "typecheck",
-			"label": "typecheck [npm]",
+			"type": "shell",
+			"command": "pnpm typecheck",
+			"label": "typecheck",
 			"detail": "tsc --noEmit",
 			"problemMatcher": [
 				"$tsc"
 			]
 		},
 		{
-			"type": "npm",
-			"script": "format",
-			"label": "format [npm]",
+			"type": "shell",
+			"command": "pnpm format",
+			"label": "format",
 			"detail": "prettier --write",
 			"problemMatcher": []
 		},

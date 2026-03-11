@@ -75,10 +75,10 @@ Example: adding a note → `features/notes/commands.ts`; display → `features/n
 ## Key Commands
 
 ```bash
-npm run dev             # Dev server
-npm run typecheck       # tsc --noEmit — run before committing
-npm run lint -- --fix
-npm run format
+pnpm dev                # Dev server
+pnpm typecheck          # tsc --noEmit — run before committing
+pnpm lint --fix
+pnpm format
 
 node run_migrations.js  # Run pending SQL migrations against Azure Postgres
 
@@ -104,7 +104,7 @@ The PostgreSQL database is hosted on Azure. Database name: `un80actions`. All ap
 - **Tailwind v4.1 syntax only** — do not use v3 patterns (`@apply` with arbitrary values, `theme()` fn, etc.)
 - **Single types file** — all shared types in `src/types/index.ts`; never scatter type definitions across features
 - **Server components by default** — `"use client"` only for interactive/stateful UI leaves
-- **shadcn**: `npx shadcn@latest add <component>` to add; never edit `components/ui/` primitives directly
+- **shadcn**: `pnpm dlx shadcn@latest add <component>` to add; never edit `components/ui/` primitives directly
 - **No parallel infrastructure** — reuse `query()`, `DB_SCHEMA`, `getCurrentUser()`, `blob-storage.ts`
 - Check `src/lib/utils.ts` before writing new utility functions
 - `ActionModal` in `features/actions/ui/` is the orchestrator for action detail; each tab (milestones, notes, questions, updates) is self-contained in its own feature folder
