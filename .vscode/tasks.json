@@ -1,76 +1,76 @@
 {
 	"version": "2.0.0",
 	"tasks": [
-		{
-			"type": "shell",
-			"command": "pnpm dev",
-			"label": "dev",
-			"detail": "next dev",
-			"problemMatcher": [],
-			"isBackground": true
-		},
-		{
-			"type": "shell",
-			"command": "pnpm build",
-			"label": "build",
-			"detail": "next build",
-			"problemMatcher": []
-		},
-		{
-			"type": "shell",
-			"command": "pnpm install",
-			"label": "install",
-			"detail": "pnpm install",
-			"problemMatcher": [],
-			"isBackground": true
-		},
-		{
-			"type": "shell",
-			"command": "pnpm start",
-			"label": "start",
-			"detail": "next start",
-			"problemMatcher": [],
-			"isBackground": true
-		},
-		{
-			"type": "shell",
-			"command": "pnpm lint",
-			"label": "lint",
-			"detail": "eslint",
-			"problemMatcher": [
-				"$eslint-stylish"
-			]
-		},
-		{
-			"type": "shell",
-			"command": "pnpm typecheck",
-			"label": "typecheck",
-			"detail": "tsc --noEmit",
-			"problemMatcher": [
-				"$tsc"
-			]
-		},
-		{
-			"type": "shell",
-			"command": "pnpm format",
-			"label": "format",
-			"detail": "prettier --write",
-			"problemMatcher": []
-		},
-		{
-			"type": "shell",
-			"command": "uv run python python/prepare_actions_data.py",
-			"label": "Process Actions Data",
-			"detail": "Run Python data processing pipeline",
-			"problemMatcher": []
-		},
-		{
-			"label": "Run Data Pipeline",
-			"type": "shell",
-			"command": "./run_pipeline.sh",
-			"isBackground": false,
-			"problemMatcher": [],
-			"group": "build"
-		}
-	]
+        {
+            "type": "shell",
+            "command": "pnpm dev",
+            "label": "dev",
+            "detail": "next dev",
+            "problemMatcher": [],
+            "isBackground": true
+        },
+        {
+            "type": "shell",
+            "command": "pnpm build",
+            "label": "build",
+            "detail": "next build",
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "command": "pnpm install",
+            "label": "install",
+            "detail": "pnpm install",
+            "problemMatcher": [],
+            "isBackground": true
+        },
+        {
+            "type": "shell",
+            "command": "pnpm start",
+            "label": "start",
+            "detail": "next start",
+            "problemMatcher": [],
+            "isBackground": true
+        },
+        {
+            "type": "shell",
+            "command": "pnpm lint",
+            "label": "lint",
+            "detail": "eslint",
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "type": "shell",
+            "command": "pnpm typecheck",
+            "label": "typecheck",
+            "detail": "tsc --noEmit",
+            "problemMatcher": [
+                "$tsc"
+            ]
+        },
+        {
+            "type": "shell",
+            "command": "pnpm format",
+            "label": "format",
+            "detail": "prettier --write",
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "command": "uv run python python/prepare_actions_data.py",
+            "label": "Process Actions Data",
+            "detail": "Run Python data processing pipeline",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Data Pipeline",
+            "type": "shell",
+            "command": "./run_pipeline.sh",
+            "isBackground": false,
+            "problemMatcher": [],
+            "group": "build"
+        }
+    ]
 }

@@ -282,7 +282,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
   const [filterIndicativeAction, setFilterIndicativeAction] = useState<
     string[]
   >([]);
-  const [filterBigTicket, setFilterBigTicket] = useState<boolean[]>([]);
   const [filterWorkPackageId, setFilterWorkPackageId] = useState<string>("");
   const [filterRisk, setFilterRisk] = useState<string>("");
   const [filterDeliverablesMonth, setFilterDeliverablesMonth] = useState<
@@ -321,7 +320,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     | "wpTitle"
     | "action"
     | "indicativeAction"
-    | "bigTicket"
     | "deliverablesMonth";
 
   // Apply all filters except one – used to derive "connected" filter options
@@ -356,15 +354,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
           filterIndicativeAction.includes(a.indicative_action),
         );
       }
-      if (except !== "bigTicket" && filterBigTicket.length > 0) {
-        const hasBigTicket = filterBigTicket.includes(true);
-        const hasNotBigTicket = filterBigTicket.includes(false);
-        if (hasBigTicket && !hasNotBigTicket) {
-          result = result.filter((a) => a.is_big_ticket);
-        } else if (hasNotBigTicket && !hasBigTicket) {
-          result = result.filter((a) => !a.is_big_ticket);
-        }
-      }
       if (filterWorkPackageId) {
         result = result.filter((a) =>
           String(a.work_package_id).includes(filterWorkPackageId),
@@ -397,7 +386,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
       filterWPTitle,
       filterAction,
       filterIndicativeAction,
-      filterBigTicket,
       filterWorkPackageId,
       filterRisk,
       filterDeliverablesMonth,
@@ -499,16 +487,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
         filterIndicativeAction.includes(a.indicative_action),
       );
     }
-    if (filterBigTicket.length > 0) {
-      const hasBigTicket = filterBigTicket.includes(true);
-      const hasNotBigTicket = filterBigTicket.includes(false);
-      if (hasBigTicket && !hasNotBigTicket) {
-        list = list.filter((a) => a.is_big_ticket);
-      } else if (hasNotBigTicket && !hasBigTicket) {
-        list = list.filter((a) => !a.is_big_ticket);
-      }
-      // If both are selected, show all (no filter)
-    }
     if (filterWorkPackageId) {
       list = list.filter((a) =>
         String(a.work_package_id).includes(filterWorkPackageId),
@@ -541,7 +519,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     filterWPTitle,
     filterAction,
     filterIndicativeAction,
-    filterBigTicket,
     filterWorkPackageId,
     filterRisk,
     filterDeliverablesMonth,
@@ -662,7 +639,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     filterWPTitle.length > 0 ||
     filterAction.length > 0 ||
     filterIndicativeAction.length > 0 ||
-    filterBigTicket.length > 0 ||
     filterWorkPackageId.length > 0 ||
     filterRisk.length > 0 ||
     filterDeliverablesMonth != null ||
@@ -673,7 +649,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     setFilterWPTitle([]);
     setFilterAction([]);
     setFilterIndicativeAction([]);
-    setFilterBigTicket([]);
     setFilterWorkPackageId("");
     setFilterRisk("");
     setFilterDeliverablesMonth(null);
@@ -1062,30 +1037,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   </button>
                 </th>
               )}
-              <th className="px-4 py-3 whitespace-nowrap">
-                <div className="flex items-center gap-2">
-                  <span>BIG TICKET</span>
-                  <MultiSelectFilter
-                    filterKey="bigTicket"
-                    options={[true, false]}
-                    selected={filterBigTicket}
-                    onToggle={(value) => {
-                      setFilterBigTicket((prev) =>
-                        prev.includes(value)
-                          ? prev.filter((v) => v !== value)
-                          : [...prev, value],
-                      );
-                    }}
-                    renderOption={(value) =>
-                      value ? "Big Ticket" : "Not Big Ticket"
-                    }
-                    isOpen={openFilters.bigTicket || false}
-                    onOpenChange={(open) =>
-                      setOpenFilters((prev) => ({ ...prev, bigTicket: open }))
-                    }
-                  />
-                </div>
-              </th>
               <th className="w-10 px-4 py-3"></th>
             </tr>
           </thead>
@@ -1093,7 +1044,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
             {sortedActions.length === 0 ? (
               <tr>
                 <td
-                  colSpan={isAdmin ? 8 : 7}
+                  colSpan={isAdmin ? 7 : 6}
                   className="px-4 py-12 text-center text-gray-400"
                 >
                   No actions found
@@ -1191,13 +1142,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                       </Select>
                     </td>
                   )}
-                  <td className="px-4 py-3 text-center">
-                    {a.is_big_ticket && (
-                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-un-blue text-xs font-bold text-white">
-                        !
-                      </span>
-                    )}
-                  </td>
                   <td className="px-4 py-3 text-gray-400">
                     <ChevronRight className="h-4 w-4" />
                   </td>
