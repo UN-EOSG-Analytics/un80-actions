@@ -505,6 +505,85 @@ export async function getMilestoneViewTableData(): Promise<MilestoneViewRow[]> {
 }
 
 // =========================================================
+// ALL MILESTONES TABLE (one row per milestone)
+// =========================================================
+
+export interface AllMilestonesTableRow {
+  milestone_id: string;
+  work_package_id: number;
+  work_package_title: string;
+  action_id: number;
+  action_sub_id: string | null;
+  milestone_type: "first" | "second" | "third" | "upcoming" | "final";
+  is_public: boolean;
+  description: string | null;
+  deadline: string | null;
+  // Status flags
+  is_draft: boolean;
+  is_approved: boolean;
+  needs_attention: boolean;
+  needs_ola_review: boolean;
+  reviewed_by_ola: boolean;
+  finalized: boolean;
+  attention_to_timeline: boolean;
+  confirmation_needed: boolean;
+  milestone_document_submitted: boolean;
+  // Public progress
+  public_progress: "in_progress" | "delayed" | "completed" | null;
+  // Submission info
+  submitted_by_entity: string | null;
+  submitted_at: Date | null;
+}
+
+/**
+ * Fetch all milestones for the admin milestones table: one row per milestone.
+ */
+export async function getAllMilestonesTableData(): Promise<
+  AllMilestonesTableRow[]
+> {
+  const q = `
+    SELECT
+      m.id AS milestone_id,
+      wp.id AS work_package_id,
+      wp.work_package_title,
+      a.id AS action_id,
+      a.sub_id AS action_sub_id,
+      m.milestone_type,
+      m.is_public,
+      m.description,
+      m.deadline::text,
+      COALESCE(m.is_draft, false) AS is_draft,
+      COALESCE(m.is_approved, false) AS is_approved,
+      COALESCE(m.needs_attention, false) AS needs_attention,
+      COALESCE(m.needs_ola_review, false) AS needs_ola_review,
+      COALESCE(m.reviewed_by_ola, false) AS reviewed_by_ola,
+      COALESCE(m.finalized, false) AS finalized,
+      COALESCE(m.attention_to_timeline, false) AS attention_to_timeline,
+      COALESCE(m.confirmation_needed, false) AS confirmation_needed,
+      COALESCE(m.milestone_document_submitted, false) AS milestone_document_submitted,
+      m.public_progress,
+      m.submitted_by_entity,
+      m.submitted_at
+    FROM ${DB_SCHEMA}.action_milestones m
+    JOIN actions a ON a.id = m.action_id AND (a.sub_id IS NOT DISTINCT FROM m.action_sub_id)
+    JOIN work_packages wp ON wp.id = a.work_package_id
+    ORDER BY
+      wp.id,
+      a.id,
+      a.sub_id ASC NULLS FIRST,
+      CASE m.milestone_type
+        WHEN 'first' THEN 1
+        WHEN 'second' THEN 2
+        WHEN 'third' THEN 3
+        WHEN 'upcoming' THEN 4
+        WHEN 'final' THEN 5
+      END,
+      m.deadline ASC NULLS LAST
+  `;
+  return query<AllMilestonesTableRow>(q);
+}
+
+// =========================================================
 // PUBLIC MILESTONES VIEW
 // =========================================================
 
