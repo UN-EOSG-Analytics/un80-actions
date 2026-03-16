@@ -7,6 +7,29 @@ import { usePathname } from "next/navigation";
 import { UserMenu } from "../features/auth/ui/UserMenu";
 import { ActivityFeed } from "../features/activity/ui/ActivityFeed";
 
+function NavLink({
+  href,
+  active,
+  children,
+}: {
+  href: string;
+  active: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`relative px-3 py-1.5 text-sm font-medium transition-colors rounded-md ${
+        active
+          ? "text-un-blue bg-un-blue/8"
+          : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+      }`}
+    >
+      {children}
+    </Link>
+  );
+}
+
 interface Props {
   user?: { email: string; entity?: string | null } | null;
   isAdmin?: boolean;
@@ -18,16 +41,15 @@ export function Header({ user, isAdmin, children, maxWidth = "7xl" }: Props) {
   const pathname = usePathname();
   const isLoggedIn = !!user;
   const isLoginPage = pathname === "/login";
-  const isMilestonePage = pathname?.startsWith("/milestones");
-  const isPublicMilestonePage = pathname?.startsWith("/milestones/public");
   const isAdminMilestonePage =
-    pathname?.startsWith("/milestones") && !isPublicMilestonePage;
+    pathname?.startsWith("/milestones") &&
+    !pathname?.startsWith("/milestones/public");
   const widthClass = maxWidth === "6xl" ? "max-w-6xl" : "max-w-7xl";
 
   return (
-    <header className="border-b border-gray-200 bg-white px-6">
+    <header className="border-b border-gray-200 bg-white px-6 [border-top:3px_solid_#009edb]">
       <div
-        className={`mx-auto flex ${widthClass} items-center justify-between py-4`}
+        className={`mx-auto flex ${widthClass} items-center justify-between py-3`}
       >
         <Link href="/" className="flex items-center gap-3 hover:opacity-90">
           <Image
@@ -36,39 +58,28 @@ export function Header({ user, isAdmin, children, maxWidth = "7xl" }: Props) {
             width={50}
             height={50}
             priority
-            className="h-12 w-auto select-none"
+            className="h-11 w-auto select-none"
             draggable={false}
           />
           <div>
-            <h1 className="text-xl font-bold text-gray-900">{SITE_TITLE}</h1>
-            <p className="text-xs text-gray-500">{SITE_SUBTITLE}</p>
+            <h1 className="text-[15px] font-bold tracking-tight text-gray-900">{SITE_TITLE}</h1>
+            <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400">{SITE_SUBTITLE}</p>
           </div>
         </Link>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {isLoggedIn ? (
             <>
-              <Link
-                href="/milestones/public"
-                className={`text-sm font-medium transition-colors ${
-                  isPublicMilestonePage
-                    ? "text-un-blue"
-                    : "text-gray-600 hover:text-un-blue"
-                }`}
-              >
-                Public Milestones
-              </Link>
-              {isAdmin && (
-                <Link
-                  href="/milestones"
-                  className={`text-sm font-medium transition-colors ${
-                    isAdminMilestonePage
-                      ? "text-un-blue"
-                      : "text-gray-600 hover:text-un-blue"
-                  }`}
-                >
-                  Milestones
-                </Link>
-              )}
+              <nav className="flex items-center gap-1">
+                <NavLink href="/" active={pathname === "/"}>
+                  Actions
+                </NavLink>
+                {isAdmin && (
+                  <NavLink href="/milestones" active={isAdminMilestonePage}>
+                    Milestones
+                  </NavLink>
+                )}
+              </nav>
+              <div className="h-5 w-px bg-gray-200" />
               <ActivityFeed />
               <UserMenu
                 email={user.email}
