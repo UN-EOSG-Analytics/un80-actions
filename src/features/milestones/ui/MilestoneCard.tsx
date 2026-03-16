@@ -24,7 +24,6 @@ import {
   MessageSquare,
   Pencil,
   Send,
-  Trash2,
 } from "lucide-react";
 import { formatUNDate } from "@/lib/format-date";
 import type { ActionMilestone } from "@/types";
@@ -35,6 +34,7 @@ export type PublicProgressValue = "completed" | "in_progress" | "delayed";
 interface MilestoneCardProps {
   milestone: ActionMilestone;
   updates: MilestoneUpdate[];
+  activePanel?: "edit" | "history" | "comments" | null;
   onEdit: () => void;
   onDelete?: () => void;
   onComment: () => void;
@@ -61,6 +61,7 @@ interface MilestoneCardProps {
 export function MilestoneCard({
   milestone,
   updates,
+  activePanel = null,
   onEdit,
   onDelete,
   onComment,
@@ -168,7 +169,7 @@ export function MilestoneCard({
     })();
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 transition-shadow hover:shadow-md">
+    <div className="px-4 py-3">
       {/* Single row layout for consistency */}
       <div className="flex items-start gap-4">
         {/* Left: Content */}
@@ -454,24 +455,26 @@ export function MilestoneCard({
           </div>
         </div>
 
-        {/* Right: Actions - fixed width for alignment */}
+        {/* Right: Actions */}
         <div className="flex shrink-0 items-center gap-0.5">
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onShowHistory();
-            }}
-            className="rounded p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            onClick={(e) => { e.stopPropagation(); onShowHistory(); }}
+            className={`rounded p-1.5 transition-colors ${
+              activePanel === "history"
+                ? "bg-slate-200 text-slate-700"
+                : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            }`}
             title="Version history"
           >
             <Clock className="h-4 w-4" />
           </button>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onComment();
-            }}
-            className="relative rounded p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            onClick={(e) => { e.stopPropagation(); onComment(); }}
+            className={`relative rounded p-1.5 transition-colors ${
+              activePanel === "comments"
+                ? "bg-un-blue/10 text-un-blue"
+                : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            }`}
             title="Comments"
           >
             <MessageSquare className="h-4 w-4" />
@@ -483,26 +486,15 @@ export function MilestoneCard({
           </button>
           {isAdmin && (
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-              }}
-              className="rounded p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+              onClick={(e) => { e.stopPropagation(); onEdit(); }}
+              className={`rounded p-1.5 transition-colors ${
+                activePanel === "edit"
+                  ? "bg-slate-200 text-slate-700"
+                  : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              }`}
               title="Edit"
             >
               <Pencil className="h-4 w-4" />
-            </button>
-          )}
-          {isAdmin && onDelete && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete();
-              }}
-              className="rounded p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
-              title="Delete milestone"
-            >
-              <Trash2 className="h-4 w-4" />
             </button>
           )}
         </div>

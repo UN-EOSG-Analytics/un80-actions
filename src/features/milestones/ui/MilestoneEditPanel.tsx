@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/DatePicker";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, Trash2 } from "lucide-react";
 
 export interface MilestoneEditForm {
   description: string;
@@ -16,6 +16,7 @@ interface MilestoneEditPanelProps {
   onChange: (form: MilestoneEditForm) => void;
   onSave: () => void;
   onCancel: () => void;
+  onDelete?: () => void;
 }
 
 export function MilestoneEditPanel({
@@ -25,6 +26,7 @@ export function MilestoneEditPanel({
   onChange,
   onSave,
   onCancel,
+  onDelete,
 }: MilestoneEditPanelProps) {
   return (
     <div className="space-y-3">
@@ -52,23 +54,38 @@ export function MilestoneEditPanel({
         />
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <div className="flex justify-end gap-2">
-        <Button variant="outline" size="sm" onClick={onCancel} disabled={saving}>
-          Cancel
-        </Button>
-        <Button
-          size="sm"
-          onClick={onSave}
-          disabled={saving}
-          className="bg-un-blue hover:bg-un-blue/90"
-        >
-          {saving ? (
-            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-          ) : (
-            <Check className="mr-1 h-3 w-3" />
-          )}
-          Save
-        </Button>
+      <div className="flex items-center justify-between">
+        {onDelete ? (
+          <Button
+            size="sm"
+            onClick={onDelete}
+            disabled={saving}
+            className="bg-red-500 hover:bg-red-600 text-white"
+          >
+            <Trash2 className="mr-1 h-3 w-3" />
+            Delete
+          </Button>
+        ) : (
+          <span />
+        )}
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={onCancel} disabled={saving}>
+            Cancel
+          </Button>
+          <Button
+            size="sm"
+            onClick={onSave}
+            disabled={saving}
+            className="bg-un-blue hover:bg-un-blue/90"
+          >
+            {saving ? (
+              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+            ) : (
+              <Check className="mr-1 h-3 w-3" />
+            )}
+            Save
+          </Button>
+        </div>
       </div>
     </div>
   );

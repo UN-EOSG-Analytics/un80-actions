@@ -1,6 +1,5 @@
 "use client";
 
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import type { MilestoneVersion } from "@/features/milestones/queries";
 import type { MilestoneUpdate } from "@/features/milestones/updates-queries";
 import type { ActionMilestone } from "@/types";
@@ -131,10 +130,11 @@ export function MilestoneRow({
   const showNewCommentForm = addingCommentId === milestone.id && !replyingToId;
 
   return (
-    <Collapsible open={isOpen}>
+    <div className={`rounded-lg border bg-white transition-shadow ${isOpen ? "border-slate-300 shadow-sm" : "border-slate-200 hover:shadow-md"}`}>
       <MilestoneCard
         milestone={milestone}
         updates={updates}
+        activePanel={openPanel}
         isAdmin={isAdmin}
         documentSubmitted={documentSubmitted}
         publicProgress={publicProgress}
@@ -147,8 +147,10 @@ export function MilestoneRow({
         onPublicProgressChange={onPublicProgressChange}
       />
 
-      <CollapsibleContent>
-        <div className="border-t border-slate-200 p-4">
+      {/* CSS grid-rows expansion — no height measurement, no layout jump on the card header */}
+      <div className={`grid transition-[grid-template-rows] duration-200 ease-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+        <div className="overflow-hidden">
+        <div className="border-t border-slate-200 px-4 py-4">
           {openPanel === "edit" && (
             <MilestoneEditPanel
               form={editForm}
@@ -157,6 +159,7 @@ export function MilestoneRow({
               onChange={onEditFormChange}
               onSave={onEditSave}
               onCancel={onClosePanel}
+              onDelete={onDelete}
             />
           )}
 
@@ -265,7 +268,8 @@ export function MilestoneRow({
             </div>
           )}
         </div>
-      </CollapsibleContent>
-    </Collapsible>
+        </div>
+      </div>
+    </div>
   );
 }
