@@ -252,7 +252,7 @@ function SortIcon({
   sortDirection,
 }: {
   column: SortField;
-  sortField: SortField;
+  sortField: SortField | null;
   sortDirection: SortDirection;
 }) {
   if (sortField !== column)
@@ -272,7 +272,7 @@ interface ActionsTableProps {
 export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
   const router = useRouter();
   const [searchInput, setSearchInput] = useState("");
-  const [sortField, setSortField] = useState<SortField>("action_id");
+  const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   // Column filters (multiselect - arrays)
@@ -550,36 +550,57 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
   const sortedActions = useMemo(() => {
     const dir = sortDirection === "asc" ? 1 : -1;
     return [...filteredActions].sort((a, b) => {
-      let cmp = 0;
-      if (sortField === "work_package_id") {
-        cmp = a.work_package_id - b.work_package_id;
-      } else if (sortField === "action_id") {
-        cmp =
-          a.action_id - b.action_id ||
-          (a.action_sub_id ?? "").localeCompare(b.action_sub_id ?? "");
-      } else if (sortField === "work_package_title") {
-        cmp = a.work_package_title.localeCompare(b.work_package_title);
-      } else if (sortField === "indicative_action") {
-        cmp = a.indicative_action.localeCompare(b.indicative_action);
-      } else if (sortField === "risk_assessment") {
-        const order: Record<string, number> = {
-          low_risk: 0,
-          medium_risk: 1,
-          at_risk: 2,
-        };
-        const av = a.risk_assessment ?? "";
-        const bv = b.risk_assessment ?? "";
-        cmp = (order[av] ?? -1) - (order[bv] ?? -1);
-      } else if (sortField === "deliverables") {
-        const order: Record<string, number> = {
-          submitted: 0,
-          not_submitted: 1,
-        };
-        const av = getDeliverablesStatus(a, filterDeliverablesMonth) ?? "";
-        const bv = getDeliverablesStatus(b, filterDeliverablesMonth) ?? "";
-        cmp = (order[av] ?? 2) - (order[bv] ?? 2);
+      // User-selected primary sort (overrides default when active)
+      if (sortField !== null) {
+        let cmp = 0;
+        if (sortField === "work_package_id") {
+          cmp = a.work_package_id - b.work_package_id;
+        } else if (sortField === "action_id") {
+          cmp =
+            a.action_id - b.action_id ||
+            (a.action_sub_id ?? "").localeCompare(b.action_sub_id ?? "");
+        } else if (sortField === "work_package_title") {
+          cmp = a.work_package_title.localeCompare(b.work_package_title);
+        } else if (sortField === "indicative_action") {
+          cmp = a.indicative_action.localeCompare(b.indicative_action);
+        } else if (sortField === "risk_assessment") {
+          const order: Record<string, number> = {
+            low_risk: 0,
+            medium_risk: 1,
+            at_risk: 2,
+          };
+          const av = a.risk_assessment ?? "";
+          const bv = b.risk_assessment ?? "";
+          cmp = (order[av] ?? -1) - (order[bv] ?? -1);
+        } else if (sortField === "deliverables") {
+          const order: Record<string, number> = {
+            submitted: 0,
+            not_submitted: 1,
+          };
+          const av = getDeliverablesStatus(a, filterDeliverablesMonth) ?? "";
+          const bv = getDeliverablesStatus(b, filterDeliverablesMonth) ?? "";
+          cmp = (order[av] ?? 2) - (order[bv] ?? 2);
+        }
+        if (cmp !== 0) return cmp * dir;
       }
-      return cmp * dir;
+
+      // Default compound sort: WP → Action → Vis (public first) → deadline (earlier first)
+      const wpCmp = a.work_package_id - b.work_package_id;
+      if (wpCmp !== 0) return wpCmp;
+
+      const actionCmp =
+        a.action_id - b.action_id ||
+        (a.action_sub_id ?? "").localeCompare(b.action_sub_id ?? "");
+      if (actionCmp !== 0) return actionCmp;
+
+      const aPublic = a.public_action_status !== null ? 0 : 1;
+      const bPublic = b.public_action_status !== null ? 0 : 1;
+      const visCmp = aPublic - bPublic;
+      if (visCmp !== 0) return visCmp;
+
+      const aDeadline = a.deliverables_deadline_month ?? Infinity;
+      const bDeadline = b.deliverables_deadline_month ?? Infinity;
+      return aDeadline - bDeadline;
     });
   }, [filteredActions, sortField, sortDirection, filterDeliverablesMonth]);
 
@@ -597,7 +618,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     const actionParam = actionSubId
       ? `${actionId}${actionSubId}`
       : `${actionId}`;
-    router.push(`/?action=${actionParam}`, { scroll: false });
+    router.push(`/actions?action=${actionParam}`, { scroll: false });
   };
 
   const handleRiskChange = async (
@@ -657,6 +678,21 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
 
   return (
     <div className="space-y-4">
+      {/* Page header */}
+      <div className="flex items-end justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Actions</h2>
+          <p className="mt-0.5 text-sm text-gray-500">
+            {data.workPackages.length} work packages &middot; {allActions.length} actions
+          </p>
+        </div>
+        <span className="mb-0.5 text-sm text-gray-400">
+          {sortedActions.length !== allActions.length
+            ? `${sortedActions.length} of ${allActions.length} shown`
+            : null}
+        </span>
+      </div>
+
       {/* Search + Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative">

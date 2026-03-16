@@ -1,26 +1,22 @@
 import { redirect } from "next/navigation";
+import { ActionsTable } from "@/features/actions/ui/ActionsTable";
+import { getActionsTableData } from "@/features/actions/queries";
 import { getCurrentUser } from "@/features/auth/service";
-import { getAllMilestonesTableData } from "@/features/milestones/queries";
-import { MilestonesTable } from "@/features/milestones/ui/MilestonesTable";
 
-export default async function MilestonesPage() {
+export default async function ActionsPage() {
   const user = await getCurrentUser();
 
   if (!user) {
     redirect("/login");
   }
 
+  const data = await getActionsTableData();
   const isAdmin = user.user_role === "Admin" || user.user_role === "Legal";
-  if (!isAdmin) {
-    redirect("/actions");
-  }
-
-  const rows = await getAllMilestonesTableData();
 
   return (
     <main className="flex-1 bg-background px-4 py-4 sm:px-6 sm:py-4">
       <div className="mx-auto max-w-7xl">
-        <MilestonesTable rows={rows} />
+        <ActionsTable data={data} isAdmin={isAdmin} />
       </div>
     </main>
   );

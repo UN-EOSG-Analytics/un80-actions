@@ -51,7 +51,7 @@ export function Header({ user, isAdmin, children, maxWidth = "7xl" }: Props) {
       <div
         className={`mx-auto flex ${widthClass} items-center justify-between py-3`}
       >
-        <Link href="/" className="flex items-center gap-3 hover:opacity-90">
+        <Link href="/actions" className="flex items-center gap-3 hover:opacity-90">
           <Image
             src="/images/un-logo-stacked-colour-english.svg"
             alt="UN Logo"
@@ -70,7 +70,7 @@ export function Header({ user, isAdmin, children, maxWidth = "7xl" }: Props) {
           {isLoggedIn ? (
             <>
               <nav className="flex items-center gap-1">
-                <NavLink href="/" active={pathname === "/"}>
+                <NavLink href="/actions" active={pathname === "/actions"}>
                   Actions
                 </NavLink>
                 {isAdmin && (

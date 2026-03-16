@@ -79,7 +79,7 @@ export default function ModalHandler({
 
   const handleClose = () => {
     // Get stored return URL and clear it
-    const returnUrl = sessionStorage.getItem(RETURN_URL_KEY) || "/";
+    const returnUrl = sessionStorage.getItem(RETURN_URL_KEY) || "/actions";
     sessionStorage.removeItem(RETURN_URL_KEY);
     sessionStorage.removeItem("actionModalOpen");
     router.replace(returnUrl, { scroll: false });

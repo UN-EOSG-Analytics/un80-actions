@@ -813,6 +813,21 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
 
   return (
     <div className="space-y-3">
+      {/* Page header */}
+      <div className="flex items-end justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Milestones</h2>
+          <p className="mt-0.5 text-sm text-gray-500">
+            {rows.length} milestones across all actions
+          </p>
+        </div>
+        {sortedRows.length !== rows.length && (
+          <span className="mb-0.5 text-sm text-gray-400">
+            {sortedRows.length} of {rows.length} shown
+          </span>
+        )}
+      </div>
+
       {/* Search bar */}
       <div className="flex items-center gap-3">
         <div className="relative">
@@ -845,10 +860,6 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
             Clear all
           </button>
         )}
-
-        <span className="ml-auto text-sm text-gray-400">
-          {sortedRows.length} milestone{sortedRows.length !== 1 ? "s" : ""}
-        </span>
       </div>
 
       {/* Table */}
