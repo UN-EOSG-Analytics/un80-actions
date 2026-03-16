@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { DatePicker } from "@/components/DatePicker";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -670,15 +671,11 @@ export default function QuestionsTab({
           <label className="mb-1 block text-xs font-medium text-slate-600">
             Date *
           </label>
-          <input
-            type="date"
+          <DatePicker
             value={newQuestion.question_date}
-            onChange={(e) =>
-              setNewQuestion({ ...newQuestion, question_date: e.target.value })
-            }
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+            onChange={(v) => setNewQuestion({ ...newQuestion, question_date: v })}
             disabled={submitting}
-            required
+            placeholder="Select date"
           />
         </div>
         <div>
@@ -1021,17 +1018,13 @@ export default function QuestionsTab({
                           <label className="mb-1 block text-xs font-medium text-slate-600">
                             Date *
                           </label>
-                          <input
-                            type="date"
+                          <DatePicker
                             value={editingQuestion.question_date}
-                            onChange={(e) =>
-                              setEditingQuestion({
-                                ...editingQuestion,
-                                question_date: e.target.value,
-                              })
+                            onChange={(v) =>
+                              setEditingQuestion({ ...editingQuestion, question_date: v })
                             }
-                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
                             disabled={saving}
+                            placeholder="Select date"
                           />
                         </div>
                         <div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { DatePicker } from "@/components/DatePicker";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -343,15 +344,11 @@ export default function NotesTab({
           <label className="mb-1.5 block text-xs font-medium text-slate-600">
             Date *
           </label>
-          <input
-            type="date"
+          <DatePicker
             value={newNote.note_date}
-            onChange={(e) =>
-              setNewNote({ ...newNote, note_date: e.target.value })
-            }
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+            onChange={(v) => setNewNote({ ...newNote, note_date: v })}
             disabled={submitting}
-            required
+            placeholder="Select date"
           />
         </div>
         <div>
@@ -437,18 +434,13 @@ export default function NotesTab({
                       <label className="mb-1.5 block text-xs font-medium text-slate-600">
                         Date *
                       </label>
-                      <input
-                        type="date"
+                      <DatePicker
                         value={editingNote.note_date}
-                        onChange={(e) =>
-                          setEditingNote({
-                            ...editingNote,
-                            note_date: e.target.value,
-                          })
+                        onChange={(v) =>
+                          setEditingNote({ ...editingNote, note_date: v })
                         }
-                        className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
                         disabled={saving}
-                        required
+                        placeholder="Select date"
                       />
                     </div>
                     <div>

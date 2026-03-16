@@ -61,6 +61,7 @@ import {
 } from "@/features/attachments/commands";
 
 import { formatUNDate } from "@/lib/format-date";
+import { DatePicker } from "@/components/DatePicker";
 import type {
   Action,
   ActionMilestone,
@@ -924,17 +925,11 @@ export default function MilestonesTab({
                   <label className="mb-1 block text-xs font-medium text-slate-600">
                     Deadline
                   </label>
-                  <input
-                    type="date"
+                  <DatePicker
                     value={editForm.deadline}
-                    onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        deadline: e.target.value,
-                      })
-                    }
-                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                    onChange={(v) => setEditForm({ ...editForm, deadline: v })}
                     disabled={saving}
+                    placeholder="Select deadline"
                   />
                 </div>
                 {error && <p className="text-sm text-red-600">{error}</p>}
@@ -2148,18 +2143,13 @@ export default function MilestonesTab({
                 <label className="mb-1 block text-xs font-medium text-slate-600">
                   Deadline <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="date"
+                <DatePicker
                   value={newMilestoneForm.deadline}
-                  onChange={(e) =>
-                    setNewMilestoneForm({
-                      ...newMilestoneForm,
-                      deadline: e.target.value,
-                    })
+                  onChange={(v) =>
+                    setNewMilestoneForm({ ...newMilestoneForm, deadline: v })
                   }
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
                   disabled={saving}
-                  required
+                  placeholder="Select deadline"
                 />
               </div>
               {error && <p className="text-sm text-red-600">{error}</p>}
@@ -2270,18 +2260,13 @@ export default function MilestonesTab({
                 <label className="mb-1 block text-xs font-medium text-slate-600">
                   Deadline <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="date"
+                <DatePicker
                   value={newMilestoneForm.deadline}
-                  onChange={(e) =>
-                    setNewMilestoneForm({
-                      ...newMilestoneForm,
-                      deadline: e.target.value,
-                    })
+                  onChange={(v) =>
+                    setNewMilestoneForm({ ...newMilestoneForm, deadline: v })
                   }
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
                   disabled={saving}
-                  required
+                  placeholder="Select deadline"
                 />
               </div>
               {error && <p className="text-sm text-red-600">{error}</p>}
