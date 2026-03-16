@@ -65,6 +65,24 @@ export function formatUNTime(date: Date | string): string {
   }
 }
 
+const MONTHS_SHORT = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+/**
+ * Format date in compact style: "31 Dec 2025"
+ * Date-only strings (YYYY-MM-DD) are treated as calendar dates to avoid timezone shifting.
+ */
+export function formatShortDate(date: Date | string): string {
+  if (typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date.trim())) {
+    const [y, m, d] = date.trim().split("-").map(Number);
+    return `${d} ${MONTHS_SHORT[m - 1]} ${y}`;
+  }
+  const d = typeof date === "string" ? new Date(date) : date;
+  return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;
+}
+
 /**
  * Format date and time together: "21 April 2004, 9.05 p.m."
  */

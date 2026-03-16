@@ -1,31 +1,21 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  AlertCircle,
   Calendar,
   Check,
   ChevronDown,
-  Circle,
   Clock,
   MessageSquare,
   Pencil,
-  Send,
 } from "lucide-react";
-import { formatUNDate } from "@/lib/format-date";
+import { formatShortDate } from "@/lib/format-date";
 import type { ActionMilestone } from "@/types";
 import type { MilestoneUpdate } from "@/features/milestones/updates-queries";
 
@@ -74,47 +64,17 @@ export function MilestoneCard({
   isAdmin = false,
 }: MilestoneCardProps) {
   // Determine display status
+  // dot color + label text — consistent badge system
   const getDisplayStatus = () => {
-    if (milestone.is_draft) {
-      return { label: "Draft", className: "bg-slate-100 text-slate-600" };
-    }
-    if (milestone.finalized) {
-      return { label: "Finalized", className: "bg-green-100 text-green-700" };
-    }
-    if (milestone.confirmation_needed) {
-      return {
-        label: "Confirmation needed",
-        className: "bg-orange-100 text-orange-700",
-      };
-    }
-    if (milestone.attention_to_timeline) {
-      return {
-        label: "Attention to timeline",
-        className: "bg-yellow-100 text-yellow-700",
-      };
-    }
-    if (milestone.reviewed_by_ola) {
-      return {
-        label: "Reviewed by OLA",
-        className: "bg-blue-100 text-blue-700",
-      };
-    }
-    if (milestone.is_approved) {
-      return { label: "Approved", className: "bg-green-100 text-green-700" };
-    }
-    if (milestone.needs_attention) {
-      return {
-        label: "Needs Attention",
-        className: "bg-amber-100 text-amber-700",
-      };
-    }
-    if (milestone.needs_ola_review) {
-      return {
-        label: "Needs OLA review",
-        className: "bg-violet-100 text-violet-700",
-      };
-    }
-    return { label: "In Review", className: "bg-blue-100 text-blue-700" };
+    if (milestone.is_draft)            return { label: "Draft",                  dot: "bg-slate-400",   className: "border-slate-200  bg-slate-50   text-slate-600"  };
+    if (milestone.finalized)           return { label: "Finalized",              dot: "bg-emerald-500", className: "border-emerald-200 bg-emerald-50 text-emerald-700" };
+    if (milestone.confirmation_needed) return { label: "Confirmation needed",    dot: "bg-orange-400",  className: "border-orange-200  bg-orange-50   text-orange-700"  };
+    if (milestone.attention_to_timeline) return { label: "Attention to timeline", dot: "bg-yellow-400", className: "border-yellow-200  bg-yellow-50   text-yellow-700"  };
+    if (milestone.reviewed_by_ola)     return { label: "Reviewed by OLA",        dot: "bg-sky-500",     className: "border-sky-200     bg-sky-50      text-sky-700"     };
+    if (milestone.is_approved)         return { label: "Approved",               dot: "bg-emerald-500", className: "border-emerald-200 bg-emerald-50 text-emerald-700" };
+    if (milestone.needs_attention)     return { label: "Needs attention",        dot: "bg-amber-400",   className: "border-amber-200   bg-amber-50    text-amber-700"   };
+    if (milestone.needs_ola_review)    return { label: "Needs OLA review",       dot: "bg-violet-500",  className: "border-violet-200  bg-violet-50   text-violet-700"  };
+    return                                    { label: "In review",              dot: "bg-blue-400",    className: "border-blue-200    bg-blue-50     text-blue-700"    };
   };
 
   const status = getDisplayStatus();
@@ -168,295 +128,176 @@ export function MilestoneCard({
       return deadlineDate < today;
     })();
 
+  const publicProgress_ = (publicProgress ?? "in_progress") as PublicProgressValue;
+  const progressConfig = {
+    completed:   { style: "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100", dot: "bg-emerald-500", label: "Completed"  },
+    in_progress: { style: "border-blue-200    bg-blue-50    text-blue-700    hover:bg-blue-100",    dot: "bg-blue-400",   label: "In progress" },
+    delayed:     { style: "border-amber-200   bg-amber-50   text-amber-700   hover:bg-amber-100",   dot: "bg-amber-400",  label: "Delayed"     },
+  }[publicProgress_];
+  const progressStyle = progressConfig.style;
+
   return (
     <div className="px-4 py-3">
-      {/* Single row layout for consistency */}
-      <div className="flex items-start gap-4">
-        {/* Left: Content */}
-        <div className="min-w-0 flex-1 space-y-1.5">
-          {/* Title row with label */}
-          <div className="flex items-start gap-3">
-            <span className="mt-0.5 shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-500">
-              {milestoneLabel}
+      {/* 3-column grid: [label] [content] [actions] */}
+      <div className="grid items-start gap-x-3" style={{ gridTemplateColumns: "auto 1fr auto" }}>
+
+        {/* Col 1: Type label — original square chip */}
+        <div className="pt-0.5">
+          <span className="inline-block shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-500 leading-tight">
+            {milestoneLabel}
+          </span>
+        </div>
+
+        {/* Col 2: Description + meta row */}
+        <div className="space-y-2 min-w-0">
+          <p className="text-sm leading-snug font-medium text-slate-900">
+            {milestone.description || (
+              <span className="font-normal text-slate-400 italic">No description</span>
+            )}
+          </p>
+
+          {/* Meta row */}
+          <div className="flex flex-wrap items-center gap-1.5">
+
+            {/* Date — plain text with icon */}
+            <span className={`flex shrink-0 items-center gap-1 text-xs tabular-nums ${isPastDue && !documentSubmitted ? "text-red-600 font-medium" : "text-slate-500"}`}>
+              <Calendar className="h-3 w-3 shrink-0" />
+              {milestone.deadline
+                ? formatShortDate(milestone.deadline)
+                : <span className="italic">No deadline</span>}
             </span>
-            <div className="min-w-0 flex-1 space-y-1.5">
-              <p className="text-sm leading-snug font-medium text-slate-900">
-                {milestone.description || (
-                  <span className="font-normal text-slate-400 italic">
-                    No description
-                  </span>
-                )}
-              </p>
-              {/* Meta row: Badge + Deadline - aligned with title */}
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                {isAdmin && onStatusChange ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        className={`inline-flex items-center gap-1 rounded-full ${status.className} px-2.5 py-0.5 text-xs font-medium transition-colors hover:opacity-80`}
-                      >
-                        {status.label}
-                        <ChevronDown className="h-3 w-3" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-40">
-                      {milestone.is_public ? (
-                        // Public milestones: draft, needs OLA review, reviewed by OLA, finalized
-                        <>
-                          <DropdownMenuItem
-                            onClick={() => onStatusChange("draft")}
-                            disabled={currentStatus === "draft"}
-                          >
-                            <span className="flex w-full items-center justify-between">
-                              Draft
-                              {currentStatus === "draft" && (
-                                <Check className="h-3 w-3" />
-                              )}
-                            </span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => onStatusChange("needs_ola_review")}
-                            disabled={currentStatus === "needs_ola_review"}
-                          >
-                            <span className="flex w-full items-center justify-between">
-                              Needs OLA review
-                              {currentStatus === "needs_ola_review" && (
-                                <Check className="h-3 w-3" />
-                              )}
-                            </span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => onStatusChange("reviewed_by_ola")}
-                            disabled={currentStatus === "reviewed_by_ola"}
-                          >
-                            <span className="flex w-full items-center justify-between">
-                              Reviewed by OLA
-                              {currentStatus === "reviewed_by_ola" && (
-                                <Check className="h-3 w-3" />
-                              )}
-                            </span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => onStatusChange("finalized")}
-                            disabled={currentStatus === "finalized"}
-                          >
-                            <span className="flex w-full items-center justify-between">
-                              Finalized
-                              {currentStatus === "finalized" && (
-                                <Check className="h-3 w-3" />
-                              )}
-                            </span>
-                          </DropdownMenuItem>
-                        </>
-                      ) : (
-                        // Internal milestones: draft, needs attention, attention to timeline, confirmation needed, approved, finalized
-                        <>
-                          <DropdownMenuItem
-                            onClick={() => onStatusChange("draft")}
-                            disabled={currentStatus === "draft"}
-                          >
-                            <span className="flex w-full items-center justify-between">
-                              Draft
-                              {currentStatus === "draft" && (
-                                <Check className="h-3 w-3" />
-                              )}
-                            </span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => onStatusChange("no_submission")}
-                            disabled={currentStatus === "draft"}
-                          >
-                            <span className="flex w-full items-center justify-between">
-                              No Submission
-                              {currentStatus === "draft" && (
-                                <Check className="h-3 w-3" />
-                              )}
-                            </span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => onStatusChange("needs_attention")}
-                            disabled={currentStatus === "needs_attention"}
-                          >
-                            <span className="flex w-full items-center justify-between">
-                              Needs Attention
-                              {currentStatus === "needs_attention" && (
-                                <Check className="h-3 w-3" />
-                              )}
-                            </span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              onStatusChange("attention_to_timeline")
-                            }
-                            disabled={currentStatus === "attention_to_timeline"}
-                          >
-                            <span className="flex w-full items-center justify-between">
-                              Attention to timeline
-                              {currentStatus === "attention_to_timeline" && (
-                                <Check className="h-3 w-3" />
-                              )}
-                            </span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              onStatusChange("confirmation_needed")
-                            }
-                            disabled={currentStatus === "confirmation_needed"}
-                          >
-                            <span className="flex w-full items-center justify-between">
-                              Confirmation needed
-                              {currentStatus === "confirmation_needed" && (
-                                <Check className="h-3 w-3" />
-                              )}
-                            </span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => onStatusChange("approved")}
-                            disabled={currentStatus === "approved"}
-                          >
-                            <span className="flex w-full items-center justify-between">
-                              Approved
-                              {currentStatus === "approved" && (
-                                <Check className="h-3 w-3" />
-                              )}
-                            </span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => onStatusChange("finalized")}
-                            disabled={currentStatus === "finalized"}
-                          >
-                            <span className="flex w-full items-center justify-between">
-                              Finalized
-                              {currentStatus === "finalized" && (
-                                <Check className="h-3 w-3" />
-                              )}
-                            </span>
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : isAdmin ? (
-                  <Badge className={`${status.className} text-xs font-medium`}>
-                    {status.label}
-                  </Badge>
-                ) : null}
-                <span className="flex items-center gap-1.5 text-xs text-slate-500">
-                  <Calendar className="h-3 w-3" />
-                  {milestone.deadline ? (
-                    formatUNDate(milestone.deadline)
-                  ) : (
-                    <span className="italic">No deadline</span>
-                  )}
-                </span>
-                {isPastDue && !documentSubmitted && (
-                  <span
-                    className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-100 text-xs font-bold text-red-700"
-                    title="Past due"
+
+            {/* Status — always occupies this slot */}
+            {isAdmin && onStatusChange ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border ${status.className} h-6 px-2.5 text-xs font-medium transition-opacity hover:opacity-75`}
                   >
-                    !
-                  </span>
-                )}
-                {milestone.is_public &&
-                  onPublicProgressChange != null &&
-                  (() => {
-                    const progress = (publicProgress ??
-                      "in_progress") as PublicProgressValue;
-                    const progressStyle = {
-                      completed:
-                        "border-green-300 bg-green-50 text-green-800 hover:bg-green-100",
-                      in_progress:
-                        "border-blue-200 bg-blue-50/80 text-blue-800 hover:bg-blue-100/80",
-                      delayed:
-                        "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100",
-                    }[progress];
-                    return (
-                      <span
-                        className="inline-flex items-center gap-1.5"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Select
-                          value={progress}
-                          onValueChange={(value: PublicProgressValue) =>
-                            onPublicProgressChange(value)
-                          }
-                        >
-                          <SelectTrigger
-                            className={`inline-flex h-7 min-w-32 items-center gap-1.5 rounded-full border px-3 py-0.5 text-xs font-medium shadow-sm transition-colors ${progressStyle}`}
-                          >
-                            <SelectValue className="text-xs" />
-                          </SelectTrigger>
-                          <SelectContent className="min-w-40" align="start">
-                            <SelectItem
-                              value="completed"
-                              className="flex items-center gap-2 py-2"
-                            >
-                              <Check className="h-4 w-4 text-green-600" />
-                              <span>Completed</span>
-                            </SelectItem>
-                            <SelectItem
-                              value="in_progress"
-                              className="flex items-center gap-2 py-2"
-                            >
-                              <Circle className="h-4 w-4 text-blue-600" />
-                              <span>In progress</span>
-                            </SelectItem>
-                            <SelectItem
-                              value="delayed"
-                              className="flex items-center gap-2 py-2"
-                            >
-                              <AlertCircle className="h-4 w-4 text-amber-600" />
-                              <span>Delayed</span>
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </span>
-                    );
-                  })()}
-                {onDocumentSubmittedChange != null && (
-                  <span
-                    className="inline-flex items-center gap-1.5"
+                    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${status.dot}`} />
+                    {status.label}
+                    <ChevronDown className="h-3 w-3 opacity-50" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-44">
+                  {milestone.is_public ? (
+                    <>
+                      <DropdownMenuItem onClick={() => onStatusChange("draft")} disabled={currentStatus === "draft"}>
+                        <span className="flex w-full items-center justify-between">Draft {currentStatus === "draft" && <Check className="h-3 w-3" />}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onStatusChange("needs_ola_review")} disabled={currentStatus === "needs_ola_review"}>
+                        <span className="flex w-full items-center justify-between">Needs OLA review {currentStatus === "needs_ola_review" && <Check className="h-3 w-3" />}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onStatusChange("reviewed_by_ola")} disabled={currentStatus === "reviewed_by_ola"}>
+                        <span className="flex w-full items-center justify-between">Reviewed by OLA {currentStatus === "reviewed_by_ola" && <Check className="h-3 w-3" />}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onStatusChange("finalized")} disabled={currentStatus === "finalized"}>
+                        <span className="flex w-full items-center justify-between">Finalized {currentStatus === "finalized" && <Check className="h-3 w-3" />}</span>
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <DropdownMenuItem onClick={() => onStatusChange("draft")} disabled={currentStatus === "draft"}>
+                        <span className="flex w-full items-center justify-between">Draft {currentStatus === "draft" && <Check className="h-3 w-3" />}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onStatusChange("no_submission")} disabled={currentStatus === "draft"}>
+                        <span className="flex w-full items-center justify-between">No Submission {currentStatus === "draft" && <Check className="h-3 w-3" />}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onStatusChange("needs_attention")} disabled={currentStatus === "needs_attention"}>
+                        <span className="flex w-full items-center justify-between">Needs Attention {currentStatus === "needs_attention" && <Check className="h-3 w-3" />}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onStatusChange("attention_to_timeline")} disabled={currentStatus === "attention_to_timeline"}>
+                        <span className="flex w-full items-center justify-between">Attention to timeline {currentStatus === "attention_to_timeline" && <Check className="h-3 w-3" />}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onStatusChange("confirmation_needed")} disabled={currentStatus === "confirmation_needed"}>
+                        <span className="flex w-full items-center justify-between">Confirmation needed {currentStatus === "confirmation_needed" && <Check className="h-3 w-3" />}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onStatusChange("approved")} disabled={currentStatus === "approved"}>
+                        <span className="flex w-full items-center justify-between">Approved {currentStatus === "approved" && <Check className="h-3 w-3" />}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onStatusChange("finalized")} disabled={currentStatus === "finalized"}>
+                        <span className="flex w-full items-center justify-between">Finalized {currentStatus === "finalized" && <Check className="h-3 w-3" />}</span>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : isAdmin ? (
+              <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border ${status.className} h-6 px-2.5 text-xs font-medium`}>
+                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${status.dot}`} />
+                {status.label}
+              </span>
+            ) : null}
+
+            {/* Public progress selector (admin only, public milestones) */}
+            {milestone.is_public && onPublicProgressChange != null && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className={`inline-flex h-6 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-xs font-medium transition-opacity hover:opacity-75 ${progressStyle}`}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <Select
-                      value={documentSubmitted ? "submitted" : "not_submitted"}
-                      onValueChange={(value: "submitted" | "not_submitted") => {
-                        onDocumentSubmittedChange(
-                          milestone.id,
-                          value === "submitted",
-                        );
-                      }}
-                    >
-                      <SelectTrigger
-                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors hover:opacity-80 ${
-                          documentSubmitted
-                            ? "border-green-300 bg-green-50 text-green-800 hover:bg-green-100"
-                            : "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
-                        }`}
-                      >
-                        {documentSubmitted ? (
-                          <Send className="h-3 w-3" />
-                        ) : (
-                          <Clock className="h-3 w-3" />
-                        )}
-                        <SelectValue className="text-xs" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="not_submitted">
-                          Not submitted
-                        </SelectItem>
-                        <SelectItem value="submitted">Submitted</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </span>
-                )}
-              </div>
-            </div>
+                    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${progressConfig.dot}`} />
+                    {progressConfig.label}
+                    <ChevronDown className="h-3 w-3 opacity-50" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-36">
+                  {(["completed", "in_progress", "delayed"] as PublicProgressValue[]).map((v) => {
+                    const labels: Record<PublicProgressValue, string> = { completed: "Completed", in_progress: "In progress", delayed: "Delayed" };
+                    return (
+                      <DropdownMenuItem key={v} onClick={() => onPublicProgressChange(v)} disabled={publicProgress_ === v}>
+                        <span className="flex w-full items-center justify-between">
+                          {labels[v]}
+                          {publicProgress_ === v && <Check className="h-3 w-3" />}
+                        </span>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {/* Non-admin public progress read-only pill */}
+            {milestone.is_public && !isAdmin && publicProgress && (
+              <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border h-6 px-2.5 text-xs font-medium ${progressConfig.style}`}>
+                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${progressConfig.dot}`} />
+                {progressConfig.label}
+              </span>
+            )}
+
+            {/* Document submitted selector (admin only, internal milestones) */}
+            {onDocumentSubmittedChange != null && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className={`inline-flex h-6 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-xs font-medium transition-opacity hover:opacity-75 ${
+                      documentSubmitted
+                        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                        : "border-slate-200 bg-slate-50 text-slate-500"
+                    }`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${documentSubmitted ? "bg-emerald-500" : "bg-slate-300"}`} />
+                    {documentSubmitted ? "Submitted" : "Not submitted"}
+                    <ChevronDown className="h-3 w-3 opacity-50" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-40">
+                  <DropdownMenuItem onClick={() => onDocumentSubmittedChange(milestone.id, false)} disabled={!documentSubmitted}>
+                    <span className="flex w-full items-center justify-between">Not submitted {!documentSubmitted && <Check className="h-3 w-3" />}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onDocumentSubmittedChange(milestone.id, true)} disabled={documentSubmitted}>
+                    <span className="flex w-full items-center justify-between">Submitted {documentSubmitted && <Check className="h-3 w-3" />}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
 
-        {/* Right: Actions */}
-        <div className="flex shrink-0 items-center gap-0.5">
+        {/* Col 2: Action buttons */}
+        <div className="flex items-center gap-0.5 pt-0.5">
           <button
             onClick={(e) => { e.stopPropagation(); onShowHistory(); }}
             className={`rounded p-1.5 transition-colors ${
