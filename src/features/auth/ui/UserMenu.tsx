@@ -34,26 +34,28 @@ export function UserMenu({ email, entity, isAdmin }: Props) {
         {entity && (
           <Badge className="bg-un-blue/10 text-un-blue">{entity}</Badge>
         )}
-        <button
-          onClick={handleToggleAdmin}
-          disabled={isPending}
-          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors ${
-            isAdmin
-              ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
-              : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-          } ${isPending ? "cursor-wait opacity-50" : "cursor-pointer"}`}
-          title={isAdmin ? "Click to remove Admin" : "Click to become Admin"}
-        >
-          {isAdmin ? (
-            <>
-              <ShieldCheck className="h-3 w-3" /> Admin
-            </>
-          ) : (
-            <>
-              <ShieldOff className="h-3 w-3" /> User
-            </>
-          )}
-        </button>
+        {process.env.NODE_ENV === "development" && (
+          <button
+            onClick={handleToggleAdmin}
+            disabled={isPending}
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors ${
+              isAdmin
+                ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
+                : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+            } ${isPending ? "cursor-wait opacity-50" : "cursor-pointer"}`}
+            title={isAdmin ? "Click to remove Admin" : "Click to become Admin"}
+          >
+            {isAdmin ? (
+              <>
+                <ShieldCheck className="h-3 w-3" /> Admin
+              </>
+            ) : (
+              <>
+                <ShieldOff className="h-3 w-3" /> User
+              </>
+            )}
+          </button>
+        )}
       </div>
       <div className="h-4 w-px bg-gray-200" />
       <button

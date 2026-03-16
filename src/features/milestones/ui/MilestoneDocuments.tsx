@@ -27,14 +27,20 @@ function getFileIcon(contentType: string, filename: string) {
   if (contentType.startsWith("image/")) {
     return <ImageIcon className="h-5 w-5 text-purple-500" />;
   }
-  if (contentType === "application/pdf" || filename.toLowerCase().endsWith(".pdf")) {
+  if (
+    contentType === "application/pdf" ||
+    filename.toLowerCase().endsWith(".pdf")
+  ) {
     return (
       <div className="flex h-5 w-5 items-center justify-center rounded bg-red-100 text-xs font-bold text-red-600">
         PDF
       </div>
     );
   }
-  if (contentType.includes("word") || filename.toLowerCase().match(/\.(doc|docx)$/)) {
+  if (
+    contentType.includes("word") ||
+    filename.toLowerCase().match(/\.(doc|docx)$/)
+  ) {
     return (
       <div className="flex h-5 w-5 items-center justify-center rounded bg-blue-100 text-xs font-bold text-blue-600">
         DOC
@@ -57,7 +63,8 @@ function formatUploadDate(date: Date) {
 function formatMilestoneLabel(milestone: ActionMilestone) {
   return milestone.is_public
     ? "Public"
-    : milestone.milestone_type.charAt(0).toUpperCase() + milestone.milestone_type.slice(1);
+    : milestone.milestone_type.charAt(0).toUpperCase() +
+        milestone.milestone_type.slice(1);
 }
 
 // ---------------------------------------------------------------------------
@@ -76,7 +83,11 @@ interface MilestoneDocumentsProps {
   isAdmin: boolean;
   onUpload: (e: React.FormEvent<HTMLFormElement>) => void;
   onDeleteAttachment: (id: string) => void;
-  onSaveAttachment: (id: string, title: string | null, description: string | null) => void;
+  onSaveAttachment: (
+    id: string,
+    title: string | null,
+    description: string | null,
+  ) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -101,9 +112,15 @@ export function MilestoneDocuments({
   const [fileSelected, setFileSelected] = useState(false);
 
   const [showCommentsId, setShowCommentsId] = useState<string | null>(null);
-  const [loadingCommentsId, setLoadingCommentsId] = useState<string | null>(null);
-  const [comments, setComments] = useState<Record<string, AttachmentComment[]>>({});
-  const [newCommentText, setNewCommentText] = useState<Record<string, string>>({});
+  const [loadingCommentsId, setLoadingCommentsId] = useState<string | null>(
+    null,
+  );
+  const [comments, setComments] = useState<Record<string, AttachmentComment[]>>(
+    {},
+  );
+  const [newCommentText, setNewCommentText] = useState<Record<string, string>>(
+    {},
+  );
   const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [commentError, setCommentError] = useState<Record<string, string>>({});
 
@@ -124,7 +141,8 @@ export function MilestoneDocuments({
 
     setLoadingCommentsId(attachmentId);
     try {
-      const { getAttachmentComments } = await import("@/features/attachments/queries");
+      const { getAttachmentComments } =
+        await import("@/features/attachments/queries");
       const data = await getAttachmentComments(attachmentId);
       setComments((prev) => ({ ...prev, [attachmentId]: data }));
     } catch {
@@ -140,7 +158,8 @@ export function MilestoneDocuments({
     setCommentError((prev) => ({ ...prev, [attachmentId]: "" }));
     setSubmittingId(attachmentId);
     try {
-      const { createAttachmentComment } = await import("@/features/attachments/commands");
+      const { createAttachmentComment } =
+        await import("@/features/attachments/commands");
       const result = await createAttachmentComment(attachmentId, text);
       if (result?.success && result.comment) {
         const c = result.comment;
@@ -151,7 +170,10 @@ export function MilestoneDocuments({
             {
               ...c,
               is_legal: c.is_legal ?? false,
-              created_at: typeof c.created_at === "string" ? new Date(c.created_at) : c.created_at,
+              created_at:
+                typeof c.created_at === "string"
+                  ? new Date(c.created_at)
+                  : c.created_at,
             },
           ],
         }));
@@ -178,7 +200,9 @@ export function MilestoneDocuments({
         <Paperclip className="h-4 w-4" />
         Documents{" "}
         {attachmentCount > 0 && (
-          <span className="font-normal text-slate-500">({attachmentCount})</span>
+          <span className="font-normal text-slate-500">
+            ({attachmentCount})
+          </span>
         )}
       </h3>
 
@@ -193,7 +217,9 @@ export function MilestoneDocuments({
         ) : (
           <div className="mb-4 space-y-3">
             {attachments.map((att) => {
-              const linkedMilestone = milestones.find((m) => m.id === att.milestone_id);
+              const linkedMilestone = milestones.find(
+                (m) => m.id === att.milestone_id,
+              );
               const isEditing = editingId === att.id;
 
               return (
@@ -204,31 +230,52 @@ export function MilestoneDocuments({
                   {isEditing ? (
                     <div className="space-y-3">
                       <div>
-                        <label className="mb-1 block text-xs font-medium text-slate-600">Title</label>
+                        <label className="mb-1 block text-xs font-medium text-slate-600">
+                          Title
+                        </label>
                         <input
                           type="text"
                           value={editForm.title}
-                          onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                          onChange={(e) =>
+                            setEditForm({ ...editForm, title: e.target.value })
+                          }
                           placeholder={att.original_filename}
                           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
                         />
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs font-medium text-slate-600">Description</label>
+                        <label className="mb-1 block text-xs font-medium text-slate-600">
+                          Description
+                        </label>
                         <textarea
                           value={editForm.description}
-                          onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                          onChange={(e) =>
+                            setEditForm({
+                              ...editForm,
+                              description: e.target.value,
+                            })
+                          }
                           placeholder="Add a description..."
                           className="w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
                           rows={2}
                         />
                       </div>
                       <div className="flex justify-end gap-2">
-                        <Button variant="outline" size="sm" onClick={cancelEdit}>Cancel</Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={cancelEdit}
+                        >
+                          Cancel
+                        </Button>
                         <Button
                           size="sm"
                           onClick={() => {
-                            onSaveAttachment(att.id, editForm.title || null, editForm.description || null);
+                            onSaveAttachment(
+                              att.id,
+                              editForm.title || null,
+                              editForm.description || null,
+                            );
                             cancelEdit();
                           }}
                           className="bg-un-blue hover:bg-un-blue/90"
@@ -263,7 +310,9 @@ export function MilestoneDocuments({
                               {att.title ?? att.original_filename}
                             </h4>
                             {att.title && (
-                              <p className="text-xs text-slate-400">{att.original_filename}</p>
+                              <p className="text-xs text-slate-400">
+                                {att.original_filename}
+                              </p>
                             )}
                           </div>
                           {isAdmin && (
@@ -309,7 +358,9 @@ export function MilestoneDocuments({
                         </div>
 
                         {att.description && (
-                          <p className="mb-2 text-sm text-slate-600">{att.description}</p>
+                          <p className="mb-2 text-sm text-slate-600">
+                            {att.description}
+                          </p>
                         )}
 
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
@@ -325,12 +376,16 @@ export function MilestoneDocuments({
                           ) : (
                             <>
                               <span className="text-slate-300">•</span>
-                              <span className="text-slate-400">Unknown uploader</span>
+                              <span className="text-slate-400">
+                                Unknown uploader
+                              </span>
                             </>
                           )}
                           <span className="text-slate-300">•</span>
                           <Badge variant="outline" className="text-xs">
-                            {linkedMilestone ? formatMilestoneLabel(linkedMilestone) : "General"}
+                            {linkedMilestone
+                              ? formatMilestoneLabel(linkedMilestone)
+                              : "General"}
                           </Badge>
                         </div>
                       </div>
@@ -343,7 +398,9 @@ export function MilestoneDocuments({
                       {loadingCommentsId === att.id ? (
                         <div className="flex items-center gap-2 py-2">
                           <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
-                          <span className="text-sm text-slate-500">Loading…</span>
+                          <span className="text-sm text-slate-500">
+                            Loading…
+                          </span>
                         </div>
                       ) : (
                         <>
@@ -354,14 +411,22 @@ export function MilestoneDocuments({
                               <span className="text-xs font-semibold tracking-wide text-slate-600 uppercase">
                                 Team comments
                               </span>
-                              {(comments[att.id] ?? []).filter((c) => !c.is_legal).length > 0 && (
+                              {(comments[att.id] ?? []).filter(
+                                (c) => !c.is_legal,
+                              ).length > 0 && (
                                 <span className="rounded-full bg-un-blue/15 px-2 py-0.5 text-xs font-semibold text-un-blue">
-                                  {(comments[att.id] ?? []).filter((c) => !c.is_legal).length}
+                                  {
+                                    (comments[att.id] ?? []).filter(
+                                      (c) => !c.is_legal,
+                                    ).length
+                                  }
                                 </span>
                               )}
                             </div>
                             <div className="p-2">
-                              {(comments[att.id] ?? []).filter((c) => !c.is_legal).length === 0 ? (
+                              {(comments[att.id] ?? []).filter(
+                                (c) => !c.is_legal,
+                              ).length === 0 ? (
                                 <p className="py-3 text-center text-xs text-slate-400">
                                   No team comments yet.
                                 </p>
@@ -376,17 +441,23 @@ export function MilestoneDocuments({
                                       >
                                         <div className="mb-1 flex items-center gap-2 text-xs text-slate-500">
                                           <div className="flex h-5 w-5 items-center justify-center rounded-full bg-un-blue/10 text-xs font-semibold text-un-blue">
-                                            {(c.user_email?.[0] ?? "U").toUpperCase()}
+                                            {(
+                                              c.user_email?.[0] ?? "U"
+                                            ).toUpperCase()}
                                           </div>
                                           {c.user_email ? (
                                             <span className="font-medium text-slate-600">
                                               {c.user_email}
                                             </span>
                                           ) : (
-                                            <span className="italic">Unknown user</span>
+                                            <span className="italic">
+                                              Unknown user
+                                            </span>
                                           )}
                                           <span>
-                                            {new Date(c.created_at).toLocaleString(undefined, {
+                                            {new Date(
+                                              c.created_at,
+                                            ).toLocaleString(undefined, {
                                               dateStyle: "short",
                                               timeStyle: "short",
                                             })}
@@ -447,7 +518,9 @@ export function MilestoneDocuments({
                                 </Button>
                               </div>
                               {commentError[att.id] && (
-                                <p className="text-sm text-red-600">{commentError[att.id]}</p>
+                                <p className="text-sm text-red-600">
+                                  {commentError[att.id]}
+                                </p>
                               )}
                             </div>
                           )}
@@ -486,7 +559,9 @@ export function MilestoneDocuments({
                   </div>
                 )}
                 <label className="min-w-30 flex-1">
-                  <span className="mb-1 block text-xs font-medium text-slate-600">File</span>
+                  <span className="mb-1 block text-xs font-medium text-slate-600">
+                    File
+                  </span>
                   <input
                     type="file"
                     name="file"

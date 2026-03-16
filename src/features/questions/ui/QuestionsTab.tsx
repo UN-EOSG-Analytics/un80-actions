@@ -28,10 +28,8 @@ import {
   approveQuestion,
   deleteQuestion,
 } from "@/features/questions/commands";
-import {
-  fetchActionMilestonesForTab,
-  fetchActionNotesForTab,
-} from "@/features/questions/fetch-tab-data";
+import { getActionMilestones as fetchActionMilestonesForTab } from "@/features/milestones/queries";
+import { getActionNotes as fetchActionNotesForTab } from "@/features/notes/queries";
 import { ReviewStatus } from "@/features/shared/ReviewStatus";
 import { TagSelector } from "@/features/shared/TagSelector";
 import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
@@ -584,564 +582,578 @@ export default function QuestionsTab({
 
   return (
     <>
-    <div className="space-y-4">
-      {/* View Notes Collapsible Section */}
-      {isAdmin && notes.length > 0 && (
-        <Collapsible open={showNotes} onOpenChange={setShowNotes}>
-          <CollapsibleTrigger asChild>
-            <button
-              type="button"
-              className="flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left shadow-sm transition-colors hover:bg-slate-50"
-            >
-              <div className="flex items-center gap-2">
-                <StickyNote className="h-4 w-4 text-amber-600" />
-                <span className="text-sm font-medium text-slate-700">
-                  View Notes ({notes.length})
-                </span>
-              </div>
-              <ChevronDown
-                className={`h-4 w-4 text-slate-500 transition-transform ${
-                  showNotes ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <div className="mt-2 max-h-96 space-y-2 overflow-y-auto rounded-lg border border-slate-200 bg-slate-50/50 p-4">
-              {notes.map((note) => (
-                <div
-                  key={note.id}
-                  className="rounded-md border border-slate-200 bg-white p-3 shadow-sm"
-                >
-                  <div className="mb-2 flex items-center gap-2">
-                    {note.header && (
-                      <span className="text-xs font-semibold text-slate-700">
-                        {note.header}
-                      </span>
-                    )}
-                    {note.note_date && (
-                      <span className="text-xs text-slate-500">
-                        {formatUNDate(note.note_date)}
-                      </span>
-                    )}
-                  </div>
-                  <p className="line-clamp-3 text-sm whitespace-pre-wrap text-slate-600">
-                    <BoldText>{note.content}</BoldText>
-                  </p>
-                  <p className="mt-1 text-xs text-slate-400">
-                    {formatUNDateTime(note.created_at)} · {note.user_email}
-                  </p>
+      <div className="space-y-4">
+        {/* View Notes Collapsible Section */}
+        {isAdmin && notes.length > 0 && (
+          <Collapsible open={showNotes} onOpenChange={setShowNotes}>
+            <CollapsibleTrigger asChild>
+              <button
+                type="button"
+                className="flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left shadow-sm transition-colors hover:bg-slate-50"
+              >
+                <div className="flex items-center gap-2">
+                  <StickyNote className="h-4 w-4 text-amber-600" />
+                  <span className="text-sm font-medium text-slate-700">
+                    View Notes ({notes.length})
+                  </span>
                 </div>
-              ))}
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-      )}
+                <ChevronDown
+                  className={`h-4 w-4 text-slate-500 transition-transform ${
+                    showNotes ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="mt-2 max-h-96 space-y-2 overflow-y-auto rounded-lg border border-slate-200 bg-slate-50/50 p-4">
+                {notes.map((note) => (
+                  <div
+                    key={note.id}
+                    className="rounded-md border border-slate-200 bg-white p-3 shadow-sm"
+                  >
+                    <div className="mb-2 flex items-center gap-2">
+                      {note.header && (
+                        <span className="text-xs font-semibold text-slate-700">
+                          {note.header}
+                        </span>
+                      )}
+                      {note.note_date && (
+                        <span className="text-xs text-slate-500">
+                          {formatUNDate(note.note_date)}
+                        </span>
+                      )}
+                    </div>
+                    <p className="line-clamp-3 text-sm whitespace-pre-wrap text-slate-600">
+                      <BoldText>{note.content}</BoldText>
+                    </p>
+                    <p className="mt-1 text-xs text-slate-400">
+                      {formatUNDateTime(note.created_at)} · {note.user_email}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
 
-      {/* Ask Question Form */}
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
-      >
-        <label className="block text-base font-semibold text-slate-800">
-          Ask a question
-        </label>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
-            Header *
+        {/* Ask Question Form */}
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+        >
+          <label className="block text-base font-semibold text-slate-800">
+            Ask a question
           </label>
-          <Select
-            value={newQuestion.header}
-            onValueChange={(value) =>
-              setNewQuestion({ ...newQuestion, header: value })
-            }
-            disabled={submitting}
-            required
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select header..." />
-            </SelectTrigger>
-            <SelectContent className="max-h-56">
-              {HEADER_OPTIONS.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
-            Date *
-          </label>
-          <DatePicker
-            value={newQuestion.question_date}
-            onChange={(v) => setNewQuestion({ ...newQuestion, question_date: v })}
-            disabled={submitting}
-            placeholder="Select date"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
-            Notes (on questions) (optional)
-          </label>
-          <NoteEditor
-            value={newQuestion.comment}
-            onChange={(html) =>
-              setNewQuestion({ ...newQuestion, comment: html })
-            }
-            placeholder="Add any additional context or notes related to these questions..."
-            disabled={submitting}
-            minRows={2}
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
-            Question *
-          </label>
-          <NoteEditor
-            value={newQuestion.question}
-            onChange={(html) =>
-              setNewQuestion({ ...newQuestion, question: html })
-            }
-            placeholder="Enter your question..."
-            disabled={submitting}
-            minRows={3}
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">
-            Milestone (optional)
-          </label>
-          <Select
-            value={newQuestion.milestone_id || MILESTONE_NONE_VALUE}
-            onValueChange={(value) =>
-              setNewQuestion({
-                ...newQuestion,
-                milestone_id: value === MILESTONE_NONE_VALUE ? "" : value,
-              })
-            }
-            disabled={submitting}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select milestone..." />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={MILESTONE_NONE_VALUE}>None</SelectItem>
-              {milestones.map((milestone) => {
-                const milestoneId = milestone.action_sub_id
-                  ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
-                  : `${milestone.action_id}.${milestone.serial_number}`;
-                const label = milestone.description
-                  ? `${milestoneId}: ${milestone.description.substring(0, 50)}${milestone.description.length > 50 ? "..." : ""}`
-                  : milestoneId;
-                return (
-                  <SelectItem key={milestone.id} value={milestone.id}>
-                    {label}
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-600">
+              Header *
+            </label>
+            <Select
+              value={newQuestion.header}
+              onValueChange={(value) =>
+                setNewQuestion({ ...newQuestion, header: value })
+              }
+              disabled={submitting}
+              required
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select header..." />
+              </SelectTrigger>
+              <SelectContent className="max-h-56">
+                {HEADER_OPTIONS.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
                   </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex justify-end">
-          <Button
-            type="submit"
-            disabled={
-              submitting ||
-              !newQuestion.header.trim() ||
-              !newQuestion.question_date ||
-              isNoteContentEmpty(newQuestion.question)
-            }
-            className="bg-un-blue hover:bg-un-blue/90"
-          >
-            {submitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              <>
-                <Send className="mr-2 h-4 w-4" />
-                Submit Question
-              </>
-            )}
-          </Button>
-        </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-      </form>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-600">
+              Date *
+            </label>
+            <DatePicker
+              value={newQuestion.question_date}
+              onChange={(v) =>
+                setNewQuestion({ ...newQuestion, question_date: v })
+              }
+              disabled={submitting}
+              placeholder="Select date"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-600">
+              Notes (on questions) (optional)
+            </label>
+            <NoteEditor
+              value={newQuestion.comment}
+              onChange={(html) =>
+                setNewQuestion({ ...newQuestion, comment: html })
+              }
+              placeholder="Add any additional context or notes related to these questions..."
+              disabled={submitting}
+              minRows={2}
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-600">
+              Question *
+            </label>
+            <NoteEditor
+              value={newQuestion.question}
+              onChange={(html) =>
+                setNewQuestion({ ...newQuestion, question: html })
+              }
+              placeholder="Enter your question..."
+              disabled={submitting}
+              minRows={3}
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-600">
+              Milestone (optional)
+            </label>
+            <Select
+              value={newQuestion.milestone_id || MILESTONE_NONE_VALUE}
+              onValueChange={(value) =>
+                setNewQuestion({
+                  ...newQuestion,
+                  milestone_id: value === MILESTONE_NONE_VALUE ? "" : value,
+                })
+              }
+              disabled={submitting}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select milestone..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={MILESTONE_NONE_VALUE}>None</SelectItem>
+                {milestones.map((milestone) => {
+                  const milestoneId = milestone.action_sub_id
+                    ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
+                    : `${milestone.action_id}.${milestone.serial_number}`;
+                  const label = milestone.description
+                    ? `${milestoneId}: ${milestone.description.substring(0, 50)}${milestone.description.length > 50 ? "..." : ""}`
+                    : milestoneId;
+                  return (
+                    <SelectItem key={milestone.id} value={milestone.id}>
+                      {label}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex justify-end">
+            <Button
+              type="submit"
+              disabled={
+                submitting ||
+                !newQuestion.header.trim() ||
+                !newQuestion.question_date ||
+                isNoteContentEmpty(newQuestion.question)
+              }
+              className="bg-un-blue hover:bg-un-blue/90"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Send className="mr-2 h-4 w-4" />
+                  Submit Question
+                </>
+              )}
+            </Button>
+          </div>
+          {error && <p className="text-sm text-red-600">{error}</p>}
+        </form>
 
-      {exportProps && (
-        <VersionHistoryHeader
-          title="All questions"
-          onExport={exportProps.onExport}
-          exporting={exportProps.exporting}
-          hasData={questions.length > 0}
-        />
-      )}
+        {exportProps && (
+          <VersionHistoryHeader
+            title="All questions"
+            onExport={exportProps.onExport}
+            exporting={exportProps.exporting}
+            hasData={questions.length > 0}
+          />
+        )}
 
-      {/* Questions List */}
-      {loading ? (
-        <LoadingState />
-      ) : questions.length === 0 ? (
-        <EmptyState message="No questions have been asked yet." />
-      ) : (
-        <div className="space-y-4">
-          {questions.map((q) => {
-            const isEditing = editingId === q.id;
-            return (
-              <Collapsible key={q.id} open={editingId === q.id}>
-                <div className="rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md">
-                  {!isEditing && (
-                    <>
-                      <div className="flex items-start justify-between gap-4 p-5">
-                        <div className="min-w-0 flex-1 space-y-4">
-                          {/* Header: category, date, milestone */}
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                            {q.header && (
-                              <div className="flex items-center gap-2">
-                                <span className="flex h-8 items-center justify-center rounded-lg bg-un-blue/10 px-2.5">
-                                  <MessageCircle className="h-4 w-4 text-un-blue" />
+        {/* Questions List */}
+        {loading ? (
+          <LoadingState />
+        ) : questions.length === 0 ? (
+          <EmptyState message="No questions have been asked yet." />
+        ) : (
+          <div className="space-y-4">
+            {questions.map((q) => {
+              const isEditing = editingId === q.id;
+              return (
+                <Collapsible key={q.id} open={editingId === q.id}>
+                  <div className="rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+                    {!isEditing && (
+                      <>
+                        <div className="flex items-start justify-between gap-4 p-5">
+                          <div className="min-w-0 flex-1 space-y-4">
+                            {/* Header: category, date, milestone */}
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                              {q.header && (
+                                <div className="flex items-center gap-2">
+                                  <span className="flex h-8 items-center justify-center rounded-lg bg-un-blue/10 px-2.5">
+                                    <MessageCircle className="h-4 w-4 text-un-blue" />
+                                  </span>
+                                  <h4 className="text-base font-semibold tracking-tight text-slate-800">
+                                    {q.header}
+                                  </h4>
+                                </div>
+                              )}
+                              {q.question_date && (
+                                <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                                  {formatUNDate(q.question_date)}
                                 </span>
-                                <h4 className="text-base font-semibold tracking-tight text-slate-800">
-                                  {q.header}
-                                </h4>
+                              )}
+                              {q.milestone_id &&
+                                (() => {
+                                  const milestone = milestones.find(
+                                    (m) => m.id === q.milestone_id,
+                                  );
+                                  if (milestone) {
+                                    const milestoneId = milestone.action_sub_id
+                                      ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
+                                      : `${milestone.action_id}.${milestone.serial_number}`;
+                                    return (
+                                      <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                                        Milestone {milestoneId}
+                                      </span>
+                                    );
+                                  }
+                                  return null;
+                                })()}
+                            </div>
+                            {/* Notes on questions (if any) */}
+                            {q.comment && (
+                              <div className="rounded-lg border border-slate-200 bg-slate-50/80 px-4 py-2.5">
+                                <p className="mb-1 text-xs font-medium text-slate-500">
+                                  Notes (on questions)
+                                </p>
+                                {q.comment.trim().startsWith("<") ? (
+                                  <div
+                                    className="prose prose-sm max-w-none text-sm leading-relaxed text-slate-700 [&_li]:my-0.5 [&_p]:my-1 [&_p]:whitespace-pre-wrap [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6"
+                                    dangerouslySetInnerHTML={{
+                                      __html: q.comment,
+                                    }}
+                                  />
+                                ) : (
+                                  <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
+                                    <BoldText>{q.comment}</BoldText>
+                                  </p>
+                                )}
                               </div>
                             )}
-                            {q.question_date && (
-                              <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                                {formatUNDate(q.question_date)}
-                              </span>
-                            )}
-                            {q.milestone_id &&
-                              (() => {
-                                const milestone = milestones.find(
-                                  (m) => m.id === q.milestone_id,
-                                );
-                                if (milestone) {
-                                  const milestoneId = milestone.action_sub_id
-                                    ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
-                                    : `${milestone.action_id}.${milestone.serial_number}`;
-                                  return (
-                                    <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                                      Milestone {milestoneId}
-                                    </span>
-                                  );
-                                }
-                                return null;
-                              })()}
-                          </div>
-                          {/* Notes on questions (if any) */}
-                          {q.comment && (
-                            <div className="rounded-lg border border-slate-200 bg-slate-50/80 px-4 py-2.5">
-                              <p className="mb-1 text-xs font-medium text-slate-500">
-                                Notes (on questions)
-                              </p>
-                              {q.comment.trim().startsWith("<") ? (
+                            {/* Question body */}
+                            <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-4 py-3">
+                              {q.question.trim().startsWith("<") ? (
                                 <div
                                   className="prose prose-sm max-w-none text-sm leading-relaxed text-slate-700 [&_li]:my-0.5 [&_p]:my-1 [&_p]:whitespace-pre-wrap [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6"
                                   dangerouslySetInnerHTML={{
-                                    __html: q.comment,
+                                    __html: q.question,
                                   }}
                                 />
                               ) : (
+                                <SelectableText
+                                  text={q.question}
+                                  questionId={q.id}
+                                  onUpdate={async (newText) => {
+                                    // Optimistic update: show new text immediately
+                                    setQuestions((prev) =>
+                                      prev.map((qq) =>
+                                        qq.id === q.id
+                                          ? { ...qq, question: newText }
+                                          : qq,
+                                      ),
+                                    );
+                                    // Persist in background (no full refetch)
+                                    await updateQuestion(q.id, {
+                                      header: q.header || "",
+                                      question_date: q.question_date || "",
+                                      question: newText,
+                                      milestone_id: q.milestone_id || null,
+                                    });
+                                  }}
+                                  isAdmin={isAdmin}
+                                />
+                              )}
+                            </div>
+                            {q.answer && (
+                              <div className="rounded-lg border-l-4 border-green-300 bg-green-50/80 px-4 py-3">
                                 <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
-                                  <BoldText>{q.comment}</BoldText>
+                                  <BoldText>{q.answer}</BoldText>
                                 </p>
-                              )}
-                            </div>
-                          )}
-                          {/* Question body */}
-                          <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-4 py-3">
-                            {q.question.trim().startsWith("<") ? (
-                              <div
-                                className="prose prose-sm max-w-none text-sm leading-relaxed text-slate-700 [&_li]:my-0.5 [&_p]:my-1 [&_p]:whitespace-pre-wrap [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6"
-                                dangerouslySetInnerHTML={{ __html: q.question }}
-                              />
-                            ) : (
-                              <SelectableText
-                                text={q.question}
-                                questionId={q.id}
-                                onUpdate={async (newText) => {
-                                  // Optimistic update: show new text immediately
-                                  setQuestions((prev) =>
-                                    prev.map((qq) =>
-                                      qq.id === q.id
-                                        ? { ...qq, question: newText }
-                                        : qq,
-                                    ),
-                                  );
-                                  // Persist in background (no full refetch)
-                                  await updateQuestion(q.id, {
-                                    header: q.header || "",
-                                    question_date: q.question_date || "",
-                                    question: newText,
-                                    milestone_id: q.milestone_id || null,
-                                  });
-                                }}
-                                isAdmin={isAdmin}
-                              />
+                                {q.answered_at && (
+                                  <p className="mt-2 text-xs font-medium text-slate-500">
+                                    Answered {formatUNDateTime(q.answered_at)}
+                                    {q.answered_by_email &&
+                                      ` by ${q.answered_by_email}`}
+                                  </p>
+                                )}
+                              </div>
                             )}
-                          </div>
-                          {q.answer && (
-                            <div className="rounded-lg border-l-4 border-green-300 bg-green-50/80 px-4 py-3">
-                              <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
-                                <BoldText>{q.answer}</BoldText>
+                            {/* Footer: meta + actions */}
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-slate-100 pt-3">
+                              <p className="text-xs text-slate-500">
+                                <span className="font-medium text-slate-600">
+                                  {formatUNDateTime(q.created_at)}
+                                </span>
+                                <span className="mx-1.5">·</span>
+                                <span>{q.user_email}</span>
                               </p>
-                              {q.answered_at && (
-                                <p className="mt-2 text-xs font-medium text-slate-500">
-                                  Answered {formatUNDateTime(q.answered_at)}
-                                  {q.answered_by_email &&
-                                    ` by ${q.answered_by_email}`}
-                                </p>
-                              )}
-                            </div>
-                          )}
-                          {/* Footer: meta + actions */}
-                          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-slate-100 pt-3">
-                            <p className="text-xs text-slate-500">
-                              <span className="font-medium text-slate-600">
-                                {formatUNDateTime(q.created_at)}
-                              </span>
-                              <span className="mx-1.5">·</span>
-                              <span>{q.user_email}</span>
-                            </p>
-                            <ReviewStatus
-                              status={q.content_review_status ?? "approved"}
-                              reviewedByEmail={q.content_reviewed_by_email}
-                              reviewedAt={q.content_reviewed_at}
-                              isAdmin={isAdmin}
-                              onApprove={async () => {
-                                setApprovingId(q.id);
-                                try {
-                                  const result = await approveQuestion(q.id);
-                                  if (result.success) {
-                                    await loadQuestions();
+                              <ReviewStatus
+                                status={q.content_review_status ?? "approved"}
+                                reviewedByEmail={q.content_reviewed_by_email}
+                                reviewedAt={q.content_reviewed_at}
+                                isAdmin={isAdmin}
+                                onApprove={async () => {
+                                  setApprovingId(q.id);
+                                  try {
+                                    const result = await approveQuestion(q.id);
+                                    if (result.success) {
+                                      await loadQuestions();
+                                    }
+                                  } finally {
+                                    setApprovingId(null);
                                   }
-                                } finally {
-                                  setApprovingId(null);
-                                }
-                              }}
-                              approving={approvingId === q.id}
-                            />
-                            {!q.answer && (
+                                }}
+                                approving={approvingId === q.id}
+                              />
+                              {!q.answer && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 gap-1.5 text-slate-500 hover:bg-slate-100 hover:text-un-blue"
+                                  onClick={() => startEditing(q)}
+                                  aria-label="Edit question"
+                                >
+                                  <Pencil className="h-3.5 w-3.5" />
+                                  Edit
+                                </Button>
+                              )}
                               <Button
                                 type="button"
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 gap-1.5 text-slate-500 hover:bg-slate-100 hover:text-un-blue"
-                                onClick={() => startEditing(q)}
-                                aria-label="Edit question"
+                                className="h-8 gap-1.5 text-slate-500 hover:bg-red-50 hover:text-red-600"
+                                onClick={() => setPendingDeleteId(q.id)}
+                                disabled={deletingId === q.id}
+                                aria-label="Delete question"
                               >
-                                <Pencil className="h-3.5 w-3.5" />
-                                Edit
+                                {deletingId === q.id ? (
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : (
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                )}
+                                Delete
                               </Button>
+                            </div>
+                          </div>
+                          <div className="flex shrink-0 flex-col items-end gap-2">
+                            {(tagsByQuestionId[q.id] ?? []).length > 0 && (
+                              <span className="flex flex-wrap justify-end gap-1.5">
+                                {(tagsByQuestionId[q.id] ?? []).map((t) => (
+                                  <Badge
+                                    key={t.id}
+                                    variant="secondary"
+                                    className="border-0 bg-un-blue/10 text-un-blue hover:bg-un-blue/20"
+                                  >
+                                    {t.name}
+                                  </Badge>
+                                ))}
+                              </span>
                             )}
+                            <TagSelector
+                              entityId={q.id}
+                              entityType="question"
+                              isAdmin={isAdmin}
+                              initialTags={[]}
+                              onTagsChange={(tags) =>
+                                setTagsByQuestionId((prev) => ({
+                                  ...prev,
+                                  [q.id]: tags,
+                                }))
+                              }
+                              hideInlineTags
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <CollapsibleContent>
+                    <div className="border-t border-slate-200 p-4">
+                      {isEditing ? (
+                        <div className="space-y-4">
+                          <div>
+                            <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                              Header *
+                            </label>
+                            <Select
+                              value={editingQuestion.header}
+                              onValueChange={(value) =>
+                                setEditingQuestion({
+                                  ...editingQuestion,
+                                  header: value,
+                                })
+                              }
+                              disabled={saving}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select header..." />
+                              </SelectTrigger>
+                              <SelectContent className="max-h-56">
+                                {HEADER_OPTIONS.map((option) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-xs font-medium text-slate-600">
+                              Date *
+                            </label>
+                            <DatePicker
+                              value={editingQuestion.question_date}
+                              onChange={(v) =>
+                                setEditingQuestion({
+                                  ...editingQuestion,
+                                  question_date: v,
+                                })
+                              }
+                              disabled={saving}
+                              placeholder="Select date"
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-xs font-medium text-slate-600">
+                              Milestone (optional)
+                            </label>
+                            <Select
+                              value={
+                                editingQuestion.milestone_id ||
+                                MILESTONE_NONE_VALUE
+                              }
+                              onValueChange={(value) =>
+                                setEditingQuestion({
+                                  ...editingQuestion,
+                                  milestone_id:
+                                    value === MILESTONE_NONE_VALUE ? "" : value,
+                                })
+                              }
+                              disabled={saving}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select milestone..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value={MILESTONE_NONE_VALUE}>
+                                  None
+                                </SelectItem>
+                                {milestones.map((milestone) => {
+                                  const milestoneId = milestone.action_sub_id
+                                    ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
+                                    : `${milestone.action_id}.${milestone.serial_number}`;
+                                  const label = milestone.description
+                                    ? `${milestoneId}: ${milestone.description.substring(0, 50)}${milestone.description.length > 50 ? "..." : ""}`
+                                    : milestoneId;
+                                  return (
+                                    <SelectItem
+                                      key={milestone.id}
+                                      value={milestone.id}
+                                    >
+                                      {label}
+                                    </SelectItem>
+                                  );
+                                })}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-xs font-medium text-slate-600">
+                              Question *
+                            </label>
+                            <NoteEditor
+                              value={editingQuestion.question}
+                              onChange={(html) =>
+                                setEditingQuestion({
+                                  ...editingQuestion,
+                                  question: html,
+                                })
+                              }
+                              placeholder="Enter your question..."
+                              disabled={saving}
+                              minRows={3}
+                            />
+                          </div>
+                          {error && (
+                            <p className="text-sm text-red-600">{error}</p>
+                          )}
+                          <div className="flex justify-end gap-2">
                             <Button
                               type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 gap-1.5 text-slate-500 hover:bg-red-50 hover:text-red-600"
-                              onClick={() => setPendingDeleteId(q.id)}
-                              disabled={deletingId === q.id}
-                              aria-label="Delete question"
+                              variant="outline"
+                              onClick={cancelEditing}
+                              disabled={saving}
                             >
-                              {deletingId === q.id ? (
-                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              <X className="mr-2 h-4 w-4" /> Cancel
+                            </Button>
+                            <Button
+                              type="button"
+                              onClick={handleSaveEdit}
+                              disabled={
+                                saving ||
+                                !editingQuestion.header.trim() ||
+                                !editingQuestion.question_date ||
+                                isNoteContentEmpty(editingQuestion.question)
+                              }
+                              className="bg-un-blue hover:bg-un-blue/90"
+                            >
+                              {saving ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                                  Saving...
+                                </>
                               ) : (
-                                <Trash2 className="h-3.5 w-3.5" />
+                                <>
+                                  <Send className="mr-2 h-4 w-4" /> Save
+                                </>
                               )}
-                              Delete
                             </Button>
                           </div>
                         </div>
-                        <div className="flex shrink-0 flex-col items-end gap-2">
-                          {(tagsByQuestionId[q.id] ?? []).length > 0 && (
-                            <span className="flex flex-wrap justify-end gap-1.5">
-                              {(tagsByQuestionId[q.id] ?? []).map((t) => (
-                                <Badge
-                                  key={t.id}
-                                  variant="secondary"
-                                  className="border-0 bg-un-blue/10 text-un-blue hover:bg-un-blue/20"
-                                >
-                                  {t.name}
-                                </Badge>
-                              ))}
-                            </span>
-                          )}
-                          <TagSelector
-                            entityId={q.id}
-                            entityType="question"
-                            isAdmin={isAdmin}
-                            initialTags={[]}
-                            onTagsChange={(tags) =>
-                              setTagsByQuestionId((prev) => ({
-                                ...prev,
-                                [q.id]: tags,
-                              }))
-                            }
-                            hideInlineTags
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-                <CollapsibleContent>
-                  <div className="border-t border-slate-200 p-4">
-                    {isEditing ? (
-                      <div className="space-y-4">
-                        <div>
-                          <label className="mb-1.5 block text-xs font-medium text-slate-600">
-                            Header *
-                          </label>
-                          <Select
-                            value={editingQuestion.header}
-                            onValueChange={(value) =>
-                              setEditingQuestion({
-                                ...editingQuestion,
-                                header: value,
-                              })
-                            }
-                            disabled={saving}
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select header..." />
-                            </SelectTrigger>
-                            <SelectContent className="max-h-56">
-                              {HEADER_OPTIONS.map((option) => (
-                                <SelectItem key={option} value={option}>
-                                  {option}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <label className="mb-1 block text-xs font-medium text-slate-600">
-                            Date *
-                          </label>
-                          <DatePicker
-                            value={editingQuestion.question_date}
-                            onChange={(v) =>
-                              setEditingQuestion({ ...editingQuestion, question_date: v })
-                            }
-                            disabled={saving}
-                            placeholder="Select date"
-                          />
-                        </div>
-                        <div>
-                          <label className="mb-1 block text-xs font-medium text-slate-600">
-                            Milestone (optional)
-                          </label>
-                          <Select
-                            value={
-                              editingQuestion.milestone_id ||
-                              MILESTONE_NONE_VALUE
-                            }
-                            onValueChange={(value) =>
-                              setEditingQuestion({
-                                ...editingQuestion,
-                                milestone_id:
-                                  value === MILESTONE_NONE_VALUE ? "" : value,
-                              })
-                            }
-                            disabled={saving}
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select milestone..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value={MILESTONE_NONE_VALUE}>
-                                None
-                              </SelectItem>
-                              {milestones.map((milestone) => {
-                                const milestoneId = milestone.action_sub_id
-                                  ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
-                                  : `${milestone.action_id}.${milestone.serial_number}`;
-                                const label = milestone.description
-                                  ? `${milestoneId}: ${milestone.description.substring(0, 50)}${milestone.description.length > 50 ? "..." : ""}`
-                                  : milestoneId;
-                                return (
-                                  <SelectItem
-                                    key={milestone.id}
-                                    value={milestone.id}
-                                  >
-                                    {label}
-                                  </SelectItem>
-                                );
-                              })}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <label className="mb-1 block text-xs font-medium text-slate-600">
-                            Question *
-                          </label>
-                          <NoteEditor
-                            value={editingQuestion.question}
-                            onChange={(html) =>
-                              setEditingQuestion({
-                                ...editingQuestion,
-                                question: html,
-                              })
-                            }
-                            placeholder="Enter your question..."
-                            disabled={saving}
-                            minRows={3}
-                          />
-                        </div>
-                        {error && (
-                          <p className="text-sm text-red-600">{error}</p>
-                        )}
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={cancelEditing}
-                            disabled={saving}
-                          >
-                            <X className="mr-2 h-4 w-4" /> Cancel
-                          </Button>
-                          <Button
-                            type="button"
-                            onClick={handleSaveEdit}
-                            disabled={
-                              saving ||
-                              !editingQuestion.header.trim() ||
-                              !editingQuestion.question_date ||
-                              isNoteContentEmpty(editingQuestion.question)
-                            }
-                            className="bg-un-blue hover:bg-un-blue/90"
-                          >
-                            {saving ? (
-                              <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
-                                Saving...
-                              </>
-                            ) : (
-                              <>
-                                <Send className="mr-2 h-4 w-4" /> Save
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-                    ) : null}
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            );
-          })}
-        </div>
-      )}
-    </div>
-    <DeleteConfirmDialog
-      open={pendingDeleteId !== null}
-      onOpenChange={(open) => { if (!open) setPendingDeleteId(null); }}
-      onConfirm={() => { if (pendingDeleteId) { handleDelete(pendingDeleteId); setPendingDeleteId(null); } }}
-      description="This question will be permanently deleted."
-    />
+                      ) : null}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <DeleteConfirmDialog
+        open={pendingDeleteId !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteId(null);
+        }}
+        onConfirm={() => {
+          if (pendingDeleteId) {
+            handleDelete(pendingDeleteId);
+            setPendingDeleteId(null);
+          }
+        }}
+        description="This question will be permanently deleted."
+      />
     </>
   );
 }

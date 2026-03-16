@@ -49,10 +49,18 @@ import {
   getMilestoneUpdates,
   type MilestoneUpdate,
 } from "@/features/milestones/updates-queries";
-import type { Action, ActionAttachment, ActionMilestone, MilestoneType } from "@/types";
+import type {
+  Action,
+  ActionAttachment,
+  ActionMilestone,
+  MilestoneType,
+} from "@/types";
 import { Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { MilestoneCreateForm, type NewMilestoneForm } from "./MilestoneCreateForm";
+import {
+  MilestoneCreateForm,
+  type NewMilestoneForm,
+} from "./MilestoneCreateForm";
 import { MilestoneDocuments } from "./MilestoneDocuments";
 import { MilestoneRow, type MilestonePanel } from "./MilestoneRow";
 import type { MilestoneEditForm } from "./MilestoneEditPanel";
@@ -75,17 +83,29 @@ type MilestoneStatus =
 
 const STATUS_CONFIRM_MESSAGES: Record<MilestoneStatus, string> = {
   draft: "Change this milestone to Draft? It will no longer be approved.",
-  no_submission: "Mark this milestone as No Submission? This will set it to draft status.",
-  approved: "Approve this milestone? This will mark it as approved and no longer a draft.",
-  needs_attention: "Mark this milestone as needing attention? This will notify the team to make changes.",
-  needs_ola_review: "Mark this milestone as needing OLA (Office of Legal Affairs) review?",
-  reviewed_by_ola: "Mark this milestone as reviewed by OLA (Office of Legal Affairs)?",
+  no_submission:
+    "Mark this milestone as No Submission? This will set it to draft status.",
+  approved:
+    "Approve this milestone? This will mark it as approved and no longer a draft.",
+  needs_attention:
+    "Mark this milestone as needing attention? This will notify the team to make changes.",
+  needs_ola_review:
+    "Mark this milestone as needing OLA (Office of Legal Affairs) review?",
+  reviewed_by_ola:
+    "Mark this milestone as reviewed by OLA (Office of Legal Affairs)?",
   finalized: "Finalize this milestone? This marks it as complete.",
-  attention_to_timeline: "Mark this milestone as needing attention to timeline?",
+  attention_to_timeline:
+    "Mark this milestone as needing attention to timeline?",
   confirmation_needed: "Mark this milestone as needing confirmation?",
 };
 
-const MILESTONE_ORDER: MilestoneType[] = ["upcoming", "first", "second", "third", "final"];
+const MILESTONE_ORDER: MilestoneType[] = [
+  "upcoming",
+  "first",
+  "second",
+  "third",
+  "final",
+];
 
 // ---------------------------------------------------------------------------
 // Shared loading / empty states
@@ -119,10 +139,15 @@ export default function MilestonesTab({
   const [loading, setLoading] = useState(true);
 
   // ── Per-milestone open panel (edit | history | comments | null) ───────────
-  const [openPanels, setOpenPanels] = useState<Record<string, MilestonePanel>>({});
+  const [openPanels, setOpenPanels] = useState<Record<string, MilestonePanel>>(
+    {},
+  );
 
   // ── Edit form ─────────────────────────────────────────────────────────────
-  const [editForm, setEditForm] = useState<MilestoneEditForm>({ description: "", deadline: "" });
+  const [editForm, setEditForm] = useState<MilestoneEditForm>({
+    description: "",
+    deadline: "",
+  });
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
 
@@ -138,7 +163,9 @@ export default function MilestonesTab({
   const [createError, setCreateError] = useState<string | null>(null);
 
   // ── Comments ──────────────────────────────────────────────────────────────
-  const [milestoneUpdates, setMilestoneUpdates] = useState<Record<string, MilestoneUpdate[]>>({});
+  const [milestoneUpdates, setMilestoneUpdates] = useState<
+    Record<string, MilestoneUpdate[]>
+  >({});
   const [addingCommentId, setAddingCommentId] = useState<string | null>(null);
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
@@ -150,11 +177,17 @@ export default function MilestonesTab({
   const [editingContent, setEditingContent] = useState("");
 
   // ── Version history ───────────────────────────────────────────────────────
-  const [versions, setVersions] = useState<Record<string, MilestoneVersion[]>>({});
-  const [loadingVersions, setLoadingVersions] = useState<Record<string, boolean>>({});
+  const [versions, setVersions] = useState<Record<string, MilestoneVersion[]>>(
+    {},
+  );
+  const [loadingVersions, setLoadingVersions] = useState<
+    Record<string, boolean>
+  >({});
 
   // ── Document submitted state ──────────────────────────────────────────────
-  const [milestoneDocumentSubmitted, setMilestoneDocumentSubmitted] = useState<Record<string, boolean>>({});
+  const [milestoneDocumentSubmitted, setMilestoneDocumentSubmitted] = useState<
+    Record<string, boolean>
+  >({});
 
   // ── Attachments ───────────────────────────────────────────────────────────
   const [attachments, setAttachments] = useState<ActionAttachment[]>([]);
@@ -173,7 +206,9 @@ export default function MilestonesTab({
     milestoneId: string;
     updateId: string;
   } | null>(null);
-  const [pendingDeleteMilestoneId, setPendingDeleteMilestoneId] = useState<string | null>(null);
+  const [pendingDeleteMilestoneId, setPendingDeleteMilestoneId] = useState<
+    string | null
+  >(null);
 
   // ── Auth ──────────────────────────────────────────────────────────────────
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -321,7 +356,9 @@ export default function MilestonesTab({
         setEditError(result.error ?? "Failed to save milestone");
       }
     } catch (err) {
-      setEditError(err instanceof Error ? err.message : "Failed to save milestone");
+      setEditError(
+        err instanceof Error ? err.message : "Failed to save milestone",
+      );
     } finally {
       setEditSaving(false);
     }
@@ -340,13 +377,17 @@ export default function MilestonesTab({
 
     setEditSaving(true);
     try {
-      const handlers: Record<MilestoneStatus, () => Promise<{ success: boolean; error?: string }>> = {
+      const handlers: Record<
+        MilestoneStatus,
+        () => Promise<{ success: boolean; error?: string }>
+      > = {
         approved: () => approveMilestoneContent(milestoneId),
         needs_attention: () => requestMilestoneChanges(milestoneId),
         needs_ola_review: () => setMilestoneNeedsOlaReview(milestoneId),
         reviewed_by_ola: () => setMilestoneReviewedByOla(milestoneId),
         finalized: () => setMilestoneFinalized(milestoneId),
-        attention_to_timeline: () => setMilestoneAttentionToTimeline(milestoneId),
+        attention_to_timeline: () =>
+          setMilestoneAttentionToTimeline(milestoneId),
         confirmation_needed: () => setMilestoneConfirmationNeeded(milestoneId),
         draft: () => setMilestoneToDraft(milestoneId),
         no_submission: () => setMilestoneToDraft(milestoneId),
@@ -387,13 +428,20 @@ export default function MilestonesTab({
       });
       if (result.success) {
         setCreatingNew(false);
-        setNewMilestoneForm({ milestone_type: "first", is_public: false, description: "", deadline: "" });
+        setNewMilestoneForm({
+          milestone_type: "first",
+          is_public: false,
+          description: "",
+          deadline: "",
+        });
         await loadMilestones();
       } else {
         setCreateError(result.error ?? "Failed to create milestone");
       }
     } catch (err) {
-      setCreateError(err instanceof Error ? err.message : "Failed to create milestone");
+      setCreateError(
+        err instanceof Error ? err.message : "Failed to create milestone",
+      );
     } finally {
       setCreateSaving(false);
     }
@@ -415,9 +463,13 @@ export default function MilestonesTab({
   const handleAddComment = async (milestoneId: string) => {
     if (!commentText.trim()) return;
     const updates = milestoneUpdates[milestoneId] ?? [];
-    const parentUpdate = replyingToId ? updates.find((u) => u.id === replyingToId) : null;
+    const parentUpdate = replyingToId
+      ? updates.find((u) => u.id === replyingToId)
+      : null;
     const isLegal = parentUpdate ? parentUpdate.is_legal : commentIsLegal;
-    const isInternal = parentUpdate ? parentUpdate.is_internal : commentIsInternal;
+    const isInternal = parentUpdate
+      ? parentUpdate.is_internal
+      : commentIsInternal;
 
     setCommentSaving(true);
     setCommentError(null);
@@ -441,13 +493,18 @@ export default function MilestonesTab({
         setCommentError(result.error ?? "Failed to add comment");
       }
     } catch (err) {
-      setCommentError(err instanceof Error ? err.message : "Failed to add comment");
+      setCommentError(
+        err instanceof Error ? err.message : "Failed to add comment",
+      );
     } finally {
       setCommentSaving(false);
     }
   };
 
-  const handleToggleResolved = async (milestoneId: string, updateId: string) => {
+  const handleToggleResolved = async (
+    milestoneId: string,
+    updateId: string,
+  ) => {
     try {
       const result = await toggleMilestoneUpdateResolved(updateId);
       if (result.success) await loadMilestoneUpdates(milestoneId);
@@ -465,12 +522,18 @@ export default function MilestonesTab({
     }
   };
 
-  const handleSaveEditComment = async (milestoneId: string, updateId: string) => {
+  const handleSaveEditComment = async (
+    milestoneId: string,
+    updateId: string,
+  ) => {
     if (!editingContent.trim()) return;
     setCommentSaving(true);
     setCommentError(null);
     try {
-      const result = await updateMilestoneUpdate(updateId, editingContent.trim());
+      const result = await updateMilestoneUpdate(
+        updateId,
+        editingContent.trim(),
+      );
       if (result.success) {
         setEditingUpdateId(null);
         setEditingContent("");
@@ -479,7 +542,9 @@ export default function MilestonesTab({
         setCommentError(result.error ?? "Failed to update comment");
       }
     } catch (err) {
-      setCommentError(err instanceof Error ? err.message : "Failed to update comment");
+      setCommentError(
+        err instanceof Error ? err.message : "Failed to update comment",
+      );
     } finally {
       setCommentSaving(false);
     }
@@ -504,7 +569,12 @@ export default function MilestonesTab({
 
   const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!window.confirm("Are you sure you want to upload this file? Once uploaded, only administrators can delete attachments.")) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to upload this file? Once uploaded, only administrators can delete attachments.",
+      )
+    )
+      return;
 
     setUploading(true);
     setUploadError(null);
@@ -516,7 +586,10 @@ export default function MilestonesTab({
       const milestoneId = formData.get("milestone_id");
       if (!milestoneId || milestoneId === "") formData.delete("milestone_id");
 
-      const response = await fetch("/api/attachments/upload", { method: "POST", body: formData });
+      const response = await fetch("/api/attachments/upload", {
+        method: "POST",
+        body: formData,
+      });
       const result = await response.json();
       if (result.success) {
         await loadAttachments();
@@ -547,7 +620,11 @@ export default function MilestonesTab({
     description: string | null,
   ) => {
     try {
-      const result = await updateAttachmentMetadata(attachmentId, title, description);
+      const result = await updateAttachmentMetadata(
+        attachmentId,
+        title,
+        description,
+      );
       if (result.success) await loadAttachments();
     } catch {
       // silently fail
@@ -564,7 +641,9 @@ export default function MilestonesTab({
     );
 
   const publicMilestones = sortedByType(milestones.filter((m) => m.is_public));
-  const privateMilestones = sortedByType(milestones.filter((m) => !m.is_public));
+  const privateMilestones = sortedByType(
+    milestones.filter((m) => !m.is_public),
+  );
 
   const availableMilestoneTypes = (): MilestoneType[] => {
     const used = milestones.map((m) => m.milestone_type);
@@ -584,7 +663,9 @@ export default function MilestonesTab({
     isAdmin,
     currentUserId,
     documentSubmitted: !milestone.is_public
-      ? (milestoneDocumentSubmitted[milestone.id] ?? milestone.milestone_document_submitted ?? false)
+      ? (milestoneDocumentSubmitted[milestone.id] ??
+        milestone.milestone_document_submitted ??
+        false)
       : false,
     publicProgress: milestone.is_public ? milestone.public_progress : undefined,
 
@@ -629,12 +710,19 @@ export default function MilestonesTab({
     onDeleteComment: (milestoneId: string, updateId: string) =>
       setPendingDeleteComment({ milestoneId, updateId }),
 
-    onDelete: isAdmin ? () => setPendingDeleteMilestoneId(milestone.id) : undefined,
-    onStatusChange: isAdmin ? (status: MilestoneStatus) => handleStatusChange(milestone.id, status) : undefined,
+    onDelete: isAdmin
+      ? () => setPendingDeleteMilestoneId(milestone.id)
+      : undefined,
+    onStatusChange: isAdmin
+      ? (status: MilestoneStatus) => handleStatusChange(milestone.id, status)
+      : undefined,
     onDocumentSubmittedChange:
       isAdmin && !milestone.is_public
         ? async (milestoneId: string, submitted: boolean) => {
-            setMilestoneDocumentSubmitted((prev) => ({ ...prev, [milestoneId]: submitted }));
+            setMilestoneDocumentSubmitted((prev) => ({
+              ...prev,
+              [milestoneId]: submitted,
+            }));
             await updateMilestoneDocumentSubmitted(milestoneId, submitted);
             await loadMilestones();
           }
@@ -642,7 +730,10 @@ export default function MilestonesTab({
     onPublicProgressChange:
       isAdmin && milestone.is_public
         ? async (value: PublicProgressValue) => {
-            const result = await updateMilestonePublicProgress(milestone.id, value);
+            const result = await updateMilestonePublicProgress(
+              milestone.id,
+              value,
+            );
             if (result.success) await loadMilestones();
           }
         : undefined,
@@ -651,15 +742,20 @@ export default function MilestonesTab({
   // ── Render ────────────────────────────────────────────────────────────────
 
   if (loading) return <LoadingState />;
-  if (milestones.length === 0) return <EmptyState message="No milestones have been added yet." />;
+  if (milestones.length === 0)
+    return <EmptyState message="No milestones have been added yet." />;
 
   return (
     <div className="space-y-8">
       {/* ── Public milestones ── */}
       <section className="space-y-3">
-        <h3 className="text-xs font-semibold tracking-wider text-slate-500 uppercase">Public Milestones</h3>
+        <h3 className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
+          Public Milestones
+        </h3>
         {publicMilestones.length === 0 && !creatingNew && (
-          <p className="text-sm text-slate-400 italic">No public milestones yet</p>
+          <p className="text-sm text-slate-400 italic">
+            No public milestones yet
+          </p>
         )}
         {publicMilestones.map((m) => (
           <MilestoneRow key={m.id} {...rowProps(m)} />
@@ -690,7 +786,10 @@ export default function MilestonesTab({
             error={createError}
             onChange={setNewMilestoneForm}
             onSave={handleCreateMilestone}
-            onCancel={() => { setCreatingNew(false); setCreateError(null); }}
+            onCancel={() => {
+              setCreatingNew(false);
+              setCreateError(null);
+            }}
           />
         )}
       </section>
@@ -699,9 +798,13 @@ export default function MilestonesTab({
 
       {/* ── Internal milestones ── */}
       <section className="space-y-3">
-        <h3 className="text-xs font-semibold tracking-wider text-slate-500 uppercase">Internal Milestones</h3>
+        <h3 className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
+          Internal Milestones
+        </h3>
         {privateMilestones.length === 0 && !creatingNew && (
-          <p className="text-sm text-slate-400 italic">No internal milestones yet</p>
+          <p className="text-sm text-slate-400 italic">
+            No internal milestones yet
+          </p>
         )}
         {privateMilestones.map((m) => (
           <MilestoneRow key={m.id} {...rowProps(m)} />
@@ -732,7 +835,10 @@ export default function MilestonesTab({
             error={createError}
             onChange={setNewMilestoneForm}
             onSave={handleCreateMilestone}
-            onCancel={() => { setCreatingNew(false); setCreateError(null); }}
+            onCancel={() => {
+              setCreatingNew(false);
+              setCreateError(null);
+            }}
           />
         )}
       </section>
@@ -759,24 +865,35 @@ export default function MilestonesTab({
       <Dialog
         open={confirmDialog.open}
         onOpenChange={(open) =>
-          !open && setConfirmDialog({ open: false, milestoneId: null, status: null })
+          !open &&
+          setConfirmDialog({ open: false, milestoneId: null, status: null })
         }
       >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Change Milestone Status</DialogTitle>
             <DialogDescription>
-              {confirmDialog.status && STATUS_CONFIRM_MESSAGES[confirmDialog.status]}
+              {confirmDialog.status &&
+                STATUS_CONFIRM_MESSAGES[confirmDialog.status]}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setConfirmDialog({ open: false, milestoneId: null, status: null })}
+              onClick={() =>
+                setConfirmDialog({
+                  open: false,
+                  milestoneId: null,
+                  status: null,
+                })
+              }
             >
               Cancel
             </Button>
-            <Button onClick={confirmStatusChange} className="bg-un-blue hover:bg-un-blue/90">
+            <Button
+              onClick={confirmStatusChange}
+              className="bg-un-blue hover:bg-un-blue/90"
+            >
               Confirm
             </Button>
           </DialogFooter>
@@ -786,10 +903,15 @@ export default function MilestonesTab({
       {/* ── Delete comment confirm ── */}
       <DeleteConfirmDialog
         open={pendingDeleteComment !== null}
-        onOpenChange={(open) => { if (!open) setPendingDeleteComment(null); }}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteComment(null);
+        }}
         onConfirm={() => {
           if (pendingDeleteComment) {
-            handleDeleteComment(pendingDeleteComment.milestoneId, pendingDeleteComment.updateId);
+            handleDeleteComment(
+              pendingDeleteComment.milestoneId,
+              pendingDeleteComment.updateId,
+            );
             setPendingDeleteComment(null);
           }
         }}
@@ -799,7 +921,9 @@ export default function MilestonesTab({
       {/* ── Delete milestone confirm ── */}
       <DeleteConfirmDialog
         open={pendingDeleteMilestoneId !== null}
-        onOpenChange={(open) => { if (!open) setPendingDeleteMilestoneId(null); }}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteMilestoneId(null);
+        }}
         onConfirm={() => {
           if (pendingDeleteMilestoneId) {
             handleDeleteMilestone(pendingDeleteMilestoneId);

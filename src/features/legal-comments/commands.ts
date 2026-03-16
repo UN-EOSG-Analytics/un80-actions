@@ -4,6 +4,7 @@ import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { getLegalCommentById } from "./queries";
 import { getCurrentUser } from "@/features/auth/service";
+import { requireAdmin, checkIsAdmin } from "@/features/auth/lib/permissions";
 import type { LegalCommentCreateInput, LegalCommentResult } from "./types";
 
 // =========================================================
@@ -30,7 +31,7 @@ export async function createLegalComment(
     }
 
     const rows = await query<{ id: string }>(
-      `INSERT INTO ${DB_SCHEMA}.action_legal_comments 
+      `INSERT INTO ${DB_SCHEMA}.action_legal_comments
      (action_id, action_sub_id, user_id, content, reply_to, content_review_status)
      VALUES ($1, $2, $3, $4, $5, 'needs_review')
      RETURNING id`,
@@ -59,20 +60,11 @@ export async function createLegalComment(
 export async function approveLegalComment(
   commentId: string,
 ): Promise<LegalCommentResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Not authenticated" };
-    }
-
-    const adminCheck = await query<{ user_role: string }>(
-      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-      [user.email],
-    );
-    if (adminCheck[0]?.user_role !== "Admin") {
-      return { success: false, error: "Admin only" };
-    }
-
     const comment = await getLegalCommentById(commentId);
     if (!comment) {
       return { success: false, error: "Comment not found" };
@@ -84,7 +76,7 @@ export async function approveLegalComment(
          content_reviewed_by = $1,
          content_reviewed_at = NOW()
      WHERE id = $2`,
-      [user.id, commentId],
+      [auth.user.id, commentId],
     );
 
     const updated = await getLegalCommentById(commentId);
@@ -104,9 +96,20 @@ export async function deleteLegalComment(
   commentId: string,
 ): Promise<LegalCommentResult> {
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "Not authenticated" };
+    }
+
     const comment = await getLegalCommentById(commentId);
     if (!comment) {
       return { success: false, error: "Comment not found" };
+    }
+
+    const isAuthor = comment.user_id === user.id;
+    const isAdmin = await checkIsAdmin();
+    if (!isAuthor && !isAdmin) {
+      return { success: false, error: "Not authorized to delete this comment" };
     }
 
     await query(

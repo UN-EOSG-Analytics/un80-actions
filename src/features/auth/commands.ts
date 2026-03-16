@@ -107,9 +107,12 @@ export async function getCurrentUserIdForClient(): Promise<{
 
 /**
  * Toggle admin role for testing purposes.
- * DEV ONLY - remove in production.
+ * DEV ONLY - not available in production.
  */
 export async function toggleAdminRole(): Promise<Result> {
+  if (process.env.NODE_ENV !== "development") {
+    throw new Error("toggleAdminRole is not available in production");
+  }
   const { getCurrentUser } = await import("./service");
   const { query } = await import("@/lib/db/db");
   const { DB_SCHEMA } = await import("@/lib/db/config");

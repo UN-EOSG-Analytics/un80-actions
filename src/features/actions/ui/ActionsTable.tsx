@@ -683,7 +683,8 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
         <div>
           <h2 className="text-xl font-bold text-gray-900">Actions</h2>
           <p className="mt-0.5 text-sm text-gray-500">
-            {data.workPackages.length} work packages &middot; {allActions.length} actions
+            {data.workPackages.length} work packages &middot;{" "}
+            {allActions.length} actions
           </p>
         </div>
         <span className="mb-0.5 text-sm text-gray-400">

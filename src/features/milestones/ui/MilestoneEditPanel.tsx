@@ -60,7 +60,7 @@ export function MilestoneEditPanel({
             size="sm"
             onClick={onDelete}
             disabled={saving}
-            className="bg-red-500 hover:bg-red-600 text-white"
+            className="bg-red-500 text-white hover:bg-red-600"
           >
             <Trash2 className="mr-1 h-3 w-3" />
             Delete
@@ -69,7 +69,12 @@ export function MilestoneEditPanel({
           <span />
         )}
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={onCancel} disabled={saving}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onCancel}
+            disabled={saving}
+          >
             Cancel
           </Button>
           <Button

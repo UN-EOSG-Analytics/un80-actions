@@ -64,20 +64,3 @@ function normalizeUrl(url: string): string {
   // Remove trailing slash
   return normalized.replace(/\/$/, "");
 }
-
-/**
- * Check if we're running in a Vercel environment.
- */
-export function isVercel(): boolean {
-  return !!process.env.VERCEL;
-}
-
-/**
- * Get the current environment type.
- * Returns 'production', 'preview', or 'development'.
- */
-export function getEnvironment(): "production" | "preview" | "development" {
-  if (process.env.VERCEL_ENV === "production") return "production";
-  if (process.env.VERCEL_ENV === "preview") return "preview";
-  return "development";
-}

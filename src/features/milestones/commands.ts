@@ -222,20 +222,11 @@ export async function updateMilestone(
 export async function approveMilestoneContent(
   milestoneId: string,
 ): Promise<MilestoneResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Not authenticated" };
-    }
-
-    const adminCheck = await query<{ user_role: string }>(
-      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-      [user.email],
-    );
-    if (adminCheck[0]?.user_role !== "Admin") {
-      return { success: false, error: "Admin only" };
-    }
-
     const milestone = await getMilestoneById(milestoneId);
     if (!milestone) {
       return { success: false, error: "Milestone not found" };
@@ -257,7 +248,7 @@ export async function approveMilestoneContent(
          attention_to_timeline = FALSE,
          confirmation_needed = FALSE
      WHERE id = $2`,
-      [user.id, milestoneId],
+      [auth.user.id, milestoneId],
     );
 
     await insertActivityEntry({
@@ -267,7 +258,7 @@ export async function approveMilestoneContent(
       milestone_id: milestoneId,
       title: "Milestone status changed",
       description: `${previousStatus} → Approved`,
-      user_id: user.id,
+      user_id: auth.user.id,
     });
 
     const updated = await getMilestoneById(milestoneId);
@@ -288,20 +279,11 @@ export async function approveMilestoneContent(
 export async function requestMilestoneChanges(
   milestoneId: string,
 ): Promise<MilestoneResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Not authenticated" };
-    }
-
-    const adminCheck = await query<{ user_role: string }>(
-      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-      [user.email],
-    );
-    if (adminCheck[0]?.user_role !== "Admin") {
-      return { success: false, error: "Admin only" };
-    }
-
     const milestone = await getMilestoneById(milestoneId);
     if (!milestone) {
       return { success: false, error: "Milestone not found" };
@@ -322,7 +304,7 @@ export async function requestMilestoneChanges(
          content_reviewed_by = $1,
          content_reviewed_at = NOW()
      WHERE id = $2`,
-      [user.id, milestoneId],
+      [auth.user.id, milestoneId],
     );
 
     await insertActivityEntry({
@@ -332,7 +314,7 @@ export async function requestMilestoneChanges(
       milestone_id: milestoneId,
       title: "Milestone status changed",
       description: `${previousStatus} → Needs Attention`,
-      user_id: user.id,
+      user_id: auth.user.id,
     });
 
     const updated = await getMilestoneById(milestoneId);
@@ -353,20 +335,11 @@ export async function requestMilestoneChanges(
 export async function setMilestoneToDraft(
   milestoneId: string,
 ): Promise<MilestoneResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Not authenticated" };
-    }
-
-    const adminCheck = await query<{ user_role: string }>(
-      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-      [user.email],
-    );
-    if (adminCheck[0]?.user_role !== "Admin") {
-      return { success: false, error: "Admin only" };
-    }
-
     const milestone = await getMilestoneById(milestoneId);
     if (!milestone) {
       return { success: false, error: "Milestone not found" };
@@ -394,7 +367,7 @@ export async function setMilestoneToDraft(
       milestone_id: milestoneId,
       title: "Milestone status changed",
       description: `${previousStatus} → Draft`,
-      user_id: user.id,
+      user_id: auth.user.id,
     });
 
     const updated = await getMilestoneById(milestoneId);
@@ -415,20 +388,11 @@ export async function setMilestoneToDraft(
 export async function setMilestoneNeedsOlaReview(
   milestoneId: string,
 ): Promise<MilestoneResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Not authenticated" };
-    }
-
-    const adminCheck = await query<{ user_role: string }>(
-      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-      [user.email],
-    );
-    if (adminCheck[0]?.user_role !== "Admin") {
-      return { success: false, error: "Admin only" };
-    }
-
     const milestone = await getMilestoneById(milestoneId);
     if (!milestone) {
       return { success: false, error: "Milestone not found" };
@@ -458,7 +422,7 @@ export async function setMilestoneNeedsOlaReview(
       milestone_id: milestoneId,
       title: "Milestone status changed",
       description: `${previousStatus} → Needs OLA review`,
-      user_id: user.id,
+      user_id: auth.user.id,
     });
 
     const updated = await getMilestoneById(milestoneId);
@@ -478,20 +442,11 @@ export async function setMilestoneNeedsOlaReview(
 export async function setMilestoneReviewedByOla(
   milestoneId: string,
 ): Promise<MilestoneResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Not authenticated" };
-    }
-
-    const adminCheck = await query<{ user_role: string }>(
-      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-      [user.email],
-    );
-    if (adminCheck[0]?.user_role !== "Admin") {
-      return { success: false, error: "Admin only" };
-    }
-
     const milestone = await getMilestoneById(milestoneId);
     if (!milestone) {
       return { success: false, error: "Milestone not found" };
@@ -519,7 +474,7 @@ export async function setMilestoneReviewedByOla(
       milestone_id: milestoneId,
       title: "Milestone status changed",
       description: `${previousStatus} → Reviewed by OLA`,
-      user_id: user.id,
+      user_id: auth.user.id,
     });
 
     const updated = await getMilestoneById(milestoneId);
@@ -539,20 +494,11 @@ export async function setMilestoneReviewedByOla(
 export async function setMilestoneFinalized(
   milestoneId: string,
 ): Promise<MilestoneResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Not authenticated" };
-    }
-
-    const adminCheck = await query<{ user_role: string }>(
-      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-      [user.email],
-    );
-    if (adminCheck[0]?.user_role !== "Admin") {
-      return { success: false, error: "Admin only" };
-    }
-
     const milestone = await getMilestoneById(milestoneId);
     if (!milestone) {
       return { success: false, error: "Milestone not found" };
@@ -582,7 +528,7 @@ export async function setMilestoneFinalized(
       milestone_id: milestoneId,
       title: "Milestone status changed",
       description: `${previousStatus} → Finalized`,
-      user_id: user.id,
+      user_id: auth.user.id,
     });
 
     const updated = await getMilestoneById(milestoneId);
@@ -602,20 +548,11 @@ export async function setMilestoneFinalized(
 export async function setMilestoneAttentionToTimeline(
   milestoneId: string,
 ): Promise<MilestoneResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Not authenticated" };
-    }
-
-    const adminCheck = await query<{ user_role: string }>(
-      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-      [user.email],
-    );
-    if (adminCheck[0]?.user_role !== "Admin") {
-      return { success: false, error: "Admin only" };
-    }
-
     const milestone = await getMilestoneById(milestoneId);
     if (!milestone) {
       return { success: false, error: "Milestone not found" };
@@ -645,7 +582,7 @@ export async function setMilestoneAttentionToTimeline(
       milestone_id: milestoneId,
       title: "Milestone status changed",
       description: `${previousStatus} → Attention to timeline`,
-      user_id: user.id,
+      user_id: auth.user.id,
     });
 
     const updated = await getMilestoneById(milestoneId);
@@ -666,20 +603,11 @@ export async function setMilestoneAttentionToTimeline(
 export async function setMilestoneConfirmationNeeded(
   milestoneId: string,
 ): Promise<MilestoneResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return { success: false, error: "Not authenticated" };
-    }
-
-    const adminCheck = await query<{ user_role: string }>(
-      `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-      [user.email],
-    );
-    if (adminCheck[0]?.user_role !== "Admin") {
-      return { success: false, error: "Admin only" };
-    }
-
     const milestone = await getMilestoneById(milestoneId);
     if (!milestone) {
       return { success: false, error: "Milestone not found" };
@@ -709,7 +637,7 @@ export async function setMilestoneConfirmationNeeded(
       milestone_id: milestoneId,
       title: "Milestone status changed",
       description: `${previousStatus} → Confirmation needed`,
-      user_id: user.id,
+      user_id: auth.user.id,
     });
 
     const updated = await getMilestoneById(milestoneId);
@@ -877,10 +805,9 @@ export async function deleteMilestone(
       return { success: false, error: "Milestone not found" };
     }
 
-    await query(
-      `DELETE FROM ${DB_SCHEMA}.action_milestones WHERE id = $1`,
-      [milestoneId],
-    );
+    await query(`DELETE FROM ${DB_SCHEMA}.action_milestones WHERE id = $1`, [
+      milestoneId,
+    ]);
 
     return { success: true };
   } catch (e) {

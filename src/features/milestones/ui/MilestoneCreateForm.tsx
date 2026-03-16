@@ -30,7 +30,9 @@ export function MilestoneCreateForm({
   onCancel,
 }: MilestoneCreateFormProps) {
   const isPublic = form.is_public;
-  const title = isPublic ? "Create New Public Milestone" : "Create New Internal Milestone";
+  const title = isPublic
+    ? "Create New Public Milestone"
+    : "Create New Internal Milestone";
   const borderClass = isPublic ? "border-un-blue/20" : "border-slate-300";
 
   return (

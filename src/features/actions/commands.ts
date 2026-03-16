@@ -1,8 +1,8 @@
 "use server";
 
 import { query } from "@/lib/db/db";
-import { getCurrentUser } from "@/features/auth/service";
 import { DB_SCHEMA } from "@/lib/db/config";
+import { requireAdmin } from "@/features/auth/lib/permissions";
 import type { RiskAssessment } from "@/types";
 
 // =========================================================
@@ -31,18 +31,9 @@ export async function updateRiskAssessment(
   actionSubId: string | null,
   riskAssessment: RiskAssessment | null,
 ): Promise<UpdateRiskAssessmentResult> {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
-  }
-
-  const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-    [user.email],
-  );
-
-  if (adminCheck[0]?.user_role !== "Admin") {
-    return { success: false, error: "Admin only" };
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
   }
 
   try {
@@ -66,18 +57,9 @@ export async function updatePublicActionStatus(
   actionSubId: string | null,
   publicActionStatus: string | null,
 ): Promise<UpdatePublicStatusResult> {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
-  }
-
-  const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-    [user.email],
-  );
-
-  if (adminCheck[0]?.user_role !== "Admin") {
-    return { success: false, error: "Admin only" };
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
   }
 
   try {

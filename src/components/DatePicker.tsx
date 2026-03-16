@@ -30,7 +30,14 @@ function toYMD(date: Date): string {
 function parseTypedMonth(text: string): Date | null {
   const t = text.trim();
   if (!t) return null;
-  for (const fmt of ["MMM yyyy", "MMMM yyyy", "M/yyyy", "yyyy-MM", "MMM", "MMMM"]) {
+  for (const fmt of [
+    "MMM yyyy",
+    "MMMM yyyy",
+    "M/yyyy",
+    "yyyy-MM",
+    "MMM",
+    "MMMM",
+  ]) {
     const d = parse(t, fmt, new Date());
     if (isValid(d)) return d;
   }
@@ -39,7 +46,13 @@ function parseTypedMonth(text: string): Date | null {
 
 function parseTypedDate(text: string): Date | null {
   const t = text.trim();
-  for (const fmt of ["d MMM yyyy", "d MMMM yyyy", "dd/MM/yyyy", "d/M/yyyy", "yyyy-MM-dd"]) {
+  for (const fmt of [
+    "d MMM yyyy",
+    "d MMMM yyyy",
+    "dd/MM/yyyy",
+    "d/M/yyyy",
+    "yyyy-MM-dd",
+  ]) {
     const d = parse(t, fmt, new Date());
     if (isValid(d) && d.getFullYear() > 1900) return d;
   }

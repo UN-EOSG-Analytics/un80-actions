@@ -1,49 +1,49 @@
 "use client";
 
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
-    approveMilestoneContent,
-    requestMilestoneChanges,
-    setMilestoneAttentionToTimeline,
-    setMilestoneConfirmationNeeded,
-    setMilestoneFinalized,
-    setMilestoneNeedsOlaReview,
-    setMilestoneReviewedByOla,
-    setMilestoneToDraft,
-    updateMilestoneDocumentSubmitted,
-    updateMilestonePublicProgress,
+  approveMilestoneContent,
+  requestMilestoneChanges,
+  setMilestoneAttentionToTimeline,
+  setMilestoneConfirmationNeeded,
+  setMilestoneFinalized,
+  setMilestoneNeedsOlaReview,
+  setMilestoneReviewedByOla,
+  setMilestoneToDraft,
+  updateMilestoneDocumentSubmitted,
+  updateMilestonePublicProgress,
 } from "@/features/milestones/commands";
 import type { AllMilestonesTableRow } from "@/features/milestones/queries";
 import { formatShortDate } from "@/lib/format-date";
 import {
-    ArrowDown,
-    ArrowUp,
-    ArrowUpDown,
-    Check,
-    ChevronDown,
-    ChevronRight,
-    Filter,
-    Search,
-    X,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Filter,
+  Search,
+  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
@@ -58,6 +58,18 @@ type SortField =
   | "deadline"
   | "milestone_type";
 type SortDirection = "asc" | "desc";
+
+// "none" is a sentinel meaning apply all filters (exclude nothing)
+type FilterSkip =
+  | "wp"
+  | "action"
+  | "type"
+  | "status"
+  | "month"
+  | "public"
+  | "doc"
+  | "desc"
+  | "none";
 
 const MILESTONE_TYPE_ORDER: Record<string, number> = {
   first: 1,
@@ -196,13 +208,19 @@ type MilestoneStatus =
 
 const STATUS_CONFIRM_MESSAGES: Record<MilestoneStatus, string> = {
   draft: "Change this milestone to Draft? It will no longer be approved.",
-  no_submission: "Mark this milestone as No Submission? This will set it to draft status.",
-  approved: "Approve this milestone? This will mark it as approved and no longer a draft.",
-  needs_attention: "Mark this milestone as needing attention? This will notify the team to make changes.",
-  needs_ola_review: "Mark this milestone as needing OLA (Office of Legal Affairs) review?",
-  reviewed_by_ola: "Mark this milestone as reviewed by OLA (Office of Legal Affairs)?",
+  no_submission:
+    "Mark this milestone as No Submission? This will set it to draft status.",
+  approved:
+    "Approve this milestone? This will mark it as approved and no longer a draft.",
+  needs_attention:
+    "Mark this milestone as needing attention? This will notify the team to make changes.",
+  needs_ola_review:
+    "Mark this milestone as needing OLA (Office of Legal Affairs) review?",
+  reviewed_by_ola:
+    "Mark this milestone as reviewed by OLA (Office of Legal Affairs)?",
   finalized: "Finalize this milestone? This marks it as complete.",
-  attention_to_timeline: "Mark this milestone as needing attention to timeline?",
+  attention_to_timeline:
+    "Mark this milestone as needing attention to timeline?",
   confirmation_needed: "Mark this milestone as needing confirmation?",
 };
 
@@ -218,7 +236,10 @@ function getCurrentStatus(row: AllMilestonesTableRow): string {
   return "in_review";
 }
 
-function applyStatusToRow(row: AllMilestonesTableRow, status: MilestoneStatus): AllMilestonesTableRow {
+function applyStatusToRow(
+  row: AllMilestonesTableRow,
+  status: MilestoneStatus,
+): AllMilestonesTableRow {
   return {
     ...row,
     is_draft: status === "draft" || status === "no_submission",
@@ -267,21 +288,6 @@ function isPastDue(deadline: string | null): boolean {
   const dl = new Date(deadline);
   dl.setHours(0, 0, 0, 0);
   return dl < today;
-}
-
-// =========================================================
-// STATUS PILL — matches MilestoneCard style
-// =========================================================
-
-function StatusPill({ config }: { config: StatusConfig }) {
-  return (
-    <span
-      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border ${config.pill} h-6 px-2.5 text-xs font-medium whitespace-nowrap`}
-    >
-      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${config.dot}`} />
-      {config.label}
-    </span>
-  );
 }
 
 // =========================================================
@@ -472,13 +478,17 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
     setConfirmDialog({ open: false, milestoneId: null, status: null });
     setSavingId(milestoneId);
     try {
-      const handlers: Record<MilestoneStatus, () => Promise<{ success: boolean; error?: string }>> = {
+      const handlers: Record<
+        MilestoneStatus,
+        () => Promise<{ success: boolean; error?: string }>
+      > = {
         approved: () => approveMilestoneContent(milestoneId),
         needs_attention: () => requestMilestoneChanges(milestoneId),
         needs_ola_review: () => setMilestoneNeedsOlaReview(milestoneId),
         reviewed_by_ola: () => setMilestoneReviewedByOla(milestoneId),
         finalized: () => setMilestoneFinalized(milestoneId),
-        attention_to_timeline: () => setMilestoneAttentionToTimeline(milestoneId),
+        attention_to_timeline: () =>
+          setMilestoneAttentionToTimeline(milestoneId),
         confirmation_needed: () => setMilestoneConfirmationNeeded(milestoneId),
         draft: () => setMilestoneToDraft(milestoneId),
         no_submission: () => setMilestoneToDraft(milestoneId),
@@ -486,7 +496,9 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
       const result = await handlers[status]();
       if (result.success) {
         setLocalRows((prev) =>
-          prev.map((r) => r.milestone_id === milestoneId ? applyStatusToRow(r, status) : r)
+          prev.map((r) =>
+            r.milestone_id === milestoneId ? applyStatusToRow(r, status) : r,
+          ),
         );
       }
     } catch {
@@ -499,10 +511,17 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
   const handleDocChange = async (milestoneId: string, submitted: boolean) => {
     setSavingId(milestoneId);
     try {
-      const result = await updateMilestoneDocumentSubmitted(milestoneId, submitted);
+      const result = await updateMilestoneDocumentSubmitted(
+        milestoneId,
+        submitted,
+      );
       if (result.success) {
         setLocalRows((prev) =>
-          prev.map((r) => r.milestone_id === milestoneId ? { ...r, milestone_document_submitted: submitted } : r)
+          prev.map((r) =>
+            r.milestone_id === milestoneId
+              ? { ...r, milestone_document_submitted: submitted }
+              : r,
+          ),
         );
       }
     } catch {
@@ -512,13 +531,20 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
     }
   };
 
-  const handlePublicProgressChange = async (milestoneId: string, value: "completed" | "in_progress" | "delayed") => {
+  const handlePublicProgressChange = async (
+    milestoneId: string,
+    value: "completed" | "in_progress" | "delayed",
+  ) => {
     setSavingId(milestoneId);
     try {
       const result = await updateMilestonePublicProgress(milestoneId, value);
       if (result.success) {
         setLocalRows((prev) =>
-          prev.map((r) => r.milestone_id === milestoneId ? { ...r, public_progress: value } : r)
+          prev.map((r) =>
+            r.milestone_id === milestoneId
+              ? { ...r, public_progress: value }
+              : r,
+          ),
         );
       }
     } catch {
@@ -530,16 +556,6 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
 
   const search = searchInput.trim().toLowerCase();
   const hasSearch = search.length > 0;
-
-  type FilterSkip =
-    | "wp"
-    | "action"
-    | "type"
-    | "status"
-    | "month"
-    | "public"
-    | "doc"
-    | "desc";
 
   const applyFiltersExcept = useCallback(
     (list: AllMilestonesTableRow[], except: FilterSkip) => {
@@ -645,7 +661,9 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
 
   const uniqueStatuses = useMemo(() => {
     const set = new Set(
-      applyFiltersExcept(localRows, "status").map((r) => getStatusConfig(r).label),
+      applyFiltersExcept(localRows, "status").map(
+        (r) => getStatusConfig(r).label,
+      ),
     );
     return ALL_STATUS_LABELS.filter((s) => set.has(s));
   }, [localRows, applyFiltersExcept]);
@@ -663,73 +681,10 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
     return sorted;
   }, [localRows, applyFiltersExcept]);
 
-  const filteredRows = useMemo(() => {
-    let list = localRows;
-    if (hasSearch) {
-      const m = (s: string) => s.toLowerCase().includes(search);
-      list = list.filter(
-        (r) =>
-          m(String(r.work_package_id)) ||
-          m(r.work_package_title) ||
-          m(actionLabel(r.action_id, r.action_sub_id)) ||
-          m(r.description ?? "") ||
-          m(MILESTONE_TYPE_LABELS[r.milestone_type] ?? ""),
-      );
-    }
-    if (filterWP.length > 0)
-      list = list.filter((r) => filterWP.includes(r.work_package_id));
-    if (filterAction.length > 0)
-      list = list.filter((r) =>
-        filterAction.includes(actionLabel(r.action_id, r.action_sub_id)),
-      );
-    if (filterType.length > 0)
-      list = list.filter((r) => filterType.includes(r.milestone_type));
-    if (filterStatus.length > 0)
-      list = list.filter((r) =>
-        filterStatus.includes(getStatusConfig(r).label),
-      );
-    if (filterMonth.length > 0)
-      list = list.filter((r) =>
-        filterMonth.includes(getDeadlineMonthKey(r.deadline)),
-      );
-    if (filterPublic.length > 0)
-      list = list.filter((r) => {
-        if (filterPublic.includes("Public") && r.is_public) return true;
-        if (filterPublic.includes("Internal") && !r.is_public) return true;
-        return false;
-      });
-    if (filterDoc.length > 0)
-      list = list.filter((r) => {
-        if (r.is_public) return false;
-        if (filterDoc.includes("Submitted") && r.milestone_document_submitted)
-          return true;
-        if (
-          filterDoc.includes("Not submitted") &&
-          !r.milestone_document_submitted
-        )
-          return true;
-        return false;
-      });
-    if (filterDesc.trim())
-      list = list.filter((r) =>
-        (r.description ?? "")
-          .toLowerCase()
-          .includes(filterDesc.trim().toLowerCase()),
-      );
-    return list;
-  }, [
-    localRows,
-    hasSearch,
-    search,
-    filterWP,
-    filterAction,
-    filterType,
-    filterStatus,
-    filterMonth,
-    filterPublic,
-    filterDoc,
-    filterDesc,
-  ]);
+  const filteredRows = useMemo(
+    () => applyFiltersExcept(localRows, "none"),
+    [localRows, applyFiltersExcept],
+  );
 
   const sortedRows = useMemo(() => {
     const dir = sortDirection === "asc" ? 1 : -1;
@@ -1104,6 +1059,8 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                 const isSaving = savingId === r.milestone_id;
                 const pastDue =
                   isPastDue(r.deadline) && !r.milestone_document_submitted;
+                const currentProgress = r.public_progress ?? "in_progress";
+                const progressConf = PUBLIC_PROGRESS_CONFIG[currentProgress];
 
                 return (
                   <tr
@@ -1137,7 +1094,9 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
 
                     {/* Visibility */}
                     <td className="px-4 py-2.5 whitespace-nowrap">
-                      <span className={`inline-block rounded px-1.5 py-0.5 text-xs leading-tight font-medium ${r.is_public ? "bg-sky-100 text-sky-700" : "bg-slate-100 text-slate-500"}`}>
+                      <span
+                        className={`inline-block rounded px-1.5 py-0.5 text-xs leading-tight font-medium ${r.is_public ? "bg-sky-100 text-sky-700" : "bg-slate-100 text-slate-500"}`}
+                      >
                         {r.is_public ? "Public" : "Internal"}
                       </span>
                     </td>
@@ -1180,14 +1139,19 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                     </td>
 
                     {/* Status */}
-                    <td className="px-4 py-2.5 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                    <td
+                      className="px-4 py-2.5 whitespace-nowrap"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button
                             disabled={isSaving}
                             className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border ${statusConfig.pill} h-6 px-2.5 text-xs font-medium transition-opacity hover:opacity-75 disabled:opacity-50`}
                           >
-                            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${statusConfig.dot}`} />
+                            <span
+                              className={`h-1.5 w-1.5 shrink-0 rounded-full ${statusConfig.dot}`}
+                            />
                             {statusConfig.label}
                             <ChevronDown className="h-3 w-3 opacity-50" />
                           </button>
@@ -1195,41 +1159,188 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                         <DropdownMenuContent align="start" className="w-48">
                           {r.is_public ? (
                             <>
-                              <DropdownMenuItem onClick={() => handleStatusChange(r.milestone_id, "draft")} disabled={currentStatusValue === "draft"}>
-                                <span className="flex w-full items-center justify-between">Draft {currentStatusValue === "draft" && <Check className="h-3 w-3" />}</span>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStatusChange(r.milestone_id, "draft")
+                                }
+                                disabled={currentStatusValue === "draft"}
+                              >
+                                <span className="flex w-full items-center justify-between">
+                                  Draft{" "}
+                                  {currentStatusValue === "draft" && (
+                                    <Check className="h-3 w-3" />
+                                  )}
+                                </span>
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleStatusChange(r.milestone_id, "needs_ola_review")} disabled={currentStatusValue === "needs_ola_review"}>
-                                <span className="flex w-full items-center justify-between">Needs OLA review {currentStatusValue === "needs_ola_review" && <Check className="h-3 w-3" />}</span>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStatusChange(
+                                    r.milestone_id,
+                                    "needs_ola_review",
+                                  )
+                                }
+                                disabled={
+                                  currentStatusValue === "needs_ola_review"
+                                }
+                              >
+                                <span className="flex w-full items-center justify-between">
+                                  Needs OLA review{" "}
+                                  {currentStatusValue ===
+                                    "needs_ola_review" && (
+                                    <Check className="h-3 w-3" />
+                                  )}
+                                </span>
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleStatusChange(r.milestone_id, "reviewed_by_ola")} disabled={currentStatusValue === "reviewed_by_ola"}>
-                                <span className="flex w-full items-center justify-between">Reviewed by OLA {currentStatusValue === "reviewed_by_ola" && <Check className="h-3 w-3" />}</span>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStatusChange(
+                                    r.milestone_id,
+                                    "reviewed_by_ola",
+                                  )
+                                }
+                                disabled={
+                                  currentStatusValue === "reviewed_by_ola"
+                                }
+                              >
+                                <span className="flex w-full items-center justify-between">
+                                  Reviewed by OLA{" "}
+                                  {currentStatusValue === "reviewed_by_ola" && (
+                                    <Check className="h-3 w-3" />
+                                  )}
+                                </span>
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleStatusChange(r.milestone_id, "finalized")} disabled={currentStatusValue === "finalized"}>
-                                <span className="flex w-full items-center justify-between">Finalized {currentStatusValue === "finalized" && <Check className="h-3 w-3" />}</span>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStatusChange(
+                                    r.milestone_id,
+                                    "finalized",
+                                  )
+                                }
+                                disabled={currentStatusValue === "finalized"}
+                              >
+                                <span className="flex w-full items-center justify-between">
+                                  Finalized{" "}
+                                  {currentStatusValue === "finalized" && (
+                                    <Check className="h-3 w-3" />
+                                  )}
+                                </span>
                               </DropdownMenuItem>
                             </>
                           ) : (
                             <>
-                              <DropdownMenuItem onClick={() => handleStatusChange(r.milestone_id, "draft")} disabled={currentStatusValue === "draft"}>
-                                <span className="flex w-full items-center justify-between">Draft {currentStatusValue === "draft" && <Check className="h-3 w-3" />}</span>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStatusChange(r.milestone_id, "draft")
+                                }
+                                disabled={currentStatusValue === "draft"}
+                              >
+                                <span className="flex w-full items-center justify-between">
+                                  Draft{" "}
+                                  {currentStatusValue === "draft" && (
+                                    <Check className="h-3 w-3" />
+                                  )}
+                                </span>
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleStatusChange(r.milestone_id, "no_submission")} disabled={currentStatusValue === "draft"}>
-                                <span className="flex w-full items-center justify-between">No Submission {currentStatusValue === "draft" && <Check className="h-3 w-3" />}</span>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStatusChange(
+                                    r.milestone_id,
+                                    "no_submission",
+                                  )
+                                }
+                                disabled={currentStatusValue === "draft"}
+                              >
+                                <span className="flex w-full items-center justify-between">
+                                  No Submission{" "}
+                                  {currentStatusValue === "draft" && (
+                                    <Check className="h-3 w-3" />
+                                  )}
+                                </span>
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleStatusChange(r.milestone_id, "needs_attention")} disabled={currentStatusValue === "needs_attention"}>
-                                <span className="flex w-full items-center justify-between">Needs Attention {currentStatusValue === "needs_attention" && <Check className="h-3 w-3" />}</span>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStatusChange(
+                                    r.milestone_id,
+                                    "needs_attention",
+                                  )
+                                }
+                                disabled={
+                                  currentStatusValue === "needs_attention"
+                                }
+                              >
+                                <span className="flex w-full items-center justify-between">
+                                  Needs Attention{" "}
+                                  {currentStatusValue === "needs_attention" && (
+                                    <Check className="h-3 w-3" />
+                                  )}
+                                </span>
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleStatusChange(r.milestone_id, "attention_to_timeline")} disabled={currentStatusValue === "attention_to_timeline"}>
-                                <span className="flex w-full items-center justify-between">Attention to timeline {currentStatusValue === "attention_to_timeline" && <Check className="h-3 w-3" />}</span>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStatusChange(
+                                    r.milestone_id,
+                                    "attention_to_timeline",
+                                  )
+                                }
+                                disabled={
+                                  currentStatusValue === "attention_to_timeline"
+                                }
+                              >
+                                <span className="flex w-full items-center justify-between">
+                                  Attention to timeline{" "}
+                                  {currentStatusValue ===
+                                    "attention_to_timeline" && (
+                                    <Check className="h-3 w-3" />
+                                  )}
+                                </span>
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleStatusChange(r.milestone_id, "confirmation_needed")} disabled={currentStatusValue === "confirmation_needed"}>
-                                <span className="flex w-full items-center justify-between">Confirmation needed {currentStatusValue === "confirmation_needed" && <Check className="h-3 w-3" />}</span>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStatusChange(
+                                    r.milestone_id,
+                                    "confirmation_needed",
+                                  )
+                                }
+                                disabled={
+                                  currentStatusValue === "confirmation_needed"
+                                }
+                              >
+                                <span className="flex w-full items-center justify-between">
+                                  Confirmation needed{" "}
+                                  {currentStatusValue ===
+                                    "confirmation_needed" && (
+                                    <Check className="h-3 w-3" />
+                                  )}
+                                </span>
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleStatusChange(r.milestone_id, "approved")} disabled={currentStatusValue === "approved"}>
-                                <span className="flex w-full items-center justify-between">Approved {currentStatusValue === "approved" && <Check className="h-3 w-3" />}</span>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStatusChange(r.milestone_id, "approved")
+                                }
+                                disabled={currentStatusValue === "approved"}
+                              >
+                                <span className="flex w-full items-center justify-between">
+                                  Approved{" "}
+                                  {currentStatusValue === "approved" && (
+                                    <Check className="h-3 w-3" />
+                                  )}
+                                </span>
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleStatusChange(r.milestone_id, "finalized")} disabled={currentStatusValue === "finalized"}>
-                                <span className="flex w-full items-center justify-between">Finalized {currentStatusValue === "finalized" && <Check className="h-3 w-3" />}</span>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStatusChange(
+                                    r.milestone_id,
+                                    "finalized",
+                                  )
+                                }
+                                disabled={currentStatusValue === "finalized"}
+                              >
+                                <span className="flex w-full items-center justify-between">
+                                  Finalized{" "}
+                                  {currentStatusValue === "finalized" && (
+                                    <Check className="h-3 w-3" />
+                                  )}
+                                </span>
                               </DropdownMenuItem>
                             </>
                           )}
@@ -1238,40 +1349,55 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                     </td>
 
                     {/* Public Progress */}
-                    <td className="px-4 py-2.5 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                      {r.is_public ? (() => {
-                        const currentProgress = r.public_progress ?? "in_progress";
-                        const progressConf = PUBLIC_PROGRESS_CONFIG[currentProgress];
-                        const progressLabels: Record<string, string> = { completed: "Completed", in_progress: "In progress", delayed: "Delayed" };
-                        return (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button
-                                disabled={isSaving}
-                                className={`inline-flex h-6 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-xs font-medium transition-opacity hover:opacity-75 disabled:opacity-50 ${progressConf.pill}`}
+                    <td
+                      className="px-4 py-2.5 whitespace-nowrap"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {r.is_public ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              disabled={isSaving}
+                              className={`inline-flex h-6 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-xs font-medium transition-opacity hover:opacity-75 disabled:opacity-50 ${progressConf.pill}`}
+                            >
+                              <span
+                                className={`h-1.5 w-1.5 shrink-0 rounded-full ${progressConf.dot}`}
+                              />
+                              {progressConf.label}
+                              <ChevronDown className="h-3 w-3 opacity-50" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start" className="w-36">
+                            {(
+                              ["completed", "in_progress", "delayed"] as const
+                            ).map((v) => (
+                              <DropdownMenuItem
+                                key={v}
+                                onClick={() =>
+                                  handlePublicProgressChange(r.milestone_id, v)
+                                }
+                                disabled={currentProgress === v}
                               >
-                                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${progressConf.dot}`} />
-                                {progressConf.label}
-                                <ChevronDown className="h-3 w-3 opacity-50" />
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="w-36">
-                              {(["completed", "in_progress", "delayed"] as const).map((v) => (
-                                <DropdownMenuItem key={v} onClick={() => handlePublicProgressChange(r.milestone_id, v)} disabled={currentProgress === v}>
-                                  <span className="flex w-full items-center justify-between">
-                                    {progressLabels[v]}
-                                    {currentProgress === v && <Check className="h-3 w-3" />}
-                                  </span>
-                                </DropdownMenuItem>
-                              ))}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        );
-                      })() : <span className="text-sm text-slate-300">—</span>}
+                                <span className="flex w-full items-center justify-between">
+                                  {PUBLIC_PROGRESS_CONFIG[v].label}
+                                  {currentProgress === v && (
+                                    <Check className="h-3 w-3" />
+                                  )}
+                                </span>
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        <span className="text-sm text-slate-300">—</span>
+                      )}
                     </td>
 
                     {/* Doc submitted */}
-                    <td className="px-4 py-2.5 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                    <td
+                      className="px-4 py-2.5 whitespace-nowrap"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       {!r.is_public ? (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -1283,17 +1409,41 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                                   : "border-slate-200 bg-slate-50 text-slate-500"
                               }`}
                             >
-                              <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${r.milestone_document_submitted ? "bg-emerald-500" : "bg-slate-300"}`} />
-                              {r.milestone_document_submitted ? "Submitted" : "Not submitted"}
+                              <span
+                                className={`h-1.5 w-1.5 shrink-0 rounded-full ${r.milestone_document_submitted ? "bg-emerald-500" : "bg-slate-300"}`}
+                              />
+                              {r.milestone_document_submitted
+                                ? "Submitted"
+                                : "Not submitted"}
                               <ChevronDown className="h-3 w-3 opacity-50" />
                             </button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="start" className="w-40">
-                            <DropdownMenuItem onClick={() => handleDocChange(r.milestone_id, false)} disabled={!r.milestone_document_submitted}>
-                              <span className="flex w-full items-center justify-between">Not submitted {!r.milestone_document_submitted && <Check className="h-3 w-3" />}</span>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleDocChange(r.milestone_id, false)
+                              }
+                              disabled={!r.milestone_document_submitted}
+                            >
+                              <span className="flex w-full items-center justify-between">
+                                Not submitted{" "}
+                                {!r.milestone_document_submitted && (
+                                  <Check className="h-3 w-3" />
+                                )}
+                              </span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDocChange(r.milestone_id, true)} disabled={r.milestone_document_submitted}>
-                              <span className="flex w-full items-center justify-between">Submitted {r.milestone_document_submitted && <Check className="h-3 w-3" />}</span>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleDocChange(r.milestone_id, true)
+                              }
+                              disabled={r.milestone_document_submitted}
+                            >
+                              <span className="flex w-full items-center justify-between">
+                                Submitted{" "}
+                                {r.milestone_document_submitted && (
+                                  <Check className="h-3 w-3" />
+                                )}
+                              </span>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -1318,24 +1468,35 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
       <Dialog
         open={confirmDialog.open}
         onOpenChange={(open) =>
-          !open && setConfirmDialog({ open: false, milestoneId: null, status: null })
+          !open &&
+          setConfirmDialog({ open: false, milestoneId: null, status: null })
         }
       >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Change Milestone Status</DialogTitle>
             <DialogDescription>
-              {confirmDialog.status && STATUS_CONFIRM_MESSAGES[confirmDialog.status]}
+              {confirmDialog.status &&
+                STATUS_CONFIRM_MESSAGES[confirmDialog.status]}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setConfirmDialog({ open: false, milestoneId: null, status: null })}
+              onClick={() =>
+                setConfirmDialog({
+                  open: false,
+                  milestoneId: null,
+                  status: null,
+                })
+              }
             >
               Cancel
             </Button>
-            <Button onClick={confirmStatusChange} className="bg-un-blue hover:bg-un-blue/90">
+            <Button
+              onClick={confirmStatusChange}
+              className="bg-un-blue hover:bg-un-blue/90"
+            >
               Confirm
             </Button>
           </DialogFooter>

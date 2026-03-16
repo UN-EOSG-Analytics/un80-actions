@@ -80,26 +80,32 @@ export default function ActionModal({
   const [panelWidth, setPanelWidth] = useState(672); // 42rem ≈ max-w-2xl
   const isResizing = useRef(false);
 
-  const handleResizeStart = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    isResizing.current = true;
-    const startX = e.clientX;
-    const startWidth = panelWidth;
+  const handleResizeStart = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      isResizing.current = true;
+      const startX = e.clientX;
+      const startWidth = panelWidth;
 
-    const onMouseMove = (e: MouseEvent) => {
-      if (!isResizing.current) return;
-      const delta = startX - e.clientX;
-      const next = Math.min(Math.max(startWidth + delta, 400), window.innerWidth - 64);
-      setPanelWidth(next);
-    };
-    const onMouseUp = () => {
-      isResizing.current = false;
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-    };
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-  }, [panelWidth]);
+      const onMouseMove = (e: MouseEvent) => {
+        if (!isResizing.current) return;
+        const delta = startX - e.clientX;
+        const next = Math.min(
+          Math.max(startWidth + delta, 400),
+          window.innerWidth - 64,
+        );
+        setPanelWidth(next);
+      };
+      const onMouseUp = () => {
+        isResizing.current = false;
+        window.removeEventListener("mousemove", onMouseMove);
+        window.removeEventListener("mouseup", onMouseUp);
+      };
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseup", onMouseUp);
+    },
+    [panelWidth],
+  );
 
   // Initialize tab from URL or default to overview
   useEffect(() => {

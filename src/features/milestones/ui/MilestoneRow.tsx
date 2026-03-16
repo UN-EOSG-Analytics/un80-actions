@@ -6,7 +6,10 @@ import type { ActionMilestone } from "@/types";
 import { MilestoneCard, type PublicProgressValue } from "./MilestoneCard";
 import { MilestoneCommentForm } from "./MilestoneCommentForm";
 import { MilestoneCommentThread } from "./MilestoneCommentThread";
-import { MilestoneEditPanel, type MilestoneEditForm } from "./MilestoneEditPanel";
+import {
+  MilestoneEditPanel,
+  type MilestoneEditForm,
+} from "./MilestoneEditPanel";
 import { MilestoneVersionHistory } from "./MilestoneVersionHistory";
 
 // ---------------------------------------------------------------------------
@@ -130,7 +133,9 @@ export function MilestoneRow({
   const showNewCommentForm = addingCommentId === milestone.id && !replyingToId;
 
   return (
-    <div className={`rounded-xl border bg-white transition-all duration-150 ${isOpen ? "border-slate-200 shadow-[0_2px_12px_0_rgba(0,0,0,0.07)]" : "border-slate-100 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)] hover:border-slate-200 hover:shadow-[0_2px_10px_0_rgba(0,0,0,0.07)]"}`}>
+    <div
+      className={`rounded-xl border bg-white transition-all duration-150 ${isOpen ? "border-slate-200 shadow-[0_2px_12px_0_rgba(0,0,0,0.07)]" : "border-slate-100 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)] hover:border-slate-200 hover:shadow-[0_2px_10px_0_rgba(0,0,0,0.07)]"}`}
+    >
       <MilestoneCard
         milestone={milestone}
         updates={updates}
@@ -148,58 +153,35 @@ export function MilestoneRow({
       />
 
       {/* CSS grid-rows expansion — no height measurement, no layout jump on the card header */}
-      <div className={`grid transition-[grid-template-rows] duration-200 ease-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+      <div
+        className={`grid transition-[grid-template-rows] duration-200 ease-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
+      >
         <div className="overflow-hidden">
-        <div className="border-t border-slate-100 px-4 py-4">
-          {openPanel === "edit" && (
-            <MilestoneEditPanel
-              form={editForm}
-              saving={editSaving}
-              error={editError}
-              onChange={onEditFormChange}
-              onSave={onEditSave}
-              onCancel={onClosePanel}
-              onDelete={onDelete}
-            />
-          )}
-
-          {openPanel === "history" && (
-            <MilestoneVersionHistory
-              versions={versions}
-              loading={loadingVersions}
-            />
-          )}
-
-          {openPanel === "comments" && (
-            <div className="space-y-4">
-              {/* Team updates (always visible) */}
-              <MilestoneCommentThread
-                variant="team"
-                milestoneId={milestone.id}
-                updates={updates}
-                currentUserId={currentUserId}
-                isAdmin={isAdmin}
-                replyingToId={replyingToId}
-                commentText={commentText}
-                saving={commentSaving}
-                editingUpdateId={editingUpdateId}
-                editingContent={editingContent}
-                onReply={onReply}
-                onCancelReply={onCancelReply}
-                onCommentTextChange={onCommentTextChange}
-                onSubmitComment={onSubmitComment}
-                onToggleResolved={onToggleResolved}
-                onStartEditComment={onStartEditComment}
-                onCancelEditComment={onCancelEditComment}
-                onEditingContentChange={onEditingContentChange}
-                onSaveEditComment={onSaveEditComment}
-                onDeleteComment={onDeleteComment}
+          <div className="border-t border-slate-100 px-4 py-4">
+            {openPanel === "edit" && (
+              <MilestoneEditPanel
+                form={editForm}
+                saving={editSaving}
+                error={editError}
+                onChange={onEditFormChange}
+                onSave={onEditSave}
+                onCancel={onClosePanel}
+                onDelete={onDelete}
               />
+            )}
 
-              {/* Internal comments (private milestones, admin only) */}
-              {!milestone.is_public && isAdmin && (
+            {openPanel === "history" && (
+              <MilestoneVersionHistory
+                versions={versions}
+                loading={loadingVersions}
+              />
+            )}
+
+            {openPanel === "comments" && (
+              <div className="space-y-4">
+                {/* Team updates (always visible) */}
                 <MilestoneCommentThread
-                  variant="internal"
+                  variant="team"
                   milestoneId={milestone.id}
                   updates={updates}
                   currentUserId={currentUserId}
@@ -220,54 +202,79 @@ export function MilestoneRow({
                   onSaveEditComment={onSaveEditComment}
                   onDeleteComment={onDeleteComment}
                 />
-              )}
 
-              {/* Legal comments (public milestones, admin only) */}
-              {milestone.is_public && isAdmin && (
-                <MilestoneCommentThread
-                  variant="legal"
-                  milestoneId={milestone.id}
-                  updates={updates}
-                  currentUserId={currentUserId}
-                  isAdmin={isAdmin}
-                  replyingToId={replyingToId}
-                  commentText={commentText}
-                  saving={commentSaving}
-                  editingUpdateId={editingUpdateId}
-                  editingContent={editingContent}
-                  onReply={onReply}
-                  onCancelReply={onCancelReply}
-                  onCommentTextChange={onCommentTextChange}
-                  onSubmitComment={onSubmitComment}
-                  onToggleResolved={onToggleResolved}
-                  onStartEditComment={onStartEditComment}
-                  onCancelEditComment={onCancelEditComment}
-                  onEditingContentChange={onEditingContentChange}
-                  onSaveEditComment={onSaveEditComment}
-                  onDeleteComment={onDeleteComment}
-                />
-              )}
+                {/* Internal comments (private milestones, admin only) */}
+                {!milestone.is_public && isAdmin && (
+                  <MilestoneCommentThread
+                    variant="internal"
+                    milestoneId={milestone.id}
+                    updates={updates}
+                    currentUserId={currentUserId}
+                    isAdmin={isAdmin}
+                    replyingToId={replyingToId}
+                    commentText={commentText}
+                    saving={commentSaving}
+                    editingUpdateId={editingUpdateId}
+                    editingContent={editingContent}
+                    onReply={onReply}
+                    onCancelReply={onCancelReply}
+                    onCommentTextChange={onCommentTextChange}
+                    onSubmitComment={onSubmitComment}
+                    onToggleResolved={onToggleResolved}
+                    onStartEditComment={onStartEditComment}
+                    onCancelEditComment={onCancelEditComment}
+                    onEditingContentChange={onEditingContentChange}
+                    onSaveEditComment={onSaveEditComment}
+                    onDeleteComment={onDeleteComment}
+                  />
+                )}
 
-              {/* New top-level comment form */}
-              {showNewCommentForm && (
-                <MilestoneCommentForm
-                  isPublic={milestone.is_public}
-                  isAdmin={isAdmin}
-                  commentText={commentText}
-                  commentIsLegal={commentIsLegal}
-                  commentIsInternal={commentIsInternal}
-                  saving={commentSaving}
-                  error={commentError}
-                  onTextChange={onCommentTextChange}
-                  onIsLegalChange={onIsLegalChange}
-                  onIsInternalChange={onIsInternalChange}
-                  onSubmit={() => onSubmitComment(milestone.id)}
-                  onCancel={onCancelReply}
-                />
-              )}
-            </div>
-          )}
-        </div>
+                {/* Legal comments (public milestones, admin only) */}
+                {milestone.is_public && isAdmin && (
+                  <MilestoneCommentThread
+                    variant="legal"
+                    milestoneId={milestone.id}
+                    updates={updates}
+                    currentUserId={currentUserId}
+                    isAdmin={isAdmin}
+                    replyingToId={replyingToId}
+                    commentText={commentText}
+                    saving={commentSaving}
+                    editingUpdateId={editingUpdateId}
+                    editingContent={editingContent}
+                    onReply={onReply}
+                    onCancelReply={onCancelReply}
+                    onCommentTextChange={onCommentTextChange}
+                    onSubmitComment={onSubmitComment}
+                    onToggleResolved={onToggleResolved}
+                    onStartEditComment={onStartEditComment}
+                    onCancelEditComment={onCancelEditComment}
+                    onEditingContentChange={onEditingContentChange}
+                    onSaveEditComment={onSaveEditComment}
+                    onDeleteComment={onDeleteComment}
+                  />
+                )}
+
+                {/* New top-level comment form */}
+                {showNewCommentForm && (
+                  <MilestoneCommentForm
+                    isPublic={milestone.is_public}
+                    isAdmin={isAdmin}
+                    commentText={commentText}
+                    commentIsLegal={commentIsLegal}
+                    commentIsInternal={commentIsInternal}
+                    saving={commentSaving}
+                    error={commentError}
+                    onTextChange={onCommentTextChange}
+                    onIsLegalChange={onIsLegalChange}
+                    onIsInternalChange={onIsInternalChange}
+                    onSubmit={() => onSubmitComment(milestone.id)}
+                    onCancel={onCancelReply}
+                  />
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

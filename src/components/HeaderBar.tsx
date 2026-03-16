@@ -19,10 +19,10 @@ function NavLink({
   return (
     <Link
       href={href}
-      className={`relative px-3 py-1.5 text-sm font-medium transition-colors rounded-md ${
+      className={`relative rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
         active
-          ? "text-un-blue bg-un-blue/8"
-          : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+          ? "bg-un-blue/8 text-un-blue"
+          : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
       }`}
     >
       {children}
@@ -51,7 +51,10 @@ export function Header({ user, isAdmin, children, maxWidth = "7xl" }: Props) {
       <div
         className={`mx-auto flex ${widthClass} items-center justify-between py-3`}
       >
-        <Link href="/actions" className="flex items-center gap-3 hover:opacity-90">
+        <Link
+          href="/actions"
+          className="flex items-center gap-3 hover:opacity-90"
+        >
           <Image
             src="/images/un-logo-stacked-colour-english.svg"
             alt="UN Logo"
@@ -62,22 +65,26 @@ export function Header({ user, isAdmin, children, maxWidth = "7xl" }: Props) {
             draggable={false}
           />
           <div>
-            <h1 className="text-[15px] font-bold tracking-tight text-gray-900">{SITE_TITLE}</h1>
-            <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400">{SITE_SUBTITLE}</p>
+            <h1 className="text-[15px] font-bold tracking-tight text-gray-900">
+              {SITE_TITLE}
+            </h1>
+            <p className="text-[11px] font-medium tracking-wider text-gray-400 uppercase">
+              {SITE_SUBTITLE}
+            </p>
           </div>
         </Link>
         <div className="flex items-center gap-3">
           {isLoggedIn ? (
             <>
               <nav className="flex items-center gap-1">
-                <NavLink href="/actions" active={pathname === "/actions"}>
-                  Actions
-                </NavLink>
                 {isAdmin && (
                   <NavLink href="/milestones" active={isAdminMilestonePage}>
                     Milestones
                   </NavLink>
                 )}
+                <NavLink href="/actions" active={pathname === "/actions"}>
+                  Actions
+                </NavLink>
               </nav>
               <div className="h-5 w-px bg-gray-200" />
               <ActivityFeed />

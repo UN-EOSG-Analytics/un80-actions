@@ -44,7 +44,9 @@ export function MilestoneCommentForm({
                 type="button"
                 onClick={() => onIsLegalChange(false)}
                 className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                  !commentIsLegal ? "bg-un-blue text-white" : "text-slate-600 hover:bg-slate-100"
+                  !commentIsLegal
+                    ? "bg-un-blue text-white"
+                    : "text-slate-600 hover:bg-slate-100"
                 }`}
               >
                 Team updates & comments
@@ -53,7 +55,9 @@ export function MilestoneCommentForm({
                 type="button"
                 onClick={() => onIsLegalChange(true)}
                 className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                  commentIsLegal ? "bg-amber-600 text-white" : "text-slate-600 hover:bg-slate-100"
+                  commentIsLegal
+                    ? "bg-amber-600 text-white"
+                    : "text-slate-600 hover:bg-slate-100"
                 }`}
               >
                 <Scale className="h-3 w-3" />
@@ -72,7 +76,9 @@ export function MilestoneCommentForm({
                 type="button"
                 onClick={() => onIsInternalChange(false)}
                 className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                  !commentIsInternal ? "bg-un-blue text-white" : "text-slate-600 hover:bg-slate-100"
+                  !commentIsInternal
+                    ? "bg-un-blue text-white"
+                    : "text-slate-600 hover:bg-slate-100"
                 }`}
               >
                 Team updates & comments
@@ -81,7 +87,9 @@ export function MilestoneCommentForm({
                 type="button"
                 onClick={() => onIsInternalChange(true)}
                 className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                  commentIsInternal ? "bg-violet-600 text-white" : "text-slate-600 hover:bg-slate-100"
+                  commentIsInternal
+                    ? "bg-violet-600 text-white"
+                    : "text-slate-600 hover:bg-slate-100"
                 }`}
               >
                 <MessageSquare className="h-3 w-3" />
@@ -104,7 +112,12 @@ export function MilestoneCommentForm({
         {error && <p className="text-sm text-red-600">{error}</p>}
 
         <div className="flex justify-end gap-2">
-          <Button variant="outline" size="sm" onClick={onCancel} disabled={saving}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onCancel}
+            disabled={saving}
+          >
             Cancel
           </Button>
           <Button

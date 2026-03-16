@@ -24,7 +24,7 @@ export function DevLoginButton({ email }: { email: string }) {
 
   return (
     <div className="mt-6 border-t border-dashed border-amber-300 pt-6">
-      <p className="mb-3 text-center text-xs font-medium uppercase tracking-wide text-amber-600">
+      <p className="mb-3 text-center text-xs font-medium tracking-wide text-amber-600 uppercase">
         Development only
       </p>
       <button

@@ -225,20 +225,30 @@ export function MilestoneCommentThread({
         : "border border-l-4 border-amber-200";
 
   return (
-    <div className={`rounded-lg ${containerBorder} ${v.borderAccent} ${variant === "team" ? "bg-slate-50/30" : variant === "internal" ? "bg-violet-50/20" : "bg-amber-50/20"}`}>
+    <div
+      className={`rounded-lg ${containerBorder} ${v.borderAccent} ${variant === "team" ? "bg-slate-50/30" : variant === "internal" ? "bg-violet-50/20" : "bg-amber-50/20"}`}
+    >
       {/* Header */}
-      <div className={`flex items-center gap-2 border-b ${v.headerBorder} ${v.headerBg} px-3 py-2`}>
+      <div
+        className={`flex items-center gap-2 border-b ${v.headerBorder} ${v.headerBg} px-3 py-2`}
+      >
         {v.icon}
-        <span className={`text-xs font-semibold tracking-wide uppercase ${variant === "team" ? "text-slate-600" : variant === "internal" ? "text-violet-800/90" : "text-amber-800/90"}`}>
+        <span
+          className={`text-xs font-semibold tracking-wide uppercase ${variant === "team" ? "text-slate-600" : variant === "internal" ? "text-violet-800/90" : "text-amber-800/90"}`}
+        >
           {v.label}
         </span>
         {v.sublabel && (
-          <span className={`text-xs ${variant === "internal" ? "text-violet-600/80" : "text-amber-600/80"}`}>
+          <span
+            className={`text-xs ${variant === "internal" ? "text-violet-600/80" : "text-amber-600/80"}`}
+          >
             {v.sublabel}
           </span>
         )}
         {topLevel.length > 0 && (
-          <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${v.countBadge}`}>
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs font-semibold ${v.countBadge}`}
+          >
             {topLevel.length}
           </span>
         )}
@@ -248,7 +258,9 @@ export function MilestoneCommentThread({
       <div className="p-2">
         {topLevel.length === 0 ? (
           <div className="py-4 text-center">
-            <p className={`text-xs ${variant === "team" ? "text-slate-400" : variant === "internal" ? "text-violet-700/70" : "text-amber-700/70"}`}>
+            <p
+              className={`text-xs ${variant === "team" ? "text-slate-400" : variant === "internal" ? "text-violet-700/70" : "text-amber-700/70"}`}
+            >
               {v.emptyText}
             </p>
           </div>
@@ -257,7 +269,8 @@ export function MilestoneCommentThread({
             {topLevel.map((update) => {
               const replies = updates.filter((r) => r.reply_to === update.id);
               const isReplying = replyingToId === update.id;
-              const canModify = isAdmin || (currentUserId && update.user_id === currentUserId);
+              const canModify =
+                isAdmin || (currentUserId && update.user_id === currentUserId);
 
               return (
                 <div key={update.id} className="space-y-2">
@@ -273,7 +286,11 @@ export function MilestoneCommentThread({
                       {/* Author row */}
                       <div className="mb-2 flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          <Avatar email={update.user_email} bgClass={v.avatarBg} textClass={v.avatarText} />
+                          <Avatar
+                            email={update.user_email}
+                            bgClass={v.avatarBg}
+                            textClass={v.avatarText}
+                          />
                           <div className="flex flex-col">
                             <span className="text-xs font-medium text-slate-700">
                               {update.user_email ?? "Unknown"}
@@ -301,9 +318,15 @@ export function MilestoneCommentThread({
                           </button>
                           {isAdmin && (
                             <button
-                              onClick={() => onToggleResolved(milestoneId, update.id)}
+                              onClick={() =>
+                                onToggleResolved(milestoneId, update.id)
+                              }
                               className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-green-600"
-                              title={update.is_resolved ? "Mark as unresolved" : "Mark as resolved"}
+                              title={
+                                update.is_resolved
+                                  ? "Mark as unresolved"
+                                  : "Mark as resolved"
+                              }
                             >
                               <CheckCircle2 className="h-3 w-3" />
                             </button>
@@ -318,7 +341,9 @@ export function MilestoneCommentThread({
                                 <Pencil className="h-3 w-3" />
                               </button>
                               <button
-                                onClick={() => onDeleteComment(milestoneId, update.id)}
+                                onClick={() =>
+                                  onDeleteComment(milestoneId, update.id)
+                                }
                                 className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600"
                                 title="Delete"
                               >
@@ -334,23 +359,42 @@ export function MilestoneCommentThread({
                         <div className="space-y-2">
                           <textarea
                             value={editingContent}
-                            onChange={(e) => onEditingContentChange(e.target.value)}
+                            onChange={(e) =>
+                              onEditingContentChange(e.target.value)
+                            }
                             className={`w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none ${v.focusBorder} ${v.focusRing} focus:ring-1`}
                             rows={3}
                             disabled={saving}
                             autoFocus
                           />
                           <div className="flex justify-end gap-2">
-                            <Button variant="outline" size="sm" onClick={onCancelEditComment} disabled={saving}>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={onCancelEditComment}
+                              disabled={saving}
+                            >
                               Cancel
                             </Button>
                             <Button
                               size="sm"
-                              onClick={() => onSaveEditComment(milestoneId, update.id)}
+                              onClick={() =>
+                                onSaveEditComment(milestoneId, update.id)
+                              }
                               disabled={saving || !editingContent.trim()}
-                              className={variant === "team" ? "bg-un-blue hover:bg-un-blue/90" : variant === "internal" ? "bg-violet-600 hover:bg-violet-700" : "bg-amber-600 hover:bg-amber-700"}
+                              className={
+                                variant === "team"
+                                  ? "bg-un-blue hover:bg-un-blue/90"
+                                  : variant === "internal"
+                                    ? "bg-violet-600 hover:bg-violet-700"
+                                    : "bg-amber-600 hover:bg-amber-700"
+                              }
                             >
-                              {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
+                              {saving ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                "Save"
+                              )}
                             </Button>
                           </div>
                         </div>
@@ -363,20 +407,32 @@ export function MilestoneCommentThread({
 
                     {/* Replies */}
                     {replies.length > 0 && (
-                      <div className={`border-t ${v.replyFormBorder} ${v.replyFormBg} px-3 py-2`}>
+                      <div
+                        className={`border-t ${v.replyFormBorder} ${v.replyFormBg} px-3 py-2`}
+                      >
                         <div className="space-y-2">
                           {replies.map((reply) => {
-                            const canModifyReply = isAdmin || (currentUserId && reply.user_id === currentUserId);
+                            const canModifyReply =
+                              isAdmin ||
+                              (currentUserId &&
+                                reply.user_id === currentUserId);
                             return (
                               <div
                                 key={reply.id}
                                 className={`group/reply relative flex gap-2 rounded-md bg-white p-2 ${v.replyHoverBg}`}
                               >
-                                <CornerDownRight className={`mt-1 h-3 w-3 shrink-0 ${v.replyArrow}`} />
+                                <CornerDownRight
+                                  className={`mt-1 h-3 w-3 shrink-0 ${v.replyArrow}`}
+                                />
                                 <div className="min-w-0 flex-1">
                                   <div className="mb-1 flex items-center justify-between gap-2">
                                     <div className="flex items-center gap-2">
-                                      <Avatar email={reply.user_email} bgClass={v.replyAvatarBg} textClass={v.replyAvatarText} size="sm" />
+                                      <Avatar
+                                        email={reply.user_email}
+                                        bgClass={v.replyAvatarBg}
+                                        textClass={v.replyAvatarText}
+                                        size="sm"
+                                      />
                                       <span className="text-xs font-medium text-slate-600">
                                         {reply.user_email ?? "Unknown"}
                                       </span>
@@ -386,7 +442,9 @@ export function MilestoneCommentThread({
                                     </div>
                                     {canModifyReply && (
                                       <button
-                                        onClick={() => onDeleteComment(milestoneId, reply.id)}
+                                        onClick={() =>
+                                          onDeleteComment(milestoneId, reply.id)
+                                        }
                                         className="shrink-0 rounded p-1 text-slate-400 opacity-0 transition-all group-hover/reply:opacity-100 hover:bg-slate-100 hover:text-red-600"
                                         title="Delete reply"
                                       >
@@ -394,7 +452,9 @@ export function MilestoneCommentThread({
                                       </button>
                                     )}
                                   </div>
-                                  <p className="text-sm whitespace-pre-wrap text-slate-700">{reply.content}</p>
+                                  <p className="text-sm whitespace-pre-wrap text-slate-700">
+                                    {reply.content}
+                                  </p>
                                 </div>
                               </div>
                             );
@@ -405,13 +465,19 @@ export function MilestoneCommentThread({
 
                     {/* Inline reply form */}
                     {isReplying && (
-                      <div className={`border-t ${v.replyFormBorder} ${v.replyFormBg} p-3`}>
+                      <div
+                        className={`border-t ${v.replyFormBorder} ${v.replyFormBg} p-3`}
+                      >
                         <div className="flex gap-2">
-                          <CornerDownRight className={`mt-2 h-3 w-3 shrink-0 ${v.replyArrowColor}`} />
+                          <CornerDownRight
+                            className={`mt-2 h-3 w-3 shrink-0 ${v.replyArrowColor}`}
+                          />
                           <div className="flex-1 space-y-2">
                             <textarea
                               value={commentText}
-                              onChange={(e) => onCommentTextChange(e.target.value)}
+                              onChange={(e) =>
+                                onCommentTextChange(e.target.value)
+                              }
                               className={`w-full resize-none rounded-md border border-slate-300 px-3 py-2 text-sm outline-none ${v.focusBorder} ${v.focusRing} focus:ring-1`}
                               rows={2}
                               placeholder="Write a reply..."
@@ -419,14 +485,25 @@ export function MilestoneCommentThread({
                               autoFocus
                             />
                             <div className="flex justify-end gap-2">
-                              <Button variant="outline" size="sm" onClick={onCancelReply} disabled={saving}>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={onCancelReply}
+                                disabled={saving}
+                              >
                                 Cancel
                               </Button>
                               <Button
                                 size="sm"
                                 onClick={() => onSubmitComment(milestoneId)}
                                 disabled={saving || !commentText.trim()}
-                                className={variant === "team" ? "bg-un-blue hover:bg-un-blue/90" : variant === "internal" ? "bg-violet-600 hover:bg-violet-700" : "bg-amber-600 hover:bg-amber-700"}
+                                className={
+                                  variant === "team"
+                                    ? "bg-un-blue hover:bg-un-blue/90"
+                                    : variant === "internal"
+                                      ? "bg-violet-600 hover:bg-violet-700"
+                                      : "bg-amber-600 hover:bg-amber-700"
+                                }
                               >
                                 {saving ? (
                                   <Loader2 className="h-3 w-3 animate-spin" />

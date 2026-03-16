@@ -3,6 +3,7 @@
 import { query } from "@/lib/db/db";
 import { getCurrentUser } from "@/features/auth/service";
 import { DB_SCHEMA } from "@/lib/db/config";
+import { checkIsAdmin } from "@/features/auth/lib/permissions";
 import type { ActionUpdate } from "@/types";
 import { getUpdateById } from "./queries";
 
@@ -39,12 +40,7 @@ async function canAccessActionUpdates(
   actionId: number,
   actionSubId: string | null,
 ): Promise<boolean> {
-  // Check if user is admin
-  const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-    [userEmail],
-  );
-  if (adminCheck[0]?.user_role === "Admin") {
+  if (await checkIsAdmin()) {
     return true;
   }
 
@@ -106,7 +102,7 @@ export async function createUpdate(
   }
 
   const rows = await query<{ id: string }>(
-    `INSERT INTO ${DB_SCHEMA}.action_updates 
+    `INSERT INTO ${DB_SCHEMA}.action_updates
      (action_id, action_sub_id, user_id, content, content_review_status)
      VALUES ($1, $2, $3, $4, 'needs_review')
      RETURNING id`,
@@ -124,7 +120,7 @@ export async function createUpdate(
 
 /**
  * Update an existing action update.
- * Only the update author can edit their updates.
+ * Only the update author or admin can edit.
  */
 export async function updateUpdate(
   updateId: string,
@@ -135,25 +131,18 @@ export async function updateUpdate(
     return { success: false, error: "Not authenticated" };
   }
 
-  // Get the update
   const update = await getUpdateById(updateId);
   if (!update) {
     return { success: false, error: "Update not found" };
   }
 
-  // Check if user is the author or admin
   const isAuthor = update.user_id === user.id;
-  const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-    [user.email],
-  );
-  const isAdmin = adminCheck[0]?.user_role === "Admin";
+  const isAdmin = await checkIsAdmin();
 
   if (!isAuthor && !isAdmin) {
     return { success: false, error: "Not authorized to edit this update" };
   }
 
-  // Validate content
   if (!input.content || input.content.trim().length === 0) {
     return { success: false, error: "Update content cannot be empty" };
   }
@@ -166,41 +155,6 @@ export async function updateUpdate(
          content_reviewed_at = NULL
      WHERE id = $2`,
     [input.content.trim(), updateId],
-  );
-
-  const updated = await getUpdateById(updateId);
-  return { success: true, update: updated || undefined };
-}
-
-/**
- * Approve an update's content (admin/reviewer only).
- */
-export async function approveUpdate(updateId: string): Promise<UpdateResult> {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Not authenticated" };
-  }
-
-  const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-    [user.email],
-  );
-  if (adminCheck[0]?.user_role !== "Admin") {
-    return { success: false, error: "Admin only" };
-  }
-
-  const update = await getUpdateById(updateId);
-  if (!update) {
-    return { success: false, error: "Update not found" };
-  }
-
-  await query(
-    `UPDATE ${DB_SCHEMA}.action_updates
-     SET content_review_status = 'approved',
-         content_reviewed_by = $1,
-         content_reviewed_at = NOW()
-     WHERE id = $2`,
-    [user.id, updateId],
   );
 
   const updated = await getUpdateById(updateId);
@@ -222,13 +176,8 @@ export async function deleteUpdate(updateId: string): Promise<UpdateResult> {
     return { success: false, error: "Update not found" };
   }
 
-  // Check if user is the author or admin
   const isAuthor = update.user_id === user.id;
-  const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-    [user.email],
-  );
-  const isAdmin = adminCheck[0]?.user_role === "Admin";
+  const isAdmin = await checkIsAdmin();
 
   if (!isAuthor && !isAdmin) {
     return { success: false, error: "Not authorized to delete this update" };

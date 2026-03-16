@@ -43,9 +43,13 @@ export function MilestoneVersionHistory({
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-xs font-medium text-slate-600">
-                      {changedAt.toLocaleDateString(undefined, { dateStyle: "medium" })}{" "}
+                      {changedAt.toLocaleDateString(undefined, {
+                        dateStyle: "medium",
+                      })}{" "}
                       at{" "}
-                      {changedAt.toLocaleTimeString(undefined, { timeStyle: "short" })}
+                      {changedAt.toLocaleTimeString(undefined, {
+                        timeStyle: "short",
+                      })}
                     </span>
                     {version.changed_by && (
                       <span className="text-xs text-slate-400">
@@ -58,10 +62,14 @@ export function MilestoneVersionHistory({
                   </Badge>
                 </div>
                 {version.description && (
-                  <p className="mb-1 text-xs text-slate-700">{version.description}</p>
+                  <p className="mb-1 text-xs text-slate-700">
+                    {version.description}
+                  </p>
                 )}
                 {version.updates && (
-                  <p className="text-xs text-slate-500 italic">{version.updates}</p>
+                  <p className="text-xs text-slate-500 italic">
+                    {version.updates}
+                  </p>
                 )}
                 {version.deadline && (
                   <p className="mt-1 text-xs text-slate-500">

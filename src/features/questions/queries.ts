@@ -65,61 +65,6 @@ export async function getActionQuestions(
 }
 
 /**
- * Fetch unanswered questions for a specific action.
- * Admin-only: Returns empty array for non-admin users.
- */
-export async function getUnansweredQuestions(
-  actionId: number,
-  subId?: string | null,
-): Promise<ActionQuestion[]> {
-  // Admin-only feature
-  if (!(await checkIsAdmin())) {
-    return [];
-  }
-
-  const whereClause =
-    subId !== undefined
-      ? "WHERE q.action_id = $1 AND (q.action_sub_id IS NOT DISTINCT FROM $2) AND q.answer IS NULL"
-      : "WHERE q.action_id = $1 AND q.answer IS NULL";
-
-  const params = subId !== undefined ? [actionId, subId] : [actionId];
-
-  const rows = await query<ActionQuestion>(
-    `SELECT
-      q.id,
-      q.action_id,
-      q.action_sub_id,
-      q.user_id,
-      u.email as user_email,
-      q.header,
-      q.subtext,
-      q.question_date::text,
-      q.question,
-      q.answer,
-      q.answered_by,
-      au.email as answered_by_email,
-      q.answered_at,
-      q.created_at,
-      q.updated_at,
-      COALESCE(q.content_review_status, 'approved')::text as content_review_status,
-      q.content_reviewed_by,
-      ru.email as content_reviewed_by_email,
-      q.content_reviewed_at,
-      q.milestone_id,
-      q.comment
-    FROM ${DB_SCHEMA}.action_questions q
-    LEFT JOIN ${DB_SCHEMA}.users u ON q.user_id = u.id
-    LEFT JOIN ${DB_SCHEMA}.users au ON q.answered_by = au.id
-    LEFT JOIN ${DB_SCHEMA}.users ru ON q.content_reviewed_by = ru.id
-    ${whereClause}
-    ORDER BY q.created_at ASC`,
-    params,
-  );
-
-  return rows;
-}
-
-/**
  * Fetch a single question by ID.
  * Admin-only: Returns null for non-admin users.
  */
