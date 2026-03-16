@@ -45,8 +45,8 @@ import {
     Search,
     X,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 // =========================================================
 // TYPES & CONSTANTS
@@ -56,7 +56,10 @@ type SortField =
   | "work_package_id"
   | "action_id"
   | "deadline"
-  | "milestone_type";
+  | "milestone_type"
+  | "status"
+  | "progress"
+  | "doc_submitted";
 type SortDirection = "asc" | "desc";
 
 // "none" is a sentinel meaning apply all filters (exclude nothing)
@@ -68,8 +71,27 @@ type FilterSkip =
   | "month"
   | "public"
   | "doc"
+  | "progress"
   | "desc"
   | "none";
+
+const STATUS_SORT_ORDER: Record<string, number> = {
+  Draft: 0,
+  "In review": 1,
+  "Needs attention": 2,
+  "Needs OLA review": 3,
+  "Reviewed by OLA": 4,
+  "Attention to timeline": 5,
+  "Confirmation needed": 6,
+  Approved: 7,
+  Finalized: 8,
+};
+
+const PROGRESS_SORT_ORDER: Record<string, number> = {
+  in_progress: 0,
+  delayed: 1,
+  completed: 2,
+};
 
 const MILESTONE_TYPE_ORDER: Record<string, number> = {
   first: 1,
@@ -465,18 +487,46 @@ interface MilestonesTableProps {
 
 export function MilestonesTable({ rows }: MilestonesTableProps) {
   const router = useRouter();
-  const [searchInput, setSearchInput] = useState("");
-  const [sortField, setSortField] = useState<SortField>("work_package_id");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const searchParamsRef = useRef(searchParams);
+  searchParamsRef.current = searchParams;
 
-  const [filterWP, setFilterWP] = useState<number[]>([]);
-  const [filterAction, setFilterAction] = useState<string[]>([]);
-  const [filterType, setFilterType] = useState<string[]>([]);
-  const [filterStatus, setFilterStatus] = useState<string[]>([]);
-  const [filterMonth, setFilterMonth] = useState<string[]>([]);
-  const [filterPublic, setFilterPublic] = useState<string[]>([]);
-  const [filterDoc, setFilterDoc] = useState<string[]>([]);
-  const [filterDesc, setFilterDesc] = useState("");
+  const [searchInput, setSearchInput] = useState(() => searchParams.get("q") ?? "");
+  const [sortField, setSortField] = useState<SortField>(() => {
+    const v = searchParams.get("sort");
+    const valid: SortField[] = ["work_package_id", "action_id", "deadline", "milestone_type", "status", "progress", "doc_submitted"];
+    return valid.includes(v as SortField) ? (v as SortField) : "work_package_id";
+  });
+  const [sortDirection, setSortDirection] = useState<SortDirection>(() =>
+    searchParams.get("dir") === "desc" ? "desc" : "asc",
+  );
+
+  const [filterWP, setFilterWP] = useState<number[]>(() =>
+    searchParams.getAll("wp").map(Number).filter((n) => !isNaN(n)),
+  );
+  const [filterAction, setFilterAction] = useState<string[]>(() =>
+    searchParams.getAll("actions").filter(Boolean),
+  );
+  const [filterType, setFilterType] = useState<string[]>(() =>
+    searchParams.getAll("type").filter(Boolean),
+  );
+  const [filterStatus, setFilterStatus] = useState<string[]>(() =>
+    searchParams.getAll("status").filter(Boolean),
+  );
+  const [filterMonth, setFilterMonth] = useState<string[]>(() =>
+    searchParams.getAll("month").filter(Boolean),
+  );
+  const [filterPublic, setFilterPublic] = useState<string[]>(() =>
+    searchParams.getAll("vis").filter(Boolean),
+  );
+  const [filterDoc, setFilterDoc] = useState<string[]>(() =>
+    searchParams.getAll("doc").filter(Boolean),
+  );
+  const [filterProgress, setFilterProgress] = useState<string[]>(() =>
+    searchParams.getAll("prog").filter(Boolean),
+  );
+  const [filterDesc, setFilterDesc] = useState(() => searchParams.get("desc") ?? "");
 
   const [openFilters, setOpenFilters] = useState<Record<string, boolean>>({});
 
@@ -629,6 +679,11 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
             return true;
           return false;
         });
+      if (except !== "progress" && filterProgress.length > 0)
+        r = r.filter((row) => {
+          if (!row.is_public) return false;
+          return filterProgress.includes(row.public_progress ?? "in_progress");
+        });
       if (except !== "desc" && filterDesc.trim())
         r = r.filter((row) =>
           (row.description ?? "")
@@ -647,6 +702,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
       filterMonth,
       filterPublic,
       filterDoc,
+      filterProgress,
       filterDesc,
     ],
   );
@@ -767,10 +823,67 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
         cmp = (a.deadline ?? "9999-12-31").localeCompare(
           b.deadline ?? "9999-12-31",
         );
+      } else if (sortField === "status") {
+        cmp =
+          (STATUS_SORT_ORDER[getStatusConfig(a).label] ?? 9) -
+          (STATUS_SORT_ORDER[getStatusConfig(b).label] ?? 9);
+      } else if (sortField === "progress") {
+        // non-public rows sort last
+        const pa = a.is_public ? (PROGRESS_SORT_ORDER[a.public_progress ?? "in_progress"] ?? 9) : 99;
+        const pb = b.is_public ? (PROGRESS_SORT_ORDER[b.public_progress ?? "in_progress"] ?? 9) : 99;
+        cmp = pa - pb;
+      } else if (sortField === "doc_submitted") {
+        // submitted=true sorts after false; public rows (no deliverable) sort last
+        const da = a.is_public ? 99 : (a.milestone_document_submitted ? 1 : 0);
+        const db = b.is_public ? 99 : (b.milestone_document_submitted ? 1 : 0);
+        cmp = da - db;
       }
       return cmp * dir;
     });
   }, [filteredRows, sortField, sortDirection]);
+
+  // Sync filter/sort state to URL
+  useEffect(() => {
+    const params = new URLSearchParams();
+    // Preserve non-filter params (modal)
+    const sp = searchParamsRef.current;
+    const modalAction = sp.get("action");
+    const modalTab = sp.get("tab");
+    if (modalAction) params.set("action", modalAction);
+    if (modalTab) params.set("tab", modalTab);
+    // Filter params
+    if (searchInput.trim()) params.set("q", searchInput.trim());
+    filterWP.forEach((v) => params.append("wp", String(v)));
+    filterAction.forEach((v) => params.append("actions", v));
+    filterType.forEach((v) => params.append("type", v));
+    filterStatus.forEach((v) => params.append("status", v));
+    filterMonth.forEach((v) => params.append("month", v));
+    filterPublic.forEach((v) => params.append("vis", v));
+    filterDoc.forEach((v) => params.append("doc", v));
+    filterProgress.forEach((v) => params.append("prog", v));
+    if (filterDesc.trim()) params.set("desc", filterDesc.trim());
+    if (sortField !== "work_package_id") params.set("sort", sortField);
+    if (sortDirection !== "asc") params.set("dir", sortDirection);
+    const newSearch = params.toString();
+    router.replace(newSearch ? `${pathname}?${newSearch}` : pathname, {
+      scroll: false,
+    });
+  }, [
+    searchInput,
+    filterWP,
+    filterAction,
+    filterType,
+    filterStatus,
+    filterMonth,
+    filterPublic,
+    filterDoc,
+    filterProgress,
+    filterDesc,
+    sortField,
+    sortDirection,
+    pathname,
+    router,
+  ]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field)
@@ -800,6 +913,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
     filterMonth.length > 0 ||
     filterPublic.length > 0 ||
     filterDoc.length > 0 ||
+    filterProgress.length > 0 ||
     filterDesc.trim().length > 0 ||
     searchInput.trim().length > 0;
 
@@ -811,16 +925,28 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
     setFilterMonth([]);
     setFilterPublic([]);
     setFilterDoc([]);
+    setFilterProgress([]);
     setFilterDesc("");
     setSearchInput("");
   };
 
   const handleRowClick = (actionId: number, actionSubId: string | null) => {
-    sessionStorage.setItem("actionModalReturnUrl", "/milestones");
+    const sp = searchParamsRef.current;
     const param = actionSubId ? `${actionId}${actionSubId}` : `${actionId}`;
-    router.push(`/milestones?action=${param}&tab=milestones`, {
-      scroll: false,
-    });
+    // Build return URL with current filter params but without modal params
+    const returnParams = new URLSearchParams(sp.toString());
+    returnParams.delete("action");
+    returnParams.delete("tab");
+    const returnStr = returnParams.toString();
+    sessionStorage.setItem(
+      "actionModalReturnUrl",
+      returnStr ? `/milestones?${returnStr}` : "/milestones",
+    );
+    // Navigate preserving filter params and adding modal params
+    const modalParams = new URLSearchParams(sp.toString());
+    modalParams.set("action", param);
+    modalParams.set("tab", "milestones");
+    router.push(`${pathname}?${modalParams.toString()}`, { scroll: false });
   };
 
   return (
@@ -1078,7 +1204,18 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
               {/* Status */}
               <th className="px-4 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-1">
-                  <span>Status</span>
+                  <button
+                    type="button"
+                    onClick={() => handleSort("status")}
+                    className="inline-flex items-center uppercase hover:text-un-blue"
+                  >
+                    Status
+                    <SortIcon
+                      column="status"
+                      sortField={sortField}
+                      sortDirection={sortDirection}
+                    />
+                  </button>
                   <MultiSelectFilter
                     filterKey="status"
                     options={[...uniqueStatuses]}
@@ -1094,13 +1231,52 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
 
               {/* Public Progress */}
               <th className="px-4 py-3 whitespace-nowrap">
-                <span>Progress</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => handleSort("progress")}
+                    className="inline-flex items-center uppercase hover:text-un-blue"
+                  >
+                    Progress
+                    <SortIcon
+                      column="progress"
+                      sortField={sortField}
+                      sortDirection={sortDirection}
+                    />
+                  </button>
+                  <MultiSelectFilter
+                    filterKey="progress"
+                    options={Object.keys(PROGRESS_SORT_ORDER).filter((k) =>
+                      applyFiltersExcept(localRows, "progress").some(
+                        (r) => r.is_public && (r.public_progress ?? "in_progress") === k,
+                      ),
+                    )}
+                    allOptions={Object.keys(PROGRESS_SORT_ORDER)}
+                    selected={filterProgress}
+                    onToggle={(v) => toggle(setFilterProgress, v)}
+                    renderOption={(v) => PUBLIC_PROGRESS_CONFIG[v]?.label ?? v}
+                    isOpen={openFilters.progress ?? false}
+                    onOpenChange={(o) => setFilter("progress", o)}
+                    maxWidth="w-40"
+                  />
+                </div>
               </th>
 
               {/* Doc submitted */}
               <th className="px-4 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-1">
-                  <span>Deliverable</span>
+                  <button
+                    type="button"
+                    onClick={() => handleSort("doc_submitted")}
+                    className="inline-flex items-center uppercase hover:text-un-blue"
+                  >
+                    Deliverable
+                    <SortIcon
+                      column="doc_submitted"
+                      sortField={sortField}
+                      sortDirection={sortDirection}
+                    />
+                  </button>
                   <MultiSelectFilter
                     filterKey="doc"
                     options={["Submitted", "Not submitted"]}

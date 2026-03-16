@@ -49,8 +49,8 @@ import {
   Send,
   X,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type SortField =
   | "work_package_id"
@@ -261,27 +261,89 @@ interface ActionsTableProps {
 
 export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
   const router = useRouter();
-  const [searchInput, setSearchInput] = useState("");
-  const [sortField, setSortField] = useState<SortField | null>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const searchParams = useSearchParams();
+  const searchParamsRef = useRef(searchParams);
+  searchParamsRef.current = searchParams;
+
+  // Initialize filter state from URL search params
+  const [searchInput, setSearchInput] = useState(() => searchParams.get("q") ?? "");
+  const [sortField, setSortField] = useState<SortField | null>(
+    () => (searchParams.get("sort") as SortField | null) ?? null,
+  );
+  const [sortDirection, setSortDirection] = useState<SortDirection>(
+    () => (searchParams.get("dir") as SortDirection | null) ?? "asc",
+  );
 
   // Column filters (multiselect - arrays)
-  const [filterWP, setFilterWP] = useState<number[]>([]);
-  const [filterWPTitle, setFilterWPTitle] = useState<string[]>([]);
-  const [filterAction, setFilterAction] = useState<string[]>([]);
-  const [filterIndicativeAction, setFilterIndicativeAction] = useState<
-    string[]
-  >([]);
-  const [filterWorkPackageId, setFilterWorkPackageId] = useState<string>("");
-  const [filterRisk, setFilterRisk] = useState<string>("");
-  const [filterDeliverablesMonth, setFilterDeliverablesMonth] = useState<
-    number | null
-  >(null);
+  const [filterWP, setFilterWP] = useState<number[]>(() =>
+    searchParams.getAll("wp").map(Number).filter((n) => !isNaN(n)),
+  );
+  const [filterWPTitle, setFilterWPTitle] = useState<string[]>(() =>
+    searchParams.getAll("wpt"),
+  );
+  const [filterAction, setFilterAction] = useState<string[]>(() =>
+    searchParams.getAll("a"),
+  );
+  const [filterIndicativeAction, setFilterIndicativeAction] = useState<string[]>(
+    () => searchParams.getAll("ia"),
+  );
+  const [filterWorkPackageId, setFilterWorkPackageId] = useState<string>(
+    () => searchParams.get("wpid") ?? "",
+  );
+  const [filterRisk, setFilterRisk] = useState<string>(
+    () => searchParams.get("risk") ?? "",
+  );
+  const [filterDeliverablesMonth, setFilterDeliverablesMonth] = useState<number | null>(
+    () => {
+      const v = searchParams.get("dm");
+      if (!v) return null;
+      const n = Number(v);
+      return isNaN(n) ? null : n;
+    },
+  );
   const [filterIntermediateMilestones, setFilterIntermediateMilestones] =
-    useState<boolean>(false);
+    useState<boolean>(() => searchParams.get("im") === "1");
 
   // Track which filter popovers are open
   const [openFilters, setOpenFilters] = useState<Record<string, boolean>>({});
+
+  // Sync filter state to URL
+  useEffect(() => {
+    const current = searchParamsRef.current;
+    const params = new URLSearchParams();
+    // Preserve modal params
+    const action = current.get("action");
+    const milestone = current.get("milestone");
+    if (action) params.set("action", action);
+    if (milestone) params.set("milestone", milestone);
+    // Filter params
+    if (searchInput) params.set("q", searchInput);
+    if (sortField) params.set("sort", sortField);
+    if (sortDirection !== "asc") params.set("dir", sortDirection);
+    filterWP.forEach((v) => params.append("wp", String(v)));
+    filterWPTitle.forEach((v) => params.append("wpt", v));
+    filterAction.forEach((v) => params.append("a", v));
+    filterIndicativeAction.forEach((v) => params.append("ia", v));
+    if (filterWorkPackageId) params.set("wpid", filterWorkPackageId);
+    if (filterRisk) params.set("risk", filterRisk);
+    if (filterDeliverablesMonth != null) params.set("dm", String(filterDeliverablesMonth));
+    if (filterIntermediateMilestones) params.set("im", "1");
+    const qs = params.toString();
+    router.replace(qs ? `?${qs}` : "?", { scroll: false });
+  }, [
+    searchInput,
+    sortField,
+    sortDirection,
+    filterWP,
+    filterWPTitle,
+    filterAction,
+    filterIndicativeAction,
+    filterWorkPackageId,
+    filterRisk,
+    filterDeliverablesMonth,
+    filterIntermediateMilestones,
+    router,
+  ]);
 
   // Status change confirmation
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -650,7 +712,11 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     const actionParam = actionSubId
       ? `${actionId}${actionSubId}`
       : `${actionId}`;
-    router.push(`/actions?action=${actionParam}`, { scroll: false });
+    // Preserve existing filter params when opening the modal
+    const params = new URLSearchParams(searchParamsRef.current.toString());
+    params.set("action", actionParam);
+    params.delete("milestone");
+    router.push(`/actions?${params.toString()}`, { scroll: false });
   };
 
   const handleRiskChange = async (

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { ActionsTable } from "@/features/actions/ui/ActionsTable";
 import { getActionsTableData } from "@/features/actions/queries";
 import { getCurrentUser } from "@/features/auth/service";
@@ -16,7 +17,9 @@ export default async function ActionsPage() {
   return (
     <main className="flex-1 bg-background px-4 py-4 sm:px-6 sm:py-4">
       <div className="mx-auto max-w-7xl">
-        <ActionsTable data={data} isAdmin={isAdmin} />
+        <Suspense fallback={null}>
+          <ActionsTable data={data} isAdmin={isAdmin} />
+        </Suspense>
       </div>
     </main>
   );
