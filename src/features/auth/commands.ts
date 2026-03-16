@@ -69,6 +69,27 @@ export async function verify(token: string): Promise<Result> {
   return { success: true };
 }
 
+export async function devLogin(): Promise<Result> {
+  if (process.env.NODE_ENV !== "development") {
+    throw new Error("devLogin is not available outside of development");
+  }
+  const email = process.env.DEV_LOGIN_EMAIL;
+  if (!email) {
+    return { success: false, error: "DEV_LOGIN_EMAIL secret is not set" };
+  }
+  const approved = await isApprovedUser(email);
+  if (!approved) {
+    return {
+      success: false,
+      error: `${email} is not in the approved users list`,
+    };
+  }
+  const userId = await upsertUser(email);
+  await createSession(userId);
+  revalidatePath("/", "layout");
+  return { success: true };
+}
+
 export async function logout(): Promise<void> {
   await clearSession();
   redirect("/login");
