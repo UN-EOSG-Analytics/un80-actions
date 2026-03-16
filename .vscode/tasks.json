@@ -26,6 +26,14 @@
         },
         {
             "type": "shell",
+            "command": "pnpm update",
+            "label": "update",
+            "detail": "pnpm update",
+            "problemMatcher": [],
+            "isBackground": true
+        },
+        {
+            "type": "shell",
             "command": "pnpm start",
             "label": "start",
             "detail": "next start",
