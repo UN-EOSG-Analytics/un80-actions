@@ -100,6 +100,7 @@ function getDeliverablesStatus(
 // Multiselect filter component
 function MultiSelectFilter<T extends string | number | boolean>({
   options,
+  allOptions,
   selected,
   onToggle,
   renderOption,
@@ -108,7 +109,10 @@ function MultiSelectFilter<T extends string | number | boolean>({
   maxWidth = "w-64",
 }: {
   filterKey: string;
+  /** Options available given current filters (determines greyed-out state). */
   options: T[];
+  /** Full list of options regardless of filters (determines display order). */
+  allOptions: T[];
   selected: T[];
   onToggle: (value: T) => void;
   renderOption: (value: T) => string;
@@ -119,25 +123,31 @@ function MultiSelectFilter<T extends string | number | boolean>({
   const [searchQuery, setSearchQuery] = useState("");
   const hasFilter = selected.length > 0;
 
-  // Filter options based on search query
-  const filteredOptions = useMemo(() => {
-    if (!searchQuery.trim()) return options;
-    const query = searchQuery.toLowerCase();
-    return options.filter((option) =>
-      renderOption(option).toLowerCase().includes(query),
-    );
-  }, [options, searchQuery, renderOption]);
+  const availableSet = useMemo(() => new Set(options.map(String)), [options]);
 
-  // Reset search when popover closes
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      setSearchQuery("");
-    }
-    onOpenChange(open);
-  };
+  // Sort: available first, then unavailable; within each group preserve allOptions order
+  const sortedOptions = useMemo(() => {
+    const available = allOptions.filter((o) => availableSet.has(String(o)));
+    const unavailable = allOptions.filter((o) => !availableSet.has(String(o)));
+    return [...available, ...unavailable];
+  }, [allOptions, availableSet]);
+
+  const filteredOptions = useMemo(() => {
+    if (!searchQuery.trim()) return sortedOptions;
+    const q = searchQuery.toLowerCase();
+    return sortedOptions.filter((o) =>
+      renderOption(o).toLowerCase().includes(q),
+    );
+  }, [sortedOptions, searchQuery, renderOption]);
 
   return (
-    <Popover open={isOpen} onOpenChange={handleOpenChange}>
+    <Popover
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) setSearchQuery("");
+        onOpenChange(open);
+      }}
+    >
       <PopoverTrigger asChild>
         <button
           type="button"
@@ -163,36 +173,12 @@ function MultiSelectFilter<T extends string | number | boolean>({
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-8 w-full rounded border border-gray-200 px-2 text-sm"
+            className="h-8 w-full rounded border border-gray-200 px-2 text-sm outline-none focus:border-un-blue"
             onClick={(e) => e.stopPropagation()}
           />
         </div>
         <div className="max-h-64 overflow-y-auto">
           <div className="space-y-1">
-            {/* Select all */}
-            {filteredOptions.length > 0 && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const toSelect = options.filter(
-                      (opt) => !selected.includes(opt),
-                    );
-                    toSelect.forEach((opt) => onToggle(opt));
-                  }}
-                  className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm font-medium text-un-blue hover:bg-gray-100"
-                >
-                  <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded border border-un-blue/50">
-                    {options.length > 0 &&
-                    selected.length === options.length ? (
-                      <Check className="h-3 w-3 text-un-blue" />
-                    ) : null}
-                  </div>
-                  <span className="flex-1">Select all</span>
-                </button>
-                <div className="my-1 border-t border-gray-200" />
-              </>
-            )}
             {filteredOptions.length === 0 ? (
               <div className="px-2 py-2 text-center text-sm text-gray-400">
                 No results found
@@ -200,12 +186,18 @@ function MultiSelectFilter<T extends string | number | boolean>({
             ) : (
               filteredOptions.map((option) => {
                 const isSelected = selected.includes(option);
+                const isAvailable = availableSet.has(String(option));
                 return (
                   <button
                     key={String(option)}
                     type="button"
-                    onClick={() => onToggle(option)}
-                    className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-gray-100"
+                    onClick={() => isAvailable && onToggle(option)}
+                    disabled={!isAvailable && !isSelected}
+                    className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm ${
+                      isAvailable || isSelected
+                        ? "hover:bg-gray-100"
+                        : "cursor-default opacity-35"
+                    }`}
                   >
                     <div
                       className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
@@ -229,11 +221,9 @@ function MultiSelectFilter<T extends string | number | boolean>({
           <div className="mt-2 border-t pt-2">
             <button
               type="button"
-              onClick={() => {
-                options.forEach((opt) => {
-                  if (selected.includes(opt)) onToggle(opt);
-                });
-              }}
+              onClick={() =>
+                allOptions.forEach((o) => selected.includes(o) && onToggle(o))
+              }
               className="w-full text-xs text-un-blue hover:underline"
             >
               Clear ({selected.length})
@@ -314,6 +304,48 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
       })),
     );
   }, [data.workPackages]);
+
+  // Full (unfiltered) option lists — used as allOptions for greyed-out display
+  const allWPIds = useMemo(() => {
+    const ids = new Set<number>();
+    allActions.forEach((a) => ids.add(a.work_package_id));
+    return Array.from(ids).sort((a, b) => a - b);
+  }, [allActions]);
+
+  const allWPTitles = useMemo(() => {
+    const titles = new Set<string>();
+    allActions.forEach((a) => {
+      if (a.work_package_title) titles.add(a.work_package_title);
+    });
+    return Array.from(titles).sort();
+  }, [allActions]);
+
+  const allActionLabels = useMemo(() => {
+    const labels = new Set<string>();
+    allActions.forEach((a) => labels.add(actionLabel(a.action_id, a.action_sub_id)));
+    return Array.from(labels).sort((a, b) => {
+      const numA = parseInt(a.replace(/[^0-9]/g, ""), 10);
+      const numB = parseInt(b.replace(/[^0-9]/g, ""), 10);
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      return a.localeCompare(b);
+    });
+  }, [allActions]);
+
+  const allIndicativeActions = useMemo(() => {
+    const actions = new Set<string>();
+    allActions.forEach((a) => {
+      if (a.indicative_action) actions.add(a.indicative_action);
+    });
+    return Array.from(actions).sort();
+  }, [allActions]);
+
+  const allDeliverableMonths = useMemo(() => {
+    const months = new Set<number>();
+    allActions.forEach((a) => {
+      a.upcoming_milestone_months.forEach((m) => months.add(m));
+    });
+    return Array.from(months).sort((a, b) => a - b);
+  }, [allActions]);
 
   type FilterSkip =
     | "wp"
@@ -782,6 +814,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   <MultiSelectFilter
                     filterKey="wp"
                     options={uniqueWPIds}
+                    allOptions={allWPIds}
                     selected={filterWP}
                     onToggle={(id) => {
                       setFilterWP((prev) =>
@@ -815,6 +848,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   <MultiSelectFilter
                     filterKey="wpTitle"
                     options={uniqueWPTitles}
+                    allOptions={allWPTitles}
                     selected={filterWPTitle}
                     onToggle={(title) => {
                       setFilterWPTitle((prev) =>
@@ -850,6 +884,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   <MultiSelectFilter
                     filterKey="action"
                     options={uniqueActions}
+                    allOptions={allActionLabels}
                     selected={filterAction}
                     onToggle={(action) => {
                       setFilterAction((prev) =>
@@ -883,6 +918,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   <MultiSelectFilter
                     filterKey="indicativeAction"
                     options={uniqueIndicativeActions}
+                    allOptions={allIndicativeActions}
                     selected={filterIndicativeAction}
                     onToggle={(action) => {
                       setFilterIndicativeAction((prev) =>
@@ -996,9 +1032,11 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                             </div>
                             All months
                           </button>
-                          {uniqueDeliverablesMonths.map((month) => {
+                          {allDeliverableMonths.map((month) => {
                             const isSelected =
                               filterDeliverablesMonth === month;
+                            const isAvailable =
+                              uniqueDeliverablesMonths.includes(month);
                             const year = Math.floor(month / 100);
                             const monthNum = month % 100;
                             const label =
@@ -1011,15 +1049,21 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                               <button
                                 key={month}
                                 type="button"
+                                disabled={!isAvailable && !isSelected}
                                 onClick={() => {
+                                  if (!isAvailable && !isSelected) return;
                                   setFilterDeliverablesMonth(month);
                                   setOpenFilters((prev) => ({
                                     ...prev,
                                     deliverablesMonth: false,
                                   }));
                                 }}
-                                className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-gray-100 ${
-                                  isSelected ? "font-medium text-un-blue" : ""
+                                className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm ${
+                                  isSelected
+                                    ? "font-medium text-un-blue"
+                                    : isAvailable
+                                      ? "hover:bg-gray-100"
+                                      : "cursor-default opacity-35"
                                 }`}
                               >
                                 <div

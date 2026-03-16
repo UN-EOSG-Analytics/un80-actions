@@ -1,49 +1,49 @@
 "use client";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
-  approveMilestoneContent,
-  requestMilestoneChanges,
-  setMilestoneAttentionToTimeline,
-  setMilestoneConfirmationNeeded,
-  setMilestoneFinalized,
-  setMilestoneNeedsOlaReview,
-  setMilestoneReviewedByOla,
-  setMilestoneToDraft,
-  updateMilestoneDocumentSubmitted,
-  updateMilestonePublicProgress,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+    approveMilestoneContent,
+    requestMilestoneChanges,
+    setMilestoneAttentionToTimeline,
+    setMilestoneConfirmationNeeded,
+    setMilestoneFinalized,
+    setMilestoneNeedsOlaReview,
+    setMilestoneReviewedByOla,
+    setMilestoneToDraft,
+    updateMilestoneDocumentSubmitted,
+    updateMilestonePublicProgress,
 } from "@/features/milestones/commands";
 import type { AllMilestonesTableRow } from "@/features/milestones/queries";
 import { formatShortDate } from "@/lib/format-date";
 import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-  Check,
-  ChevronDown,
-  ChevronRight,
-  Filter,
-  Search,
-  X,
+    ArrowDown,
+    ArrowUp,
+    ArrowUpDown,
+    Check,
+    ChevronDown,
+    ChevronRight,
+    Filter,
+    Search,
+    X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
@@ -297,6 +297,7 @@ function isPastDue(deadline: string | null): boolean {
 function MultiSelectFilter<T extends string | number>({
   filterKey,
   options,
+  allOptions,
   selected,
   onToggle,
   renderOption,
@@ -305,7 +306,10 @@ function MultiSelectFilter<T extends string | number>({
   maxWidth = "w-64",
 }: {
   filterKey: string;
+  /** Options available given current filters (determines greyed-out state). */
   options: T[];
+  /** Full list of options regardless of filters (determines display order). */
+  allOptions: T[];
   selected: T[];
   onToggle: (value: T) => void;
   renderOption: (value: T) => string;
@@ -316,11 +320,22 @@ function MultiSelectFilter<T extends string | number>({
   const [searchQuery, setSearchQuery] = useState("");
   const hasFilter = selected.length > 0;
 
+  const availableSet = useMemo(() => new Set(options.map(String)), [options]);
+
+  // Sort: available first, then unavailable; within each group preserve allOptions order
+  const sortedOptions = useMemo(() => {
+    const available = allOptions.filter((o) => availableSet.has(String(o)));
+    const unavailable = allOptions.filter((o) => !availableSet.has(String(o)));
+    return [...available, ...unavailable];
+  }, [allOptions, availableSet]);
+
   const filteredOptions = useMemo(() => {
-    if (!searchQuery.trim()) return options;
+    if (!searchQuery.trim()) return sortedOptions;
     const q = searchQuery.toLowerCase();
-    return options.filter((o) => renderOption(o).toLowerCase().includes(q));
-  }, [options, searchQuery, renderOption]);
+    return sortedOptions.filter((o) =>
+      renderOption(o).toLowerCase().includes(q),
+    );
+  }, [sortedOptions, searchQuery, renderOption]);
 
   return (
     <Popover
@@ -369,12 +384,18 @@ function MultiSelectFilter<T extends string | number>({
             ) : (
               filteredOptions.map((option) => {
                 const isSelected = selected.includes(option);
+                const isAvailable = availableSet.has(String(option));
                 return (
                   <button
                     key={String(option)}
                     type="button"
-                    onClick={() => onToggle(option)}
-                    className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-gray-100"
+                    onClick={() => isAvailable && onToggle(option)}
+                    disabled={!isAvailable && !isSelected}
+                    className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm ${
+                      isAvailable || isSelected
+                        ? "hover:bg-gray-100"
+                        : "cursor-default opacity-35"
+                    }`}
                   >
                     <div
                       className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
@@ -445,7 +466,7 @@ interface MilestonesTableProps {
 export function MilestonesTable({ rows }: MilestonesTableProps) {
   const router = useRouter();
   const [searchInput, setSearchInput] = useState("");
-  const [sortField, setSortField] = useState<SortField>("action_id");
+  const [sortField, setSortField] = useState<SortField>("work_package_id");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   const [filterWP, setFilterWP] = useState<number[]>([]);
@@ -637,6 +658,11 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
     return Array.from(ids).sort((a, b) => a - b);
   }, [localRows, applyFiltersExcept]);
 
+  const allWPIds = useMemo(() => {
+    const ids = new Set(localRows.map((r) => r.work_package_id));
+    return Array.from(ids).sort((a, b) => a - b);
+  }, [localRows]);
+
   const uniqueActions = useMemo(() => {
     const set = new Set(
       applyFiltersExcept(localRows, "action").map((r) =>
@@ -650,6 +676,17 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
     });
   }, [localRows, applyFiltersExcept]);
 
+  const allActions = useMemo(() => {
+    const set = new Set(
+      localRows.map((r) => actionLabel(r.action_id, r.action_sub_id)),
+    );
+    return Array.from(set).sort((a, b) => {
+      const na = parseInt(a.replace(/\D/g, ""), 10);
+      const nb = parseInt(b.replace(/\D/g, ""), 10);
+      return !isNaN(na) && !isNaN(nb) ? na - nb : a.localeCompare(b);
+    });
+  }, [localRows]);
+
   const uniqueTypes = useMemo(() => {
     const set = new Set(
       applyFiltersExcept(localRows, "type").map((r) => r.milestone_type),
@@ -659,6 +696,13 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
     );
   }, [localRows, applyFiltersExcept]);
 
+  const allTypes = useMemo(() => {
+    const set = new Set(localRows.map((r) => r.milestone_type));
+    return Array.from(set).sort(
+      (a, b) => (MILESTONE_TYPE_ORDER[a] ?? 9) - (MILESTONE_TYPE_ORDER[b] ?? 9),
+    );
+  }, [localRows]);
+
   const uniqueStatuses = useMemo(() => {
     const set = new Set(
       applyFiltersExcept(localRows, "status").map(
@@ -667,6 +711,11 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
     );
     return ALL_STATUS_LABELS.filter((s) => set.has(s));
   }, [localRows, applyFiltersExcept]);
+
+  const allStatuses = useMemo(() => {
+    const set = new Set(localRows.map((r) => getStatusConfig(r).label));
+    return ALL_STATUS_LABELS.filter((s) => set.has(s));
+  }, [localRows]);
 
   const uniqueMonthKeys = useMemo(() => {
     const set = new Set(
@@ -681,6 +730,15 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
     return sorted;
   }, [localRows, applyFiltersExcept]);
 
+  const allMonthKeys = useMemo(() => {
+    const set = new Set(localRows.map((r) => getDeadlineMonthKey(r.deadline)));
+    const sorted = Array.from(set)
+      .filter((k) => k !== "no_date")
+      .sort();
+    if (set.has("no_date")) sorted.push("no_date");
+    return sorted;
+  }, [localRows]);
+
   const filteredRows = useMemo(
     () => applyFiltersExcept(localRows, "none"),
     [localRows, applyFiltersExcept],
@@ -694,8 +752,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
         cmp =
           a.work_package_id - b.work_package_id ||
           a.action_id - b.action_id ||
-          (MILESTONE_TYPE_ORDER[a.milestone_type] ?? 9) -
-            (MILESTONE_TYPE_ORDER[b.milestone_type] ?? 9);
+          (a.deadline ?? "9999-12-31").localeCompare(b.deadline ?? "9999-12-31");
       } else if (sortField === "action_id") {
         cmp =
           a.action_id - b.action_id ||
@@ -820,10 +877,22 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
       {/* Table */}
       <div className="overflow-hidden overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
         <table className="w-full text-sm">
+          <colgroup>
+            <col className="w-14" />        {/* WP */}
+            <col className="w-20" />        {/* Action */}
+            <col className="w-24" />        {/* Type */}
+            <col className="w-24" />        {/* Visibility */}
+            <col style={{ width: "420px" }} />{/* Description */}
+            <col className="w-32" />        {/* Deadline */}
+            <col className="w-48" />        {/* Status — widest label: "Attention to timeline" */}
+            <col className="w-36" />        {/* Progress */}
+            <col className="w-36" />        {/* Deliverable */}
+            <col className="w-8" />         {/* Chevron */}
+          </colgroup>
           <thead className="sticky top-0 z-10">
             <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
               {/* WP */}
-              <th className="w-14 py-3 pr-2 pl-4 whitespace-nowrap">
+              <th className="py-3 pr-2 pl-4 whitespace-nowrap">
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
@@ -840,6 +909,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                   <MultiSelectFilter
                     filterKey="wp"
                     options={uniqueWPIds}
+                    allOptions={allWPIds}
                     selected={filterWP}
                     onToggle={(v) => toggle(setFilterWP, v)}
                     renderOption={(id) => `WP ${id}`}
@@ -868,6 +938,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                   <MultiSelectFilter
                     filterKey="action"
                     options={uniqueActions}
+                    allOptions={allActions}
                     selected={filterAction}
                     onToggle={(v) => toggle(setFilterAction, v)}
                     renderOption={(a) => `Action ${a}`}
@@ -895,6 +966,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                   <MultiSelectFilter
                     filterKey="type"
                     options={uniqueTypes}
+                    allOptions={allTypes}
                     selected={filterType}
                     onToggle={(v) => toggle(setFilterType, v)}
                     renderOption={(t) => MILESTONE_TYPE_LABELS[t] ?? t}
@@ -912,6 +984,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                   <MultiSelectFilter
                     filterKey="public"
                     options={["Public", "Internal"]}
+                    allOptions={["Public", "Internal"]}
                     selected={filterPublic}
                     onToggle={(v) => toggle(setFilterPublic, v)}
                     renderOption={(v) => v}
@@ -991,6 +1064,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                   <MultiSelectFilter
                     filterKey="month"
                     options={uniqueMonthKeys}
+                    allOptions={allMonthKeys}
                     selected={filterMonth}
                     onToggle={(v) => toggle(setFilterMonth, v)}
                     renderOption={(k) => formatMonthLabel(k)}
@@ -1008,6 +1082,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                   <MultiSelectFilter
                     filterKey="status"
                     options={[...uniqueStatuses]}
+                    allOptions={allStatuses}
                     selected={filterStatus}
                     onToggle={(v) => toggle(setFilterStatus, v)}
                     renderOption={(s) => s}
@@ -1029,6 +1104,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                   <MultiSelectFilter
                     filterKey="doc"
                     options={["Submitted", "Not submitted"]}
+                    allOptions={["Submitted", "Not submitted"]}
                     selected={filterDoc}
                     onToggle={(v) => toggle(setFilterDoc, v)}
                     renderOption={(v) => v}
@@ -1066,7 +1142,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                   <tr
                     key={r.milestone_id}
                     onClick={() => handleRowClick(r.action_id, r.action_sub_id)}
-                    className="cursor-pointer transition-colors hover:bg-sky-50/50"
+                    className={`cursor-pointer transition-colors ${r.is_public ? "bg-un-blue/[3%] hover:bg-un-blue/[6%]" : "hover:bg-sky-50/50"}`}
                   >
                     {/* WP */}
                     <td className="py-2.5 pr-2 pl-4 whitespace-nowrap">
@@ -1102,10 +1178,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                     </td>
 
                     {/* Description */}
-                    <td
-                      className="px-4 py-2.5 align-top"
-                      style={{ maxWidth: "420px" }}
-                    >
+                    <td className="px-4 py-2.5 align-top">
                       {r.description ? (
                         <p className="line-clamp-2 text-xs leading-snug text-gray-600">
                           {r.description}
