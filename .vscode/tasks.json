@@ -3,7 +3,7 @@
 	"tasks": [
         {
             "type": "shell",
-            "command": "pnpm dev",
+            "command": "pnpm dev:local",
             "label": "dev",
             "detail": "next dev",
             "problemMatcher": [],
