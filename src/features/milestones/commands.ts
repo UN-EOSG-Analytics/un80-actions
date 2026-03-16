@@ -858,6 +858,40 @@ export async function saveAndSubmitMilestone(
 }
 
 // =========================================================
+// DELETE
+// =========================================================
+
+/**
+ * Permanently delete a milestone and all related data (admin only).
+ */
+export async function deleteMilestone(
+  milestoneId: string,
+): Promise<MilestoneResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
+  try {
+    const milestone = await getMilestoneById(milestoneId);
+    if (!milestone) {
+      return { success: false, error: "Milestone not found" };
+    }
+
+    await query(
+      `DELETE FROM ${DB_SCHEMA}.action_milestones WHERE id = $1`,
+      [milestoneId],
+    );
+
+    return { success: true };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Failed to delete milestone",
+    };
+  }
+}
+
+// =========================================================
 // ADMIN FUNCTIONS
 // =========================================================
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { DatePicker } from "@/components/DatePicker";
 import { Button } from "@/components/ui/button";
 import {
@@ -397,6 +398,7 @@ export default function QuestionsTab({
   const [error, setError] = useState<string | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingQuestion, setEditingQuestion] = useState({
     header: "",
@@ -581,6 +583,7 @@ export default function QuestionsTab({
   };
 
   return (
+    <>
     <div className="space-y-4">
       {/* View Notes Collapsible Section */}
       {isAdmin && notes.length > 0 && (
@@ -939,7 +942,7 @@ export default function QuestionsTab({
                               variant="ghost"
                               size="sm"
                               className="h-8 gap-1.5 text-slate-500 hover:bg-red-50 hover:text-red-600"
-                              onClick={() => handleDelete(q.id)}
+                              onClick={() => setPendingDeleteId(q.id)}
                               disabled={deletingId === q.id}
                               aria-label="Delete question"
                             >
@@ -1133,5 +1136,12 @@ export default function QuestionsTab({
         </div>
       )}
     </div>
+    <DeleteConfirmDialog
+      open={pendingDeleteId !== null}
+      onOpenChange={(open) => { if (!open) setPendingDeleteId(null); }}
+      onConfirm={() => { if (pendingDeleteId) { handleDelete(pendingDeleteId); setPendingDeleteId(null); } }}
+      description="This question will be permanently deleted."
+    />
+    </>
   );
 }

@@ -24,6 +24,7 @@ import {
   MessageSquare,
   Pencil,
   Send,
+  Trash2,
 } from "lucide-react";
 import { formatUNDate } from "@/lib/format-date";
 import type { ActionMilestone } from "@/types";
@@ -35,6 +36,7 @@ interface MilestoneCardProps {
   milestone: ActionMilestone;
   updates: MilestoneUpdate[];
   onEdit: () => void;
+  onDelete?: () => void;
   onComment: () => void;
   onShowHistory: () => void;
   onStatusChange?: (
@@ -60,6 +62,7 @@ export function MilestoneCard({
   milestone,
   updates,
   onEdit,
+  onDelete,
   onComment,
   onShowHistory,
   onStatusChange,
@@ -488,6 +491,18 @@ export function MilestoneCard({
               title="Edit"
             >
               <Pencil className="h-4 w-4" />
+            </button>
+          )}
+          {isAdmin && onDelete && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              className="rounded p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
+              title="Delete milestone"
+            >
+              <Trash2 className="h-4 w-4" />
             </button>
           )}
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { DatePicker } from "@/components/DatePicker";
 import { Button } from "@/components/ui/button";
 import {
@@ -82,6 +83,7 @@ export default function NotesTab({
   const [error, setError] = useState<string | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingNote, setEditingNote] = useState({
     header: "",
@@ -223,6 +225,7 @@ export default function NotesTab({
   };
 
   return (
+    <>
     <div className="space-y-4">
       {/* Add Note Form */}
       <form
@@ -486,7 +489,7 @@ export default function NotesTab({
                             variant="ghost"
                             size="sm"
                             className="h-8 gap-1.5 text-slate-500 hover:bg-red-50 hover:text-red-600"
-                            onClick={() => handleDelete(note.id)}
+                            onClick={() => setPendingDeleteId(note.id)}
                             disabled={deletingId === note.id}
                             aria-label="Delete note"
                           >
@@ -536,5 +539,12 @@ export default function NotesTab({
         </div>
       )}
     </div>
+    <DeleteConfirmDialog
+      open={pendingDeleteId !== null}
+      onOpenChange={(open) => { if (!open) setPendingDeleteId(null); }}
+      onConfirm={() => { if (pendingDeleteId) { handleDelete(pendingDeleteId); setPendingDeleteId(null); } }}
+      description="This note will be permanently deleted."
+    />
+    </>
   );
 }

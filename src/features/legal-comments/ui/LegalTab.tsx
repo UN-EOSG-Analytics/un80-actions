@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { getActionLegalComments } from "@/features/legal-comments/queries";
 import {
@@ -64,6 +65,7 @@ export default function LegalTab({
   const [error, setError] = useState<string | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const [tagsByCommentId, setTagsByCommentId] = useState<Record<string, Tag[]>>(
@@ -180,6 +182,7 @@ export default function LegalTab({
   );
 
   return (
+    <>
     <div className="space-y-4">
       {/* Add Comment Form */}
       <form
@@ -301,7 +304,7 @@ export default function LegalTab({
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 text-slate-400 hover:text-red-600"
-                            onClick={() => handleDelete(comment.id)}
+                            onClick={() => setPendingDeleteId(comment.id)}
                             disabled={deletingId === comment.id}
                             aria-label="Delete comment"
                           >
@@ -408,7 +411,7 @@ export default function LegalTab({
                                   variant="ghost"
                                   size="icon"
                                   className="h-7 w-7 text-slate-400 opacity-0 group-hover/reply:opacity-100 hover:text-red-600"
-                                  onClick={() => handleDelete(reply.id)}
+                                  onClick={() => setPendingDeleteId(reply.id)}
                                   disabled={deletingId === reply.id}
                                   aria-label="Delete reply"
                                 >
@@ -470,5 +473,12 @@ export default function LegalTab({
         </div>
       )}
     </div>
+    <DeleteConfirmDialog
+      open={pendingDeleteId !== null}
+      onOpenChange={(open) => { if (!open) setPendingDeleteId(null); }}
+      onConfirm={() => { if (pendingDeleteId) { handleDelete(pendingDeleteId); setPendingDeleteId(null); } }}
+      description="This comment will be permanently deleted."
+    />
+    </>
   );
 }

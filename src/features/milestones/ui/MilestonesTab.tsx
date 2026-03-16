@@ -2,91 +2,85 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  getActionMilestones,
-  getMilestoneVersions,
-  type MilestoneVersion,
-} from "@/features/milestones/queries";
+    createAttachmentComment,
+    deleteActionAttachment,
+    updateAttachmentMetadata,
+} from "@/features/attachments/commands";
 import {
-  updateMilestone,
-  createMilestone,
-  approveMilestoneContent,
-  requestMilestoneChanges,
-  setMilestoneToDraft,
-  setMilestoneNeedsOlaReview,
-  setMilestoneReviewedByOla,
-  setMilestoneFinalized,
-  setMilestoneAttentionToTimeline,
-  setMilestoneConfirmationNeeded,
-  updateMilestoneDocumentSubmitted,
-  updateMilestonePublicProgress,
-} from "@/features/milestones/commands";
-import { MilestoneCard } from "./MilestoneCard";
-import {
-  getMilestoneUpdates,
-  type MilestoneUpdate,
-} from "@/features/milestones/updates-queries";
-import {
-  createMilestoneUpdate,
-  deleteMilestoneUpdate,
-  toggleMilestoneUpdateResolved,
-  updateMilestoneUpdate,
-} from "@/features/milestones/updates-commands";
+    getActionAttachmentCount,
+    getActionAttachments,
+    getAttachmentComments,
+} from "@/features/attachments/queries";
 import { getCurrentUserIdForClient } from "@/features/auth/commands";
 import {
-  getActionAttachments,
-  getActionAttachmentCount,
-  getAttachmentComments,
-} from "@/features/attachments/queries";
+    approveMilestoneContent,
+    createMilestone,
+    deleteMilestone,
+    requestMilestoneChanges,
+    setMilestoneAttentionToTimeline,
+    setMilestoneConfirmationNeeded,
+    setMilestoneFinalized,
+    setMilestoneNeedsOlaReview,
+    setMilestoneReviewedByOla,
+    setMilestoneToDraft,
+    updateMilestone,
+    updateMilestoneDocumentSubmitted,
+    updateMilestonePublicProgress,
+} from "@/features/milestones/commands";
 import {
-  deleteActionAttachment,
-  updateAttachmentMetadata,
-  createAttachmentComment,
-} from "@/features/attachments/commands";
+    getActionMilestones,
+    getMilestoneVersions,
+    type MilestoneVersion,
+} from "@/features/milestones/queries";
+import {
+    createMilestoneUpdate,
+    deleteMilestoneUpdate,
+    toggleMilestoneUpdateResolved,
+    updateMilestoneUpdate,
+} from "@/features/milestones/updates-commands";
+import {
+    getMilestoneUpdates,
+    type MilestoneUpdate,
+} from "@/features/milestones/updates-queries";
+import { MilestoneCard } from "./MilestoneCard";
 
-import { formatUNDate } from "@/lib/format-date";
 import { DatePicker } from "@/components/DatePicker";
+import { formatUNDate } from "@/lib/format-date";
 import type {
-  Action,
-  ActionMilestone,
-  ActionAttachment,
-  AttachmentComment,
-  MilestoneType,
+    Action,
+    ActionAttachment,
+    ActionMilestone,
+    AttachmentComment,
+    MilestoneType,
 } from "@/types";
 import {
-  Check,
-  CheckCircle2,
-  CornerDownRight,
-  History,
-  Loader2,
-  MessageSquare,
-  Paperclip,
-  Pencil,
-  Plus,
-  Download,
-  Trash2,
-  FileText,
-  ImageIcon,
-  User,
-  Send,
-  Clock,
-  Scale,
+    Check,
+    CheckCircle2,
+    CornerDownRight,
+    Download,
+    FileText,
+    History,
+    ImageIcon,
+    Loader2,
+    MessageSquare,
+    Paperclip,
+    Pencil,
+    Plus,
+    Scale,
+    Send,
+    Trash2,
+    User
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -168,6 +162,11 @@ export default function MilestonesTab({
     description: "",
   });
   const [fileSelected, setFileSelected] = useState(false);
+  const [pendingDeleteComment, setPendingDeleteComment] = useState<{
+    milestoneId: string;
+    updateId: string;
+  } | null>(null);
+  const [pendingDeleteMilestoneId, setPendingDeleteMilestoneId] = useState<string | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     milestoneId: string | null;
@@ -593,6 +592,19 @@ export default function MilestonesTab({
     }
   };
 
+  const handleDeleteMilestone = async (milestoneId: string) => {
+    try {
+      const result = await deleteMilestone(milestoneId);
+      if (result.success) {
+        await loadMilestones();
+      } else {
+        setError(result.error || "Failed to delete milestone");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete milestone");
+    }
+  };
+
   const startEditComment = (update: MilestoneUpdate) => {
     setEditingUpdateId(update.id);
     setEditingContent(update.content);
@@ -848,6 +860,7 @@ export default function MilestonesTab({
           milestone={milestone}
           updates={updates}
           onEdit={() => startEditing(milestone)}
+          onDelete={isAdmin ? () => setPendingDeleteMilestoneId(milestone.id) : undefined}
           onComment={() =>
             startAddingComment(milestone.id, milestone.is_public, isAdmin)
           }
@@ -1084,8 +1097,7 @@ export default function MilestonesTab({
                                         </div>
                                         <div className="flex flex-col">
                                           <span className="text-xs font-medium text-slate-700">
-                                            {update.user_email ||
-                                              "Unknown"}
+                                            {update.user_email || "Unknown"}
                                           </span>
                                           <span className="text-[10px] text-slate-400">
                                             {new Date(
@@ -1153,10 +1165,10 @@ export default function MilestonesTab({
                                             </button>
                                             <button
                                               onClick={() =>
-                                                handleDeleteComment(
-                                                  milestone.id,
-                                                  update.id,
-                                                )
+                                                setPendingDeleteComment({
+                                                  milestoneId: milestone.id,
+                                                  updateId: update.id,
+                                                })
                                               }
                                               className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600"
                                               title="Delete"
@@ -1238,7 +1250,8 @@ export default function MilestonesTab({
                                                     ).toUpperCase()}
                                                   </div>
                                                   <span className="text-xs font-medium text-slate-600">
-                                                    {reply.user_email || "Unknown"}
+                                                    {reply.user_email ||
+                                                      "Unknown"}
                                                   </span>
                                                   <span className="text-[10px] text-slate-400">
                                                     {new Date(
@@ -1259,10 +1272,11 @@ export default function MilestonesTab({
                                                       currentUserId)) && (
                                                   <button
                                                     onClick={() =>
-                                                      handleDeleteComment(
-                                                        milestone.id,
-                                                        reply.id,
-                                                      )
+                                                      setPendingDeleteComment({
+                                                        milestoneId:
+                                                          milestone.id,
+                                                        updateId: reply.id,
+                                                      })
                                                     }
                                                     className="shrink-0 rounded p-1 text-slate-400 opacity-0 transition-all group-hover/reply:opacity-100 hover:bg-slate-100 hover:text-red-600"
                                                     title="Delete reply"
@@ -1468,10 +1482,10 @@ export default function MilestonesTab({
                                               </button>
                                               <button
                                                 onClick={() =>
-                                                  handleDeleteComment(
-                                                    milestone.id,
-                                                    update.id,
-                                                  )
+                                                  setPendingDeleteComment({
+                                                    milestoneId: milestone.id,
+                                                    updateId: update.id,
+                                                  })
                                                 }
                                                 className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600"
                                                 title="Delete"
@@ -1549,7 +1563,8 @@ export default function MilestonesTab({
                                                       ).toUpperCase()}
                                                     </div>
                                                     <span className="text-xs font-medium text-slate-600">
-                                                      {reply.user_email || "Unknown"}
+                                                      {reply.user_email ||
+                                                        "Unknown"}
                                                     </span>
                                                     <span className="text-[10px] text-slate-400">
                                                       {new Date(
@@ -1570,9 +1585,12 @@ export default function MilestonesTab({
                                                         currentUserId)) && (
                                                     <button
                                                       onClick={() =>
-                                                        handleDeleteComment(
-                                                          milestone.id,
-                                                          reply.id,
+                                                        setPendingDeleteComment(
+                                                          {
+                                                            milestoneId:
+                                                              milestone.id,
+                                                            updateId: reply.id,
+                                                          },
                                                         )
                                                       }
                                                       className="shrink-0 rounded p-1 text-slate-400 opacity-0 transition-all group-hover/reply:opacity-100 hover:bg-slate-100 hover:text-red-600"
@@ -1771,10 +1789,10 @@ export default function MilestonesTab({
                                               </button>
                                               <button
                                                 onClick={() =>
-                                                  handleDeleteComment(
-                                                    milestone.id,
-                                                    update.id,
-                                                  )
+                                                  setPendingDeleteComment({
+                                                    milestoneId: milestone.id,
+                                                    updateId: update.id,
+                                                  })
                                                 }
                                                 className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600"
                                                 title="Delete"
@@ -1852,7 +1870,8 @@ export default function MilestonesTab({
                                                       ).toUpperCase()}
                                                     </div>
                                                     <span className="text-xs font-medium text-slate-600">
-                                                      {reply.user_email || "Unknown"}
+                                                      {reply.user_email ||
+                                                        "Unknown"}
                                                     </span>
                                                     <span className="text-[10px] text-slate-400">
                                                       {new Date(
@@ -1873,9 +1892,12 @@ export default function MilestonesTab({
                                                         currentUserId)) && (
                                                     <button
                                                       onClick={() =>
-                                                        handleDeleteComment(
-                                                          milestone.id,
-                                                          reply.id,
+                                                        setPendingDeleteComment(
+                                                          {
+                                                            milestoneId:
+                                                              milestone.id,
+                                                            updateId: reply.id,
+                                                          },
                                                         )
                                                       }
                                                       className="shrink-0 rounded p-1 text-slate-400 opacity-0 transition-all group-hover/reply:opacity-100 hover:bg-slate-100 hover:text-red-600"
@@ -2822,6 +2844,18 @@ export default function MilestonesTab({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <DeleteConfirmDialog
+        open={pendingDeleteComment !== null}
+        onOpenChange={(open) => { if (!open) setPendingDeleteComment(null); }}
+        onConfirm={() => { if (pendingDeleteComment) { handleDeleteComment(pendingDeleteComment.milestoneId, pendingDeleteComment.updateId); setPendingDeleteComment(null); } }}
+        description="This comment will be permanently deleted."
+      />
+      <DeleteConfirmDialog
+        open={pendingDeleteMilestoneId !== null}
+        onOpenChange={(open) => { if (!open) setPendingDeleteMilestoneId(null); }}
+        onConfirm={() => { if (pendingDeleteMilestoneId) { handleDeleteMilestone(pendingDeleteMilestoneId); setPendingDeleteMilestoneId(null); } }}
+        description="This milestone and all its comments will be permanently deleted."
+      />
     </div>
   );
 }
