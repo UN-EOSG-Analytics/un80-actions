@@ -29,14 +29,14 @@ function getFileIcon(contentType: string, filename: string) {
   }
   if (contentType === "application/pdf" || filename.toLowerCase().endsWith(".pdf")) {
     return (
-      <div className="flex h-5 w-5 items-center justify-center rounded bg-red-100 text-[10px] font-bold text-red-600">
+      <div className="flex h-5 w-5 items-center justify-center rounded bg-red-100 text-xs font-bold text-red-600">
         PDF
       </div>
     );
   }
   if (contentType.includes("word") || filename.toLowerCase().match(/\.(doc|docx)$/)) {
     return (
-      <div className="flex h-5 w-5 items-center justify-center rounded bg-blue-100 text-[10px] font-bold text-blue-600">
+      <div className="flex h-5 w-5 items-center justify-center rounded bg-blue-100 text-xs font-bold text-blue-600">
         DOC
       </div>
     );
@@ -329,7 +329,7 @@ export function MilestoneDocuments({
                             </>
                           )}
                           <span className="text-slate-300">•</span>
-                          <Badge variant="outline" className="text-[10px]">
+                          <Badge variant="outline" className="text-xs">
                             {linkedMilestone ? formatMilestoneLabel(linkedMilestone) : "General"}
                           </Badge>
                         </div>
@@ -355,7 +355,7 @@ export function MilestoneDocuments({
                                 Team comments
                               </span>
                               {(comments[att.id] ?? []).filter((c) => !c.is_legal).length > 0 && (
-                                <span className="rounded-full bg-un-blue/15 px-2 py-0.5 text-[10px] font-semibold text-un-blue">
+                                <span className="rounded-full bg-un-blue/15 px-2 py-0.5 text-xs font-semibold text-un-blue">
                                   {(comments[att.id] ?? []).filter((c) => !c.is_legal).length}
                                 </span>
                               )}
@@ -375,7 +375,7 @@ export function MilestoneDocuments({
                                         className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
                                       >
                                         <div className="mb-1 flex items-center gap-2 text-xs text-slate-500">
-                                          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-un-blue/10 text-[9px] font-semibold text-un-blue">
+                                          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-un-blue/10 text-xs font-semibold text-un-blue">
                                             {(c.user_email?.[0] ?? "U").toUpperCase()}
                                           </div>
                                           {c.user_email ? (

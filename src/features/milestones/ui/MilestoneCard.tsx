@@ -180,7 +180,7 @@ export function MilestoneCard({
               {milestoneLabel}
             </span>
             <div className="min-w-0 flex-1 space-y-1.5">
-              <p className="leading-snug font-medium text-slate-900">
+              <p className="text-sm leading-snug font-medium text-slate-900">
                 {milestone.description || (
                   <span className="font-normal text-slate-400 italic">
                     No description
@@ -479,7 +479,7 @@ export function MilestoneCard({
           >
             <MessageSquare className="h-4 w-4" />
             {updates.length > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-un-blue text-[9px] font-semibold text-white">
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-un-blue text-xs font-semibold text-white">
                 {updates.length}
               </span>
             )}

@@ -151,7 +151,7 @@ function Avatar({
   textClass: string;
   size?: "sm" | "md";
 }) {
-  const dim = size === "sm" ? "h-5 w-5 text-[9px]" : "h-6 w-6 text-[10px]";
+  const dim = size === "sm" ? "h-5 w-5 text-xs" : "h-6 w-6 text-xs";
   return (
     <div
       className={`flex ${dim} shrink-0 items-center justify-center rounded-full ${bgClass} font-semibold ${textClass}`}
@@ -233,12 +233,12 @@ export function MilestoneCommentThread({
           {v.label}
         </span>
         {v.sublabel && (
-          <span className={`text-[10px] ${variant === "internal" ? "text-violet-600/80" : "text-amber-600/80"}`}>
+          <span className={`text-xs ${variant === "internal" ? "text-violet-600/80" : "text-amber-600/80"}`}>
             {v.sublabel}
           </span>
         )}
         {topLevel.length > 0 && (
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${v.countBadge}`}>
+          <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${v.countBadge}`}>
             {topLevel.length}
           </span>
         )}
@@ -278,12 +278,12 @@ export function MilestoneCommentThread({
                             <span className="text-xs font-medium text-slate-700">
                               {update.user_email ?? "Unknown"}
                             </span>
-                            <span className="text-[10px] text-slate-400">
+                            <span className="text-xs text-slate-400">
                               {formatTimestamp(update.created_at)}
                             </span>
                           </div>
                           {update.is_resolved && (
-                            <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700">
+                            <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
                               <CheckCircle2 className="h-3 w-3" />
                               Resolved
                             </span>
@@ -380,7 +380,7 @@ export function MilestoneCommentThread({
                                       <span className="text-xs font-medium text-slate-600">
                                         {reply.user_email ?? "Unknown"}
                                       </span>
-                                      <span className="text-[10px] text-slate-400">
+                                      <span className="text-xs text-slate-400">
                                         {formatTimestamp(reply.created_at)}
                                       </span>
                                     </div>
