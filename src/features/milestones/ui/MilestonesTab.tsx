@@ -657,7 +657,7 @@ export default function MilestonesTab({
     <div className="space-y-8">
       {/* ── Public milestones ── */}
       <section className="space-y-3">
-        <h3 className="text-sm font-semibold text-slate-700">Public Milestones</h3>
+        <h3 className="text-xs font-semibold tracking-wider text-slate-500 uppercase">Public Milestones</h3>
         {publicMilestones.length === 0 && !creatingNew && (
           <p className="text-sm text-slate-400 italic">No public milestones yet</p>
         )}
@@ -699,7 +699,7 @@ export default function MilestonesTab({
 
       {/* ── Internal milestones ── */}
       <section className="space-y-3">
-        <h3 className="text-sm font-semibold text-slate-700">Internal Milestones</h3>
+        <h3 className="text-xs font-semibold tracking-wider text-slate-500 uppercase">Internal Milestones</h3>
         {privateMilestones.length === 0 && !creatingNew && (
           <p className="text-sm text-slate-400 italic">No internal milestones yet</p>
         )}

@@ -174,7 +174,7 @@ export function MilestoneDocuments({
 
   return (
     <section className="space-y-3">
-      <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+      <h3 className="flex items-center gap-2 text-xs font-semibold tracking-wider text-slate-500 uppercase">
         <Paperclip className="h-4 w-4" />
         Documents{" "}
         {attachmentCount > 0 && (
@@ -422,7 +422,7 @@ export function MilestoneDocuments({
                                     }
                                   }}
                                   placeholder="Add a comment…"
-                                  className="min-h-[72px] w-full resize-y rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
+                                  className="min-h-18 w-full resize-y rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-un-blue focus:ring-1 focus:ring-un-blue"
                                   rows={2}
                                   disabled={submittingId === att.id}
                                 />

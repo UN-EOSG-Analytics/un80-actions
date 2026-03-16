@@ -130,7 +130,7 @@ export function MilestoneRow({
   const showNewCommentForm = addingCommentId === milestone.id && !replyingToId;
 
   return (
-    <div className={`rounded-lg border bg-white transition-shadow ${isOpen ? "border-slate-300 shadow-sm" : "border-slate-200 hover:shadow-md"}`}>
+    <div className={`rounded-xl border bg-white transition-all duration-150 ${isOpen ? "border-slate-200 shadow-[0_2px_12px_0_rgba(0,0,0,0.07)]" : "border-slate-100 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)] hover:border-slate-200 hover:shadow-[0_2px_10px_0_rgba(0,0,0,0.07)]"}`}>
       <MilestoneCard
         milestone={milestone}
         updates={updates}
@@ -150,7 +150,7 @@ export function MilestoneRow({
       {/* CSS grid-rows expansion — no height measurement, no layout jump on the card header */}
       <div className={`grid transition-[grid-template-rows] duration-200 ease-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
         <div className="overflow-hidden">
-        <div className="border-t border-slate-200 px-4 py-4">
+        <div className="border-t border-slate-100 px-4 py-4">
           {openPanel === "edit" && (
             <MilestoneEditPanel
               form={editForm}

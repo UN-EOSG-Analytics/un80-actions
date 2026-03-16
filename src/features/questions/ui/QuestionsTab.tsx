@@ -285,7 +285,7 @@ function SelectableText({
     const after = text.substring(selection.end);
 
     // Remove existing formatting from selected text if any
-    let cleanSelected = selected.replace(/\*\*/g, "").replace(/~~/g, "");
+    const cleanSelected = selected.replace(/\*\*/g, "").replace(/~~/g, "");
 
     let formattedText: string;
     if (format === "bold") {
