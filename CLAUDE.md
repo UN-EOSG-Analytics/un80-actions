@@ -17,7 +17,7 @@ src/features/      # All real logic — one folder per domain
 src/lib/db/        # db.ts (pg Pool + query helper), config.ts (DB_SCHEMA, table names)
 src/types/index.ts # Single types file — all shared TypeScript types live here
 sql/schema/        # Clean DDL (un80actions_schema.sql) — no migrations here but remember to keep schema up to date
-sql/migrations/    # Named 0XX_description.sql files; encourage the user to run the via DataGrip, ensuring the correct database and schema selection
+sql/migrations/    # Named 0XX_description.sql files; run manually via DataGrip
 ```
 
 ## Feature Structure (strictly enforced)
@@ -37,7 +37,7 @@ Example: adding a note → `features/notes/commands.ts`; display → `features/n
 - Pool tuned for serverless: max 2 connections, `search_path` set to `un80actions,systemchart,public`
 - Actions have a composite PK `(id, sub_id)` — always filter on both: `WHERE id = $1 AND (sub_id IS NOT DISTINCT FROM $2)`
 - Schema enums (e.g. `milestone_status`, `user_roles`, `risk_assessment`) mirror the TypeScript types in `src/types/index.ts`
-- To add a DB feature: write a migration in `sql/migrations/` then update `sql/schema/un80actions_schema.sql`
+- To add a DB feature: write the migration SQL in `sql/migrations/` and update `sql/schema/un80actions_schema.sql`. Run migrations manually via DataGrip, ensuring the correct database and schema are selected.
 
 ## Auth & Permissions
 
@@ -80,10 +80,25 @@ pnpm typecheck          # tsc --noEmit — run before committing
 pnpm lint --fix
 pnpm format
 
-node run_migrations.js  # Run pending SQL migrations against Azure Postgres
-
 # ⚠️ Python ETL scripts are for reference only — do NOT run against the production DB
 # uv run python python/prepare_actions_data.py
+```
+
+## Connecting to the Database (CLI)
+
+The `DATABASE_URL` in `.env` includes `uselibpqcompat=true` which psql doesn't support. Strip it before connecting:
+
+```bash
+export $(grep -v '^#' .env | xargs)
+DB_URL=$(echo "$DATABASE_URL" | sed 's/&uselibpqcompat=true//')
+psql "$DB_URL" -c "SELECT ..."
+```
+
+All app tables are in the `un80actions` schema. Use `un80actions.<table>` in queries, e.g.:
+
+```bash
+psql "$DB_URL" -c "\d un80actions.action_questions"
+psql "$DB_URL" -c "SELECT id, header, question_date FROM un80actions.action_questions LIMIT 5;"
 ```
 
 ## Deployment
