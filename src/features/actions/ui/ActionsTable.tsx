@@ -266,7 +266,9 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
   searchParamsRef.current = searchParams;
 
   // Initialize filter state from URL search params
-  const [searchInput, setSearchInput] = useState(() => searchParams.get("q") ?? "");
+  const [searchInput, setSearchInput] = useState(
+    () => searchParams.get("q") ?? "",
+  );
   const [sortField, setSortField] = useState<SortField | null>(
     () => (searchParams.get("sort") as SortField | null) ?? null,
   );
@@ -276,7 +278,10 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
 
   // Column filters (multiselect - arrays)
   const [filterWP, setFilterWP] = useState<number[]>(() =>
-    searchParams.getAll("wp").map(Number).filter((n) => !isNaN(n)),
+    searchParams
+      .getAll("wp")
+      .map(Number)
+      .filter((n) => !isNaN(n)),
   );
   const [filterWPTitle, setFilterWPTitle] = useState<string[]>(() =>
     searchParams.getAll("wpt"),
@@ -284,23 +289,23 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
   const [filterAction, setFilterAction] = useState<string[]>(() =>
     searchParams.getAll("a"),
   );
-  const [filterIndicativeAction, setFilterIndicativeAction] = useState<string[]>(
-    () => searchParams.getAll("ia"),
-  );
+  const [filterIndicativeAction, setFilterIndicativeAction] = useState<
+    string[]
+  >(() => searchParams.getAll("ia"));
   const [filterWorkPackageId, setFilterWorkPackageId] = useState<string>(
     () => searchParams.get("wpid") ?? "",
   );
   const [filterRisk, setFilterRisk] = useState<string>(
     () => searchParams.get("risk") ?? "",
   );
-  const [filterDeliverablesMonth, setFilterDeliverablesMonth] = useState<number | null>(
-    () => {
-      const v = searchParams.get("dm");
-      if (!v) return null;
-      const n = Number(v);
-      return isNaN(n) ? null : n;
-    },
-  );
+  const [filterDeliverablesMonth, setFilterDeliverablesMonth] = useState<
+    number | null
+  >(() => {
+    const v = searchParams.get("dm");
+    if (!v) return null;
+    const n = Number(v);
+    return isNaN(n) ? null : n;
+  });
   const [filterIntermediateMilestones, setFilterIntermediateMilestones] =
     useState<boolean>(() => searchParams.get("im") === "1");
 
@@ -326,7 +331,8 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     filterIndicativeAction.forEach((v) => params.append("ia", v));
     if (filterWorkPackageId) params.set("wpid", filterWorkPackageId);
     if (filterRisk) params.set("risk", filterRisk);
-    if (filterDeliverablesMonth != null) params.set("dm", String(filterDeliverablesMonth));
+    if (filterDeliverablesMonth != null)
+      params.set("dm", String(filterDeliverablesMonth));
     if (filterIntermediateMilestones) params.set("im", "1");
     const qs = params.toString();
     router.replace(qs ? `?${qs}` : "?", { scroll: false });
@@ -384,7 +390,9 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
 
   const allActionLabels = useMemo(() => {
     const labels = new Set<string>();
-    allActions.forEach((a) => labels.add(actionLabel(a.action_id, a.action_sub_id)));
+    allActions.forEach((a) =>
+      labels.add(actionLabel(a.action_id, a.action_sub_id)),
+    );
     return Array.from(labels).sort((a, b) => {
       const numA = parseInt(a.replace(/[^0-9]/g, ""), 10);
       const numB = parseInt(b.replace(/[^0-9]/g, ""), 10);

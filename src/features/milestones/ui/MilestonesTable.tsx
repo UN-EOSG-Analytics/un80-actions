@@ -2,48 +2,48 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-    approveMilestoneContent,
-    requestMilestoneChanges,
-    setMilestoneAttentionToTimeline,
-    setMilestoneConfirmationNeeded,
-    setMilestoneFinalized,
-    setMilestoneNeedsOlaReview,
-    setMilestoneReviewedByOla,
-    setMilestoneToDraft,
-    updateMilestoneDocumentSubmitted,
-    updateMilestonePublicProgress,
+  approveMilestoneContent,
+  requestMilestoneChanges,
+  setMilestoneAttentionToTimeline,
+  setMilestoneConfirmationNeeded,
+  setMilestoneFinalized,
+  setMilestoneNeedsOlaReview,
+  setMilestoneReviewedByOla,
+  setMilestoneToDraft,
+  updateMilestoneDocumentSubmitted,
+  updateMilestonePublicProgress,
 } from "@/features/milestones/commands";
 import type { AllMilestonesTableRow } from "@/features/milestones/queries";
 import { formatShortDate } from "@/lib/format-date";
 import {
-    ArrowDown,
-    ArrowUp,
-    ArrowUpDown,
-    Check,
-    ChevronDown,
-    ChevronRight,
-    Filter,
-    Search,
-    X,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Filter,
+  Search,
+  X,
 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -492,18 +492,33 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
   const searchParamsRef = useRef(searchParams);
   searchParamsRef.current = searchParams;
 
-  const [searchInput, setSearchInput] = useState(() => searchParams.get("q") ?? "");
+  const [searchInput, setSearchInput] = useState(
+    () => searchParams.get("q") ?? "",
+  );
   const [sortField, setSortField] = useState<SortField>(() => {
     const v = searchParams.get("sort");
-    const valid: SortField[] = ["work_package_id", "action_id", "deadline", "milestone_type", "status", "progress", "doc_submitted"];
-    return valid.includes(v as SortField) ? (v as SortField) : "work_package_id";
+    const valid: SortField[] = [
+      "work_package_id",
+      "action_id",
+      "deadline",
+      "milestone_type",
+      "status",
+      "progress",
+      "doc_submitted",
+    ];
+    return valid.includes(v as SortField)
+      ? (v as SortField)
+      : "work_package_id";
   });
   const [sortDirection, setSortDirection] = useState<SortDirection>(() =>
     searchParams.get("dir") === "desc" ? "desc" : "asc",
   );
 
   const [filterWP, setFilterWP] = useState<number[]>(() =>
-    searchParams.getAll("wp").map(Number).filter((n) => !isNaN(n)),
+    searchParams
+      .getAll("wp")
+      .map(Number)
+      .filter((n) => !isNaN(n)),
   );
   const [filterAction, setFilterAction] = useState<string[]>(() =>
     searchParams.getAll("actions").filter(Boolean),
@@ -526,7 +541,9 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
   const [filterProgress, setFilterProgress] = useState<string[]>(() =>
     searchParams.getAll("prog").filter(Boolean),
   );
-  const [filterDesc, setFilterDesc] = useState(() => searchParams.get("desc") ?? "");
+  const [filterDesc, setFilterDesc] = useState(
+    () => searchParams.get("desc") ?? "",
+  );
 
   const [openFilters, setOpenFilters] = useState<Record<string, boolean>>({});
 
@@ -808,7 +825,9 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
         cmp =
           a.work_package_id - b.work_package_id ||
           a.action_id - b.action_id ||
-          (a.deadline ?? "9999-12-31").localeCompare(b.deadline ?? "9999-12-31");
+          (a.deadline ?? "9999-12-31").localeCompare(
+            b.deadline ?? "9999-12-31",
+          );
       } else if (sortField === "action_id") {
         cmp =
           a.action_id - b.action_id ||
@@ -829,13 +848,17 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
           (STATUS_SORT_ORDER[getStatusConfig(b).label] ?? 9);
       } else if (sortField === "progress") {
         // non-public rows sort last
-        const pa = a.is_public ? (PROGRESS_SORT_ORDER[a.public_progress ?? "in_progress"] ?? 9) : 99;
-        const pb = b.is_public ? (PROGRESS_SORT_ORDER[b.public_progress ?? "in_progress"] ?? 9) : 99;
+        const pa = a.is_public
+          ? (PROGRESS_SORT_ORDER[a.public_progress ?? "in_progress"] ?? 9)
+          : 99;
+        const pb = b.is_public
+          ? (PROGRESS_SORT_ORDER[b.public_progress ?? "in_progress"] ?? 9)
+          : 99;
         cmp = pa - pb;
       } else if (sortField === "doc_submitted") {
         // submitted=true sorts after false; public rows (no deliverable) sort last
-        const da = a.is_public ? 99 : (a.milestone_document_submitted ? 1 : 0);
-        const db = b.is_public ? 99 : (b.milestone_document_submitted ? 1 : 0);
+        const da = a.is_public ? 99 : a.milestone_document_submitted ? 1 : 0;
+        const db = b.is_public ? 99 : b.milestone_document_submitted ? 1 : 0;
         cmp = da - db;
       }
       return cmp * dir;
@@ -1004,16 +1027,18 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
       <div className="overflow-hidden overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
         <table className="w-full text-sm">
           <colgroup>
-            <col className="w-14" />        {/* WP */}
-            <col className="w-20" />        {/* Action */}
-            <col className="w-24" />        {/* Type */}
-            <col className="w-24" />        {/* Visibility */}
-            <col style={{ width: "420px" }} />{/* Description */}
-            <col className="w-32" />        {/* Deadline */}
-            <col className="w-48" />        {/* Status — widest label: "Attention to timeline" */}
-            <col className="w-36" />        {/* Progress */}
-            <col className="w-36" />        {/* Deliverable */}
-            <col className="w-8" />         {/* Chevron */}
+            <col className="w-14" /> {/* WP */}
+            <col className="w-20" /> {/* Action */}
+            <col className="w-24" /> {/* Type */}
+            <col className="w-24" /> {/* Visibility */}
+            <col style={{ width: "420px" }} />
+            {/* Description */}
+            <col className="w-32" /> {/* Deadline */}
+            <col className="w-48" />{" "}
+            {/* Status — widest label: "Attention to timeline" */}
+            <col className="w-36" /> {/* Progress */}
+            <col className="w-36" /> {/* Deliverable */}
+            <col className="w-8" /> {/* Chevron */}
           </colgroup>
           <thead className="sticky top-0 z-10">
             <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
@@ -1248,7 +1273,9 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                     filterKey="progress"
                     options={Object.keys(PROGRESS_SORT_ORDER).filter((k) =>
                       applyFiltersExcept(localRows, "progress").some(
-                        (r) => r.is_public && (r.public_progress ?? "in_progress") === k,
+                        (r) =>
+                          r.is_public &&
+                          (r.public_progress ?? "in_progress") === k,
                       ),
                     )}
                     allOptions={Object.keys(PROGRESS_SORT_ORDER)}
