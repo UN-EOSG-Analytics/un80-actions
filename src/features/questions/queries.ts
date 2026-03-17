@@ -57,7 +57,7 @@ export async function getActionQuestions(
     LEFT JOIN ${DB_SCHEMA}.users au ON q.answered_by = au.id
     LEFT JOIN ${DB_SCHEMA}.users ru ON q.content_reviewed_by = ru.id
     ${whereClause}
-    ORDER BY q.created_at DESC`,
+    ORDER BY q.question_date DESC NULLS LAST, q.created_at DESC`,
     params,
   );
 

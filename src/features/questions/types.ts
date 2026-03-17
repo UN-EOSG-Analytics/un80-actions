@@ -17,7 +17,7 @@ export interface QuestionCreateInput {
 
 export interface QuestionUpdateInput {
   header: string;
-  question_date: string; // ISO date string (YYYY-MM-DD)
+  question_date?: string | null; // ISO date string (YYYY-MM-DD), optional
   question: string;
   milestone_id?: string | null;
 }

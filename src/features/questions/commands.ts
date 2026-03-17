@@ -94,9 +94,6 @@ export async function updateQuestion(
     if (!input.header || input.header.trim().length === 0) {
       return { success: false, error: "Header cannot be empty" };
     }
-    if (!input.question_date) {
-      return { success: false, error: "Date is required" };
-    }
     if (!input.question || input.question.trim().length === 0) {
       return { success: false, error: "Question cannot be empty" };
     }
@@ -110,7 +107,7 @@ export async function updateQuestion(
      WHERE id = $5`,
       [
         input.header.trim(),
-        input.question_date,
+        input.question_date || null,
         input.question.trim(),
         input.milestone_id ?? null,
         questionId,
