@@ -122,7 +122,9 @@ export async function getRecentActivity(
     id: string;
     action_id: number;
     action_sub_id: string | null;
-    milestone_type: string;
+    serial_number: number;
+    is_public: boolean;
+    is_final: boolean;
     submitted_by_email: string | null;
     reviewed_by_email: string | null;
     approved_by_email: string | null;
@@ -134,7 +136,9 @@ export async function getRecentActivity(
       m.id,
       m.action_id,
       m.action_sub_id,
-      m.milestone_type,
+      m.serial_number,
+      m.is_public,
+      m.is_final,
       su.email as submitted_by_email,
       ru.email as reviewed_by_email,
       au.email as approved_by_email,
@@ -183,7 +187,7 @@ export async function getRecentActivity(
         type: "milestone",
         action_id: milestone.action_id,
         action_sub_id: milestone.action_sub_id,
-        title: `${milestone.milestone_type} milestone`,
+        title: `${milestone.is_public ? "Public" : "Internal"} milestone #${milestone.serial_number}${milestone.is_final ? " (Final)" : ""}`,
         description: `Milestone ${latest.type}`,
         user_email: latest.email,
         timestamp: latest.time!,

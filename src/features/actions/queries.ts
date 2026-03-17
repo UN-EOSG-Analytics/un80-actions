@@ -111,16 +111,16 @@ const ACTION_SELECT = `
      FROM action_milestones am
      WHERE am.action_id = a.id
        AND (am.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-       AND am.milestone_type = 'upcoming'
+       AND am.is_public = true
      ORDER BY am.deadline ASC NULLS LAST
      LIMIT 1
     ) as upcoming_milestone,
-    -- Delivery date (from upcoming milestone)
+    -- Delivery date (from first public milestone)
     (SELECT am.deadline::text
      FROM action_milestones am
      WHERE am.action_id = a.id
        AND (am.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-       AND am.milestone_type = 'upcoming'
+       AND am.is_public = true
      ORDER BY am.deadline ASC NULLS LAST
      LIMIT 1
     ) as delivery_date,
@@ -472,7 +472,8 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       a.is_big_ticket,
       a.risk_assessment,
       COALESCE(a.document_submitted, false) AS document_submitted,
-      m.milestone_type,
+      m.serial_number AS milestone_serial_number,
+      m.is_final AS milestone_is_final,
       m.description AS milestone_description,
       m.deadline::text AS milestone_deadline,
       m.updates AS milestone_updates,
@@ -540,7 +541,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
     JOIN actions a ON a.work_package_id = wp.id
     LEFT JOIN action_milestones m ON m.action_id = a.id
       AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-    ORDER BY wp.id, a.id, a.sub_id, m.milestone_type
+    ORDER BY wp.id, a.id, a.sub_id, m.is_public ASC, m.serial_number ASC
   `;
   const wpSelectWithoutRisk = `
     SELECT
@@ -553,7 +554,8 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       a.public_action_status,
       a.is_big_ticket,
       COALESCE(a.document_submitted, false) AS document_submitted,
-      m.milestone_type,
+      m.serial_number AS milestone_serial_number,
+      m.is_final AS milestone_is_final,
       m.description AS milestone_description,
       m.deadline::text AS milestone_deadline,
       m.updates AS milestone_updates,
@@ -561,14 +563,6 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
       m.attention_to_timeline AS milestone_attention_to_timeline,
       m.is_public AS milestone_is_public,
       COALESCE(m.milestone_document_submitted, false) AS milestone_document_submitted,
-      (SELECT EXISTS(
-         SELECT 1 FROM un80actions.action_milestones delayed_m
-         WHERE delayed_m.action_id = a.id
-           AND (delayed_m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-           AND delayed_m.deadline IS NOT NULL
-           AND delayed_m.deadline < CURRENT_DATE
-           AND COALESCE(delayed_m.milestone_document_submitted, false) = false
-       )) AS has_overdue_milestone,
       (SELECT EXISTS(
          SELECT 1 FROM un80actions.action_milestones delayed_m
          WHERE delayed_m.action_id = a.id
@@ -629,7 +623,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
     JOIN actions a ON a.work_package_id = wp.id
     LEFT JOIN action_milestones m ON m.action_id = a.id
       AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-    ORDER BY wp.id, a.id, a.sub_id, m.milestone_type
+    ORDER BY wp.id, a.id, a.sub_id, m.is_public ASC, m.serial_number ASC
   `;
 
   type WpRow = {
@@ -646,7 +640,8 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
     next_upcoming_milestone_document_submitted?: boolean | null;
     next_upcoming_milestone_deadline_month?: number | null;
     all_upcoming_milestone_months?: number[] | null;
-    milestone_type: string | null;
+    milestone_serial_number: number | null;
+    milestone_is_final: boolean | null;
     milestone_description: string | null;
     milestone_deadline: string | null;
     milestone_updates: string | null;
@@ -802,9 +797,10 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
         actionsMap.set(key, action);
         wp.actions.push(action);
       }
-      if (r.milestone_type) {
+      if (r.milestone_serial_number !== null && r.milestone_serial_number !== undefined) {
         action.milestones.push({
-          milestone_type: r.milestone_type,
+          serial_number: r.milestone_serial_number,
+          is_final: r.milestone_is_final ?? false,
           description: r.milestone_description,
           deadline: r.milestone_deadline,
           updates: r.milestone_updates,

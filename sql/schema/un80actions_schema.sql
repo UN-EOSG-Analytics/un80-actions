@@ -5,7 +5,6 @@ create type un80actions.action_tracking_status as enum (
     'No submission',
     'Confirmation needed'
 );
-create type un80actions.milestone_type as enum ('first', 'second', 'third', 'upcoming', 'final');
 create type un80actions.milestone_status as enum (
     'draft',
     'submitted',
@@ -98,8 +97,8 @@ create table if not exists un80actions.action_milestones (
     id uuid default gen_random_uuid() not null primary key,
     action_id integer not null,
     action_sub_id text default ''::text not null,
-    milestone_type un80actions.milestone_type not null,
     is_public boolean default false not null,
+    is_final boolean default false not null,
     is_draft boolean default true not null,
     is_approved boolean default false not null,
     needs_attention boolean default false not null,
@@ -137,7 +136,7 @@ create table if not exists un80actions.action_milestones (
                 )
             )
         ),
-        constraint action_milestones_action_type_key unique (action_id, action_sub_id, milestone_type),
+        constraint action_milestones_action_track_serial_unique unique (action_id, action_sub_id, is_public, serial_number),
         foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
 );
 create table if not exists un80actions.milestone_versions (

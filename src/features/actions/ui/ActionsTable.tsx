@@ -471,12 +471,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
       }
       if (filterIntermediateMilestones) {
         result = result.filter((a) =>
-          a.milestones.some(
-            (m) =>
-              m.milestone_type === "second" ||
-              m.milestone_type === "third" ||
-              m.milestone_type === "fourth",
-          ),
+          a.milestones.filter((m) => !m.is_public).length > 1,
         );
       }
       return result;
@@ -604,12 +599,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     }
     if (filterIntermediateMilestones) {
       list = list.filter((a) => {
-        return a.milestones.some(
-          (m) =>
-            m.milestone_type === "second" ||
-            m.milestone_type === "third" ||
-            m.milestone_type === "fourth",
-        );
+        return a.milestones.filter((m) => !m.is_public).length > 1;
       });
     }
     return list;
@@ -639,12 +629,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
   // Calculate intermediate milestones counter
   const intermediateMilestonesCounter = useMemo(() => {
     const actionsWithIntermediate = filteredActions.filter((a) => {
-      return a.milestones.some(
-        (m) =>
-          m.milestone_type === "second" ||
-          m.milestone_type === "third" ||
-          m.milestone_type === "fourth",
-      );
+      return a.milestones.filter((m) => !m.is_public).length > 1;
     });
     return actionsWithIntermediate.length;
   }, [filteredActions]);

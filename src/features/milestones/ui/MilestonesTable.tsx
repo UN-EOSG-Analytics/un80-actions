@@ -56,7 +56,7 @@ type SortField =
   | "work_package_id"
   | "action_id"
   | "deadline"
-  | "milestone_type"
+  | "serial_number"
   | "status"
   | "progress"
   | "doc_submitted";
@@ -91,22 +91,6 @@ const PROGRESS_SORT_ORDER: Record<string, number> = {
   in_progress: 0,
   delayed: 1,
   completed: 2,
-};
-
-const MILESTONE_TYPE_ORDER: Record<string, number> = {
-  first: 1,
-  second: 2,
-  third: 3,
-  upcoming: 4,
-  final: 5,
-};
-
-const MILESTONE_TYPE_LABELS: Record<string, string> = {
-  first: "First",
-  second: "Second",
-  third: "Third",
-  upcoming: "Upcoming",
-  final: "Final",
 };
 
 // Matches MilestoneCard's getDisplayStatus() priority order and styles
@@ -501,7 +485,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
       "work_package_id",
       "action_id",
       "deadline",
-      "milestone_type",
+      "serial_number",
       "status",
       "progress",
       "doc_submitted",
@@ -655,8 +639,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
             m(String(row.work_package_id)) ||
             m(row.work_package_title) ||
             m(actionLabel(row.action_id, row.action_sub_id)) ||
-            m(row.description ?? "") ||
-            m(MILESTONE_TYPE_LABELS[row.milestone_type] ?? ""),
+            m(row.description ?? ""),
         );
       }
       if (except !== "wp" && filterWP.length > 0)
@@ -665,8 +648,8 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
         r = r.filter((row) =>
           filterAction.includes(actionLabel(row.action_id, row.action_sub_id)),
         );
-      if (except !== "type" && filterType.length > 0)
-        r = r.filter((row) => filterType.includes(row.milestone_type));
+      if (except !== "type" && filterType.includes("Final"))
+        r = r.filter((row) => row.is_final);
       if (except !== "status" && filterStatus.length > 0)
         r = r.filter((row) =>
           filterStatus.includes(getStatusConfig(row).label),
@@ -761,19 +744,14 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
   }, [localRows]);
 
   const uniqueTypes = useMemo(() => {
-    const set = new Set(
-      applyFiltersExcept(localRows, "type").map((r) => r.milestone_type),
+    const hasFinal = applyFiltersExcept(localRows, "type").some(
+      (r) => r.is_final,
     );
-    return Array.from(set).sort(
-      (a, b) => (MILESTONE_TYPE_ORDER[a] ?? 9) - (MILESTONE_TYPE_ORDER[b] ?? 9),
-    );
+    return hasFinal ? ["Final"] : [];
   }, [localRows, applyFiltersExcept]);
 
   const allTypes = useMemo(() => {
-    const set = new Set(localRows.map((r) => r.milestone_type));
-    return Array.from(set).sort(
-      (a, b) => (MILESTONE_TYPE_ORDER[a] ?? 9) - (MILESTONE_TYPE_ORDER[b] ?? 9),
-    );
+    return localRows.some((r) => r.is_final) ? ["Final"] : [];
   }, [localRows]);
 
   const uniqueStatuses = useMemo(() => {
@@ -832,12 +810,12 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
         cmp =
           a.action_id - b.action_id ||
           (a.action_sub_id ?? "").localeCompare(b.action_sub_id ?? "") ||
-          (MILESTONE_TYPE_ORDER[a.milestone_type] ?? 9) -
-            (MILESTONE_TYPE_ORDER[b.milestone_type] ?? 9);
-      } else if (sortField === "milestone_type") {
+          (a.is_public ? 0 : 1) - (b.is_public ? 0 : 1) ||
+          a.serial_number - b.serial_number;
+      } else if (sortField === "serial_number") {
         cmp =
-          (MILESTONE_TYPE_ORDER[a.milestone_type] ?? 9) -
-          (MILESTONE_TYPE_ORDER[b.milestone_type] ?? 9);
+          (a.is_public ? 0 : 1) - (b.is_public ? 0 : 1) ||
+          a.serial_number - b.serial_number;
       } else if (sortField === "deadline") {
         cmp = (a.deadline ?? "9999-12-31").localeCompare(
           b.deadline ?? "9999-12-31",
@@ -1029,7 +1007,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
           <colgroup>
             <col className="w-14" /> {/* WP */}
             <col className="w-20" /> {/* Action */}
-            <col className="w-24" /> {/* Type */}
+            <col className="w-20" /> {/* # */}
             <col className="w-24" /> {/* Visibility */}
             <col style={{ width: "420px" }} />
             {/* Description */}
@@ -1099,17 +1077,17 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                 </div>
               </th>
 
-              {/* Type */}
+              {/* # (Serial) */}
               <th className="px-2 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
-                    onClick={() => handleSort("milestone_type")}
+                    onClick={() => handleSort("serial_number")}
                     className="inline-flex items-center uppercase hover:text-un-blue"
                   >
-                    Type
+                    #
                     <SortIcon
-                      column="milestone_type"
+                      column="serial_number"
                       sortField={sortField}
                       sortDirection={sortDirection}
                     />
@@ -1120,10 +1098,10 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                     allOptions={allTypes}
                     selected={filterType}
                     onToggle={(v) => toggle(setFilterType, v)}
-                    renderOption={(t) => MILESTONE_TYPE_LABELS[t] ?? t}
+                    renderOption={(t) => t}
                     isOpen={openFilters.type ?? false}
                     onOpenChange={(o) => setFilter("type", o)}
-                    maxWidth="w-40"
+                    maxWidth="w-32"
                   />
                 </div>
               </th>
@@ -1361,14 +1339,16 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                       </span>
                     </td>
 
-                    {/* Type */}
+                    {/* # (Serial) */}
                     <td className="px-2 py-2.5 whitespace-nowrap">
                       <span className="inline-block rounded bg-slate-100 px-1.5 py-0.5 text-xs leading-tight font-medium text-slate-500">
-                        {r.is_public
-                          ? "Public"
-                          : (MILESTONE_TYPE_LABELS[r.milestone_type] ??
-                            r.milestone_type)}
+                        #{r.serial_number}
                       </span>
+                      {r.is_final && (
+                        <span className="ml-1 inline-block rounded bg-amber-100 px-1.5 py-0.5 text-xs leading-tight font-medium text-amber-700">
+                          Final
+                        </span>
+                      )}
                     </td>
 
                     {/* Visibility */}

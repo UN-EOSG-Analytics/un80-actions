@@ -147,11 +147,9 @@ export function MilestoneCard({
 
   const currentStatus = getCurrentStatus();
 
-  // Display label: Public, First, Second, Third, or Final (as before serial numbering)
-  const milestoneLabel = milestone.is_public
-    ? "Public"
-    : milestone.milestone_type.charAt(0).toUpperCase() +
-      milestone.milestone_type.slice(1);
+  // Display label: "Public #1", "Public #2", "Internal #1", etc. with "Final" badge if is_final
+  const trackLabel = milestone.is_public ? "Public" : "Internal";
+  const milestoneLabel = `${trackLabel} #${milestone.serial_number}`;
 
   // Past due: deadline has passed (parse YYYY-MM-DD as local date to avoid timezone shift)
   const isPastDue =
@@ -204,10 +202,15 @@ export function MilestoneCard({
         style={{ gridTemplateColumns: "auto 1fr auto" }}
       >
         {/* Col 1: Type label — original square chip */}
-        <div className="pt-0.5">
+        <div className="flex flex-col items-start gap-1 pt-0.5">
           <span className="inline-block shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-xs leading-tight font-medium text-slate-500">
             {milestoneLabel}
           </span>
+          {milestone.is_final && (
+            <span className="inline-block shrink-0 rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-xs leading-tight font-medium text-amber-700">
+              Final
+            </span>
+          )}
         </div>
 
         {/* Col 2: Description + meta row */}

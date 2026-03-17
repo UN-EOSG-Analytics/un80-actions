@@ -53,7 +53,6 @@ import type {
   Action,
   ActionAttachment,
   ActionMilestone,
-  MilestoneType,
 } from "@/types";
 import { Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -98,14 +97,6 @@ const STATUS_CONFIRM_MESSAGES: Record<MilestoneStatus, string> = {
     "Mark this milestone as needing attention to timeline?",
   confirmation_needed: "Mark this milestone as needing confirmation?",
 };
-
-const MILESTONE_ORDER: MilestoneType[] = [
-  "upcoming",
-  "first",
-  "second",
-  "third",
-  "final",
-];
 
 // ---------------------------------------------------------------------------
 // Shared loading / empty states
@@ -154,8 +145,8 @@ export default function MilestonesTab({
   // ── Create form ───────────────────────────────────────────────────────────
   const [creatingNew, setCreatingNew] = useState(false);
   const [newMilestoneForm, setNewMilestoneForm] = useState<NewMilestoneForm>({
-    milestone_type: "first",
     is_public: false,
+    is_final: false,
     description: "",
     deadline: "",
   });
@@ -421,16 +412,16 @@ export default function MilestonesTab({
       const result = await createMilestone({
         action_id: action.id,
         action_sub_id: action.sub_id,
-        milestone_type: newMilestoneForm.milestone_type,
         is_public: newMilestoneForm.is_public,
+        is_final: newMilestoneForm.is_final,
         description: newMilestoneForm.description || null,
         deadline: newMilestoneForm.deadline || null,
       });
       if (result.success) {
         setCreatingNew(false);
         setNewMilestoneForm({
-          milestone_type: "first",
           is_public: false,
+          is_final: false,
           description: "",
           deadline: "",
         });
@@ -633,24 +624,13 @@ export default function MilestonesTab({
 
   // ── Derived data ──────────────────────────────────────────────────────────
 
-  const sortedByType = (list: ActionMilestone[]) =>
-    [...list].sort(
-      (a, b) =>
-        MILESTONE_ORDER.indexOf(a.milestone_type as MilestoneType) -
-        MILESTONE_ORDER.indexOf(b.milestone_type as MilestoneType),
-    );
+  const sortedBySerial = (list: ActionMilestone[]) =>
+    [...list].sort((a, b) => a.serial_number - b.serial_number);
 
-  const publicMilestones = sortedByType(milestones.filter((m) => m.is_public));
-  const privateMilestones = sortedByType(
+  const publicMilestones = sortedBySerial(milestones.filter((m) => m.is_public));
+  const privateMilestones = sortedBySerial(
     milestones.filter((m) => !m.is_public),
   );
-
-  const availableMilestoneTypes = (): MilestoneType[] => {
-    const used = milestones.map((m) => m.milestone_type);
-    return (["first", "second", "third", "final"] as MilestoneType[]).filter(
-      (t) => !used.includes(t),
-    );
-  };
 
   // ── Shared row props builder ───────────────────────────────────────────────
 
@@ -761,12 +741,12 @@ export default function MilestonesTab({
           <MilestoneRow key={m.id} {...rowProps(m)} />
         ))}
 
-        {isAdmin && !creatingNew && availableMilestoneTypes().length > 0 && (
+        {isAdmin && !creatingNew && (
           <button
             onClick={() => {
               setNewMilestoneForm({
-                milestone_type: availableMilestoneTypes()[0] ?? "first",
                 is_public: true,
+                is_final: false,
                 description: "",
                 deadline: "",
               });
@@ -810,12 +790,12 @@ export default function MilestonesTab({
           <MilestoneRow key={m.id} {...rowProps(m)} />
         ))}
 
-        {isAdmin && !creatingNew && availableMilestoneTypes().length > 0 && (
+        {isAdmin && !creatingNew && (
           <button
             onClick={() => {
               setNewMilestoneForm({
-                milestone_type: availableMilestoneTypes()[0] ?? "first",
                 is_public: false,
+                is_final: false,
                 description: "",
                 deadline: "",
               });

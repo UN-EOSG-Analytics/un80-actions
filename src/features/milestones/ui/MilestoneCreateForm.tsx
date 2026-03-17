@@ -2,12 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/DatePicker";
-import type { MilestoneType } from "@/types";
 import { Loader2, Plus } from "lucide-react";
 
 export interface NewMilestoneForm {
-  milestone_type: MilestoneType;
   is_public: boolean;
+  is_final: boolean;
   description: string;
   deadline: string;
 }
@@ -73,6 +72,20 @@ export function MilestoneCreateForm({
             disabled={saving}
             placeholder="Select deadline"
           />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            id="is_final_checkbox"
+            type="checkbox"
+            checked={form.is_final}
+            onChange={(e) => onChange({ ...form, is_final: e.target.checked })}
+            disabled={saving}
+            className="h-4 w-4 accent-un-blue"
+          />
+          <label htmlFor="is_final_checkbox" className="text-sm text-slate-600">
+            Tag as <span className="font-medium">Final Milestone</span>
+          </label>
         </div>
 
         {error && <p className="text-sm text-red-600">{error}</p>}

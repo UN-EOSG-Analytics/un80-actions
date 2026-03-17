@@ -27,8 +27,8 @@ function getMilestoneStatusLabel(m: ActionMilestone): string {
 export interface MilestoneCreateInput {
   action_id: number;
   action_sub_id?: string | null;
-  milestone_type: string;
   is_public?: boolean;
+  is_final?: boolean;
   description?: string | null;
   deadline?: string | null;
 }
@@ -69,27 +69,30 @@ export async function createMilestone(
     // action_sub_id is NOT NULL in DB; use '' when absent (e.g. internal milestones on actions without sub_id)
     const actionSubId = input.action_sub_id ?? "";
 
-    // Get next serial_number for this action (max + 1, or 1 if none exist)
+    const isPublic = input.is_public ?? false;
+    const isFinal = input.is_final ?? false;
+
+    // Get next serial_number for this action+track (max + 1, or 1 if none exist)
+    // Serial is independent per (action_id, action_sub_id, is_public) track
     const nextSerial = await query<{ next_serial: number }>(
       `SELECT COALESCE(MAX(serial_number), 0) + 1 AS next_serial
        FROM ${DB_SCHEMA}.action_milestones
-       WHERE action_id = $1 AND (action_sub_id IS NOT DISTINCT FROM $2)`,
-      [input.action_id, actionSubId],
+       WHERE action_id = $1 AND (action_sub_id IS NOT DISTINCT FROM $2) AND is_public = $3`,
+      [input.action_id, actionSubId, isPublic],
     );
     const serial_number = nextSerial[0]?.next_serial ?? 1;
 
-    const isPublic = input.is_public ?? false;
     const rows = await query<ActionMilestone>(
       `INSERT INTO ${DB_SCHEMA}.action_milestones 
-       (action_id, action_sub_id, serial_number, milestone_type, is_public, public_progress, description, deadline, status, submitted_by, submitted_by_entity)
+       (action_id, action_sub_id, serial_number, is_public, is_final, public_progress, description, deadline, status, submitted_by, submitted_by_entity)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'draft', $9, $10)
        RETURNING *`,
       [
         input.action_id,
         actionSubId,
         serial_number,
-        input.milestone_type,
         isPublic,
+        isFinal,
         isPublic ? "in_progress" : null,
         input.description || null,
         input.deadline || null,
@@ -112,7 +115,7 @@ export async function createMilestone(
     if (msg.includes("unique") || msg.includes("duplicate")) {
       return {
         success: false,
-        error: "A milestone of this type already exists for this action",
+        error: "A milestone with this serial number already exists for this action track",
       };
     }
     return {

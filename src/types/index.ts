@@ -10,8 +10,6 @@ export type ActionTrackingStatus =
   | "No submission"
   | "Confirmation needed";
 
-export type MilestoneType = "first" | "second" | "third" | "upcoming" | "final";
-
 export type MilestoneStatus =
   | "draft"
   | "submitted"
@@ -138,8 +136,8 @@ export interface ActionMilestone {
   action_id: number;
   action_sub_id: string | null;
   serial_number: number;
-  milestone_type: MilestoneType;
   is_public: boolean;
+  is_final: boolean;
   is_draft: boolean;
   is_approved: boolean;
   needs_attention: boolean;
@@ -367,13 +365,14 @@ export interface ActionResponse {
  */
 
 export interface MilestoneRow {
-  milestone_type: string;
+  serial_number: number;
+  is_public: boolean;
+  is_final: boolean;
   description: string | null;
   deadline: string | null;
   updates: string | null;
   status: string;
   attention_to_timeline: boolean;
-  is_public?: boolean;
   document_submitted?: boolean;
 }
 

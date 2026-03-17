@@ -61,10 +61,8 @@ function formatUploadDate(date: Date) {
 }
 
 function formatMilestoneLabel(milestone: ActionMilestone) {
-  return milestone.is_public
-    ? "Public"
-    : milestone.milestone_type.charAt(0).toUpperCase() +
-        milestone.milestone_type.slice(1);
+  const track = milestone.is_public ? "Public" : "Internal";
+  return `${track} #${milestone.serial_number}${milestone.is_final ? " (Final)" : ""}`;
 }
 
 // ---------------------------------------------------------------------------

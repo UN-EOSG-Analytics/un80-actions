@@ -44,8 +44,8 @@ export async function getActionMilestones(
       m.action_id,
       m.action_sub_id,
       m.serial_number,
-      m.milestone_type,
       m.is_public,
+      m.is_final,
       m.is_draft,
       m.is_approved,
       m.needs_attention,
@@ -75,13 +75,8 @@ export async function getActionMilestones(
     LEFT JOIN ${DB_SCHEMA}.users ru ON m.content_reviewed_by = ru.id
     ${whereClause.replace("action_id", "m.action_id").replace("action_sub_id", "m.action_sub_id")}
     ORDER BY
-      CASE m.milestone_type
-        WHEN 'first' THEN 1
-        WHEN 'second' THEN 2
-        WHEN 'third' THEN 3
-        WHEN 'upcoming' THEN 4
-        WHEN 'final' THEN 5
-      END,
+      m.is_public ASC,
+      m.serial_number ASC,
       m.deadline ASC NULLS LAST`,
     params,
   );
@@ -99,8 +94,8 @@ export async function getMilestoneById(
       m.action_id,
       m.action_sub_id,
       m.serial_number,
-      m.milestone_type,
       m.is_public,
+      m.is_final,
       m.is_draft,
       m.is_approved,
       m.needs_attention,
@@ -254,59 +249,66 @@ export async function getMilestoneViewTableData(): Promise<MilestoneViewRow[]> {
        LIMIT 1) AS public_needs_ola_review,
       (SELECT m.description FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND m.milestone_type = 'first'
+         AND m.is_public = false
+       ORDER BY m.serial_number ASC
        LIMIT 1) AS first_description,
       (SELECT m.deadline::text FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND m.milestone_type = 'first'
+         AND m.is_public = false
+       ORDER BY m.serial_number ASC
        LIMIT 1) AS first_deadline,
       (SELECT m.is_draft FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND m.milestone_type = 'first'
+         AND m.is_public = false
+       ORDER BY m.serial_number ASC
        LIMIT 1) AS first_is_draft,
       (SELECT m.needs_attention FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND m.milestone_type = 'first'
+         AND m.is_public = false
+       ORDER BY m.serial_number ASC
        LIMIT 1) AS first_needs_attention,
       (SELECT m.needs_ola_review FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND m.milestone_type = 'first'
+         AND m.is_public = false
+       ORDER BY m.serial_number ASC
        LIMIT 1) AS first_needs_ola_review,
       (SELECT m.finalized FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND m.milestone_type = 'first'
+         AND m.is_public = false
+       ORDER BY m.serial_number ASC
        LIMIT 1) AS first_finalized,
       (SELECT m.attention_to_timeline FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND m.milestone_type = 'first'
+         AND m.is_public = false
+       ORDER BY m.serial_number ASC
        LIMIT 1) AS first_attention_to_timeline,
       (SELECT m.description FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND m.milestone_type = 'final'
+         AND m.is_final = true
        LIMIT 1) AS final_description,
       (SELECT m.deadline::text FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND m.milestone_type = 'final'
+         AND m.is_final = true
        LIMIT 1) AS final_deadline,
       (SELECT m.is_draft FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND m.milestone_type = 'final'
+         AND m.is_final = true
        LIMIT 1) AS final_is_draft,
       (SELECT m.needs_attention FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND m.milestone_type = 'final'
+         AND m.is_final = true
        LIMIT 1) AS final_needs_attention,
       (SELECT m.needs_ola_review FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND m.milestone_type = 'final'
+         AND m.is_final = true
        LIMIT 1) AS final_needs_ola_review,
       (SELECT m.finalized FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND m.milestone_type = 'final'
+         AND m.is_final = true
        LIMIT 1) AS final_finalized,
       (SELECT m.attention_to_timeline FROM ${DB_SCHEMA}.action_milestones m
        WHERE m.action_id = a.id AND (m.action_sub_id IS NOT DISTINCT FROM a.sub_id)
-         AND m.milestone_type = 'final'
+         AND m.is_final = true
        LIMIT 1) AS final_attention_to_timeline,
       COALESCE(a.document_submitted, false) AS document_submitted
     FROM work_packages wp
@@ -390,8 +392,9 @@ export interface AllMilestonesTableRow {
   work_package_title: string;
   action_id: number;
   action_sub_id: string | null;
-  milestone_type: "first" | "second" | "third" | "upcoming" | "final";
+  serial_number: number;
   is_public: boolean;
+  is_final: boolean;
   description: string | null;
   deadline: string | null;
   // Status flags
@@ -424,8 +427,9 @@ export async function getAllMilestonesTableData(): Promise<
       wp.work_package_title,
       a.id AS action_id,
       a.sub_id AS action_sub_id,
-      m.milestone_type,
+      m.serial_number,
       m.is_public,
+      m.is_final,
       m.description,
       m.deadline::text,
       COALESCE(m.is_draft, false) AS is_draft,
@@ -447,13 +451,8 @@ export async function getAllMilestonesTableData(): Promise<
       wp.id,
       a.id,
       a.sub_id ASC NULLS FIRST,
-      CASE m.milestone_type
-        WHEN 'first' THEN 1
-        WHEN 'second' THEN 2
-        WHEN 'third' THEN 3
-        WHEN 'upcoming' THEN 4
-        WHEN 'final' THEN 5
-      END,
+      m.is_public ASC,
+      m.serial_number ASC,
       m.deadline ASC NULLS LAST
   `;
   return query<AllMilestonesTableRow>(q);
