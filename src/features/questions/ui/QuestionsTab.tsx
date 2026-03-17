@@ -601,21 +601,7 @@ export default function QuestionsTab({
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-600">
-              Notes (on questions) (optional)
-            </label>
-            <NoteEditor
-              value={newQuestion.comment}
-              onChange={(html) =>
-                setNewQuestion({ ...newQuestion, comment: html })
-              }
-              placeholder="Add any additional context or notes related to these questions..."
-              disabled={submitting}
-              minRows={2}
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">
-              Question *
+              Questions *
             </label>
             <NoteEditor
               value={newQuestion.question}
@@ -629,7 +615,22 @@ export default function QuestionsTab({
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-600">
-              Milestone (optional)
+              Notes on questions (optional)
+            </label>
+            <NoteEditor
+              value={newQuestion.comment}
+              onChange={(html) =>
+                setNewQuestion({ ...newQuestion, comment: html })
+              }
+              placeholder="Add any additional context or notes related to these questions..."
+              disabled={submitting}
+              minRows={2}
+            />
+          </div>
+          
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-600">
+              Linked Milestone (optional)
             </label>
             <Select
               value={newQuestion.milestone_id || MILESTONE_NONE_VALUE}

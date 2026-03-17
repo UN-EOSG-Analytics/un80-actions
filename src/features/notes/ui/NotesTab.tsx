@@ -236,7 +236,7 @@ export default function NotesTab({
             Add a note
           </label>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-xs font-medium text-slate-600">
               Header *
             </label>
             <Select
@@ -260,7 +260,7 @@ export default function NotesTab({
             </Select>
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-xs font-medium text-slate-600">
               Date *
             </label>
             <DatePicker
@@ -271,7 +271,7 @@ export default function NotesTab({
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-600">
+            <label className="mb-1 block text-xs font-medium text-slate-600">
               Note *
             </label>
             <NoteEditor
@@ -331,7 +331,7 @@ export default function NotesTab({
                   {isEditing ? (
                     <div className="space-y-4 p-5">
                       <div>
-                        <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                        <label className="mb-1 block text-xs font-medium text-slate-600">
                           Header *
                         </label>
                         <input
@@ -350,7 +350,7 @@ export default function NotesTab({
                         />
                       </div>
                       <div>
-                        <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                        <label className="mb-1 block text-xs font-medium text-slate-600">
                           Date *
                         </label>
                         <DatePicker
@@ -363,7 +363,7 @@ export default function NotesTab({
                         />
                       </div>
                       <div>
-                        <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                        <label className="mb-1 block text-xs font-medium text-slate-600">
                           Note *
                         </label>
                         <NoteEditor
