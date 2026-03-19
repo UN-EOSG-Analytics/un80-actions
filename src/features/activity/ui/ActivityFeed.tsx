@@ -183,7 +183,7 @@ export function ActivityFeed() {
             </Button>
           </div>
         </div>
-        <div className="max-h-[70vh] min-h-80 overflow-y-auto">
+        <div className="max-h-[70vh] min-h-80 overflow-y-auto overscroll-contain">
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-un-blue" />

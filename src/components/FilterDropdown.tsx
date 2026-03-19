@@ -144,7 +144,7 @@ export default function FilterDropdown({
 
           {/* Options List */}
           <div
-            className={`${enableSearch ? "max-h-80" : "max-h-96"} overflow-y-auto`}
+            className={`${enableSearch ? "max-h-80" : "max-h-96"} overflow-y-auto overscroll-contain`}
           >
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option) => {

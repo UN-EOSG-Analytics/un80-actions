@@ -180,7 +180,7 @@ function MultiSelectFilter<T extends string | number | boolean>({
             onClick={(e) => e.stopPropagation()}
           />
         </div>
-        <div className="max-h-64 overflow-y-auto">
+        <div className="max-h-64 overflow-y-auto overscroll-contain">
           <div className="space-y-1">
             {filteredOptions.length === 0 ? (
               <div className="px-2 py-2 text-center text-sm text-gray-400">
@@ -1040,7 +1040,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                         align="start"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <div className="max-h-64 space-y-1 overflow-y-auto">
+                        <div className="max-h-64 space-y-1 overflow-y-auto overscroll-contain">
                           <button
                             type="button"
                             onClick={() => {

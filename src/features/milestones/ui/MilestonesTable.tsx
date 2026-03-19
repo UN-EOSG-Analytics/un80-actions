@@ -381,7 +381,7 @@ function MultiSelectFilter<T extends string | number>({
             onClick={(e) => e.stopPropagation()}
           />
         </div>
-        <div className="max-h-64 overflow-y-auto">
+        <div className="max-h-64 overflow-y-auto overscroll-contain">
           <div className="space-y-1">
             {filteredOptions.length === 0 ? (
               <div className="px-2 py-2 text-center text-sm text-gray-400">
