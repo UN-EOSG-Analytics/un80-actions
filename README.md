@@ -9,12 +9,12 @@ This Dashboard is an annex to the [UN80 Initiative Action Plan](https://www.un.o
 ### Prerequisites
 
 - Node.js (v18 or higher)
-- npm
+- pnpm
 
 ### Installation
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### Development
@@ -22,7 +22,7 @@ npm install
 Run the development server:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -49,15 +49,15 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## Maintenance 
 
 ```bash
-npm run format
+pnpm format
 
-npm run lint
-npm run lint -- --fix
+pnpm lint
+pnpm lint --fix
 
-npm outdated
-npm update
+pnpm outdated
+pnpm update
 
-npm audit
+pnpm audit
 ```
 
 ## Deployment

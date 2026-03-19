@@ -15,16 +15,16 @@ UN80 Actions Dashboard — a static public Next.js site tracking UN80 Initiative
 
 - **Next.js 16** App Router, static export — no route handlers or server actions
 - **Tailwind CSS v4.1** — syntax differs significantly from v3; always consult docs
-- **shadcn/ui** — install via `npx shadcn@latest add <component>`; **never edit `src/components/ui/` directly**, create wrapper components instead. This applies unconditionally — no exceptions for styling fixes.
+- **shadcn/ui** — install via `pnpm dlx shadcn@latest add <component>`; **never edit `src/components/ui/` directly**, create wrapper components instead. This applies unconditionally — no exceptions for styling fixes.
 
 ## Developer Commands
 
 ```bash
-npm run dev        # local dev server
-npm run build      # static export to /out
-npm run lint       # ESLint
-npm run typecheck  # tsc --noEmit
-npm run format     # Prettier
+pnpm dev           # local dev server
+pnpm build         # static export to /out
+pnpm lint          # ESLint
+pnpm typecheck     # tsc --noEmit
+pnpm format        # Prettier
 uv run python python/prepare_actions_data.py  # regenerate public/data/actions.json
 ```
 
