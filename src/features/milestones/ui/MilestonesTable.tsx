@@ -1003,20 +1003,23 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
 
       {/* Table */}
       <div className="overflow-hidden overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-        <table className="w-full text-sm">
+        <table
+          className="table-fixed text-sm"
+          style={{ width: "1476px", minWidth: "1476px" }}
+        >
           <colgroup>
-            <col className="w-14" /> {/* WP */}
-            <col className="w-20" /> {/* Action */}
-            <col className="w-20" /> {/* # */}
-            <col className="w-24" /> {/* Visibility */}
-            <col style={{ width: "420px" }} />
+            <col style={{ width: "64px" }} /> {/* WP */}
+            <col style={{ width: "112px" }} /> {/* Action */}
+            <col style={{ width: "88px" }} /> {/* # */}
+            <col style={{ width: "120px" }} /> {/* Visibility */}
+            <col style={{ width: "340px" }} />
             {/* Description */}
-            <col className="w-32" /> {/* Deadline */}
-            <col className="w-48" />{" "}
+            <col style={{ width: "136px" }} /> {/* Deadline */}
+            <col style={{ width: "216px" }} />{" "}
             {/* Status — widest label: "Attention to timeline" */}
-            <col className="w-36" /> {/* Progress */}
-            <col className="w-36" /> {/* Deliverable */}
-            <col className="w-8" /> {/* Chevron */}
+            <col style={{ width: "176px" }} /> {/* Progress */}
+            <col style={{ width: "184px" }} /> {/* Deliverable */}
+            <col style={{ width: "40px" }} /> {/* Chevron */}
           </colgroup>
           <thead className="sticky top-0 z-10">
             <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
