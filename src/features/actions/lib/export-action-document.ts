@@ -1,5 +1,5 @@
 /**
- * Export action Questions, Notes, and Legal Comments as Word (.docx), PDF, or Markdown.
+ * Export action Questions, Notes, and Legal Comments as Word (.docx) or Markdown.
  * Supports tab-specific exports (only questions, only notes, or only legal comments).
  */
 
@@ -11,7 +11,6 @@ import {
   HeadingLevel,
   AlignmentType,
 } from "docx";
-import { jsPDF } from "jspdf";
 import type { Action } from "@/types";
 import type { ActionQuestion } from "@/types";
 import type { ActionNote } from "@/types";
@@ -23,7 +22,7 @@ import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
 // =========================================================
 
 export type ExportTab = "questions" | "notes" | "all";
-export type ExportFormat = "word" | "pdf" | "markdown";
+export type ExportFormat = "word" | "markdown";
 
 // =========================================================
 // HELPERS
@@ -61,14 +60,6 @@ function splitNotesOnQuestions(comment: string | null): {
     };
   }
   return { notesDateLabel: "", notesBody: trimmed };
-}
-
-function wrapPdfText(doc: jsPDF, text: string, maxWidth: number): string[] {
-  const trimmed = (text || "").trim();
-  if (!trimmed) return [];
-  return trimmed
-    .split(/\r?\n/)
-    .flatMap((line) => doc.splitTextToSize(line, maxWidth));
 }
 
 // =========================================================
@@ -355,148 +346,6 @@ export async function exportActionToWord(
 ): Promise<Blob> {
   const doc = buildWordDocument(action, tab, questions, notes, legalComments);
   return Packer.toBlob(doc);
-}
-
-// =========================================================
-// PDF
-// =========================================================
-
-const PDF_FONT = "helvetica";
-const PDF_TITLE = 16;
-const PDF_HEADING = 12;
-const PDF_BODY = 10;
-const PDF_SMALL = 9;
-const PDF_MARGIN = 20;
-const PDF_LINE_HEIGHT = 6;
-
-export function exportActionToPdf(
-  action: Action,
-  tab: ExportTab,
-  questions: ActionQuestion[],
-  notes: ActionNote[],
-  legalComments: ActionLegalComment[],
-): Blob {
-  const doc = new jsPDF({ format: "a4", unit: "mm" });
-  let y = PDF_MARGIN;
-
-  const addText = (text: string, fontSize: number, bold = false) => {
-    doc.setFontSize(fontSize);
-    doc.setFont(PDF_FONT, bold ? "bold" : "normal");
-    const lines = wrapPdfText(doc, text, 170);
-    lines.forEach((line) => {
-      if (y > 270) {
-        doc.addPage();
-        y = PDF_MARGIN;
-      }
-      doc.text(line, PDF_MARGIN, y);
-      y += PDF_LINE_HEIGHT;
-    });
-  };
-
-  const addSpace = (mm = 4) => {
-    y += mm;
-  };
-
-  // Title
-  addText(`Action ${action.action_display_id}`, PDF_TITLE, true);
-  addSpace(2);
-  addText(
-    `${action.report} · Work package ${action.work_package_number}`,
-    PDF_BODY,
-  );
-  addText(action.indicative_activity, PDF_BODY);
-  addSpace(8);
-
-  // Questions
-  if (tab === "questions" || tab === "all") {
-    addText("Questions", PDF_HEADING, true);
-    addSpace(4);
-    if (questions.length === 0) {
-      addText("No questions recorded.", PDF_BODY);
-    } else {
-      questions.forEach((q, i) => {
-        const num = i + 1;
-        const { notesDateLabel, notesBody } = splitNotesOnQuestions(
-          q.comment ?? null,
-        );
-        if (q.comment && q.comment.trim()) {
-          const notesHeader =
-            notesDateLabel !== ""
-              ? `${num}. Notes on Questions: ${notesDateLabel}`
-              : `${num}. Notes on Questions:`;
-          addText(notesHeader, PDF_BODY, true);
-          if (notesBody) addText(notesBody, PDF_BODY);
-        }
-        const headerLabel = q.header || "Unspecified";
-        const questionHeader =
-          !q.comment || !q.comment.trim()
-            ? `${num}. ${headerLabel} · ${formatQuestionDate(q.question_date)}`
-            : `${headerLabel} · ${formatQuestionDate(q.question_date)}`;
-        addText(questionHeader, PDF_BODY, true);
-        const questionPrefix = q.question.trimStart().startsWith("-")
-          ? ""
-          : "- ";
-        addText(questionPrefix + q.question, PDF_BODY);
-        if (q.subtext) addText(q.subtext, PDF_SMALL);
-        if (q.answer) {
-          addText(`Answer: ${q.answer}`, PDF_BODY);
-          if (q.answered_at || q.answered_by_email) {
-            addText(
-              `Answered ${formatDate(q.answered_at)}${q.answered_by_email ? ` by ${q.answered_by_email}` : ""}`,
-              PDF_SMALL,
-            );
-          }
-        }
-        addText(
-          `${formatDate(q.created_at)} · ${q.user_email ?? "—"}`,
-          PDF_SMALL,
-        );
-        addSpace(4);
-      });
-    }
-    addSpace(8);
-  }
-
-  // Notes
-  if (tab === "notes" || tab === "all") {
-    addText("Notes", PDF_HEADING, true);
-    addSpace(4);
-    if (notes.length === 0) {
-      addText("No notes recorded.", PDF_BODY);
-    } else {
-      notes.forEach((n, i) => {
-        addText(
-          `Note ${i + 1} · ${formatDate(n.created_at)}${n.user_email ? ` · ${n.user_email}` : ""}`,
-          PDF_BODY,
-          true,
-        );
-        addText(n.content, PDF_BODY);
-        addSpace(4);
-      });
-    }
-    addSpace(8);
-  }
-
-  // Legal Comments
-  if (tab === "all") {
-    addText("Legal Comments", PDF_HEADING, true);
-    addSpace(4);
-    if (legalComments.length === 0) {
-      addText("No legal comments recorded.", PDF_BODY);
-    } else {
-      legalComments.forEach((c, i) => {
-        addText(
-          `Comment ${i + 1} · ${formatDate(c.created_at)}${c.user_email ? ` · ${c.user_email}` : ""}`,
-          PDF_BODY,
-          true,
-        );
-        addText(c.content, PDF_BODY);
-        addSpace(4);
-      });
-    }
-  }
-
-  return doc.output("blob");
 }
 
 // =========================================================

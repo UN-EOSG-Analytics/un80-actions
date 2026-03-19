@@ -358,7 +358,7 @@ export default function QuestionsTab({
   action: Action;
   isAdmin?: boolean;
   exportProps?: {
-    onExport: (format: "word" | "pdf" | "markdown") => void;
+    onExport: (format: "word" | "markdown") => void;
     exporting: boolean;
   };
 }) {

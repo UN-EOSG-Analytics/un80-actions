@@ -11,7 +11,7 @@ import { ChevronDown, FileDown, Loader2 } from "lucide-react";
 
 export interface VersionHistoryHeaderProps {
   title: string;
-  onExport: (format: "word" | "pdf" | "markdown") => void;
+  onExport: (format: "word" | "markdown") => void;
   exporting: boolean;
   hasData?: boolean;
 }
@@ -38,7 +38,7 @@ export function VersionHistoryHeader({
             ) : (
               <FileDown className="h-4 w-4" />
             )}
-            Export
+            Export All
             <ChevronDown className="h-3.5 w-3.5" />
           </Button>
         </DropdownMenuTrigger>
@@ -48,12 +48,6 @@ export function VersionHistoryHeader({
             disabled={exporting}
           >
             Word (.docx)
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => onExport("pdf")}
-            disabled={exporting}
-          >
-            PDF
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => onExport("markdown")}

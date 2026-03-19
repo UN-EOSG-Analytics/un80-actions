@@ -10,7 +10,6 @@ import { getActionNotes } from "@/features/notes/queries";
 import { getActionLegalComments } from "@/features/legal-comments/queries";
 import {
   exportActionToWord,
-  exportActionToPdf,
   exportActionToMarkdown,
   type ExportTab,
   type ExportFormat,
@@ -227,20 +226,6 @@ export default function ActionModal({
           const a = document.createElement("a");
           a.href = url;
           a.download = `${safeName}-${tabSuffix}.docx`;
-          a.click();
-          URL.revokeObjectURL(url);
-        } else if (format === "pdf") {
-          const blob = exportActionToPdf(
-            action,
-            exportTab,
-            questions,
-            notes,
-            legalComments,
-          );
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `${safeName}-${tabSuffix}.pdf`;
           a.click();
           URL.revokeObjectURL(url);
         } else if (format === "markdown") {
