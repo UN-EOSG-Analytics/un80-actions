@@ -532,7 +532,7 @@
       "SG UNCTAD"
     ],
     "first_milestone":"The first meeting endorsed the concept note, agreed on hub list with leads, and committed to distinct value and collaboration with UN mechanisms",
-    "first_milestone_deadline":"2026-01-31",
+    "first_milestone_deadline":"2026-03-13",
     "final_milestone":"Established hubs deliver coherent, efficient UN-wide support, integrating data and knowledge for policy coherence and innovative solutions",
     "final_milestone_deadline":"2026-09-18",
     "doc_text":"As a first step, we will establish Joint Knowledge Hubs to pool knowledge on key issues spread across UN development system entities and avoid duplications. These hubs will be co-led by the best placed entities and be anchored in joint mechanisms. They will start within the UN Secretariat, be open to other UN system entities, and link to regional and Resident Coordinator offices. These hubs are not new institutions and are not coordination committees. Instead, they will leverage existing assessed resources, eliminate overlaps, link to pooled funding mechanisms, and focus on adding real value. A provisional list of key issues for hubs to address includes: climate change; science, technology and innovation; financing for development; critical minerals; trade; and regional integration.",
@@ -567,7 +567,7 @@
     "final_milestone_deadline":"2026-09-17",
     "doc_text":"We will create a pro-active mechanism to identify and channel to Member States and country teams on-demand, UN system-wide expertise, particularly from specialized agencies and non-resident entities. Over time, this will replace duplicative UN system capacities, with co-location, delegation and regular reviews to eliminate overlaps.",
     "work_package_goal":"Unified knowledge hubs and expertise on demand",
-    "action_entities":"ITU; UNDP; FAO; ICAO; ILO; UNESCO; UNIDO; WHO; WMO; ITC; UN Women; UNOPS; ECA; ECE; ESCWA; UNCTAD; DESA; EOSG (SA); ECLAC",
+    "action_entities":"ITU; UNDP; FAO; ICAO; ILO; UNESCO; UNIDO; WHO; WMO; ITC; UN Women; UNOPS; ECA; ECE; ESCWA; UNCTAD; DESA; EOSG (SA); ECLAC; UN Habitat; UNEP; DCO",
     "sub_action_details":null,
     "action_leads":[
       "SG ITU",
@@ -597,7 +597,7 @@
     "final_milestone_deadline":"2026-09-17",
     "doc_text":"We will consolidate expertise across all pillars at the regional level. Capacities on peace and security, rule of law, disarmament, demobilization and reintegration, security sector reform, small arms control, mission transitions, prevention of extremist violence, and counterterrorism will join Regional Integrated Platforms, ready for surge deployment. This will serve as an extension of the expertiseon- demand mechanism outlined in the sustainable development pillar (see paragraph 46).",
     "work_package_goal":"Unified knowledge hubs and expertise on demand",
-    "action_entities":"ITU; UNDP; FAO; ICAO; ILO; UNESCO; UNIDO; WHO; WMO; ITC; UN Women; UNOPS; ECA; ECE; ESCWA; UNCTAD; DESA; EOSG (SA); ECLAC",
+    "action_entities":"ITU; UNDP; FAO; ICAO; ILO; UNESCO; UNIDO; WHO; WMO; ITC; UN Women; UNOPS; ECA; ECE; ESCWA; UNCTAD; DESA; EOSG (SA); ECLAC; UN Habitat; UNEP; DCO",
     "sub_action_details":null,
     "action_leads":[
       "SG ITU",
@@ -849,7 +849,7 @@
       "USG OCHA",
       "DSG"
     ],
-    "first_milestone":"Action plan for the Shared Platform Initiative on four specific priorities areas the SPI under the DSG and ERC leadership mention: co‑location of RCOs and OCHA offices, establishing joined-up performance management and accountability frameworks for multi‑hatted RC\/HCs, and advancing joint strategies for transitions and advocacy in crisis‑affected settings with specific timelines for immediate implementation and progress report to the Secretary-General summarizing next steps finalized",
+    "first_milestone":"Action plan for the Shared Platform Initiative on four specific priorities areas the SPI under the DSG and ERC leadership mention: co‑location of RCOs and OCHA offices, establishing common performance management, clear accountability toward RC\/HCs and advancing joint strategies for transitions and advocacy in crisis‑affected settings with specific timelines for immediate implementation and progress report to the Secretary-General summarizing next steps finalized",
     "first_milestone_deadline":"2026-01-30",
     "final_milestone":"All initiatives rolled out and implementation finalized, as country contexts required",
     "final_milestone_deadline":"2026-07-30",
@@ -1554,7 +1554,7 @@
     "work_package_leads":[
       "CDC"
     ],
-    "first_milestone":"Revised budget instruction issued by PPBD accompanied by a political message from EOSG",
+    "first_milestone":"Revised budget instruction issued by PPBD",
     "first_milestone_deadline":"2026-01-30",
     "final_milestone":"Budget instructions for the 2028 programme plan issued with fully developed guidance on defining comparative advantage, based on lessons learned from the 2027 process",
     "final_milestone_deadline":"2026-10-31",
@@ -1582,7 +1582,7 @@
     "work_package_leads":[
       "CDC"
     ],
-    "first_milestone":"Revised budget instruction issued by PPBD accompanied by a political message from EOSG",
+    "first_milestone":"Revised budget instruction issued by PPBD",
     "first_milestone_deadline":"2026-01-31",
     "final_milestone":"Budget instructions for the 2028 programme plan issued with fully developed guidance on defining comparative advantage, based on lessons learned from the 2027 process",
     "final_milestone_deadline":"2026-10-31",
@@ -2262,10 +2262,10 @@
       "ES ECA",
       "SG UNCTAD"
     ],
-    "first_milestone":null,
-    "first_milestone_deadline":null,
-    "final_milestone":null,
-    "final_milestone_deadline":null,
+    "first_milestone":"Action members agreed on a plan to conduct a mapping exercise to: 1) identify all major activities related to macroeconomics, including reports and meetings; and 2) identify opportunities for collaboration, elimination of duplication, and streamlining of activities",
+    "first_milestone_deadline":"2026-03-03",
+    "final_milestone":"The Secretariat will present an agreed plan to Member States for consideration.",
+    "final_milestone_deadline":"2026-12-31",
     "doc_text":"We will realign macroeconomic analysis capacities across DESA, UN Trade and Development (UNCTAD), the Regional Commissions and other entities to create a unified \"single entry point\" for Member States, anchored in joint mechanisms.",
     "work_package_goal":"Unified support to people and planet",
     "action_entities":null,
@@ -2294,10 +2294,10 @@
       "ES ECA",
       "SG UNCTAD"
     ],
-    "first_milestone":null,
-    "first_milestone_deadline":null,
-    "final_milestone":null,
-    "final_milestone_deadline":null,
+    "first_milestone":"Action members agreed on a plan to conduct a mapping exercise of existing capacities across DESA, UNCTAD, OHRLLS, and the Regional Commissions to: 1) identify all major activities related to these vulnerable economies, including reports and meetings; and 2) identify areas for collaboration, elimination of duplication, and streamlining of activities",
+    "first_milestone_deadline":"2026-03-17",
+    "final_milestone":"The Secretariat will present an agreed plan to Member States for consideration.",
+    "final_milestone_deadline":"2026-09-11",
     "doc_text":"We plan to realign UN Secretariat support for least developed countries (LDCs), landlocked developing countries (LLDCs) and small island developing states (SIDS) across DESA, UNCTAD and the Office of the High Representative for LDCs, LLDCs and SIDS (OHRLLS). This realignment would strengthen and optimize organizational arrangements and support for these countries.",
     "work_package_goal":"Unified support to people and planet",
     "action_entities":null,
