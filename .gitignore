@@ -265,7 +265,6 @@ __marimo__/
 data/*
 uploads/
 *.csv
-*.json
 !vercel.json
 *.pkl
 *.parquet
