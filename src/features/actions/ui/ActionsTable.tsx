@@ -308,8 +308,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     const n = Number(v);
     return isNaN(n) ? null : n;
   });
-  const [filterIntermediateMilestones, setFilterIntermediateMilestones] =
-    useState<boolean>(() => searchParams.get("im") === "1");
 
   // Track which filter popovers are open
   const [openFilters, setOpenFilters] = useState<Record<string, boolean>>({});
@@ -335,7 +333,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     if (filterRisk) params.set("risk", filterRisk);
     if (filterDeliverablesMonth != null)
       params.set("dm", String(filterDeliverablesMonth));
-    if (filterIntermediateMilestones) params.set("im", "1");
     const qs = params.toString();
     router.replace(qs ? `?${qs}` : "?", { scroll: false });
   }, [
@@ -349,7 +346,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     filterWorkPackageId,
     filterRisk,
     filterDeliverablesMonth,
-    filterIntermediateMilestones,
     router,
   ]);
 
@@ -472,11 +468,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
           a.upcoming_milestone_months.includes(filterDeliverablesMonth),
         );
       }
-      if (filterIntermediateMilestones) {
-        result = result.filter(
-          (a) => a.milestones.filter((m) => !m.is_public).length > 1,
-        );
-      }
       return result;
     },
     [
@@ -489,7 +480,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
       filterWorkPackageId,
       filterRisk,
       filterDeliverablesMonth,
-      filterIntermediateMilestones,
     ],
   );
 
@@ -609,11 +599,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
         a.upcoming_milestone_months.includes(filterDeliverablesMonth),
       );
     }
-    if (filterIntermediateMilestones) {
-      list = list.filter((a) => {
-        return a.milestones.filter((m) => !m.is_public).length > 1;
-      });
-    }
     return list;
   }, [
     allActions,
@@ -626,7 +611,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     filterWorkPackageId,
     filterRisk,
     filterDeliverablesMonth,
-    filterIntermediateMilestones,
   ]);
 
   // Calculate deliverables counter (when month filter set, use status for that month)
@@ -637,14 +621,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     ).length;
     return { submitted, total };
   }, [filteredActions, filterDeliverablesMonth]);
-
-  // Calculate intermediate milestones counter
-  const intermediateMilestonesCounter = useMemo(() => {
-    const actionsWithIntermediate = filteredActions.filter((a) => {
-      return a.milestones.filter((m) => !m.is_public).length > 1;
-    });
-    return actionsWithIntermediate.length;
-  }, [filteredActions]);
 
   const sortedActions = useMemo(() => {
     const dir = sortDirection === "asc" ? 1 : -1;
@@ -765,8 +741,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     filterIndicativeAction.length > 0 ||
     filterWorkPackageId.length > 0 ||
     filterRisk.length > 0 ||
-    filterDeliverablesMonth != null ||
-    filterIntermediateMilestones;
+    filterDeliverablesMonth != null;
 
   const clearAllFilters = () => {
     setFilterWP([]);
@@ -776,7 +751,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     setFilterWorkPackageId("");
     setFilterRisk("");
     setFilterDeliverablesMonth(null);
-    setFilterIntermediateMilestones(false);
   };
 
   return (
@@ -826,39 +800,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
           >
             <X className="h-3.5 w-3.5" />
             Clear all filters
-          </button>
-        )}
-      </div>
-
-      {/* Intermediate Milestones Counter */}
-      <div className="flex items-center gap-2 text-sm text-gray-600">
-        <span className="font-medium">
-          Actions with intermediate milestones:
-        </span>
-        <button
-          type="button"
-          onClick={() => setFilterIntermediateMilestones((prev) => !prev)}
-          className={`font-semibold transition-colors hover:underline ${
-            filterIntermediateMilestones
-              ? "text-un-blue underline"
-              : "text-un-blue hover:text-un-blue/80"
-          }`}
-          title={
-            filterIntermediateMilestones
-              ? "Click to show all actions"
-              : "Click to filter to actions with intermediate milestones"
-          }
-        >
-          {intermediateMilestonesCounter}
-        </button>
-        {filterIntermediateMilestones && (
-          <button
-            type="button"
-            onClick={() => setFilterIntermediateMilestones(false)}
-            className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600"
-            title="Clear filter"
-          >
-            <X className="h-3 w-3" />
           </button>
         )}
       </div>
