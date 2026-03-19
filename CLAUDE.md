@@ -1,4 +1,8 @@
-You are a senior Next.js (v16) / React (v19) developer working on the **UN80 Initiative Actions Dashboard** — an internal UN tracking tool for the UN80 reform action plan
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+You are a senior Next.js (v16) / React (v19) developer working on the **UN80 Initiative Actions Dashboard** — a UN tracking tool for the UN80 reform action plan.
 
 Stack: Next.js 16 App Router, TypeScript strict, Tailwind CSS v4.1, shadcn/ui, PostgreSQL (Azure) via `pg`.
 
@@ -34,7 +38,7 @@ Example: adding a note → `features/notes/commands.ts`; display → `features/n
 
 - All tables live in the `un80actions` schema; use `DB_SCHEMA` constant from `@/lib/db/config` — never hardcode the schema name
 - Use the `query<T>()` helper from `@/lib/db/db` for all SQL — it handles pool management and connection release
-- Pool tuned for serverless: max 2 connections, `search_path` set to `un80actions,systemchart,public`
+- Pool tuned for serverless: max 1 connection, `search_path` set to `un80actions,systemchart,public`; uses PgBouncer on Azure port 6432 in transaction mode
 - Actions have a composite PK `(id, sub_id)` — always filter on both: `WHERE id = $1 AND (sub_id IS NOT DISTINCT FROM $2)`
 - Schema enums (e.g. `milestone_status`, `user_roles`, `risk_assessment`) mirror the TypeScript types in `src/types/index.ts`
 - To add a DB feature: write the migration SQL in `sql/migrations/` and update `sql/schema/un80actions_schema.sql`. Run migrations manually via DataGrip, ensuring the correct database and schema are selected.
@@ -64,7 +68,7 @@ Example: adding a note → `features/notes/commands.ts`; display → `features/n
 
 **PostgreSQL RLS**: `sql/policies/rls_policies.sql` exists but is currently empty — all access control is enforced in application-layer server actions/queries, not at the DB level. RLS is a future consideration.
 
-**Auth files**: `features/auth/service.ts` (tokens/sessions), `commands.ts` (orchestration), `mail.ts` (Resend email), `lib/permissions.ts` (role helpers).
+**Auth files**: `features/auth/service.ts` (tokens/sessions), `commands.ts` (orchestration), `mail.ts` (SMTP email), `lib/permissions.ts` (role helpers).
 
 ## Files & External Services
 
@@ -75,8 +79,9 @@ Example: adding a note → `features/notes/commands.ts`; display → `features/n
 ## Key Commands
 
 ```bash
-pnpm dev                # Dev server
-pnpm typecheck          # tsc --noEmit — run before committing
+pnpm dev:local          # Dev server (local development)
+pnpm dev                # Dev server on port 5000 (0.0.0.0) — Replit only
+pnpm typecheck          # tsc --noEmit — also runs automatically as pre-commit hook
 pnpm lint --fix
 pnpm format
 
