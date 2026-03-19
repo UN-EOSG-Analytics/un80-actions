@@ -952,76 +952,79 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
 
   return (
     <div className="space-y-3">
-      {/* Page header */}
-      <div className="flex items-end justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-gray-900">Milestones</h2>
-          <p className="mt-0.5 text-sm text-gray-500">
-            {rows.length} milestones across all actions
-          </p>
-        </div>
-        {sortedRows.length !== rows.length && (
-          <span className="mb-0.5 text-sm text-gray-400">
-            {sortedRows.length} of {rows.length} shown
-          </span>
-        )}
-      </div>
-
-      {/* Search bar */}
-      <div className="flex items-center gap-3">
-        <div className="relative">
-          <Search className="absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search milestones..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="h-9 w-80 rounded-md border border-input bg-background px-3 pl-9 text-sm outline-none focus:border-un-blue"
-          />
-          {searchInput && (
-            <button
-              type="button"
-              onClick={() => setSearchInput("")}
-              className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              <X className="h-3 w-3" />
-            </button>
+      <div className="mx-auto max-w-7xl space-y-3">
+        {/* Page header */}
+        <div className="flex items-end justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Milestones</h2>
+            <p className="mt-0.5 text-sm text-gray-500">
+              {rows.length} milestones across all actions
+            </p>
+          </div>
+          {sortedRows.length !== rows.length && (
+            <span className="mb-0.5 text-sm text-gray-400">
+              {sortedRows.length} of {rows.length} shown
+            </span>
           )}
         </div>
 
-        {hasActiveFilters && (
-          <button
-            type="button"
-            onClick={clearAllFilters}
-            className="flex h-9 items-center gap-1.5 rounded-md border border-un-blue/20 bg-un-blue/5 px-3 text-sm font-medium text-un-blue transition-colors hover:bg-un-blue/10"
-          >
-            <X className="h-3.5 w-3.5" />
-            Clear all
-          </button>
-        )}
+        {/* Search bar */}
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search className="absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search milestones..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="h-9 w-80 rounded-md border border-input bg-background px-3 pl-9 text-sm outline-none focus:border-un-blue"
+            />
+            {searchInput && (
+              <button
+                type="button"
+                onClick={() => setSearchInput("")}
+                className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
+          </div>
+
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearAllFilters}
+              className="flex h-9 items-center gap-1.5 rounded-md border border-un-blue/20 bg-un-blue/5 px-3 text-sm font-medium text-un-blue transition-colors hover:bg-un-blue/10"
+            >
+              <X className="h-3.5 w-3.5" />
+              Clear all
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-        <table
-          className="table-fixed text-sm"
-          style={{ width: "1476px", minWidth: "1476px" }}
-        >
-          <colgroup>
-            <col style={{ width: "64px" }} /> {/* WP */}
-            <col style={{ width: "112px" }} /> {/* Action */}
-            <col style={{ width: "88px" }} /> {/* # */}
-            <col style={{ width: "120px" }} /> {/* Visibility */}
-            <col style={{ width: "340px" }} />
-            {/* Description */}
-            <col style={{ width: "136px" }} /> {/* Deadline */}
-            <col style={{ width: "216px" }} />{" "}
-            {/* Status — widest label: "Attention to timeline" */}
-            <col style={{ width: "176px" }} /> {/* Progress */}
-            <col style={{ width: "184px" }} /> {/* Deliverable */}
-            <col style={{ width: "40px" }} /> {/* Chevron */}
-          </colgroup>
-          <thead className="sticky top-0 z-10">
+      <div className="overflow-x-auto">
+        <div className="mx-auto w-fit overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+          <table
+            className="table-fixed text-sm"
+            style={{ width: "1476px", minWidth: "1476px" }}
+          >
+            <colgroup>
+              <col style={{ width: "64px" }} /> {/* WP */}
+              <col style={{ width: "112px" }} /> {/* Action */}
+              <col style={{ width: "88px" }} /> {/* # */}
+              <col style={{ width: "120px" }} /> {/* Visibility */}
+              <col style={{ width: "340px" }} />
+              {/* Description */}
+              <col style={{ width: "136px" }} /> {/* Deadline */}
+              <col style={{ width: "216px" }} />{" "}
+              {/* Status — widest label: "Attention to timeline" */}
+              <col style={{ width: "176px" }} /> {/* Progress */}
+              <col style={{ width: "184px" }} /> {/* Deliverable */}
+              <col style={{ width: "40px" }} /> {/* Chevron */}
+            </colgroup>
+            <thead className="sticky top-0 z-10">
             <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
               {/* WP */}
               <th className="py-3 pr-2 pl-4 whitespace-nowrap">
@@ -1720,7 +1723,8 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
               })
             )}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
 
       {/* Status change confirm dialog */}

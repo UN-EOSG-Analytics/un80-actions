@@ -20,7 +20,7 @@ export default async function MilestonesPage() {
 
   return (
     <main className="flex-1 bg-background px-4 py-4 sm:px-6 sm:py-4">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto w-full max-w-none">
         <Suspense>
           <MilestonesTable rows={rows} />
         </Suspense>
