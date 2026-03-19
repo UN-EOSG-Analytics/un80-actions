@@ -124,6 +124,7 @@ function MultiSelectFilter<T extends string | number | boolean>({
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const hasFilter = selected.length > 0;
+  const canSelectAll = options.some((option) => !selected.includes(option));
 
   const availableSet = useMemo(() => new Set(options.map(String)), [options]);
 
@@ -219,17 +220,37 @@ function MultiSelectFilter<T extends string | number | boolean>({
             )}
           </div>
         </div>
-        {hasFilter && (
+        {(canSelectAll || hasFilter) && (
           <div className="mt-2 border-t pt-2">
-            <button
-              type="button"
-              onClick={() =>
-                allOptions.forEach((o) => selected.includes(o) && onToggle(o))
-              }
-              className="w-full text-xs text-un-blue hover:underline"
-            >
-              Clear ({selected.length})
-            </button>
+            <div className="flex items-center justify-between gap-3 text-xs">
+              <button
+                type="button"
+                onClick={() => {
+                  options.forEach((option) => {
+                    if (!selected.includes(option)) onToggle(option);
+                  });
+                }}
+                disabled={!canSelectAll}
+                className={`hover:underline ${
+                  canSelectAll
+                    ? "text-un-blue"
+                    : "cursor-default text-gray-300 no-underline"
+                }`}
+              >
+                Select all
+              </button>
+              {hasFilter && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    allOptions.forEach((o) => selected.includes(o) && onToggle(o))
+                  }
+                  className="text-un-blue hover:underline"
+                >
+                  Clear ({selected.length})
+                </button>
+              )}
+            </div>
           </div>
         )}
       </PopoverContent>
