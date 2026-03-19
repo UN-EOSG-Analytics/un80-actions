@@ -3,51 +3,51 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ACTION_STATUS } from "@/constants/actionStatus";
 import {
-    updatePublicActionStatus,
-    updateRiskAssessment,
+  updatePublicActionStatus,
+  updateRiskAssessment,
 } from "@/features/actions/commands";
 import type {
-    ActionsTableData,
-    ActionWithMilestones,
-    RiskAssessment,
+  ActionsTableData,
+  ActionWithMilestones,
+  RiskAssessment,
 } from "@/types";
 import {
-    ArrowDown,
-    ArrowUp,
-    ArrowUpDown,
-    Check,
-    ChevronRight,
-    Filter,
-    Search,
-    Send,
-    X,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Check,
+  ChevronRight,
+  Filter,
+  Search,
+  Send,
+  X,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -764,11 +764,6 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
             {allActions.length} actions
           </p>
         </div>
-        <span className="mb-0.5 text-sm text-gray-400">
-          {sortedActions.length !== allActions.length
-            ? `${sortedActions.length} of ${allActions.length} shown`
-            : null}
-        </span>
       </div>
 
       {/* Search + Filters */}
@@ -792,16 +787,25 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
             </button>
           )}
         </div>
-        {hasActiveFilters && (
-          <button
-            type="button"
-            onClick={clearAllFilters}
-            className="ml-auto flex items-center gap-1 text-sm text-un-blue hover:underline"
-          >
-            <X className="h-3.5 w-3.5" />
-            Clear all filters
-          </button>
-        )}
+        <div className="ml-auto flex flex-1 flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm">
+          {hasActiveFilters && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={clearAllFilters}
+              className="h-8 border-gray-200 whitespace-nowrap text-un-blue hover:border-un-blue/30 hover:bg-sky-50 hover:text-un-blue"
+            >
+              <X className="h-3.5 w-3.5" />
+              Clear all filters
+            </Button>
+          )}
+          {sortedActions.length !== allActions.length && (
+            <span className="ml-auto whitespace-nowrap text-gray-400">
+              {sortedActions.length} of {allActions.length} shown
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Simple Table */}
@@ -1149,9 +1153,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                             }));
                           }}
                           className={`flex h-6 w-6 items-center justify-center rounded border-0 bg-transparent p-0 transition-colors hover:bg-gray-100 ${
-                            filterRisk
-                              ? "text-un-blue"
-                              : "text-gray-400"
+                            filterRisk ? "text-un-blue" : "text-gray-400"
                           }`}
                         >
                           <Filter className="h-3.5 w-3.5" />
@@ -1173,7 +1175,9 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                               }));
                             }}
                             className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-gray-100 ${
-                              filterRisk === "" ? "font-medium text-un-blue" : ""
+                              filterRisk === ""
+                                ? "font-medium text-un-blue"
+                                : ""
                             }`}
                           >
                             <div
