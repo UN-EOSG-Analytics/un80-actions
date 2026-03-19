@@ -30,9 +30,7 @@ import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
 import type { Action, ActionQuestion, ActionMilestone } from "@/types";
 import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
-import {
-  BoldText,
-} from "@/features/shared/markdown-bold";
+import { BoldText } from "@/features/shared/markdown-bold";
 import { NoteEditor, isNoteContentEmpty } from "@/features/notes/ui/NoteEditor";
 import {
   Loader2,
@@ -623,7 +621,7 @@ export default function QuestionsTab({
               minRows={2}
             />
           </div>
-          
+
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-600">
               Linked Milestone (optional)

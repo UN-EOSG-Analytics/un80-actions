@@ -49,11 +49,7 @@ import {
   getMilestoneUpdates,
   type MilestoneUpdate,
 } from "@/features/milestones/updates-queries";
-import type {
-  Action,
-  ActionAttachment,
-  ActionMilestone,
-} from "@/types";
+import type { Action, ActionAttachment, ActionMilestone } from "@/types";
 import { Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -627,7 +623,9 @@ export default function MilestonesTab({
   const sortedBySerial = (list: ActionMilestone[]) =>
     [...list].sort((a, b) => a.serial_number - b.serial_number);
 
-  const publicMilestones = sortedBySerial(milestones.filter((m) => m.is_public));
+  const publicMilestones = sortedBySerial(
+    milestones.filter((m) => m.is_public),
+  );
   const privateMilestones = sortedBySerial(
     milestones.filter((m) => !m.is_public),
   );

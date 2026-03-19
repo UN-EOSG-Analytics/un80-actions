@@ -797,7 +797,10 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
         actionsMap.set(key, action);
         wp.actions.push(action);
       }
-      if (r.milestone_serial_number !== null && r.milestone_serial_number !== undefined) {
+      if (
+        r.milestone_serial_number !== null &&
+        r.milestone_serial_number !== undefined
+      ) {
         action.milestones.push({
           serial_number: r.milestone_serial_number,
           is_final: r.milestone_is_final ?? false,

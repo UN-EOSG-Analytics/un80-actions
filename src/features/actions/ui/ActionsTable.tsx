@@ -470,8 +470,8 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
         );
       }
       if (filterIntermediateMilestones) {
-        result = result.filter((a) =>
-          a.milestones.filter((m) => !m.is_public).length > 1,
+        result = result.filter(
+          (a) => a.milestones.filter((m) => !m.is_public).length > 1,
         );
       }
       return result;

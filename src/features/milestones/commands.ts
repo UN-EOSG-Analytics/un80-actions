@@ -115,7 +115,8 @@ export async function createMilestone(
     if (msg.includes("unique") || msg.includes("duplicate")) {
       return {
         success: false,
-        error: "A milestone with this serial number already exists for this action track",
+        error:
+          "A milestone with this serial number already exists for this action track",
       };
     }
     return {
