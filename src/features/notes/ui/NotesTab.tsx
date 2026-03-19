@@ -29,6 +29,8 @@ import {
   Pencil,
   X,
   Send,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { updateNote } from "@/features/notes/commands";
@@ -92,6 +94,8 @@ export default function NotesTab({
   });
   const [saving, setSaving] = useState(false);
   const [tagsByNoteId, setTagsByNoteId] = useState<Record<string, Tag[]>>({});
+  const [sortBy, setSortBy] = useState<"date" | "updated">("date");
+  const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
 
   const loadNotes = async () => {
     if (!isAdmin) return; // Notes are admin-only
@@ -321,7 +325,66 @@ export default function NotesTab({
           <EmptyState message="No notes have been added yet." />
         ) : (
           <div className="space-y-4">
-            {notes.map((note) => {
+            {/* Sort controls */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-slate-500">Sort by:</span>
+              <button
+                type="button"
+                onClick={() => setSortBy("date")}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                  sortBy === "date"
+                    ? "bg-un-blue text-white"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                Event date
+              </button>
+              <button
+                type="button"
+                onClick={() => setSortBy("updated")}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                  sortBy === "updated"
+                    ? "bg-un-blue text-white"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                Last edited
+              </button>
+              <div className="ml-1 h-4 w-px bg-slate-200" />
+              <button
+                type="button"
+                onClick={() => setSortDir(sortDir === "desc" ? "asc" : "desc")}
+                className="flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-200"
+                title={sortDir === "desc" ? "Newest first" : "Oldest first"}
+              >
+                {sortDir === "desc" ? (
+                  <><ArrowDown className="h-3 w-3" /> Newest first</>
+                ) : (
+                  <><ArrowUp className="h-3 w-3" /> Oldest first</>
+                )}
+              </button>
+            </div>
+            {[...notes]
+              .sort((a, b) => {
+                const dir = sortDir === "desc" ? -1 : 1;
+                if (sortBy === "updated") {
+                  return (
+                    dir *
+                    (new Date(a.updated_at ?? a.created_at).getTime() -
+                      new Date(b.updated_at ?? b.created_at).getTime())
+                  );
+                }
+                // sort by event date (note_date), nulls always last
+                if (!a.note_date && !b.note_date) return 0;
+                if (!a.note_date) return 1;
+                if (!b.note_date) return -1;
+                return (
+                  dir *
+                  (new Date(a.note_date).getTime() -
+                    new Date(b.note_date).getTime())
+                );
+              })
+              .map((note) => {
               const isEditing = editingId === note.id;
               return (
                 <div
@@ -479,9 +542,9 @@ export default function NotesTab({
                             />
                             <Button
                               type="button"
-                              variant="ghost"
+                              variant="outline"
                               size="sm"
-                              className="h-8 gap-1.5 text-slate-500 hover:bg-slate-100 hover:text-un-blue"
+                              className="h-8 gap-1.5 border-slate-300 text-slate-700 hover:border-un-blue hover:bg-un-blue/5 hover:text-un-blue"
                               onClick={() => startEditing(note)}
                               aria-label="Edit note"
                             >

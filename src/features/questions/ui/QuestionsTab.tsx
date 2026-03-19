@@ -20,6 +20,7 @@ import { getActionQuestions } from "@/features/questions/queries";
 import {
   createQuestion,
   updateQuestion,
+  updateQuestionComment,
   approveQuestion,
   deleteQuestion,
 } from "@/features/questions/commands";
@@ -41,6 +42,8 @@ import {
   X,
   Bold,
   Minus,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { useEffect, useState, useRef, useCallback } from "react";
 
@@ -383,11 +386,14 @@ export default function QuestionsTab({
     question_date: "",
     question: "",
     milestone_id: "",
+    comment: "",
   });
   const [saving, setSaving] = useState(false);
   const [tagsByQuestionId, setTagsByQuestionId] = useState<
     Record<string, Tag[]>
   >({});
+  const [sortBy, setSortBy] = useState<"date" | "updated">("date");
+  const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
   const HEADER_OPTIONS = [
     "Task Force",
     "Steering Committee",
@@ -494,6 +500,7 @@ export default function QuestionsTab({
       question_date: q.question_date || "",
       question: q.question || "",
       milestone_id: q.milestone_id || "",
+      comment: q.comment || "",
     });
     setError(null);
   };
@@ -505,6 +512,7 @@ export default function QuestionsTab({
       question_date: "",
       question: "",
       milestone_id: "",
+      comment: "",
     });
     setError(null);
   };
@@ -531,6 +539,12 @@ export default function QuestionsTab({
       });
 
       if (result.success) {
+        await updateQuestionComment(
+          editingId,
+          isNoteContentEmpty(editingQuestion.comment)
+            ? null
+            : editingQuestion.comment,
+        );
         setEditingId(null);
         await loadQuestions();
       } else {
@@ -700,30 +714,85 @@ export default function QuestionsTab({
           <EmptyState message="No questions have been asked yet." />
         ) : (
           <div className="space-y-4">
-            {questions.map((q) => {
-              const isEditing = editingId === q.id;
-              return (
-                <div
-                  key={q.id}
+            {/* Sort controls */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-slate-500">Sort by:</span>
+              <button
+                type="button"
+                onClick={() => setSortBy("date")}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                  sortBy === "date"
+                    ? "bg-un-blue text-white"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                Event date
+              </button>
+              <button
+                type="button"
+                onClick={() => setSortBy("updated")}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                  sortBy === "updated"
+                    ? "bg-un-blue text-white"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                Last edited
+              </button>
+              <div className="ml-1 h-4 w-px bg-slate-200" />
+              <button
+                type="button"
+                onClick={() => setSortDir(sortDir === "desc" ? "asc" : "desc")}
+                className="flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-200"
+                title={sortDir === "desc" ? "Newest first" : "Oldest first"}
+              >
+                {sortDir === "desc" ? (
+                  <><ArrowDown className="h-3 w-3" /> Newest first</>
+                ) : (
+                  <><ArrowUp className="h-3 w-3" /> Oldest first</>
+                )}
+              </button>
+            </div>
+            {[...questions]
+              .sort((a, b) => {
+                const dir = sortDir === "desc" ? -1 : 1;
+                if (sortBy === "updated") {
+                  return (
+                    dir *
+                    (new Date(a.updated_at ?? a.created_at ?? 0).getTime() -
+                      new Date(b.updated_at ?? b.created_at ?? 0).getTime())
+                  );
+                }
+                // sort by event date (question_date), nulls always last
+                if (!a.question_date && !b.question_date) return 0;
+                if (!a.question_date) return 1;
+                if (!b.question_date) return -1;
+                return (
+                  dir *
+                  (new Date(a.question_date).getTime() -
+                    new Date(b.question_date).getTime())
+                );
+              })
+              .map((q) => {
+                const isEditing = editingId === q.id;
+                return (
+                  <div
+                    key={q.id}
                   className={`rounded-xl border bg-white transition-all duration-150 ${isEditing ? "border-slate-200 shadow-[0_2px_12px_0_rgba(0,0,0,0.07)]" : "border-slate-100 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)] hover:border-slate-200 hover:shadow-[0_2px_10px_0_rgba(0,0,0,0.07)]"}`}
                 >
                   {/* Card content — always visible */}
-                  <div className="flex items-start justify-between gap-4 p-5">
-                    <div className="min-w-0 flex-1 space-y-4">
-                      {/* Header: category, date, milestone */}
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                  <div className="p-5 space-y-3.5">
+                    {/* Identity row: category + date + milestone | tags */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex flex-wrap items-center gap-2">
                         {q.header && (
-                          <div className="flex items-center gap-2">
-                            <span className="flex h-8 items-center justify-center rounded-lg bg-un-blue/10 px-2.5">
-                              <MessageCircle className="h-4 w-4 text-un-blue" />
-                            </span>
-                            <h4 className="text-base font-semibold tracking-tight text-slate-800">
-                              {q.header}
-                            </h4>
-                          </div>
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-un-blue/10 px-2.5 py-0.5 text-xs font-semibold text-un-blue">
+                            <MessageCircle className="h-3 w-3" />
+                            {q.header}
+                          </span>
                         )}
                         {q.question_date && (
-                          <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                          <span className="text-sm font-medium text-slate-700">
                             {formatUNDate(q.question_date)}
                           </span>
                         )}
@@ -737,7 +806,7 @@ export default function QuestionsTab({
                                 ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
                                 : `${milestone.action_id}.${milestone.serial_number}`;
                               return (
-                                <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                                <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
                                   Milestone {milestoneId}
                                 </span>
                               );
@@ -745,70 +814,102 @@ export default function QuestionsTab({
                             return null;
                           })()}
                       </div>
-                      {/* Notes on questions (if any) */}
-                      {q.comment && (
-                        <div className="rounded-lg border border-slate-200 bg-slate-50/80 px-4 py-2.5">
-                          <p className="mb-1 text-xs font-medium text-slate-500">
-                            Notes (on questions)
-                          </p>
-                          {q.comment.trim().startsWith("<") ? (
-                            <div
-                              className="prose prose-sm max-w-none text-sm leading-relaxed text-slate-700 [&_li]:my-0.5 [&_p]:my-1 [&_p]:whitespace-pre-wrap [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6"
-                              dangerouslySetInnerHTML={{ __html: q.comment }}
-                            />
-                          ) : (
-                            <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
-                              <BoldText>{q.comment}</BoldText>
-                            </p>
-                          )}
-                        </div>
-                      )}
-                      {/* Question body */}
-                      <div className="rounded-lg border border-slate-100 bg-slate-50/50 px-4 py-3">
-                        {q.question.trim().startsWith("<") ? (
+                      {/* Tags */}
+                      <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
+                        {(tagsByQuestionId[q.id] ?? []).map((t) => (
+                          <Badge
+                            key={t.id}
+                            variant="secondary"
+                            className="border-0 bg-un-blue/10 text-un-blue hover:bg-un-blue/20"
+                          >
+                            {t.name}
+                          </Badge>
+                        ))}
+                        <TagSelector
+                          entityId={q.id}
+                          entityType="question"
+                          isAdmin={isAdmin}
+                          initialTags={[]}
+                          onTagsChange={(tags) =>
+                            setTagsByQuestionId((prev) => ({
+                              ...prev,
+                              [q.id]: tags,
+                            }))
+                          }
+                          hideInlineTags
+                        />
+                      </div>
+                    </div>
+
+                    {/* Context note — secondary, left-border aside */}
+                    {q.comment && (
+                      <div className="border-l-2 border-slate-200 pl-3">
+                        <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                          Context
+                        </p>
+                        {q.comment.trim().startsWith("<") ? (
                           <div
-                            className="prose prose-sm max-w-none text-sm leading-relaxed text-slate-700 [&_li]:my-0.5 [&_p]:my-1 [&_p]:whitespace-pre-wrap [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6"
-                            dangerouslySetInnerHTML={{ __html: q.question }}
+                            className="prose prose-sm max-w-none text-sm leading-relaxed text-slate-600 [&_li]:my-0.5 [&_p]:my-1 [&_p]:whitespace-pre-wrap [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6"
+                            dangerouslySetInnerHTML={{ __html: q.comment }}
                           />
                         ) : (
-                          <SelectableText
-                            text={q.question}
-                            questionId={q.id}
-                            onUpdate={async (newText) => {
-                              setQuestions((prev) =>
-                                prev.map((qq) =>
-                                  qq.id === q.id
-                                    ? { ...qq, question: newText }
-                                    : qq,
-                                ),
-                              );
-                              await updateQuestion(q.id, {
-                                header: q.header || "",
-                                question_date: q.question_date || "",
-                                question: newText,
-                                milestone_id: q.milestone_id || null,
-                              });
-                            }}
-                            isAdmin={isAdmin}
-                          />
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-600">
+                            <BoldText>{q.comment}</BoldText>
+                          </p>
                         )}
                       </div>
-                      {q.answer && (
-                        <div className="rounded-lg border-l-4 border-green-300 bg-green-50/80 px-4 py-3">
-                          <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
-                            <BoldText>{q.answer}</BoldText>
-                          </p>
-                          {q.answered_at && (
-                            <p className="mt-2 text-xs font-medium text-slate-500">
-                              Answered {formatUNDateTime(q.answered_at)}
-                              {q.answered_by_email &&
-                                ` by ${q.answered_by_email}`}
-                            </p>
-                          )}
-                        </div>
+                    )}
+
+                    {/* Question body — primary content, clean typography */}
+                    <div>
+                      {q.question.trim().startsWith("<") ? (
+                        <div
+                          className="prose prose-sm max-w-none text-[15px] leading-relaxed text-slate-800 [&_li]:my-0.5 [&_p]:my-1 [&_p]:whitespace-pre-wrap [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6"
+                          dangerouslySetInnerHTML={{ __html: q.question }}
+                        />
+                      ) : (
+                        <SelectableText
+                          text={q.question}
+                          questionId={q.id}
+                          onUpdate={async (newText) => {
+                            setQuestions((prev) =>
+                              prev.map((qq) =>
+                                qq.id === q.id
+                                  ? { ...qq, question: newText }
+                                  : qq,
+                              ),
+                            );
+                            await updateQuestion(q.id, {
+                              header: q.header || "",
+                              question_date: q.question_date || "",
+                              question: newText,
+                              milestone_id: q.milestone_id || null,
+                            });
+                          }}
+                          isAdmin={isAdmin}
+                        />
                       )}
-                      {/* Footer: meta + actions */}
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-slate-100 pt-3">
+                    </div>
+
+                    {/* Answer */}
+                    {q.answer && (
+                      <div className="rounded-lg border-l-4 border-green-300 bg-green-50/80 px-4 py-3">
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
+                          <BoldText>{q.answer}</BoldText>
+                        </p>
+                        {q.answered_at && (
+                          <p className="mt-2 text-xs font-medium text-slate-500">
+                            Answered {formatUNDateTime(q.answered_at)}
+                            {q.answered_by_email &&
+                              ` by ${q.answered_by_email}`}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Footer: meta left · actions right */}
+                    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-slate-100 pt-3">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
                         <p className="text-xs text-slate-500">
                           <span className="font-medium text-slate-600">
                             {formatUNDateTime(q.created_at)}
@@ -834,12 +935,14 @@ export default function QuestionsTab({
                           }}
                           approving={approvingId === q.id}
                         />
+                      </div>
+                      <div className="flex shrink-0 items-center gap-1.5">
                         {!q.answer && (
                           <Button
                             type="button"
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
-                            className="h-8 gap-1.5 text-slate-500 hover:bg-slate-100 hover:text-un-blue"
+                            className="h-8 gap-1.5 border-slate-300 text-slate-700 hover:border-un-blue hover:bg-un-blue/5 hover:text-un-blue"
                             onClick={() => startEditing(q)}
                             aria-label="Edit question"
                           >
@@ -851,7 +954,7 @@ export default function QuestionsTab({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="h-8 gap-1.5 text-slate-500 hover:bg-red-50 hover:text-red-600"
+                          className="h-8 gap-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
                           onClick={() => setPendingDeleteId(q.id)}
                           disabled={deletingId === q.id}
                           aria-label="Delete question"
@@ -864,34 +967,6 @@ export default function QuestionsTab({
                           Delete
                         </Button>
                       </div>
-                    </div>
-                    <div className="flex shrink-0 flex-col items-end gap-2">
-                      {(tagsByQuestionId[q.id] ?? []).length > 0 && (
-                        <span className="flex flex-wrap justify-end gap-1.5">
-                          {(tagsByQuestionId[q.id] ?? []).map((t) => (
-                            <Badge
-                              key={t.id}
-                              variant="secondary"
-                              className="border-0 bg-un-blue/10 text-un-blue hover:bg-un-blue/20"
-                            >
-                              {t.name}
-                            </Badge>
-                          ))}
-                        </span>
-                      )}
-                      <TagSelector
-                        entityId={q.id}
-                        entityType="question"
-                        isAdmin={isAdmin}
-                        initialTags={[]}
-                        onTagsChange={(tags) =>
-                          setTagsByQuestionId((prev) => ({
-                            ...prev,
-                            [q.id]: tags,
-                          }))
-                        }
-                        hideInlineTags
-                      />
                     </div>
                   </div>
 
@@ -1005,6 +1080,23 @@ export default function QuestionsTab({
                               minRows={3}
                             />
                           </div>
+                          <div>
+                            <label className="mb-1 block text-xs font-medium text-slate-600">
+                              Context (optional)
+                            </label>
+                            <NoteEditor
+                              value={editingQuestion.comment}
+                              onChange={(html) =>
+                                setEditingQuestion({
+                                  ...editingQuestion,
+                                  comment: html,
+                                })
+                              }
+                              placeholder="Background notes or context for reviewers..."
+                              disabled={saving}
+                              minRows={3}
+                            />
+                          </div>
                           {error && (
                             <p className="text-sm text-red-600">{error}</p>
                           )}
@@ -1014,6 +1106,7 @@ export default function QuestionsTab({
                               variant="outline"
                               onClick={cancelEditing}
                               disabled={saving}
+                              className="w-28 border-slate-300 text-slate-600 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-900"
                             >
                               <X className="mr-2 h-4 w-4" /> Cancel
                             </Button>
@@ -1021,7 +1114,7 @@ export default function QuestionsTab({
                               type="button"
                               onClick={handleSaveEdit}
                               disabled={saving}
-                              className="bg-un-blue hover:bg-un-blue/90"
+                              className="w-28 border border-un-blue/80 bg-un-blue text-white hover:bg-un-blue/90"
                             >
                               {saving ? (
                                 <>
