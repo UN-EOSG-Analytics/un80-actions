@@ -3,51 +3,51 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ACTION_STATUS } from "@/constants/actionStatus";
 import {
-  updatePublicActionStatus,
-  updateRiskAssessment,
+    updatePublicActionStatus,
+    updateRiskAssessment,
 } from "@/features/actions/commands";
 import type {
-  ActionsTableData,
-  ActionWithMilestones,
-  RiskAssessment,
+    ActionsTableData,
+    ActionWithMilestones,
+    RiskAssessment,
 } from "@/types";
 import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-  Check,
-  ChevronRight,
-  Filter,
-  Search,
-  Send,
-  X,
+    ArrowDown,
+    ArrowUp,
+    ArrowUpDown,
+    Check,
+    ChevronRight,
+    Filter,
+    Search,
+    Send,
+    X,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -70,6 +70,8 @@ const RISK_OPTIONS: {
   { value: "medium_risk", label: "Medium", indicatorClass: "bg-amber-400" },
   { value: "at_risk", label: "High", indicatorClass: "bg-red-500" },
 ];
+
+const ALL_RISK_VALUES = RISK_OPTIONS.map((option) => option.value);
 
 function actionLabel(actionId: number, subId: string | null): string {
   return subId ? `${actionId}${subId}` : String(actionId);
@@ -422,6 +424,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     | "wpTitle"
     | "action"
     | "indicativeAction"
+    | "risk"
     | "deliverablesMonth";
 
   // Apply all filters except one – used to derive "connected" filter options
@@ -461,7 +464,7 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
           String(a.work_package_id).includes(filterWorkPackageId),
         );
       }
-      if (filterRisk) {
+      if (except !== "risk" && filterRisk) {
         result = result.filter((a) => a.risk_assessment === filterRisk);
       }
       if (except !== "deliverablesMonth" && filterDeliverablesMonth != null) {
@@ -528,6 +531,15 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
       if (a.indicative_action) actions.add(a.indicative_action);
     });
     return Array.from(actions).sort();
+  }, [allActions, applyFiltersExcept]);
+
+  const uniqueRiskOptions = useMemo(() => {
+    const list = applyFiltersExcept(allActions, "risk");
+    const risks = new Set<RiskAssessment>();
+    list.forEach((a) => {
+      if (a.risk_assessment) risks.add(a.risk_assessment);
+    });
+    return ALL_RISK_VALUES.filter((value) => risks.has(value));
   }, [allActions, applyFiltersExcept]);
 
   const uniqueDeliverablesMonths = useMemo(() => {
@@ -1163,18 +1175,128 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
               </th>
               {isAdmin && (
                 <th className="px-4 py-3 whitespace-nowrap">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("risk_assessment")}
-                    className="inline-flex items-center hover:text-un-blue"
-                  >
-                    RISK
-                    <SortIcon
-                      column="risk_assessment"
-                      sortField={sortField}
-                      sortDirection={sortDirection}
-                    />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleSort("risk_assessment")}
+                      className="inline-flex items-center hover:text-un-blue"
+                    >
+                      RISK
+                      <SortIcon
+                        column="risk_assessment"
+                        sortField={sortField}
+                        sortDirection={sortDirection}
+                      />
+                    </button>
+                    <Popover
+                      open={openFilters.risk || false}
+                      onOpenChange={(open) =>
+                        setOpenFilters((prev) => ({
+                          ...prev,
+                          risk: open,
+                        }))
+                      }
+                    >
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenFilters((prev) => ({
+                              ...prev,
+                              risk: !prev.risk,
+                            }));
+                          }}
+                          className={`flex h-6 w-6 items-center justify-center rounded border-0 bg-transparent p-0 transition-colors hover:bg-gray-100 ${
+                            filterRisk
+                              ? "text-un-blue"
+                              : "text-gray-400"
+                          }`}
+                        >
+                          <Filter className="h-3.5 w-3.5" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-48 p-2"
+                        align="start"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="space-y-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFilterRisk("");
+                              setOpenFilters((prev) => ({
+                                ...prev,
+                                risk: false,
+                              }));
+                            }}
+                            className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-gray-100 ${
+                              filterRisk === "" ? "font-medium text-un-blue" : ""
+                            }`}
+                          >
+                            <div
+                              className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                                filterRisk === ""
+                                  ? "border-un-blue bg-un-blue"
+                                  : "border-gray-300"
+                              }`}
+                            >
+                              {filterRisk === "" && (
+                                <Check className="h-3 w-3 text-white" />
+                              )}
+                            </div>
+                            All risk levels
+                          </button>
+                          {RISK_OPTIONS.map((option) => {
+                            const isSelected = filterRisk === option.value;
+                            const isAvailable = uniqueRiskOptions.includes(
+                              option.value,
+                            );
+
+                            return (
+                              <button
+                                key={option.value}
+                                type="button"
+                                disabled={!isAvailable && !isSelected}
+                                onClick={() => {
+                                  if (!isAvailable && !isSelected) return;
+                                  setFilterRisk(option.value);
+                                  setOpenFilters((prev) => ({
+                                    ...prev,
+                                    risk: false,
+                                  }));
+                                }}
+                                className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm ${
+                                  isSelected
+                                    ? "font-medium text-un-blue"
+                                    : isAvailable
+                                      ? "hover:bg-gray-100"
+                                      : "cursor-default opacity-35"
+                                }`}
+                              >
+                                <div
+                                  className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                                    isSelected
+                                      ? "border-un-blue bg-un-blue"
+                                      : "border-gray-300"
+                                  }`}
+                                >
+                                  {isSelected && (
+                                    <Check className="h-3 w-3 text-white" />
+                                  )}
+                                </div>
+                                <span
+                                  className={`h-2.5 w-2.5 rounded-full ${option.indicatorClass}`}
+                                />
+                                <span>{option.label}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </th>
               )}
               <th className="w-10 px-4 py-3"></th>
