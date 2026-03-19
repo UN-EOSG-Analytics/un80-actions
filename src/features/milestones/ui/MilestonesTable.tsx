@@ -1048,704 +1048,717 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
               <col style={{ width: "40px" }} /> {/* Chevron */}
             </colgroup>
             <thead className="sticky top-0 z-10">
-            <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-              {/* WP */}
-              <th className="py-3 pr-2 pl-4 whitespace-nowrap">
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("work_package_id")}
-                    className="inline-flex items-center uppercase hover:text-un-blue"
-                  >
-                    WP
-                    <SortIcon
-                      column="work_package_id"
-                      sortField={sortField}
-                      sortDirection={sortDirection}
-                    />
-                  </button>
-                  <MultiSelectFilter
-                    filterKey="wp"
-                    options={uniqueWPIds}
-                    allOptions={allWPIds}
-                    selected={filterWP}
-                    onToggle={(v) => toggle(setFilterWP, v)}
-                    renderOption={(id) => `WP ${id}`}
-                    isOpen={openFilters.wp ?? false}
-                    onOpenChange={(o) => setFilter("wp", o)}
-                    maxWidth="w-36"
-                  />
-                </div>
-              </th>
-
-              {/* Action */}
-              <th className="px-2 py-3 whitespace-nowrap">
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("action_id")}
-                    className="inline-flex items-center uppercase hover:text-un-blue"
-                  >
-                    Action
-                    <SortIcon
-                      column="action_id"
-                      sortField={sortField}
-                      sortDirection={sortDirection}
-                    />
-                  </button>
-                  <MultiSelectFilter
-                    filterKey="action"
-                    options={uniqueActions}
-                    allOptions={allActions}
-                    selected={filterAction}
-                    onToggle={(v) => toggle(setFilterAction, v)}
-                    renderOption={(a) => `Action ${a}`}
-                    isOpen={openFilters.action ?? false}
-                    onOpenChange={(o) => setFilter("action", o)}
-                  />
-                </div>
-              </th>
-
-              {/* # (Serial) */}
-              <th className="px-2 py-3 whitespace-nowrap">
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("serial_number")}
-                    className="inline-flex items-center uppercase hover:text-un-blue"
-                  >
-                    #
-                    <SortIcon
-                      column="serial_number"
-                      sortField={sortField}
-                      sortDirection={sortDirection}
-                    />
-                  </button>
-                  <MultiSelectFilter
-                    filterKey="type"
-                    options={uniqueTypes}
-                    allOptions={allTypes}
-                    selected={filterType}
-                    onToggle={(v) => toggle(setFilterType, v)}
-                    renderOption={(t) => t}
-                    isOpen={openFilters.type ?? false}
-                    onOpenChange={(o) => setFilter("type", o)}
-                    maxWidth="w-32"
-                  />
-                </div>
-              </th>
-
-              {/* Visibility */}
-              <th className="px-4 py-3 whitespace-nowrap">
-                <div className="flex items-center gap-1">
-                  <span>Visibility</span>
-                  <MultiSelectFilter
-                    filterKey="public"
-                    options={["Public", "Internal"]}
-                    allOptions={["Public", "Internal"]}
-                    selected={filterPublic}
-                    onToggle={(v) => toggle(setFilterPublic, v)}
-                    renderOption={(v) => v}
-                    isOpen={openFilters.public ?? false}
-                    onOpenChange={(o) => setFilter("public", o)}
-                    maxWidth="w-36"
-                  />
-                </div>
-              </th>
-
-              {/* Description */}
-              <th className="px-4 py-3">
-                <div className="flex items-center gap-1">
-                  <span>Description</span>
-                  <Popover
-                    open={openFilters.desc ?? false}
-                    onOpenChange={(o) => setFilter("desc", o)}
-                  >
-                    <PopoverTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setFilter("desc", !(openFilters.desc ?? false));
-                        }}
-                        className={`flex h-6 w-6 items-center justify-center rounded border-0 bg-transparent p-0 transition-colors hover:bg-gray-100 ${filterDesc.trim() ? "text-un-blue" : "text-gray-400"}`}
-                        aria-label="Filter description"
-                      >
-                        <Filter className="h-3.5 w-3.5" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="w-64 p-2"
-                      align="start"
-                      onClick={(e) => e.stopPropagation()}
+              <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                {/* WP */}
+                <th className="py-3 pr-2 pl-4 whitespace-nowrap">
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleSort("work_package_id")}
+                      className="inline-flex items-center uppercase hover:text-un-blue"
                     >
-                      <div className="relative">
-                        <input
-                          type="text"
-                          placeholder="Search description..."
-                          value={filterDesc}
-                          onChange={(e) => setFilterDesc(e.target.value)}
-                          className="h-8 w-full rounded border border-gray-200 px-2 pr-6 text-sm outline-none focus:border-un-blue"
-                          onClick={(e) => e.stopPropagation()}
-                          autoFocus
-                        />
-                        {filterDesc && (
-                          <button
-                            type="button"
-                            onClick={() => setFilterDesc("")}
-                            className="absolute top-1/2 right-1.5 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        )}
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </th>
-
-              {/* Deadline */}
-              <th className="px-4 py-3 whitespace-nowrap">
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("deadline")}
-                    className="inline-flex items-center uppercase hover:text-un-blue"
-                  >
-                    Deadline
-                    <SortIcon
-                      column="deadline"
-                      sortField={sortField}
-                      sortDirection={sortDirection}
+                      WP
+                      <SortIcon
+                        column="work_package_id"
+                        sortField={sortField}
+                        sortDirection={sortDirection}
+                      />
+                    </button>
+                    <MultiSelectFilter
+                      filterKey="wp"
+                      options={uniqueWPIds}
+                      allOptions={allWPIds}
+                      selected={filterWP}
+                      onToggle={(v) => toggle(setFilterWP, v)}
+                      renderOption={(id) => `WP ${id}`}
+                      isOpen={openFilters.wp ?? false}
+                      onOpenChange={(o) => setFilter("wp", o)}
+                      maxWidth="w-36"
                     />
-                  </button>
-                  <MultiSelectFilter
-                    filterKey="month"
-                    options={uniqueMonthKeys}
-                    allOptions={allMonthKeys}
-                    selected={filterMonth}
-                    onToggle={(v) => toggle(setFilterMonth, v)}
-                    renderOption={(k) => formatMonthLabel(k)}
-                    isOpen={openFilters.month ?? false}
-                    onOpenChange={(o) => setFilter("month", o)}
-                    maxWidth="w-44"
-                  />
-                </div>
-              </th>
+                  </div>
+                </th>
 
-              {/* Status */}
-              <th className="px-4 py-3 whitespace-nowrap">
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("status")}
-                    className="inline-flex items-center uppercase hover:text-un-blue"
-                  >
-                    Status
-                    <SortIcon
-                      column="status"
-                      sortField={sortField}
-                      sortDirection={sortDirection}
+                {/* Action */}
+                <th className="px-2 py-3 whitespace-nowrap">
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleSort("action_id")}
+                      className="inline-flex items-center uppercase hover:text-un-blue"
+                    >
+                      Action
+                      <SortIcon
+                        column="action_id"
+                        sortField={sortField}
+                        sortDirection={sortDirection}
+                      />
+                    </button>
+                    <MultiSelectFilter
+                      filterKey="action"
+                      options={uniqueActions}
+                      allOptions={allActions}
+                      selected={filterAction}
+                      onToggle={(v) => toggle(setFilterAction, v)}
+                      renderOption={(a) => `Action ${a}`}
+                      isOpen={openFilters.action ?? false}
+                      onOpenChange={(o) => setFilter("action", o)}
                     />
-                  </button>
-                  <MultiSelectFilter
-                    filterKey="status"
-                    options={[...uniqueStatuses]}
-                    allOptions={allStatuses}
-                    selected={filterStatus}
-                    onToggle={(v) => toggle(setFilterStatus, v)}
-                    renderOption={(s) => s}
-                    isOpen={openFilters.status ?? false}
-                    onOpenChange={(o) => setFilter("status", o)}
-                  />
-                </div>
-              </th>
+                  </div>
+                </th>
 
-              {/* Public Progress */}
-              <th className="px-4 py-3 whitespace-nowrap">
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("progress")}
-                    className="inline-flex items-center uppercase hover:text-un-blue"
-                  >
-                    Progress
-                    <SortIcon
-                      column="progress"
-                      sortField={sortField}
-                      sortDirection={sortDirection}
+                {/* # (Serial) */}
+                <th className="px-2 py-3 whitespace-nowrap">
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleSort("serial_number")}
+                      className="inline-flex items-center uppercase hover:text-un-blue"
+                    >
+                      #
+                      <SortIcon
+                        column="serial_number"
+                        sortField={sortField}
+                        sortDirection={sortDirection}
+                      />
+                    </button>
+                    <MultiSelectFilter
+                      filterKey="type"
+                      options={uniqueTypes}
+                      allOptions={allTypes}
+                      selected={filterType}
+                      onToggle={(v) => toggle(setFilterType, v)}
+                      renderOption={(t) => t}
+                      isOpen={openFilters.type ?? false}
+                      onOpenChange={(o) => setFilter("type", o)}
+                      maxWidth="w-32"
                     />
-                  </button>
-                  <MultiSelectFilter
-                    filterKey="progress"
-                    options={Object.keys(PROGRESS_SORT_ORDER).filter((k) =>
-                      applyFiltersExcept(localRows, "progress").some(
-                        (r) =>
-                          r.is_public &&
-                          (r.public_progress ?? "in_progress") === k,
-                      ),
-                    )}
-                    allOptions={Object.keys(PROGRESS_SORT_ORDER)}
-                    selected={filterProgress}
-                    onToggle={(v) => toggle(setFilterProgress, v)}
-                    renderOption={(v) => PUBLIC_PROGRESS_CONFIG[v]?.label ?? v}
-                    isOpen={openFilters.progress ?? false}
-                    onOpenChange={(o) => setFilter("progress", o)}
-                    maxWidth="w-40"
-                  />
-                </div>
-              </th>
+                  </div>
+                </th>
 
-              {/* Doc submitted */}
-              <th className="px-4 py-3 whitespace-nowrap">
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => handleSort("doc_submitted")}
-                    className="inline-flex items-center uppercase hover:text-un-blue"
-                  >
-                    Deliverable
-                    <SortIcon
-                      column="doc_submitted"
-                      sortField={sortField}
-                      sortDirection={sortDirection}
+                {/* Visibility */}
+                <th className="px-4 py-3 whitespace-nowrap">
+                  <div className="flex items-center gap-1">
+                    <span>Visibility</span>
+                    <MultiSelectFilter
+                      filterKey="public"
+                      options={["Public", "Internal"]}
+                      allOptions={["Public", "Internal"]}
+                      selected={filterPublic}
+                      onToggle={(v) => toggle(setFilterPublic, v)}
+                      renderOption={(v) => v}
+                      isOpen={openFilters.public ?? false}
+                      onOpenChange={(o) => setFilter("public", o)}
+                      maxWidth="w-36"
                     />
-                  </button>
-                  <MultiSelectFilter
-                    filterKey="doc"
-                    options={["Submitted", "Not submitted"]}
-                    allOptions={["Submitted", "Not submitted"]}
-                    selected={filterDoc}
-                    onToggle={(v) => toggle(setFilterDoc, v)}
-                    renderOption={(v) => v}
-                    isOpen={openFilters.doc ?? false}
-                    onOpenChange={(o) => setFilter("doc", o)}
-                    maxWidth="w-44"
-                  />
-                </div>
-              </th>
+                  </div>
+                </th>
 
-              <th className="w-8 px-3 py-3" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {sortedRows.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={10}
-                  className="px-4 py-12 text-center text-gray-400"
-                >
-                  No milestones found
-                </td>
-              </tr>
-            ) : (
-              sortedRows.map((r) => {
-                const statusConfig = getStatusConfig(r);
-                const currentStatusValue = getCurrentStatus(r);
-                const isSaving = savingId === r.milestone_id;
-                const pastDue =
-                  isPastDue(r.deadline) && !r.milestone_document_submitted;
-                const currentProgress = r.public_progress ?? "in_progress";
-                const progressConf = PUBLIC_PROGRESS_CONFIG[currentProgress];
-
-                return (
-                  <tr
-                    key={r.milestone_id}
-                    onClick={() => handleRowClick(r.action_id, r.action_sub_id)}
-                    className={`cursor-pointer transition-colors ${r.is_public ? "bg-un-blue/[3%] hover:bg-un-blue/[6%]" : "hover:bg-sky-50/50"}`}
-                  >
-                    {/* WP */}
-                    <td className="py-2.5 pr-2 pl-4 whitespace-nowrap">
-                      <span className="inline-flex items-center justify-center rounded bg-gray-100 px-1.5 py-0.5 text-sm font-medium text-gray-700 tabular-nums">
-                        {r.work_package_id}
-                      </span>
-                    </td>
-
-                    {/* Action */}
-                    <td className="px-2 py-2.5 whitespace-nowrap">
-                      <span className="inline-flex items-center justify-center rounded bg-un-blue/10 px-1.5 py-0.5 text-sm font-semibold text-un-blue tabular-nums">
-                        {actionLabel(r.action_id, r.action_sub_id)}
-                      </span>
-                    </td>
-
-                    {/* # (Serial) */}
-                    <td className="px-2 py-2.5 whitespace-nowrap">
-                      <span className="inline-block rounded bg-slate-100 px-1.5 py-0.5 text-xs leading-tight font-medium text-slate-500">
-                        #{r.serial_number}
-                      </span>
-                      {r.is_final && (
-                        <span className="ml-1 inline-block rounded bg-amber-100 px-1.5 py-0.5 text-xs leading-tight font-medium text-amber-700">
-                          Final
-                        </span>
-                      )}
-                    </td>
-
-                    {/* Visibility */}
-                    <td className="px-4 py-2.5 whitespace-nowrap">
-                      <span
-                        className={`inline-block rounded px-1.5 py-0.5 text-xs leading-tight font-medium ${r.is_public ? "bg-sky-100 text-sky-700" : "bg-slate-100 text-slate-500"}`}
-                      >
-                        {r.is_public ? "Public" : "Internal"}
-                      </span>
-                    </td>
-
-                    {/* Description */}
-                    <td className="px-4 py-2.5 align-top">
-                      {r.description ? (
-                        <p className="line-clamp-2 text-xs leading-snug text-gray-600">
-                          {r.description}
-                        </p>
-                      ) : (
-                        <span className="text-xs text-gray-400">—</span>
-                      )}
-                    </td>
-
-                    {/* Deadline */}
-                    <td className="px-4 py-2.5 whitespace-nowrap">
-                      {r.deadline ? (
-                        <span
-                          className={`flex items-center gap-1 text-sm tabular-nums ${pastDue ? "font-medium text-red-600" : "text-slate-500"}`}
+                {/* Description */}
+                <th className="px-4 py-3">
+                  <div className="flex items-center gap-1">
+                    <span>Description</span>
+                    <Popover
+                      open={openFilters.desc ?? false}
+                      onOpenChange={(o) => setFilter("desc", o)}
+                    >
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFilter("desc", !(openFilters.desc ?? false));
+                          }}
+                          className={`flex h-6 w-6 items-center justify-center rounded border-0 bg-transparent p-0 transition-colors hover:bg-gray-100 ${filterDesc.trim() ? "text-un-blue" : "text-gray-400"}`}
+                          aria-label="Filter description"
                         >
-                          {formatShortDate(r.deadline)}
-                          {pastDue && (
-                            <span
-                              className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-xs font-bold text-red-700"
-                              title="Past due"
+                          <Filter className="h-3.5 w-3.5" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-64 p-2"
+                        align="start"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="relative">
+                          <input
+                            type="text"
+                            placeholder="Search description..."
+                            value={filterDesc}
+                            onChange={(e) => setFilterDesc(e.target.value)}
+                            className="h-8 w-full rounded border border-gray-200 px-2 pr-6 text-sm outline-none focus:border-un-blue"
+                            onClick={(e) => e.stopPropagation()}
+                            autoFocus
+                          />
+                          {filterDesc && (
+                            <button
+                              type="button"
+                              onClick={() => setFilterDesc("")}
+                              className="absolute top-1/2 right-1.5 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                             >
-                              !
-                            </span>
+                              <X className="h-3 w-3" />
+                            </button>
                           )}
-                        </span>
-                      ) : (
-                        <span className="text-sm text-slate-400 italic">
-                          No deadline
-                        </span>
-                      )}
-                    </td>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </th>
 
-                    {/* Status */}
-                    <td
-                      className="px-4 py-2.5 whitespace-nowrap"
-                      onClick={(e) => e.stopPropagation()}
+                {/* Deadline */}
+                <th className="px-4 py-3 whitespace-nowrap">
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleSort("deadline")}
+                      className="inline-flex items-center uppercase hover:text-un-blue"
                     >
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            disabled={isSaving}
-                            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border ${statusConfig.pill} h-6 px-2.5 text-xs font-medium transition-opacity hover:opacity-75 disabled:opacity-50`}
+                      Deadline
+                      <SortIcon
+                        column="deadline"
+                        sortField={sortField}
+                        sortDirection={sortDirection}
+                      />
+                    </button>
+                    <MultiSelectFilter
+                      filterKey="month"
+                      options={uniqueMonthKeys}
+                      allOptions={allMonthKeys}
+                      selected={filterMonth}
+                      onToggle={(v) => toggle(setFilterMonth, v)}
+                      renderOption={(k) => formatMonthLabel(k)}
+                      isOpen={openFilters.month ?? false}
+                      onOpenChange={(o) => setFilter("month", o)}
+                      maxWidth="w-44"
+                    />
+                  </div>
+                </th>
+
+                {/* Status */}
+                <th className="px-4 py-3 whitespace-nowrap">
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleSort("status")}
+                      className="inline-flex items-center uppercase hover:text-un-blue"
+                    >
+                      Status
+                      <SortIcon
+                        column="status"
+                        sortField={sortField}
+                        sortDirection={sortDirection}
+                      />
+                    </button>
+                    <MultiSelectFilter
+                      filterKey="status"
+                      options={[...uniqueStatuses]}
+                      allOptions={allStatuses}
+                      selected={filterStatus}
+                      onToggle={(v) => toggle(setFilterStatus, v)}
+                      renderOption={(s) => s}
+                      isOpen={openFilters.status ?? false}
+                      onOpenChange={(o) => setFilter("status", o)}
+                    />
+                  </div>
+                </th>
+
+                {/* Public Progress */}
+                <th className="px-4 py-3 whitespace-nowrap">
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleSort("progress")}
+                      className="inline-flex items-center uppercase hover:text-un-blue"
+                    >
+                      Progress
+                      <SortIcon
+                        column="progress"
+                        sortField={sortField}
+                        sortDirection={sortDirection}
+                      />
+                    </button>
+                    <MultiSelectFilter
+                      filterKey="progress"
+                      options={Object.keys(PROGRESS_SORT_ORDER).filter((k) =>
+                        applyFiltersExcept(localRows, "progress").some(
+                          (r) =>
+                            r.is_public &&
+                            (r.public_progress ?? "in_progress") === k,
+                        ),
+                      )}
+                      allOptions={Object.keys(PROGRESS_SORT_ORDER)}
+                      selected={filterProgress}
+                      onToggle={(v) => toggle(setFilterProgress, v)}
+                      renderOption={(v) =>
+                        PUBLIC_PROGRESS_CONFIG[v]?.label ?? v
+                      }
+                      isOpen={openFilters.progress ?? false}
+                      onOpenChange={(o) => setFilter("progress", o)}
+                      maxWidth="w-40"
+                    />
+                  </div>
+                </th>
+
+                {/* Doc submitted */}
+                <th className="px-4 py-3 whitespace-nowrap">
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleSort("doc_submitted")}
+                      className="inline-flex items-center uppercase hover:text-un-blue"
+                    >
+                      Deliverable
+                      <SortIcon
+                        column="doc_submitted"
+                        sortField={sortField}
+                        sortDirection={sortDirection}
+                      />
+                    </button>
+                    <MultiSelectFilter
+                      filterKey="doc"
+                      options={["Submitted", "Not submitted"]}
+                      allOptions={["Submitted", "Not submitted"]}
+                      selected={filterDoc}
+                      onToggle={(v) => toggle(setFilterDoc, v)}
+                      renderOption={(v) => v}
+                      isOpen={openFilters.doc ?? false}
+                      onOpenChange={(o) => setFilter("doc", o)}
+                      maxWidth="w-44"
+                    />
+                  </div>
+                </th>
+
+                <th className="w-8 px-3 py-3" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {sortedRows.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={10}
+                    className="px-4 py-12 text-center text-gray-400"
+                  >
+                    No milestones found
+                  </td>
+                </tr>
+              ) : (
+                sortedRows.map((r) => {
+                  const statusConfig = getStatusConfig(r);
+                  const currentStatusValue = getCurrentStatus(r);
+                  const isSaving = savingId === r.milestone_id;
+                  const pastDue =
+                    isPastDue(r.deadline) && !r.milestone_document_submitted;
+                  const currentProgress = r.public_progress ?? "in_progress";
+                  const progressConf = PUBLIC_PROGRESS_CONFIG[currentProgress];
+
+                  return (
+                    <tr
+                      key={r.milestone_id}
+                      onClick={() =>
+                        handleRowClick(r.action_id, r.action_sub_id)
+                      }
+                      className={`cursor-pointer transition-colors ${r.is_public ? "bg-un-blue/[3%] hover:bg-un-blue/[6%]" : "hover:bg-sky-50/50"}`}
+                    >
+                      {/* WP */}
+                      <td className="py-2.5 pr-2 pl-4 whitespace-nowrap">
+                        <span className="inline-flex items-center justify-center rounded bg-gray-100 px-1.5 py-0.5 text-sm font-medium text-gray-700 tabular-nums">
+                          {r.work_package_id}
+                        </span>
+                      </td>
+
+                      {/* Action */}
+                      <td className="px-2 py-2.5 whitespace-nowrap">
+                        <span className="inline-flex items-center justify-center rounded bg-un-blue/10 px-1.5 py-0.5 text-sm font-semibold text-un-blue tabular-nums">
+                          {actionLabel(r.action_id, r.action_sub_id)}
+                        </span>
+                      </td>
+
+                      {/* # (Serial) */}
+                      <td className="px-2 py-2.5 whitespace-nowrap">
+                        <span className="inline-block rounded bg-slate-100 px-1.5 py-0.5 text-xs leading-tight font-medium text-slate-500">
+                          #{r.serial_number}
+                        </span>
+                        {r.is_final && (
+                          <span className="ml-1 inline-block rounded bg-amber-100 px-1.5 py-0.5 text-xs leading-tight font-medium text-amber-700">
+                            Final
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Visibility */}
+                      <td className="px-4 py-2.5 whitespace-nowrap">
+                        <span
+                          className={`inline-block rounded px-1.5 py-0.5 text-xs leading-tight font-medium ${r.is_public ? "bg-sky-100 text-sky-700" : "bg-slate-100 text-slate-500"}`}
+                        >
+                          {r.is_public ? "Public" : "Internal"}
+                        </span>
+                      </td>
+
+                      {/* Description */}
+                      <td className="px-4 py-2.5 align-top">
+                        {r.description ? (
+                          <p className="line-clamp-2 text-xs leading-snug text-gray-600">
+                            {r.description}
+                          </p>
+                        ) : (
+                          <span className="text-xs text-gray-400">—</span>
+                        )}
+                      </td>
+
+                      {/* Deadline */}
+                      <td className="px-4 py-2.5 whitespace-nowrap">
+                        {r.deadline ? (
+                          <span
+                            className={`flex items-center gap-1 text-sm tabular-nums ${pastDue ? "font-medium text-red-600" : "text-slate-500"}`}
                           >
-                            <span
-                              className={`h-1.5 w-1.5 shrink-0 rounded-full ${statusConfig.dot}`}
-                            />
-                            {statusConfig.label}
-                            <ChevronDown className="h-3 w-3 opacity-50" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-48">
-                          {r.is_public ? (
-                            <>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleStatusChange(r.milestone_id, "draft")
-                                }
-                                disabled={currentStatusValue === "draft"}
+                            {formatShortDate(r.deadline)}
+                            {pastDue && (
+                              <span
+                                className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-xs font-bold text-red-700"
+                                title="Past due"
                               >
-                                <span className="flex w-full items-center justify-between">
-                                  Draft{" "}
-                                  {currentStatusValue === "draft" && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                </span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleStatusChange(
-                                    r.milestone_id,
-                                    "needs_ola_review",
-                                  )
-                                }
-                                disabled={
-                                  currentStatusValue === "needs_ola_review"
-                                }
-                              >
-                                <span className="flex w-full items-center justify-between">
-                                  Needs OLA review{" "}
-                                  {currentStatusValue ===
-                                    "needs_ola_review" && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                </span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleStatusChange(
-                                    r.milestone_id,
-                                    "reviewed_by_ola",
-                                  )
-                                }
-                                disabled={
-                                  currentStatusValue === "reviewed_by_ola"
-                                }
-                              >
-                                <span className="flex w-full items-center justify-between">
-                                  Reviewed by OLA{" "}
-                                  {currentStatusValue === "reviewed_by_ola" && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                </span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleStatusChange(
-                                    r.milestone_id,
-                                    "finalized",
-                                  )
-                                }
-                                disabled={currentStatusValue === "finalized"}
-                              >
-                                <span className="flex w-full items-center justify-between">
-                                  Finalized{" "}
-                                  {currentStatusValue === "finalized" && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                </span>
-                              </DropdownMenuItem>
-                            </>
-                          ) : (
-                            <>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleStatusChange(r.milestone_id, "draft")
-                                }
-                                disabled={currentStatusValue === "draft"}
-                              >
-                                <span className="flex w-full items-center justify-between">
-                                  Draft{" "}
-                                  {currentStatusValue === "draft" && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                </span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleStatusChange(
-                                    r.milestone_id,
-                                    "no_submission",
-                                  )
-                                }
-                                disabled={currentStatusValue === "draft"}
-                              >
-                                <span className="flex w-full items-center justify-between">
-                                  No Submission{" "}
-                                  {currentStatusValue === "draft" && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                </span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleStatusChange(
-                                    r.milestone_id,
-                                    "needs_attention",
-                                  )
-                                }
-                                disabled={
-                                  currentStatusValue === "needs_attention"
-                                }
-                              >
-                                <span className="flex w-full items-center justify-between">
-                                  Needs Attention{" "}
-                                  {currentStatusValue === "needs_attention" && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                </span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleStatusChange(
-                                    r.milestone_id,
-                                    "attention_to_timeline",
-                                  )
-                                }
-                                disabled={
-                                  currentStatusValue === "attention_to_timeline"
-                                }
-                              >
-                                <span className="flex w-full items-center justify-between">
-                                  Attention to timeline{" "}
-                                  {currentStatusValue ===
-                                    "attention_to_timeline" && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                </span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleStatusChange(
-                                    r.milestone_id,
-                                    "confirmation_needed",
-                                  )
-                                }
-                                disabled={
-                                  currentStatusValue === "confirmation_needed"
-                                }
-                              >
-                                <span className="flex w-full items-center justify-between">
-                                  Confirmation needed{" "}
-                                  {currentStatusValue ===
-                                    "confirmation_needed" && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                </span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleStatusChange(r.milestone_id, "approved")
-                                }
-                                disabled={currentStatusValue === "approved"}
-                              >
-                                <span className="flex w-full items-center justify-between">
-                                  Approved{" "}
-                                  {currentStatusValue === "approved" && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                </span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleStatusChange(
-                                    r.milestone_id,
-                                    "finalized",
-                                  )
-                                }
-                                disabled={currentStatusValue === "finalized"}
-                              >
-                                <span className="flex w-full items-center justify-between">
-                                  Finalized{" "}
-                                  {currentStatusValue === "finalized" && (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                </span>
-                              </DropdownMenuItem>
-                            </>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
+                                !
+                              </span>
+                            )}
+                          </span>
+                        ) : (
+                          <span className="text-sm text-slate-400 italic">
+                            No deadline
+                          </span>
+                        )}
+                      </td>
 
-                    {/* Public Progress */}
-                    <td
-                      className="px-4 py-2.5 whitespace-nowrap"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {r.is_public ? (
+                      {/* Status */}
+                      <td
+                        className="px-4 py-2.5 whitespace-nowrap"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <button
                               disabled={isSaving}
-                              className={`inline-flex h-6 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-xs font-medium transition-opacity hover:opacity-75 disabled:opacity-50 ${progressConf.pill}`}
+                              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border ${statusConfig.pill} h-6 px-2.5 text-xs font-medium transition-opacity hover:opacity-75 disabled:opacity-50`}
                             >
                               <span
-                                className={`h-1.5 w-1.5 shrink-0 rounded-full ${progressConf.dot}`}
+                                className={`h-1.5 w-1.5 shrink-0 rounded-full ${statusConfig.dot}`}
                               />
-                              {progressConf.label}
+                              {statusConfig.label}
                               <ChevronDown className="h-3 w-3 opacity-50" />
                             </button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start" className="w-36">
-                            {(
-                              ["completed", "in_progress", "delayed"] as const
-                            ).map((v) => (
+                          <DropdownMenuContent align="start" className="w-48">
+                            {r.is_public ? (
+                              <>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleStatusChange(r.milestone_id, "draft")
+                                  }
+                                  disabled={currentStatusValue === "draft"}
+                                >
+                                  <span className="flex w-full items-center justify-between">
+                                    Draft{" "}
+                                    {currentStatusValue === "draft" && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                  </span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      r.milestone_id,
+                                      "needs_ola_review",
+                                    )
+                                  }
+                                  disabled={
+                                    currentStatusValue === "needs_ola_review"
+                                  }
+                                >
+                                  <span className="flex w-full items-center justify-between">
+                                    Needs OLA review{" "}
+                                    {currentStatusValue ===
+                                      "needs_ola_review" && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                  </span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      r.milestone_id,
+                                      "reviewed_by_ola",
+                                    )
+                                  }
+                                  disabled={
+                                    currentStatusValue === "reviewed_by_ola"
+                                  }
+                                >
+                                  <span className="flex w-full items-center justify-between">
+                                    Reviewed by OLA{" "}
+                                    {currentStatusValue ===
+                                      "reviewed_by_ola" && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                  </span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      r.milestone_id,
+                                      "finalized",
+                                    )
+                                  }
+                                  disabled={currentStatusValue === "finalized"}
+                                >
+                                  <span className="flex w-full items-center justify-between">
+                                    Finalized{" "}
+                                    {currentStatusValue === "finalized" && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                  </span>
+                                </DropdownMenuItem>
+                              </>
+                            ) : (
+                              <>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleStatusChange(r.milestone_id, "draft")
+                                  }
+                                  disabled={currentStatusValue === "draft"}
+                                >
+                                  <span className="flex w-full items-center justify-between">
+                                    Draft{" "}
+                                    {currentStatusValue === "draft" && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                  </span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      r.milestone_id,
+                                      "no_submission",
+                                    )
+                                  }
+                                  disabled={currentStatusValue === "draft"}
+                                >
+                                  <span className="flex w-full items-center justify-between">
+                                    No Submission{" "}
+                                    {currentStatusValue === "draft" && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                  </span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      r.milestone_id,
+                                      "needs_attention",
+                                    )
+                                  }
+                                  disabled={
+                                    currentStatusValue === "needs_attention"
+                                  }
+                                >
+                                  <span className="flex w-full items-center justify-between">
+                                    Needs Attention{" "}
+                                    {currentStatusValue ===
+                                      "needs_attention" && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                  </span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      r.milestone_id,
+                                      "attention_to_timeline",
+                                    )
+                                  }
+                                  disabled={
+                                    currentStatusValue ===
+                                    "attention_to_timeline"
+                                  }
+                                >
+                                  <span className="flex w-full items-center justify-between">
+                                    Attention to timeline{" "}
+                                    {currentStatusValue ===
+                                      "attention_to_timeline" && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                  </span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      r.milestone_id,
+                                      "confirmation_needed",
+                                    )
+                                  }
+                                  disabled={
+                                    currentStatusValue === "confirmation_needed"
+                                  }
+                                >
+                                  <span className="flex w-full items-center justify-between">
+                                    Confirmation needed{" "}
+                                    {currentStatusValue ===
+                                      "confirmation_needed" && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                  </span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      r.milestone_id,
+                                      "approved",
+                                    )
+                                  }
+                                  disabled={currentStatusValue === "approved"}
+                                >
+                                  <span className="flex w-full items-center justify-between">
+                                    Approved{" "}
+                                    {currentStatusValue === "approved" && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                  </span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      r.milestone_id,
+                                      "finalized",
+                                    )
+                                  }
+                                  disabled={currentStatusValue === "finalized"}
+                                >
+                                  <span className="flex w-full items-center justify-between">
+                                    Finalized{" "}
+                                    {currentStatusValue === "finalized" && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                  </span>
+                                </DropdownMenuItem>
+                              </>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+
+                      {/* Public Progress */}
+                      <td
+                        className="px-4 py-2.5 whitespace-nowrap"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {r.is_public ? (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                disabled={isSaving}
+                                className={`inline-flex h-6 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-xs font-medium transition-opacity hover:opacity-75 disabled:opacity-50 ${progressConf.pill}`}
+                              >
+                                <span
+                                  className={`h-1.5 w-1.5 shrink-0 rounded-full ${progressConf.dot}`}
+                                />
+                                {progressConf.label}
+                                <ChevronDown className="h-3 w-3 opacity-50" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start" className="w-36">
+                              {(
+                                ["completed", "in_progress", "delayed"] as const
+                              ).map((v) => (
+                                <DropdownMenuItem
+                                  key={v}
+                                  onClick={() =>
+                                    handlePublicProgressChange(
+                                      r.milestone_id,
+                                      v,
+                                    )
+                                  }
+                                  disabled={currentProgress === v}
+                                >
+                                  <span className="flex w-full items-center justify-between">
+                                    {PUBLIC_PROGRESS_CONFIG[v].label}
+                                    {currentProgress === v && (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                  </span>
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        ) : (
+                          <span className="text-sm text-slate-300">—</span>
+                        )}
+                      </td>
+
+                      {/* Doc submitted */}
+                      <td
+                        className="px-4 py-2.5 whitespace-nowrap"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {!r.is_public ? (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                disabled={isSaving}
+                                className={`inline-flex h-6 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-xs font-medium transition-opacity hover:opacity-75 disabled:opacity-50 ${
+                                  r.milestone_document_submitted
+                                    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                                    : "border-slate-200 bg-slate-50 text-slate-500"
+                                }`}
+                              >
+                                <span
+                                  className={`h-1.5 w-1.5 shrink-0 rounded-full ${r.milestone_document_submitted ? "bg-emerald-500" : "bg-slate-300"}`}
+                                />
+                                {r.milestone_document_submitted
+                                  ? "Submitted"
+                                  : "Not submitted"}
+                                <ChevronDown className="h-3 w-3 opacity-50" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start" className="w-40">
                               <DropdownMenuItem
-                                key={v}
                                 onClick={() =>
-                                  handlePublicProgressChange(r.milestone_id, v)
+                                  handleDocChange(r.milestone_id, false)
                                 }
-                                disabled={currentProgress === v}
+                                disabled={!r.milestone_document_submitted}
                               >
                                 <span className="flex w-full items-center justify-between">
-                                  {PUBLIC_PROGRESS_CONFIG[v].label}
-                                  {currentProgress === v && (
+                                  Not submitted{" "}
+                                  {!r.milestone_document_submitted && (
                                     <Check className="h-3 w-3" />
                                   )}
                                 </span>
                               </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      ) : (
-                        <span className="text-sm text-slate-300">—</span>
-                      )}
-                    </td>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleDocChange(r.milestone_id, true)
+                                }
+                                disabled={r.milestone_document_submitted}
+                              >
+                                <span className="flex w-full items-center justify-between">
+                                  Submitted{" "}
+                                  {r.milestone_document_submitted && (
+                                    <Check className="h-3 w-3" />
+                                  )}
+                                </span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        ) : (
+                          <span className="text-sm text-slate-300">—</span>
+                        )}
+                      </td>
 
-                    {/* Doc submitted */}
-                    <td
-                      className="px-4 py-2.5 whitespace-nowrap"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {!r.is_public ? (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button
-                              disabled={isSaving}
-                              className={`inline-flex h-6 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-xs font-medium transition-opacity hover:opacity-75 disabled:opacity-50 ${
-                                r.milestone_document_submitted
-                                  ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                                  : "border-slate-200 bg-slate-50 text-slate-500"
-                              }`}
-                            >
-                              <span
-                                className={`h-1.5 w-1.5 shrink-0 rounded-full ${r.milestone_document_submitted ? "bg-emerald-500" : "bg-slate-300"}`}
-                              />
-                              {r.milestone_document_submitted
-                                ? "Submitted"
-                                : "Not submitted"}
-                              <ChevronDown className="h-3 w-3 opacity-50" />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start" className="w-40">
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleDocChange(r.milestone_id, false)
-                              }
-                              disabled={!r.milestone_document_submitted}
-                            >
-                              <span className="flex w-full items-center justify-between">
-                                Not submitted{" "}
-                                {!r.milestone_document_submitted && (
-                                  <Check className="h-3 w-3" />
-                                )}
-                              </span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleDocChange(r.milestone_id, true)
-                              }
-                              disabled={r.milestone_document_submitted}
-                            >
-                              <span className="flex w-full items-center justify-between">
-                                Submitted{" "}
-                                {r.milestone_document_submitted && (
-                                  <Check className="h-3 w-3" />
-                                )}
-                              </span>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      ) : (
-                        <span className="text-sm text-slate-300">—</span>
-                      )}
-                    </td>
-
-                    {/* Chevron */}
-                    <td className="px-3 py-2.5 text-gray-400">
-                      <ChevronRight className="h-4 w-4" />
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
+                      {/* Chevron */}
+                      <td className="px-3 py-2.5 text-gray-400">
+                        <ChevronRight className="h-4 w-4" />
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
           </table>
         </div>
       </div>

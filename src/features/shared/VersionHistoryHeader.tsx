@@ -24,7 +24,7 @@ export function VersionHistoryHeader({
 }: VersionHistoryHeaderProps) {
   return (
     <div className="flex items-center justify-between gap-4 border-b border-slate-200 pb-3">
-      <h3 className="text-sm font-semibold text-slate-700">{title}</h3>
+      <h3 className="text-base font-semibold text-slate-800">{title}</h3>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button

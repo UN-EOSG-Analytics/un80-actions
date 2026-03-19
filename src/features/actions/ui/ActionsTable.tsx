@@ -243,7 +243,9 @@ function MultiSelectFilter<T extends string | number | boolean>({
                 <button
                   type="button"
                   onClick={() =>
-                    allOptions.forEach((o) => selected.includes(o) && onToggle(o))
+                    allOptions.forEach(
+                      (o) => selected.includes(o) && onToggle(o),
+                    )
                   }
                   className="text-un-blue hover:underline"
                 >

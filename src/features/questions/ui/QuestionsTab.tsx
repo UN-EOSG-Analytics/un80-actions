@@ -21,11 +21,9 @@ import {
   createQuestion,
   updateQuestion,
   updateQuestionComment,
-  approveQuestion,
   deleteQuestion,
 } from "@/features/questions/commands";
 import { getActionMilestones as fetchActionMilestonesForTab } from "@/features/milestones/queries";
-import { ReviewStatus } from "@/features/shared/ReviewStatus";
 import { TagSelector } from "@/features/shared/TagSelector";
 import { VersionHistoryHeader } from "@/features/shared/VersionHistoryHeader";
 import type { Tag } from "@/features/tags/queries";
@@ -377,7 +375,6 @@ export default function QuestionsTab({
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [approvingId, setApprovingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -394,6 +391,7 @@ export default function QuestionsTab({
   >({});
   const [sortBy, setSortBy] = useState<"date" | "updated">("date");
   const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
+  const [filterHeader, setFilterHeader] = useState("");
   const HEADER_OPTIONS = [
     "Task Force",
     "Steering Committee",
@@ -714,46 +712,75 @@ export default function QuestionsTab({
           <EmptyState message="No questions have been asked yet." />
         ) : (
           <div className="space-y-4">
-            {/* Sort controls */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-slate-500">Sort by:</span>
-              <button
-                type="button"
-                onClick={() => setSortBy("date")}
-                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                  sortBy === "date"
-                    ? "bg-un-blue text-white"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
+            {/* Filter + Sort controls */}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <Select
+                value={filterHeader}
+                onValueChange={(v) => setFilterHeader(v === "__all__" ? "" : v)}
               >
-                Event date
-              </button>
-              <button
-                type="button"
-                onClick={() => setSortBy("updated")}
-                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                  sortBy === "updated"
-                    ? "bg-un-blue text-white"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
-              >
-                Last edited
-              </button>
-              <div className="ml-1 h-4 w-px bg-slate-200" />
-              <button
-                type="button"
-                onClick={() => setSortDir(sortDir === "desc" ? "asc" : "desc")}
-                className="flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-200"
-                title={sortDir === "desc" ? "Newest first" : "Oldest first"}
-              >
-                {sortDir === "desc" ? (
-                  <><ArrowDown className="h-3 w-3" /> Newest first</>
-                ) : (
-                  <><ArrowUp className="h-3 w-3" /> Oldest first</>
-                )}
-              </button>
+                <SelectTrigger className="h-8 w-full text-sm sm:w-48">
+                  <SelectValue placeholder="All headers" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">All headers</SelectItem>
+                  {HEADER_OPTIONS.map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-slate-500">
+                  Sort by:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSortBy("date")}
+                  className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                    sortBy === "date"
+                      ? "bg-un-blue text-white"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  Event date
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSortBy("updated")}
+                  className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                    sortBy === "updated"
+                      ? "bg-un-blue text-white"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  Last edited
+                </button>
+                <div className="ml-1 h-4 w-px bg-slate-200" />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSortDir(sortDir === "desc" ? "asc" : "desc")
+                  }
+                  className="flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-200"
+                  title={sortDir === "desc" ? "Newest first" : "Oldest first"}
+                >
+                  {sortDir === "desc" ? (
+                    <>
+                      <ArrowDown className="h-3 w-3" /> Newest first
+                    </>
+                  ) : (
+                    <>
+                      <ArrowUp className="h-3 w-3" /> Oldest first
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
             {[...questions]
+              .filter(
+                (q) => filterHeader === "" || (q.header ?? "") === filterHeader,
+              )
               .sort((a, b) => {
                 const dir = sortDir === "desc" ? -1 : 1;
                 if (sortBy === "updated") {
@@ -778,363 +805,349 @@ export default function QuestionsTab({
                 return (
                   <div
                     key={q.id}
-                  className={`rounded-xl border bg-white transition-all duration-150 ${isEditing ? "border-slate-200 shadow-[0_2px_12px_0_rgba(0,0,0,0.07)]" : "border-slate-100 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)] hover:border-slate-200 hover:shadow-[0_2px_10px_0_rgba(0,0,0,0.07)]"}`}
-                >
-                  {/* Card content — always visible */}
-                  <div className="p-5 space-y-3.5">
-                    {/* Identity row: category + date + milestone | tags */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        {q.header && (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-un-blue/10 px-2.5 py-0.5 text-xs font-semibold text-un-blue">
-                            <MessageCircle className="h-3 w-3" />
-                            {q.header}
-                          </span>
-                        )}
-                        {q.question_date && (
-                          <span className="text-sm font-medium text-slate-700">
-                            {formatUNDate(q.question_date)}
-                          </span>
-                        )}
-                        {q.milestone_id &&
-                          (() => {
-                            const milestone = milestones.find(
-                              (m) => m.id === q.milestone_id,
-                            );
-                            if (milestone) {
-                              const milestoneId = milestone.action_sub_id
-                                ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
-                                : `${milestone.action_id}.${milestone.serial_number}`;
-                              return (
-                                <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
-                                  Milestone {milestoneId}
-                                </span>
+                    className={`rounded-xl border bg-white transition-all duration-150 ${isEditing ? "border-slate-200 shadow-[0_2px_12px_0_rgba(0,0,0,0.07)]" : "border-slate-100 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)] hover:border-slate-200 hover:shadow-[0_2px_10px_0_rgba(0,0,0,0.07)]"}`}
+                  >
+                    {/* Card content — always visible */}
+                    <div className="space-y-3.5 p-5">
+                      {/* Identity row: category + date + milestone | tags */}
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {q.header && (
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-un-blue/10 px-2.5 py-0.5 text-xs font-semibold text-un-blue">
+                              <MessageCircle className="h-3 w-3" />
+                              {q.header}
+                            </span>
+                          )}
+                          {q.question_date && (
+                            <span className="text-sm font-medium text-slate-700">
+                              {formatUNDate(q.question_date)}
+                            </span>
+                          )}
+                          {q.milestone_id &&
+                            (() => {
+                              const milestone = milestones.find(
+                                (m) => m.id === q.milestone_id,
                               );
+                              if (milestone) {
+                                const milestoneId = milestone.action_sub_id
+                                  ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
+                                  : `${milestone.action_id}.${milestone.serial_number}`;
+                                return (
+                                  <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
+                                    Milestone {milestoneId}
+                                  </span>
+                                );
+                              }
+                              return null;
+                            })()}
+                        </div>
+                        {/* Tags */}
+                        <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
+                          {(tagsByQuestionId[q.id] ?? []).map((t) => (
+                            <Badge
+                              key={t.id}
+                              variant="secondary"
+                              className="border-0 bg-un-blue/10 text-un-blue hover:bg-un-blue/20"
+                            >
+                              {t.name}
+                            </Badge>
+                          ))}
+                          <TagSelector
+                            entityId={q.id}
+                            entityType="question"
+                            isAdmin={isAdmin}
+                            initialTags={[]}
+                            onTagsChange={(tags) =>
+                              setTagsByQuestionId((prev) => ({
+                                ...prev,
+                                [q.id]: tags,
+                              }))
                             }
-                            return null;
-                          })()}
+                            hideInlineTags
+                          />
+                        </div>
                       </div>
-                      {/* Tags */}
-                      <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
-                        {(tagsByQuestionId[q.id] ?? []).map((t) => (
-                          <Badge
-                            key={t.id}
-                            variant="secondary"
-                            className="border-0 bg-un-blue/10 text-un-blue hover:bg-un-blue/20"
-                          >
-                            {t.name}
-                          </Badge>
-                        ))}
-                        <TagSelector
-                          entityId={q.id}
-                          entityType="question"
-                          isAdmin={isAdmin}
-                          initialTags={[]}
-                          onTagsChange={(tags) =>
-                            setTagsByQuestionId((prev) => ({
-                              ...prev,
-                              [q.id]: tags,
-                            }))
-                          }
-                          hideInlineTags
-                        />
-                      </div>
-                    </div>
 
-                    {/* Context note — secondary, left-border aside */}
-                    {q.comment && (
-                      <div className="border-l-2 border-slate-200 pl-3">
-                        <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                          Context
-                        </p>
-                        {q.comment.trim().startsWith("<") ? (
+                      {/* Context note — secondary, left-border aside */}
+                      {q.comment && (
+                        <div className="border-l-2 border-slate-200 pl-3">
+                          <p className="mb-0.5 text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
+                            Context
+                          </p>
+                          {q.comment.trim().startsWith("<") ? (
+                            <div
+                              className="prose prose-sm max-w-none text-sm leading-relaxed text-slate-600 [&_li]:my-0.5 [&_p]:my-1 [&_p]:whitespace-pre-wrap [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6"
+                              dangerouslySetInnerHTML={{ __html: q.comment }}
+                            />
+                          ) : (
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-600">
+                              <BoldText>{q.comment}</BoldText>
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Question body — primary content, clean typography */}
+                      <div>
+                        {q.question.trim().startsWith("<") ? (
                           <div
-                            className="prose prose-sm max-w-none text-sm leading-relaxed text-slate-600 [&_li]:my-0.5 [&_p]:my-1 [&_p]:whitespace-pre-wrap [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6"
-                            dangerouslySetInnerHTML={{ __html: q.comment }}
+                            className="prose prose-sm max-w-none text-[15px] leading-relaxed text-slate-800 [&_li]:my-0.5 [&_p]:my-1 [&_p]:whitespace-pre-wrap [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6"
+                            dangerouslySetInnerHTML={{ __html: q.question }}
                           />
                         ) : (
-                          <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-600">
-                            <BoldText>{q.comment}</BoldText>
-                          </p>
+                          <SelectableText
+                            text={q.question}
+                            questionId={q.id}
+                            onUpdate={async (newText) => {
+                              setQuestions((prev) =>
+                                prev.map((qq) =>
+                                  qq.id === q.id
+                                    ? { ...qq, question: newText }
+                                    : qq,
+                                ),
+                              );
+                              await updateQuestion(q.id, {
+                                header: q.header || "",
+                                question_date: q.question_date || "",
+                                question: newText,
+                                milestone_id: q.milestone_id || null,
+                              });
+                            }}
+                            isAdmin={isAdmin}
+                          />
                         )}
                       </div>
-                    )}
 
-                    {/* Question body — primary content, clean typography */}
-                    <div>
-                      {q.question.trim().startsWith("<") ? (
-                        <div
-                          className="prose prose-sm max-w-none text-[15px] leading-relaxed text-slate-800 [&_li]:my-0.5 [&_p]:my-1 [&_p]:whitespace-pre-wrap [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6"
-                          dangerouslySetInnerHTML={{ __html: q.question }}
-                        />
-                      ) : (
-                        <SelectableText
-                          text={q.question}
-                          questionId={q.id}
-                          onUpdate={async (newText) => {
-                            setQuestions((prev) =>
-                              prev.map((qq) =>
-                                qq.id === q.id
-                                  ? { ...qq, question: newText }
-                                  : qq,
-                              ),
-                            );
-                            await updateQuestion(q.id, {
-                              header: q.header || "",
-                              question_date: q.question_date || "",
-                              question: newText,
-                              milestone_id: q.milestone_id || null,
-                            });
-                          }}
-                          isAdmin={isAdmin}
-                        />
+                      {/* Answer */}
+                      {q.answer && (
+                        <div className="rounded-lg border-l-4 border-green-300 bg-green-50/80 px-4 py-3">
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
+                            <BoldText>{q.answer}</BoldText>
+                          </p>
+                          {q.answered_at && (
+                            <p className="mt-2 text-xs font-medium text-slate-500">
+                              Answered {formatUNDateTime(q.answered_at)}
+                              {q.answered_by_email &&
+                                ` by ${q.answered_by_email}`}
+                            </p>
+                          )}
+                        </div>
                       )}
-                    </div>
 
-                    {/* Answer */}
-                    {q.answer && (
-                      <div className="rounded-lg border-l-4 border-green-300 bg-green-50/80 px-4 py-3">
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
-                          <BoldText>{q.answer}</BoldText>
-                        </p>
-                        {q.answered_at && (
-                          <p className="mt-2 text-xs font-medium text-slate-500">
-                            Answered {formatUNDateTime(q.answered_at)}
-                            {q.answered_by_email &&
-                              ` by ${q.answered_by_email}`}
+                      {/* Footer: meta left · actions right */}
+                      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-slate-100 pt-3">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                          <p className="text-xs text-slate-500">
+                            <span className="font-medium text-slate-600">
+                              {formatUNDateTime(q.created_at)}
+                            </span>
+                            <span className="mx-1.5">·</span>
+                            <span>{q.user_email}</span>
                           </p>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Footer: meta left · actions right */}
-                    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-slate-100 pt-3">
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                        <p className="text-xs text-slate-500">
-                          <span className="font-medium text-slate-600">
-                            {formatUNDateTime(q.created_at)}
-                          </span>
-                          <span className="mx-1.5">·</span>
-                          <span>{q.user_email}</span>
-                        </p>
-                        <ReviewStatus
-                          status={q.content_review_status ?? "approved"}
-                          reviewedByEmail={q.content_reviewed_by_email}
-                          reviewedAt={q.content_reviewed_at}
-                          isAdmin={isAdmin}
-                          onApprove={async () => {
-                            setApprovingId(q.id);
-                            try {
-                              const result = await approveQuestion(q.id);
-                              if (result.success) {
-                                await loadQuestions();
-                              }
-                            } finally {
-                              setApprovingId(null);
-                            }
-                          }}
-                          approving={approvingId === q.id}
-                        />
-                      </div>
-                      <div className="flex shrink-0 items-center gap-1.5">
-                        {!q.answer && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="h-8 gap-1.5 border-slate-300 text-slate-700 hover:border-un-blue hover:bg-un-blue/5 hover:text-un-blue"
-                            onClick={() => startEditing(q)}
-                            aria-label="Edit question"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                            Edit
-                          </Button>
-                        )}
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 gap-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
-                          onClick={() => setPendingDeleteId(q.id)}
-                          disabled={deletingId === q.id}
-                          aria-label="Delete question"
-                        >
-                          {deletingId === q.id ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-3.5 w-3.5" />
-                          )}
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Edit form — CSS grid-rows expansion */}
-                  <div
-                    className={`grid transition-[grid-template-rows] duration-200 ease-out ${isEditing ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
-                  >
-                    <div className="overflow-hidden">
-                      <div className="border-t border-slate-100 px-4 py-4">
-                        <div className="space-y-4">
-                          <div>
-                            <label className="mb-1.5 block text-xs font-medium text-slate-600">
-                              Header *
-                            </label>
-                            <Select
-                              value={editingQuestion.header}
-                              onValueChange={(value) =>
-                                setEditingQuestion({
-                                  ...editingQuestion,
-                                  header: value,
-                                })
-                              }
-                              disabled={saving}
-                            >
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select header..." />
-                              </SelectTrigger>
-                              <SelectContent className="max-h-56">
-                                {HEADER_OPTIONS.map((option) => (
-                                  <SelectItem key={option} value={option}>
-                                    {option}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <label className="mb-1 block text-xs font-medium text-slate-600">
-                              Date *
-                            </label>
-                            <DatePicker
-                              value={editingQuestion.question_date}
-                              onChange={(v) =>
-                                setEditingQuestion({
-                                  ...editingQuestion,
-                                  question_date: v,
-                                })
-                              }
-                              disabled={saving}
-                              placeholder="Select date"
-                            />
-                          </div>
-                          <div>
-                            <label className="mb-1 block text-xs font-medium text-slate-600">
-                              Milestone (optional)
-                            </label>
-                            <Select
-                              value={
-                                editingQuestion.milestone_id ||
-                                MILESTONE_NONE_VALUE
-                              }
-                              onValueChange={(value) =>
-                                setEditingQuestion({
-                                  ...editingQuestion,
-                                  milestone_id:
-                                    value === MILESTONE_NONE_VALUE ? "" : value,
-                                })
-                              }
-                              disabled={saving}
-                            >
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select milestone..." />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value={MILESTONE_NONE_VALUE}>
-                                  None
-                                </SelectItem>
-                                {milestones.map((milestone) => {
-                                  const milestoneId = milestone.action_sub_id
-                                    ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
-                                    : `${milestone.action_id}.${milestone.serial_number}`;
-                                  const label = milestone.description
-                                    ? `${milestoneId}: ${milestone.description.substring(0, 50)}${milestone.description.length > 50 ? "..." : ""}`
-                                    : milestoneId;
-                                  return (
-                                    <SelectItem
-                                      key={milestone.id}
-                                      value={milestone.id}
-                                    >
-                                      {label}
-                                    </SelectItem>
-                                  );
-                                })}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <label className="mb-1 block text-xs font-medium text-slate-600">
-                              Question *
-                            </label>
-                            <NoteEditor
-                              value={editingQuestion.question}
-                              onChange={(html) =>
-                                setEditingQuestion({
-                                  ...editingQuestion,
-                                  question: html,
-                                })
-                              }
-                              placeholder="Enter your question..."
-                              disabled={saving}
-                              minRows={3}
-                            />
-                          </div>
-                          <div>
-                            <label className="mb-1 block text-xs font-medium text-slate-600">
-                              Context (optional)
-                            </label>
-                            <NoteEditor
-                              value={editingQuestion.comment}
-                              onChange={(html) =>
-                                setEditingQuestion({
-                                  ...editingQuestion,
-                                  comment: html,
-                                })
-                              }
-                              placeholder="Background notes or context for reviewers..."
-                              disabled={saving}
-                              minRows={3}
-                            />
-                          </div>
-                          {error && (
-                            <p className="text-sm text-red-600">{error}</p>
-                          )}
-                          <div className="flex justify-end gap-2">
+                        </div>
+                        <div className="flex shrink-0 items-center gap-1.5">
+                          {!q.answer && (
                             <Button
                               type="button"
                               variant="outline"
-                              onClick={cancelEditing}
-                              disabled={saving}
-                              className="w-28 border-slate-300 text-slate-600 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-900"
+                              size="sm"
+                              className="h-8 gap-1.5 border-slate-300 text-slate-700 hover:border-un-blue hover:bg-un-blue/5 hover:text-un-blue"
+                              onClick={() => startEditing(q)}
+                              aria-label="Edit question"
                             >
-                              <X className="mr-2 h-4 w-4" /> Cancel
+                              <Pencil className="h-3.5 w-3.5" />
+                              Edit
                             </Button>
-                            <Button
-                              type="button"
-                              onClick={handleSaveEdit}
-                              disabled={saving}
-                              className="w-28 border border-un-blue/80 bg-un-blue text-white hover:bg-un-blue/90"
-                            >
-                              {saving ? (
-                                <>
-                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
-                                  Saving...
-                                </>
-                              ) : (
-                                <>
-                                  <Send className="mr-2 h-4 w-4" /> Save
-                                </>
-                              )}
-                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Edit form — CSS grid-rows expansion */}
+                    <div
+                      className={`grid transition-[grid-template-rows] duration-200 ease-out ${isEditing ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
+                    >
+                      <div className="overflow-hidden">
+                        <div className="border-t border-slate-100 px-4 py-4">
+                          <div className="space-y-4">
+                            <div>
+                              <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                                Header *
+                              </label>
+                              <Select
+                                value={editingQuestion.header}
+                                onValueChange={(value) =>
+                                  setEditingQuestion({
+                                    ...editingQuestion,
+                                    header: value,
+                                  })
+                                }
+                                disabled={saving}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select header..." />
+                                </SelectTrigger>
+                                <SelectContent className="max-h-56">
+                                  {HEADER_OPTIONS.map((option) => (
+                                    <SelectItem key={option} value={option}>
+                                      {option}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
+                              <label className="mb-1 block text-xs font-medium text-slate-600">
+                                Date *
+                              </label>
+                              <DatePicker
+                                value={editingQuestion.question_date}
+                                onChange={(v) =>
+                                  setEditingQuestion({
+                                    ...editingQuestion,
+                                    question_date: v,
+                                  })
+                                }
+                                disabled={saving}
+                                placeholder="Select date"
+                              />
+                            </div>
+                            <div>
+                              <label className="mb-1 block text-xs font-medium text-slate-600">
+                                Milestone (optional)
+                              </label>
+                              <Select
+                                value={
+                                  editingQuestion.milestone_id ||
+                                  MILESTONE_NONE_VALUE
+                                }
+                                onValueChange={(value) =>
+                                  setEditingQuestion({
+                                    ...editingQuestion,
+                                    milestone_id:
+                                      value === MILESTONE_NONE_VALUE
+                                        ? ""
+                                        : value,
+                                  })
+                                }
+                                disabled={saving}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select milestone..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value={MILESTONE_NONE_VALUE}>
+                                    None
+                                  </SelectItem>
+                                  {milestones.map((milestone) => {
+                                    const milestoneId = milestone.action_sub_id
+                                      ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
+                                      : `${milestone.action_id}.${milestone.serial_number}`;
+                                    const label = milestone.description
+                                      ? `${milestoneId}: ${milestone.description.substring(0, 50)}${milestone.description.length > 50 ? "..." : ""}`
+                                      : milestoneId;
+                                    return (
+                                      <SelectItem
+                                        key={milestone.id}
+                                        value={milestone.id}
+                                      >
+                                        {label}
+                                      </SelectItem>
+                                    );
+                                  })}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
+                              <label className="mb-1 block text-xs font-medium text-slate-600">
+                                Question *
+                              </label>
+                              <NoteEditor
+                                value={editingQuestion.question}
+                                onChange={(html) =>
+                                  setEditingQuestion({
+                                    ...editingQuestion,
+                                    question: html,
+                                  })
+                                }
+                                placeholder="Enter your question..."
+                                disabled={saving}
+                                minRows={3}
+                              />
+                            </div>
+                            <div>
+                              <label className="mb-1 block text-xs font-medium text-slate-600">
+                                Context (optional)
+                              </label>
+                              <NoteEditor
+                                value={editingQuestion.comment}
+                                onChange={(html) =>
+                                  setEditingQuestion({
+                                    ...editingQuestion,
+                                    comment: html,
+                                  })
+                                }
+                                placeholder="Background notes or context for reviewers..."
+                                disabled={saving}
+                                minRows={3}
+                              />
+                            </div>
+                            {error && (
+                              <p className="text-sm text-red-600">{error}</p>
+                            )}
+                            <div className="flex items-center justify-between gap-2">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 gap-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                                onClick={() => setPendingDeleteId(q.id)}
+                                disabled={deletingId === q.id || saving}
+                                aria-label="Delete question"
+                              >
+                                {deletingId === q.id ? (
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : (
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                )}
+                                Delete
+                              </Button>
+                              <div className="flex gap-2">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  onClick={cancelEditing}
+                                  disabled={saving}
+                                  className="w-28 border-slate-300 text-slate-600 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-900"
+                                >
+                                  <X className="mr-2 h-4 w-4" /> Cancel
+                                </Button>
+                                <Button
+                                  type="button"
+                                  onClick={handleSaveEdit}
+                                  disabled={saving}
+                                  className="w-28 border border-un-blue/80 bg-un-blue text-white hover:bg-un-blue/90"
+                                >
+                                  {saving ? (
+                                    <>
+                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                                      Saving...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Send className="mr-2 h-4 w-4" /> Save
+                                    </>
+                                  )}
+                                </Button>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         )}
       </div>
