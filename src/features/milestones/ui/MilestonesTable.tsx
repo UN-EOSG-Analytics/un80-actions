@@ -962,9 +962,32 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
             </p>
           </div>
           {sortedRows.length !== rows.length && (
-            <span className="mb-0.5 text-sm text-gray-400">
-              {sortedRows.length} of {rows.length} shown
-            </span>
+            <div className="mb-0.5 text-right text-sm text-gray-400">
+              <div>
+                <span className="font-medium text-gray-600">
+                  {sortedRows.length}
+                </span>{" "}
+                of {rows.length} milestones
+              </div>
+              <div>
+                <span className="font-medium text-gray-600">
+                  {
+                    new Set(
+                      sortedRows.map(
+                        (r) => `${r.action_id}-${r.action_sub_id ?? ""}`,
+                      ),
+                    ).size
+                  }
+                </span>{" "}
+                of{" "}
+                {
+                  new Set(
+                    rows.map((r) => `${r.action_id}-${r.action_sub_id ?? ""}`),
+                  ).size
+                }{" "}
+                actions shown
+              </div>
+            </div>
           )}
         </div>
 
