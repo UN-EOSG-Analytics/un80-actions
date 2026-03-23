@@ -3,6 +3,7 @@
 import { query } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { requireAdmin } from "@/features/auth/lib/permissions";
+import { getCurrentUser } from "@/features/auth/service";
 import type { RiskAssessment } from "@/types";
 
 // =========================================================
@@ -46,6 +47,39 @@ export async function updateRiskAssessment(
     return { success: true };
   } catch {
     return { success: false, error: "Failed to update" };
+  }
+}
+
+/**
+ * Toggle the current user's own entity on an action. Any authenticated user.
+ * Users can only add/remove their own entity — not others'.
+ */
+export async function toggleOwnEntityOnAction(
+  actionId: number,
+  actionSubId: string | null,
+  add: boolean,
+): Promise<{ success: boolean; error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+  if (!user.entity) return { success: false, error: "Your account has no entity assigned" };
+
+  try {
+    if (add) {
+      await query(
+        `INSERT INTO ${DB_SCHEMA}.action_member_entities (action_id, action_sub_id, entity)
+         VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+        [actionId, actionSubId ?? "", user.entity],
+      );
+    } else {
+      await query(
+        `DELETE FROM ${DB_SCHEMA}.action_member_entities
+         WHERE action_id = $1 AND action_sub_id = $2 AND entity = $3`,
+        [actionId, actionSubId ?? "", user.entity],
+      );
+    }
+    return { success: true };
+  } catch {
+    return { success: false, error: "Failed to update team members" };
   }
 }
 

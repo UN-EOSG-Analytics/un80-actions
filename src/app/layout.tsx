@@ -40,6 +40,7 @@ export default async function RootLayout({
 }>) {
   const user = await getCurrentUser();
   const isAdmin = user?.user_role === "Admin" || user?.user_role === "Legal";
+  const userEntity = user?.entity ?? null;
 
   return (
     <html lang="en" className={`${roboto.className} antialiased`}>
@@ -50,7 +51,7 @@ export default async function RootLayout({
           <Footer />
         </div>
         <Suspense fallback={null}>
-          <ModalHandler isAdmin={isAdmin} />
+          <ModalHandler isAdmin={isAdmin} userEntity={userEntity} />
         </Suspense>
         <GoogleAnalytics gaId="G-XYZ" />
       </body>

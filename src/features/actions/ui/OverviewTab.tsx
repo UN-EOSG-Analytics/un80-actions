@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { getStatusStyles } from "@/constants/actionStatus";
 import { getAllEntities } from "@/features/actions/queries";
-import { createEntity, updateActionEntities } from "@/features/actions/commands";
+import { createEntity, toggleOwnEntityOnAction, updateActionEntities } from "@/features/actions/commands";
 import type { Action } from "@/types";
 import { Check, Clock, FileText, Lightbulb, Pencil, Target, X } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
@@ -53,9 +53,11 @@ const InfoRow = ({
 export default function OverviewTab({
   action,
   isAdmin = false,
+  userEntity = null,
 }: {
   action: Action;
   isAdmin?: boolean;
+  userEntity?: string | null;
 }) {
   const router = useRouter();
   const statusStyles = getStatusStyles(action.public_action_status);
@@ -101,6 +103,22 @@ export default function OverviewTab({
   const cancel = () => {
     setSelected(action.action_entities ?? []);
     setEditing(false);
+  };
+
+  const [togglingOwn, setTogglingOwn] = useState(false);
+  const ownIsListed = userEntity ? selected.includes(userEntity) : false;
+
+  const toggleOwn = async () => {
+    if (!userEntity) return;
+    setTogglingOwn(true);
+    const result = await toggleOwnEntityOnAction(action.id, action.sub_id, !ownIsListed);
+    if (result.success) {
+      setSelected((prev) =>
+        ownIsListed ? prev.filter((e) => e !== userEntity) : [...prev, userEntity],
+      );
+      router.refresh();
+    }
+    setTogglingOwn(false);
   };
 
   const addNew = async () => {
@@ -286,18 +304,35 @@ export default function OverviewTab({
                 </div>
               </div>
             ) : (
-              <div className="text-sm text-slate-700">
-                {selected.length > 0 ? (
-                  <div className="flex flex-wrap gap-1.5">
-                    {selected.map((entity) => (
+              <div className="space-y-2 text-sm text-slate-700">
+                <div className="flex flex-wrap gap-1.5">
+                  {selected.map((entity) => (
+                    !isAdmin && entity === userEntity ? (
+                      <Badge key={entity} variant="outline" className="bg-slate-50 text-slate-600 gap-1">
+                        {entity}
+                        <button onClick={toggleOwn} disabled={togglingOwn} className="text-slate-400 hover:text-slate-600 disabled:opacity-50">
+                          <X className="h-2.5 w-2.5" />
+                        </button>
+                      </Badge>
+                    ) : (
                       <Badge key={entity} variant="outline" className="bg-slate-50 text-slate-600">
                         {entity}
                       </Badge>
-                    ))}
-                  </div>
-                ) : (
-                  <span className="text-slate-400 italic">Not applicable</span>
-                )}
+                    )
+                  ))}
+                  {!isAdmin && userEntity && !ownIsListed && (
+                    <button
+                      onClick={toggleOwn}
+                      disabled={togglingOwn}
+                      className="inline-flex items-center rounded-full border border-dashed border-slate-400 px-2.5 py-0.5 text-xs text-slate-500 hover:border-un-blue hover:text-un-blue transition-colors disabled:opacity-50"
+                    >
+                      + Add {userEntity}
+                    </button>
+                  )}
+                  {selected.length === 0 && (isAdmin || !userEntity) && (
+                    <span className="text-slate-400 italic">Not applicable</span>
+                  )}
+                </div>
               </div>
             )}
           </div>

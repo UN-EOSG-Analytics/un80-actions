@@ -12,8 +12,10 @@ const RETURN_URL_KEY = "actionModalReturnUrl";
 
 export default function ModalHandler({
   isAdmin = false,
+  userEntity = null,
 }: {
   isAdmin?: boolean;
+  userEntity?: string | null;
 }) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -95,6 +97,7 @@ export default function ModalHandler({
       loading={loading}
       error={error}
       isAdmin={isAdmin}
+      userEntity={userEntity}
     />
   );
 }
