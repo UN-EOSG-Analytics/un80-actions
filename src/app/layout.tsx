@@ -46,7 +46,7 @@ export default async function RootLayout({
     <html lang="en" className={`${roboto.className} antialiased`}>
       <body>
         <div className="flex min-h-screen flex-col">
-          <Header user={user} isAdmin={isAdmin} />
+          <Header user={user} isAdmin={isAdmin} userRole={user?.user_role ?? null} />
           <div className="mb-12 flex flex-1 flex-col">{children}</div>
           <Footer />
         </div>

@@ -6,15 +6,36 @@ import { LogOut, ShieldCheck, ShieldOff } from "lucide-react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 
+const ROLE_STYLES: Record<string, string> = {
+  Admin: "bg-amber-100 text-amber-700",
+  Legal: "bg-purple-100 text-purple-700",
+  Principal: "bg-blue-100 text-blue-700",
+  "Focal Point": "bg-emerald-100 text-emerald-700",
+  Support: "bg-slate-100 text-slate-600",
+  Assistant: "bg-slate-100 text-slate-600",
+};
+
+function getRoleStyle(role: string | null | undefined): string {
+  if (!role) return "bg-gray-100 text-gray-400";
+  return ROLE_STYLES[role] ?? "bg-gray-100 text-gray-500";
+}
+
+function getRoleLabel(role: string | null | undefined): string {
+  if (!role) return "No role";
+  return role;
+}
+
 interface Props {
   email: string;
   entity?: string | null;
   isAdmin?: boolean;
+  userRole?: string | null;
 }
 
-export function UserMenu({ email, entity, isAdmin }: Props) {
+export function UserMenu({ email, entity, isAdmin, userRole }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const isDev = process.env.NODE_ENV === "development";
 
   async function handleLogout() {
     await logout();
@@ -27,6 +48,9 @@ export function UserMenu({ email, entity, isAdmin }: Props) {
     });
   }
 
+  const roleLabel = getRoleLabel(userRole);
+  const roleStyle = getRoleStyle(userRole);
+
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
@@ -34,27 +58,25 @@ export function UserMenu({ email, entity, isAdmin }: Props) {
         {entity && (
           <Badge className="bg-un-blue/10 text-un-blue">{entity}</Badge>
         )}
-        {process.env.NODE_ENV === "development" && (
+        {isDev ? (
           <button
             onClick={handleToggleAdmin}
             disabled={isPending}
-            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors ${
-              isAdmin
-                ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
-                : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-            } ${isPending ? "cursor-wait opacity-50" : "cursor-pointer"}`}
-            title={isAdmin ? "Click to remove Admin" : "Click to become Admin"}
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors ${roleStyle} ${
+              isPending ? "cursor-wait opacity-50" : "cursor-pointer hover:opacity-80"
+            }`}
+            title={isAdmin ? "Click to switch to User view" : "Click to switch to Admin view"}
           >
-            {isAdmin ? (
-              <>
-                <ShieldCheck className="h-3 w-3" /> Admin
-              </>
-            ) : (
-              <>
-                <ShieldOff className="h-3 w-3" /> User
-              </>
-            )}
+            {isAdmin ? <ShieldCheck className="h-3 w-3" /> : <ShieldOff className="h-3 w-3" />}
+            {roleLabel}
           </button>
+        ) : (
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${roleStyle}`}
+          >
+            {isAdmin ? <ShieldCheck className="h-3 w-3" /> : null}
+            {roleLabel}
+          </span>
         )}
       </div>
       <div className="h-4 w-px bg-gray-200" />

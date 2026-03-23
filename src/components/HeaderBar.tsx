@@ -33,11 +33,12 @@ function NavLink({
 interface Props {
   user?: { email: string; entity?: string | null } | null;
   isAdmin?: boolean;
+  userRole?: string | null;
   children?: React.ReactNode;
   maxWidth?: "6xl" | "7xl";
 }
 
-export function Header({ user, isAdmin, children, maxWidth = "7xl" }: Props) {
+export function Header({ user, isAdmin, userRole, children, maxWidth = "7xl" }: Props) {
   const pathname = usePathname();
   const isLoggedIn = !!user;
   const isLoginPage = pathname === "/login";
@@ -92,6 +93,7 @@ export function Header({ user, isAdmin, children, maxWidth = "7xl" }: Props) {
                 email={user.email}
                 entity={user.entity}
                 isAdmin={isAdmin}
+                userRole={userRole}
               />
             </>
           ) : !isLoginPage ? (
