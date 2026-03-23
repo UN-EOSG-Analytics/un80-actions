@@ -1,7 +1,8 @@
 "use server";
 
-import { query } from "@/lib/db/db";
+import { queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
+import { getCurrentUser } from "@/features/auth/service";
 import { checkIsAdmin } from "@/features/auth/lib/permissions";
 import type { ActionQuestion } from "@/types";
 
@@ -17,6 +18,9 @@ export async function getActionQuestions(
   actionId: number,
   subId?: string | null,
 ): Promise<ActionQuestion[]> {
+  const user = await getCurrentUser();
+  if (!user) return [];
+
   // Admin-only feature
   if (!(await checkIsAdmin())) {
     return [];
@@ -29,7 +33,8 @@ export async function getActionQuestions(
 
   const params = subId !== undefined ? [actionId, subId] : [actionId];
 
-  const rows = await query<ActionQuestion>(
+  const rows = await queryWithUser<ActionQuestion>(
+    user.email,
     `SELECT
       q.id,
       q.action_id,
@@ -71,12 +76,16 @@ export async function getActionQuestions(
 export async function getQuestionById(
   questionId: string,
 ): Promise<ActionQuestion | null> {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
   // Admin-only feature
   if (!(await checkIsAdmin())) {
     return null;
   }
 
-  const rows = await query<ActionQuestion>(
+  const rows = await queryWithUser<ActionQuestion>(
+    user.email,
     `SELECT
       q.id,
       q.action_id,

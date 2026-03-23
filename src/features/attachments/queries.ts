@@ -5,7 +5,8 @@
 
 "use server";
 
-import { query } from "@/lib/db/db";
+import { queryWithUser } from "@/lib/db/db";
+import { getCurrentUser } from "@/features/auth/service";
 import { checkIsAdmin } from "@/features/auth/lib/permissions";
 import type { ActionAttachment, AttachmentComment } from "@/types";
 
@@ -16,7 +17,10 @@ export async function getActionAttachments(
   actionId: number,
   actionSubId: string | null,
 ): Promise<ActionAttachment[]> {
-  const rows = await query<ActionAttachment>(
+  const user = await getCurrentUser();
+  if (!user) return [];
+
+  const rows = await queryWithUser<ActionAttachment>(user.email,
     `SELECT 
       aa.id,
       aa.action_id,
@@ -53,7 +57,10 @@ export async function getActionAttachmentCount(
   actionId: number,
   actionSubId: string | null,
 ): Promise<number> {
-  const result = await query<{ count: string }>(
+  const user = await getCurrentUser();
+  if (!user) return 0;
+
+  const result = await queryWithUser<{ count: string }>(user.email,
     `SELECT COUNT(*) as count
     FROM un80actions.action_attachments
     WHERE action_id = $1 
@@ -70,7 +77,10 @@ export async function getActionAttachmentCount(
 export async function getAttachmentById(
   attachmentId: string,
 ): Promise<ActionAttachment | null> {
-  const rows = await query<ActionAttachment>(
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  const rows = await queryWithUser<ActionAttachment>(user.email,
     `SELECT 
       aa.id,
       aa.action_id,
@@ -111,11 +121,14 @@ export async function getAttachmentById(
 export async function getAttachmentComments(
   attachmentId: string,
 ): Promise<AttachmentComment[]> {
+  const user = await getCurrentUser();
+  if (!user) return [];
+
   if (!(await checkIsAdmin())) {
     return [];
   }
 
-  const rows = await query<{
+  const rows = await queryWithUser<{
     id: string;
     attachment_id: string;
     user_id: string | null;
@@ -123,7 +136,7 @@ export async function getAttachmentComments(
     comment: string;
     is_legal?: boolean;
     created_at: Date;
-  }>(
+  }>(user.email,
     `SELECT
       c.id,
       c.attachment_id,

@@ -1,1 +1,32 @@
-
+-- Row-Level Security (RLS) Policies Reference
+-- See sql/migrations/016_rls_action_scope.sql for the full migration.
+--
+-- RLS is ENABLED + FORCED on these 13 tables:
+--   actions, action_milestones, action_notes, action_questions,
+--   action_updates, action_attachments, action_legal_comments,
+--   activity_entries, activity_read, milestone_versions,
+--   milestone_updates, milestone_attachments, attachment_comments
+--
+-- Identity mechanism:
+--   SET LOCAL app.current_user_email = '<email>'
+--   Policies use current_setting('app.current_user_email', true)
+--   Empty string (no SET LOCAL) returns zero rows (fail-closed).
+--
+-- Access ranks (highest privilege wins):
+--   0 - Admin/Legal (full access, all tables)
+--   1 - Work Package Lead (read+write actions in their WPs)
+--   2 - Work Package Focal Point (read+write actions in their WPs)
+--   3 - Action Lead (read+write specific actions)
+--   4 - Action Focal Point (read+write specific actions)
+--   5 - Action Member Person (read-only)
+--   6 - Action Support Person (read-only)
+--
+-- action_notes, action_questions: Admin/Legal only (SELECT + write).
+--
+-- Tables WITHOUT RLS (referenced BY policies, not protected):
+--   workstreams, work_packages, leads, entities, tags,
+--   note_tags, question_tags, legal_comment_tags, milestone_tags,
+--   approved_users, users, magic_tokens, approved_user_leads,
+--   work_package_leads, work_package_focal_points, action_leads,
+--   action_focal_points, action_member_persons, action_support_persons,
+--   action_member_entities

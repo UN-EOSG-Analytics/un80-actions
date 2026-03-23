@@ -1,6 +1,6 @@
 "use server";
 
-import { query } from "@/lib/db/db";
+import { query, queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { requireAdmin } from "@/features/auth/lib/permissions";
 import { getCurrentUser } from "@/features/auth/service";
@@ -38,7 +38,7 @@ export async function updateRiskAssessment(
   }
 
   try {
-    await query(
+    await queryWithUser(auth.user.email,
       `UPDATE ${DB_SCHEMA}.actions
        SET risk_assessment = $1
        WHERE id = $2 AND (sub_id IS NOT DISTINCT FROM $3)`,
@@ -65,13 +65,13 @@ export async function toggleOwnEntityOnAction(
 
   try {
     if (add) {
-      await query(
+      await queryWithUser(user.email,
         `INSERT INTO ${DB_SCHEMA}.action_member_entities (action_id, action_sub_id, entity)
          VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
         [actionId, actionSubId ?? "", user.entity],
       );
     } else {
-      await query(
+      await queryWithUser(user.email,
         `DELETE FROM ${DB_SCHEMA}.action_member_entities
          WHERE action_id = $1 AND action_sub_id = $2 AND entity = $3`,
         [actionId, actionSubId ?? "", user.entity],
@@ -155,7 +155,7 @@ export async function updatePublicActionStatus(
   }
 
   try {
-    await query(
+    await queryWithUser(auth.user.email,
       `UPDATE ${DB_SCHEMA}.actions
        SET public_action_status = $1
        WHERE id = $2 AND (sub_id IS NOT DISTINCT FROM $3)`,

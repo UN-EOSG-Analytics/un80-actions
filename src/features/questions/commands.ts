@@ -1,6 +1,6 @@
 "use server";
 
-import { query } from "@/lib/db/db";
+import { query, queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { getQuestionById } from "./queries";
 import { requireAdmin } from "@/features/auth/lib/permissions";
@@ -38,8 +38,9 @@ export async function createQuestion(
       return { success: false, error: "Question cannot be empty" };
     }
 
-    const rows = await query<{ id: string }>(
-      `INSERT INTO ${DB_SCHEMA}.action_questions 
+    const rows = await queryWithUser<{ id: string }>(
+      user.email,
+      `INSERT INTO ${DB_SCHEMA}.action_questions
      (action_id, action_sub_id, user_id, header, subtext, question_date, question, milestone_id, content_review_status, comment)
      VALUES ($1, $2, $3, $4, NULL, $5, $6, $7, 'needs_review', $8)
      RETURNING id`,
@@ -98,7 +99,8 @@ export async function updateQuestion(
       return { success: false, error: "Question cannot be empty" };
     }
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_questions
      SET header = $1, subtext = NULL, question_date = $2, question = $3, milestone_id = $4, updated_at = NOW(),
          content_review_status = 'needs_review',
@@ -148,10 +150,11 @@ export async function answerQuestion(
       return { success: false, error: "Answer cannot be empty" };
     }
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_questions
-     SET answer = $1, 
-         answered_by = $2, 
+     SET answer = $1,
+         answered_by = $2,
          answered_at = NOW(),
          updated_at = NOW(),
          content_review_status = 'needs_review',
@@ -198,7 +201,8 @@ export async function updateAnswer(
       return { success: false, error: "Answer cannot be empty" };
     }
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_questions
      SET answer = $1, updated_at = NOW(),
          content_review_status = 'needs_review',
@@ -237,7 +241,8 @@ export async function approveQuestion(
       return { success: false, error: "Question not found" };
     }
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_questions
      SET content_review_status = 'approved',
          content_reviewed_by = $1,
@@ -275,7 +280,8 @@ export async function updateQuestionComment(
       return { success: false, error: "Question not found" };
     }
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_questions
      SET comment = $1, updated_at = NOW()
      WHERE id = $2`,
@@ -310,7 +316,7 @@ export async function deleteQuestion(
       return { success: false, error: "Question not found" };
     }
 
-    await query(`DELETE FROM ${DB_SCHEMA}.action_questions WHERE id = $1`, [
+    await queryWithUser(auth.user.email, `DELETE FROM ${DB_SCHEMA}.action_questions WHERE id = $1`, [
       questionId,
     ]);
     return { success: true };

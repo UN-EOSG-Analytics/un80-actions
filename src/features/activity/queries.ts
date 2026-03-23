@@ -1,6 +1,6 @@
 "use server";
 
-import { query } from "@/lib/db/db";
+import { queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { getCurrentUser } from "@/features/auth/service";
 
@@ -34,9 +34,10 @@ export async function getRecentActivity(
 ): Promise<ActivityItem[]> {
   const activities: ActivityItem[] = [];
   const currentUser = await getCurrentUser();
+  if (!currentUser) return [];
 
   // Recent notes (created or updated)
-  const notes = await query<{
+  const notes = await queryWithUser<{
     id: string;
     action_id: number;
     action_sub_id: string | null;
@@ -44,7 +45,7 @@ export async function getRecentActivity(
     created_at: Date;
     updated_at: Date | null;
     header: string | null;
-  }>(
+  }>(currentUser.email,
     `SELECT 
       n.id,
       n.action_id,
@@ -77,7 +78,7 @@ export async function getRecentActivity(
   }
 
   // Recent questions (created or updated)
-  const questions = await query<{
+  const questions = await queryWithUser<{
     id: string;
     action_id: number;
     action_sub_id: string | null;
@@ -85,7 +86,7 @@ export async function getRecentActivity(
     created_at: Date;
     updated_at: Date | null;
     header: string | null;
-  }>(
+  }>(currentUser.email,
     `SELECT 
       q.id,
       q.action_id,
@@ -118,7 +119,7 @@ export async function getRecentActivity(
   }
 
   // Recent milestone changes (submitted, reviewed, approved)
-  const milestones = await query<{
+  const milestones = await queryWithUser<{
     id: string;
     action_id: number;
     action_sub_id: string | null;
@@ -131,7 +132,7 @@ export async function getRecentActivity(
     submitted_at: Date | null;
     reviewed_at: Date | null;
     approved_at: Date | null;
-  }>(
+  }>(currentUser.email,
     `SELECT 
       m.id,
       m.action_id,
@@ -197,7 +198,7 @@ export async function getRecentActivity(
   }
 
   // Recent milestone updates
-  const milestoneUpdates = await query<{
+  const milestoneUpdates = await queryWithUser<{
     id: string;
     milestone_id: string;
     action_id: number;
@@ -205,7 +206,7 @@ export async function getRecentActivity(
     user_email: string | null;
     created_at: Date;
     updated_at: Date | null;
-  }>(
+  }>(currentUser.email,
     `SELECT 
       mu.id,
       mu.milestone_id,
@@ -241,11 +242,11 @@ export async function getRecentActivity(
   }
 
   // Recent tags (when tags are created)
-  const tags = await query<{
+  const tags = await queryWithUser<{
     id: string;
     name: string;
     created_at: Date;
-  }>(
+  }>(currentUser.email,
     `SELECT id, name, created_at
     FROM ${DB_SCHEMA}.tags
     ORDER BY created_at DESC
@@ -269,7 +270,7 @@ export async function getRecentActivity(
 
   // Milestone status changes (from activity_entries)
   try {
-    const entries = await query<{
+    const entries = await queryWithUser<{
       id: string;
       action_id: number;
       action_sub_id: string | null;
@@ -277,7 +278,7 @@ export async function getRecentActivity(
       description: string;
       user_email: string | null;
       created_at: Date;
-    }>(
+    }>(currentUser.email,
       `SELECT 
         e.id,
         e.action_id,
@@ -318,7 +319,7 @@ export async function getRecentActivity(
   // Attach read_at for current user
   if (currentUser) {
     try {
-      const readRows = await query<{ activity_id: string; read_at: Date }>(
+      const readRows = await queryWithUser<{ activity_id: string; read_at: Date }>(currentUser.email,
         `SELECT activity_id, read_at FROM ${DB_SCHEMA}.activity_read WHERE user_id = $1`,
         [currentUser.id],
       );

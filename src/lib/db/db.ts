@@ -42,4 +42,29 @@ export async function query<T = unknown>(
   }
 }
 
+// RLS-aware query: wraps the SQL in a transaction with SET LOCAL app.current_user_email.
+// PostgreSQL RLS policies use current_setting('app.current_user_email', true) to scope rows.
+// PgBouncer transaction mode ensures SET LOCAL is isolated to this transaction.
+export async function queryWithUser<T = unknown>(
+  userEmail: string,
+  text: string,
+  params?: unknown[],
+): Promise<T[]> {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("SELECT set_config('app.current_user_email', $1, true)", [
+      userEmail.toLowerCase(),
+    ]);
+    const result = await client.query(text, params);
+    await client.query("COMMIT");
+    return result.rows;
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 export default pool;

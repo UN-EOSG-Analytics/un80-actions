@@ -1,6 +1,6 @@
 "use server";
 
-import { query } from "@/lib/db/db";
+import { query, queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { getNoteById } from "./queries";
 import { requireAdmin } from "@/features/auth/lib/permissions";
@@ -34,8 +34,9 @@ export async function createNote(input: NoteCreateInput): Promise<NoteResult> {
       return { success: false, error: "Note content cannot be empty" };
     }
 
-    const rows = await query<{ id: string }>(
-      `INSERT INTO ${DB_SCHEMA}.action_notes 
+    const rows = await queryWithUser<{ id: string }>(
+      user.email,
+      `INSERT INTO ${DB_SCHEMA}.action_notes
      (action_id, action_sub_id, user_id, header, note_date, content, content_review_status)
      VALUES ($1, $2, $3, $4, $5, $6, 'needs_review')
      RETURNING id`,
@@ -88,7 +89,8 @@ export async function updateNote(
       return { success: false, error: "Note content cannot be empty" };
     }
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_notes
      SET header = $1, note_date = $2, content = $3, updated_at = NOW(),
          content_review_status = 'needs_review',
@@ -125,7 +127,8 @@ export async function approveNote(noteId: string): Promise<NoteResult> {
       return { success: false, error: "Note not found" };
     }
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_notes
      SET content_review_status = 'approved',
          content_reviewed_by = $1,
@@ -160,7 +163,7 @@ export async function deleteNote(noteId: string): Promise<NoteResult> {
       return { success: false, error: "Note not found" };
     }
 
-    await query(`DELETE FROM ${DB_SCHEMA}.action_notes WHERE id = $1`, [
+    await queryWithUser(auth.user.email, `DELETE FROM ${DB_SCHEMA}.action_notes WHERE id = $1`, [
       noteId,
     ]);
 

@@ -6,7 +6,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { query } from "@/lib/db/db";
+import { query, queryWithUser } from "@/lib/db/db";
 import { getCurrentUser } from "@/features/auth/service";
 import { requireAdmin } from "@/features/auth/lib/permissions";
 import {
@@ -73,7 +73,7 @@ export async function uploadActionAttachment(
     await uploadBlob(blobName, buffer, file.type);
 
     // Store metadata in database
-    const result = await query<{ id: string }>(
+    const result = await queryWithUser<{ id: string }>(user.email,
       `INSERT INTO un80actions.action_attachments (
         action_id,
         action_sub_id,
@@ -128,11 +128,13 @@ export async function deleteActionAttachment(
   if (!auth.authorized) {
     return { success: false, error: auth.error };
   }
+  const user = await getCurrentUser();
+  if (!user) return { success: false, error: "Unauthorized" };
   try {
     // Get attachment details
-    const rows = await query<{
+    const rows = await queryWithUser<{
       blob_name: string;
-    }>(
+    }>(user.email,
       `SELECT blob_name
        FROM un80actions.action_attachments 
        WHERE id = $1`,
@@ -149,7 +151,7 @@ export async function deleteActionAttachment(
     await deleteBlob(attachment.blob_name);
 
     // Delete from database
-    await query(`DELETE FROM un80actions.action_attachments WHERE id = $1`, [
+    await queryWithUser(user.email, `DELETE FROM un80actions.action_attachments WHERE id = $1`, [
       attachmentId,
     ]);
 
@@ -176,8 +178,10 @@ export async function updateAttachmentMetadata(
   if (!auth.authorized) {
     return { success: false, error: auth.error };
   }
+  const user = await getCurrentUser();
+  if (!user) return { success: false, error: "Unauthorized" };
   try {
-    await query(
+    await queryWithUser(user.email,
       `UPDATE un80actions.action_attachments 
        SET title = $1, description = $2
        WHERE id = $3`,
@@ -201,9 +205,13 @@ export async function updateAttachmentMetadata(
 export async function getAttachmentDownloadUrl(
   attachmentId: string,
 ): Promise<DownloadUrlResult> {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, error: "Not authenticated" };
+  }
   try {
     // Get blob name from database
-    const rows = await query<{ blob_name: string; original_filename: string }>(
+    const rows = await queryWithUser<{ blob_name: string; original_filename: string }>(user.email,
       `SELECT blob_name, original_filename 
        FROM un80actions.action_attachments 
        WHERE id = $1`,
@@ -270,7 +278,7 @@ export async function createAttachmentComment(
     }
 
     // Verify attachment exists and belongs to an action the user can access (same action context is assumed via UI)
-    const attachmentRows = await query<{ id: string }>(
+    const attachmentRows = await queryWithUser<{ id: string }>(user.email,
       `SELECT id FROM un80actions.action_attachments WHERE id = $1`,
       [attachmentId],
     );
@@ -280,14 +288,14 @@ export async function createAttachmentComment(
 
     const isLegal = user.user_role === "Legal";
 
-    const rows = await query<{
+    const rows = await queryWithUser<{
       id: string;
       attachment_id: string;
       user_id: string | null;
       comment: string;
       is_legal?: boolean;
       created_at: Date;
-    }>(
+    }>(user.email,
       `INSERT INTO un80actions.attachment_comments (attachment_id, user_id, comment, is_legal)
        VALUES ($1, $2, $3, $4)
        RETURNING id, attachment_id, user_id, comment, is_legal, created_at`,

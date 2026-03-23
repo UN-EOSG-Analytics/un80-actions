@@ -1,6 +1,6 @@
 "use server";
 
-import { query } from "@/lib/db/db";
+import { query, queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { getLegalCommentById } from "./queries";
 import { getCurrentUser } from "@/features/auth/service";
@@ -30,7 +30,8 @@ export async function createLegalComment(
       return { success: false, error: "Comment content cannot be empty" };
     }
 
-    const rows = await query<{ id: string }>(
+    const rows = await queryWithUser<{ id: string }>(
+      user.email,
       `INSERT INTO ${DB_SCHEMA}.action_legal_comments
      (action_id, action_sub_id, user_id, content, reply_to, content_review_status)
      VALUES ($1, $2, $3, $4, $5, 'needs_review')
@@ -70,7 +71,8 @@ export async function approveLegalComment(
       return { success: false, error: "Comment not found" };
     }
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_legal_comments
      SET content_review_status = 'approved',
          content_reviewed_by = $1,
@@ -112,7 +114,8 @@ export async function deleteLegalComment(
       return { success: false, error: "Not authorized to delete this comment" };
     }
 
-    await query(
+    await queryWithUser(
+      user.email,
       `DELETE FROM ${DB_SCHEMA}.action_legal_comments WHERE id = $1`,
       [commentId],
     );

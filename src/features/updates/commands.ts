@@ -1,6 +1,6 @@
 "use server";
 
-import { query } from "@/lib/db/db";
+import { query, queryWithUser } from "@/lib/db/db";
 import { getCurrentUser } from "@/features/auth/service";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { checkIsAdmin } from "@/features/auth/lib/permissions";
@@ -101,7 +101,8 @@ export async function createUpdate(
     return { success: false, error: "Update content cannot be empty" };
   }
 
-  const rows = await query<{ id: string }>(
+  const rows = await queryWithUser<{ id: string }>(
+    user.email,
     `INSERT INTO ${DB_SCHEMA}.action_updates
      (action_id, action_sub_id, user_id, content, content_review_status)
      VALUES ($1, $2, $3, $4, 'needs_review')
@@ -147,7 +148,8 @@ export async function updateUpdate(
     return { success: false, error: "Update content cannot be empty" };
   }
 
-  await query(
+  await queryWithUser(
+    user.email,
     `UPDATE ${DB_SCHEMA}.action_updates
      SET content = $1, updated_at = NOW(),
          content_review_status = 'needs_review',
@@ -183,9 +185,11 @@ export async function deleteUpdate(updateId: string): Promise<UpdateResult> {
     return { success: false, error: "Not authorized to delete this update" };
   }
 
-  await query(`DELETE FROM ${DB_SCHEMA}.action_updates WHERE id = $1`, [
-    updateId,
-  ]);
+  await queryWithUser(
+    user.email,
+    `DELETE FROM ${DB_SCHEMA}.action_updates WHERE id = $1`,
+    [updateId],
+  );
 
   return { success: true };
 }

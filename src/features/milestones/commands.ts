@@ -1,6 +1,6 @@
 "use server";
 
-import { query } from "@/lib/db/db";
+import { query, queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import type { ActionMilestone } from "@/types";
 import { getMilestoneById } from "./queries";
@@ -74,7 +74,8 @@ export async function createMilestone(
 
     // Get next serial_number for this action+track (max + 1, or 1 if none exist)
     // Serial is independent per (action_id, action_sub_id, is_public) track
-    const nextSerial = await query<{ next_serial: number }>(
+    const nextSerial = await queryWithUser<{ next_serial: number }>(
+      auth.user.email,
       `SELECT COALESCE(MAX(serial_number), 0) + 1 AS next_serial
        FROM ${DB_SCHEMA}.action_milestones
        WHERE action_id = $1 AND (action_sub_id IS NOT DISTINCT FROM $2) AND is_public = $3`,
@@ -82,8 +83,9 @@ export async function createMilestone(
     );
     const serial_number = nextSerial[0]?.next_serial ?? 1;
 
-    const rows = await query<ActionMilestone>(
-      `INSERT INTO ${DB_SCHEMA}.action_milestones 
+    const rows = await queryWithUser<ActionMilestone>(
+      auth.user.email,
+      `INSERT INTO ${DB_SCHEMA}.action_milestones
        (action_id, action_sub_id, serial_number, is_public, is_final, public_progress, description, deadline, status, submitted_by, submitted_by_entity)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'draft', $9, $10)
        RETURNING *`,
@@ -102,8 +104,9 @@ export async function createMilestone(
     );
 
     // Create initial version history entry
-    await query(
-      `INSERT INTO ${DB_SCHEMA}.milestone_versions 
+    await queryWithUser(
+      auth.user.email,
+      `INSERT INTO ${DB_SCHEMA}.milestone_versions
        (milestone_id, description, deadline, updates, status, changed_by, change_type)
        VALUES ($1, $2, $3, NULL, 'draft', $4, 'created')`,
       [rows[0].id, input.description || null, input.deadline || null, user.id],
@@ -172,8 +175,9 @@ export async function updateMilestone(
 
     params.push(milestoneId);
 
-    await query(
-      `INSERT INTO ${DB_SCHEMA}.milestone_versions 
+    await queryWithUser(
+      auth.user.email,
+      `INSERT INTO ${DB_SCHEMA}.milestone_versions
      (milestone_id, description, deadline, updates, status, changed_by, change_type)
      SELECT id, description, deadline, updates, status, $1, 'updated'
      FROM ${DB_SCHEMA}.action_milestones
@@ -189,7 +193,8 @@ export async function updateMilestone(
     ];
 
     try {
-      await query(
+      await queryWithUser(
+        auth.user.email,
         `UPDATE ${DB_SCHEMA}.action_milestones
        SET ${updatesWithReview.join(", ")}
        WHERE id = $${paramIndex}`,
@@ -198,7 +203,8 @@ export async function updateMilestone(
     } catch (e) {
       const msg = String((e as Error).message ?? "");
       if (msg.includes("content_review") || msg.includes("does not exist")) {
-        await query(
+        await queryWithUser(
+          auth.user.email,
           `UPDATE ${DB_SCHEMA}.action_milestones
          SET ${updates.join(", ")}
          WHERE id = $${paramIndex}`,
@@ -238,7 +244,8 @@ export async function approveMilestoneContent(
 
     const previousStatus = getMilestoneStatusLabel(milestone);
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET content_review_status = 'approved',
          content_reviewed_by = $1,
@@ -295,7 +302,8 @@ export async function requestMilestoneChanges(
 
     const previousStatus = getMilestoneStatusLabel(milestone);
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET needs_attention = TRUE,
          is_approved = FALSE,
@@ -351,7 +359,8 @@ export async function setMilestoneToDraft(
 
     const previousStatus = getMilestoneStatusLabel(milestone);
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET is_draft = TRUE,
          is_approved = FALSE,
@@ -404,7 +413,8 @@ export async function setMilestoneNeedsOlaReview(
 
     const previousStatus = getMilestoneStatusLabel(milestone);
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET needs_ola_review = TRUE,
          is_draft = FALSE,
@@ -458,7 +468,8 @@ export async function setMilestoneReviewedByOla(
 
     const previousStatus = getMilestoneStatusLabel(milestone);
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET reviewed_by_ola = TRUE,
          is_draft = FALSE,
@@ -510,7 +521,8 @@ export async function setMilestoneFinalized(
 
     const previousStatus = getMilestoneStatusLabel(milestone);
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET finalized = TRUE,
          is_draft = FALSE,
@@ -564,7 +576,8 @@ export async function setMilestoneAttentionToTimeline(
 
     const previousStatus = getMilestoneStatusLabel(milestone);
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET attention_to_timeline = TRUE,
          is_draft = FALSE,
@@ -619,7 +632,8 @@ export async function setMilestoneConfirmationNeeded(
 
     const previousStatus = getMilestoneStatusLabel(milestone);
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET confirmation_needed = TRUE,
          is_draft = FALSE,
@@ -667,7 +681,8 @@ export async function updateMilestoneDocumentSubmitted(
     return { success: false, error: auth.error };
   }
   try {
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_milestones
        SET milestone_document_submitted = $1
        WHERE id = $2`,
@@ -713,7 +728,8 @@ export async function updateMilestonePublicProgress(
       };
     }
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_milestones
        SET public_progress = $1
        WHERE id = $2 AND is_public = true`,
@@ -738,6 +754,10 @@ export async function updateMilestonePublicProgress(
 export async function submitMilestone(
   milestoneId: string,
 ): Promise<MilestoneResult> {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, error: "Not authenticated" };
+  }
   try {
     const milestone = await getMilestoneById(milestoneId);
     if (!milestone) {
@@ -751,7 +771,8 @@ export async function submitMilestone(
       };
     }
 
-    await query(
+    await queryWithUser(
+      user.email,
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET status = 'submitted',
          submitted_by = NULL,
@@ -809,7 +830,7 @@ export async function deleteMilestone(
       return { success: false, error: "Milestone not found" };
     }
 
-    await query(`DELETE FROM ${DB_SCHEMA}.action_milestones WHERE id = $1`, [
+    await queryWithUser(auth.user.email, `DELETE FROM ${DB_SCHEMA}.action_milestones WHERE id = $1`, [
       milestoneId,
     ]);
 
@@ -832,6 +853,10 @@ export async function deleteMilestone(
 export async function approveMilestone(
   milestoneId: string,
 ): Promise<MilestoneResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
     const milestone = await getMilestoneById(milestoneId);
     if (!milestone) {
@@ -845,7 +870,8 @@ export async function approveMilestone(
       return { success: false, error: "Milestone is not pending approval" };
     }
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET status = 'approved',
          approved_by = NULL,
@@ -871,6 +897,10 @@ export async function rejectMilestone(
   milestoneId: string,
   feedback?: string,
 ): Promise<MilestoneResult> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
   try {
     const milestone = await getMilestoneById(milestoneId);
     if (!milestone) {
@@ -888,7 +918,8 @@ export async function rejectMilestone(
       ? `${milestone.updates || ""}\n\n[Rejected]: ${feedback}`.trim()
       : milestone.updates;
 
-    await query(
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.action_milestones
      SET status = 'rejected',
          updates = $1,

@@ -1,7 +1,8 @@
 "use server";
 
-import { query } from "@/lib/db/db";
+import { query, queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
+import { getCurrentUser } from "@/features/auth/service";
 import { getActionMilestones } from "@/features/milestones/queries";
 import type {
   Action,
@@ -354,13 +355,16 @@ export async function getActionById(
   id: number,
   subId?: string | null,
 ): Promise<Action | null> {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
   const whereClause = subId
     ? "WHERE a.id = $1 AND a.sub_id = $2"
     : "WHERE a.id = $1 AND a.sub_id IS NULL";
 
   const params = subId ? [id, subId] : [id];
 
-  const rows = await query<ActionRow>(
+  const rows = await queryWithUser<ActionRow>(user.email,
     `${ACTION_SELECT} ${whereClause}`,
     params,
   );
@@ -379,9 +383,12 @@ export async function getActionByNumber(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   firstMilestone?: string | null,
 ): Promise<Action | null> {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
   // Match exact action by id and sub_id (empty string for no sub_id)
   // TODO: Use firstMilestone to filter or highlight specific milestone
-  const rows = await query<ActionRow>(
+  const rows = await queryWithUser<ActionRow>(user.email,
     `${ACTION_SELECT}
      WHERE a.id = $1
        AND a.sub_id = $2
@@ -406,6 +413,9 @@ export async function getActions(
   pagination: PaginationOptions = {},
   sort?: SortOptions,
 ): Promise<ActionsResponse> {
+  const user = await getCurrentUser();
+  if (!user) return { actions: [], total: 0, limit: pagination.limit ?? 50, offset: pagination.offset ?? 0 };
+
   const { limit = 50, offset = 0 } = pagination;
 
   const { clause: whereClause, params: filterParams } =
@@ -421,7 +431,7 @@ export async function getActions(
     ${whereClause}
   `;
 
-  const countResult = await query<{ total: string }>(countQuery, filterParams);
+  const countResult = await queryWithUser<{ total: string }>(user.email, countQuery, filterParams);
   const total = parseInt(countResult[0]?.total || "0", 10);
 
   // Get paginated results
@@ -433,7 +443,7 @@ export async function getActions(
     OFFSET $${filterParams.length + 2}
   `;
 
-  const rows = await query<ActionRow>(dataQuery, [
+  const rows = await queryWithUser<ActionRow>(user.email, dataQuery, [
     ...filterParams,
     limit,
     offset,
@@ -471,6 +481,9 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
     actionsWithNotes: [],
     actionsWithQuestions: [],
   };
+
+  const user = await getCurrentUser();
+  if (!user) return empty;
 
   const wpSelectWithRisk = `
     SELECT
@@ -667,7 +680,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
   try {
     let wpRows: WpRow[];
     try {
-      wpRows = await query<WpRow>(wpSelectWithRisk);
+      wpRows = await queryWithUser<WpRow>(user.email, wpSelectWithRisk);
     } catch (wpErr) {
       const msg = String((wpErr as Error).message ?? "");
       const code = (wpErr as { code?: string })?.code;
@@ -676,14 +689,14 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
         msg.includes("risk_assessment") ||
         msg.includes("does not exist")
       ) {
-        wpRows = await query<WpRow>(wpSelectWithoutRisk);
+        wpRows = await queryWithUser<WpRow>(user.email, wpSelectWithoutRisk);
       } else {
         throw wpErr;
       }
     }
 
     const [updateRows, noteRows, questionRows] = await Promise.all([
-      query<{
+      queryWithUser<{
         action_id: number;
         action_sub_id: string | null;
         work_package_id: number;
@@ -692,7 +705,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
         update_id: string;
         update_content: string;
         update_created_at: Date;
-      }>(`
+      }>(user.email, `
         SELECT
           a.id AS action_id,
           a.sub_id AS action_sub_id,
@@ -708,7 +721,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
           AND (u.action_sub_id IS NOT DISTINCT FROM a.sub_id)
         ORDER BY a.work_package_id, a.id, a.sub_id, u.created_at
       `),
-      query<{
+      queryWithUser<{
         action_id: number;
         action_sub_id: string | null;
         work_package_id: number;
@@ -717,7 +730,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
         note_id: string;
         note_content: string;
         note_created_at: Date;
-      }>(`
+      }>(user.email, `
         SELECT
           a.id AS action_id,
           a.sub_id AS action_sub_id,
@@ -733,7 +746,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
           AND (n.action_sub_id IS NOT DISTINCT FROM a.sub_id)
         ORDER BY a.work_package_id, a.id, a.sub_id, n.created_at
       `),
-      query<{
+      queryWithUser<{
         action_id: number;
         action_sub_id: string | null;
         work_package_id: number;
@@ -743,7 +756,7 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
         q_question: string;
         q_answer: string | null;
         q_created_at: Date;
-      }>(`
+      }>(user.email, `
         SELECT
           a.id AS action_id,
           a.sub_id AS action_sub_id,

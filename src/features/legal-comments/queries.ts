@@ -1,7 +1,8 @@
 "use server";
 
-import { query } from "@/lib/db/db";
+import { queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
+import { getCurrentUser } from "@/features/auth/service";
 import type { ActionLegalComment } from "@/types";
 
 // =========================================================
@@ -16,6 +17,9 @@ export async function getActionLegalComments(
   actionId: number,
   subId?: string | null,
 ): Promise<ActionLegalComment[]> {
+  const user = await getCurrentUser();
+  if (!user) return [];
+
   const whereClause =
     subId !== undefined
       ? "WHERE c.action_id = $1 AND (c.action_sub_id IS NOT DISTINCT FROM $2)"
@@ -23,7 +27,8 @@ export async function getActionLegalComments(
 
   const params = subId !== undefined ? [actionId, subId] : [actionId];
 
-  const rows = await query<ActionLegalComment>(
+  const rows = await queryWithUser<ActionLegalComment>(
+    user.email,
     `SELECT
       c.id,
       c.action_id,
@@ -55,7 +60,11 @@ export async function getActionLegalComments(
 export async function getLegalCommentById(
   commentId: string,
 ): Promise<ActionLegalComment | null> {
-  const rows = await query<ActionLegalComment>(
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  const rows = await queryWithUser<ActionLegalComment>(
+    user.email,
     `SELECT
       c.id,
       c.action_id,

@@ -1,7 +1,8 @@
 "use server";
 
-import { query } from "@/lib/db/db";
+import { queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
+import { getCurrentUser } from "@/features/auth/service";
 import type { ActionMilestone, MilestoneStatus } from "@/types";
 
 // =========================================================
@@ -31,6 +32,9 @@ export async function getActionMilestones(
   actionId: number,
   subId?: string | null,
 ): Promise<ActionMilestone[]> {
+  const user = await getCurrentUser();
+  if (!user) return [];
+
   const whereClause =
     subId !== undefined
       ? "WHERE action_id = $1 AND (action_sub_id IS NOT DISTINCT FROM $2)"
@@ -38,7 +42,7 @@ export async function getActionMilestones(
 
   const params = subId !== undefined ? [actionId, subId] : [actionId];
 
-  return query(
+  return queryWithUser(user.email,
     `SELECT
       m.id,
       m.action_id,
@@ -88,7 +92,10 @@ export async function getActionMilestones(
 export async function getMilestoneById(
   milestoneId: string,
 ): Promise<ActionMilestone | null> {
-  const rows = await query<ActionMilestone>(
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  const rows = await queryWithUser<ActionMilestone>(user.email,
     `SELECT
       m.id,
       m.action_id,
@@ -136,7 +143,10 @@ export async function getMilestoneById(
 export async function getMilestoneVersions(
   milestoneId: string,
 ): Promise<MilestoneVersion[]> {
-  const rows = await query<MilestoneVersion>(
+  const user = await getCurrentUser();
+  if (!user) return [];
+
+  const rows = await queryWithUser<MilestoneVersion>(user.email,
     `SELECT
       mv.id,
       mv.milestone_id,
@@ -216,6 +226,9 @@ type MilestoneViewRowDb = {
  * action number, and public / first / final milestone (description + deadline).
  */
 export async function getMilestoneViewTableData(): Promise<MilestoneViewRow[]> {
+  const user = await getCurrentUser();
+  if (!user) return [];
+
   const q = `
     SELECT
       wp.id AS work_package_id,
@@ -315,7 +328,7 @@ export async function getMilestoneViewTableData(): Promise<MilestoneViewRow[]> {
     JOIN actions a ON a.work_package_id = wp.id
     ORDER BY wp.id, a.id, a.sub_id ASC NULLS FIRST
   `;
-  const rows = await query<MilestoneViewRowDb>(q);
+  const rows = await queryWithUser<MilestoneViewRowDb>(user.email, q);
   const toCell = (
     desc: string | null,
     deadline: string | null,
@@ -420,6 +433,9 @@ export interface AllMilestonesTableRow {
 export async function getAllMilestonesTableData(): Promise<
   AllMilestonesTableRow[]
 > {
+  const user = await getCurrentUser();
+  if (!user) return [];
+
   const q = `
     SELECT
       m.id AS milestone_id,
@@ -455,7 +471,7 @@ export async function getAllMilestonesTableData(): Promise<
       m.serial_number ASC,
       m.deadline ASC NULLS LAST
   `;
-  return query<AllMilestonesTableRow>(q);
+  return queryWithUser<AllMilestonesTableRow>(user.email, q);
 }
 
 // =========================================================
@@ -479,6 +495,9 @@ export interface PublicMilestoneViewRow {
 export async function getPublicMilestonesViewData(): Promise<
   PublicMilestoneViewRow[]
 > {
+  const user = await getCurrentUser();
+  if (!user) return [];
+
   const q = `
     SELECT
       wp.id AS work_package_id,
@@ -494,6 +513,6 @@ export async function getPublicMilestonesViewData(): Promise<
     WHERE m.is_public = true
     ORDER BY wp.id, a.id, a.sub_id ASC NULLS FIRST, m.deadline ASC NULLS LAST
   `;
-  const rows = await query<PublicMilestoneViewRow>(q);
+  const rows = await queryWithUser<PublicMilestoneViewRow>(user.email, q);
   return rows;
 }

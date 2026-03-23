@@ -1,7 +1,8 @@
 "use server";
 
-import { query } from "@/lib/db/db";
+import { queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
+import { getCurrentUser } from "@/features/auth/service";
 import { checkIsAdmin } from "@/features/auth/lib/permissions";
 import type { ActionNote } from "@/types";
 
@@ -17,6 +18,9 @@ export async function getActionNotes(
   actionId: number,
   subId?: string | null,
 ): Promise<ActionNote[]> {
+  const user = await getCurrentUser();
+  if (!user) return [];
+
   // Admin-only feature
   if (!(await checkIsAdmin())) {
     return [];
@@ -29,7 +33,8 @@ export async function getActionNotes(
 
   const params = subId !== undefined ? [actionId, subId] : [actionId];
 
-  const rows = await query<ActionNote>(
+  const rows = await queryWithUser<ActionNote>(
+    user.email,
     `SELECT
       n.id,
       n.action_id,
@@ -61,12 +66,16 @@ export async function getActionNotes(
  * Admin-only: Returns null for non-admin users.
  */
 export async function getNoteById(noteId: string): Promise<ActionNote | null> {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
   // Admin-only feature
   if (!(await checkIsAdmin())) {
     return null;
   }
 
-  const rows = await query<ActionNote>(
+  const rows = await queryWithUser<ActionNote>(
+    user.email,
     `SELECT
       n.id,
       n.action_id,

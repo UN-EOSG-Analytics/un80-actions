@@ -1034,18 +1034,16 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
             style={{ width: "1476px", minWidth: "1476px" }}
           >
             <colgroup>
-              <col style={{ width: "64px" }} /> {/* WP */}
-              <col style={{ width: "112px" }} /> {/* Action */}
-              <col style={{ width: "88px" }} /> {/* # */}
-              <col style={{ width: "120px" }} /> {/* Visibility */}
+              <col style={{ width: "64px" }} />
+              <col style={{ width: "112px" }} />
+              <col style={{ width: "88px" }} />
+              <col style={{ width: "120px" }} />
               <col style={{ width: "340px" }} />
-              {/* Description */}
-              <col style={{ width: "136px" }} /> {/* Deadline */}
-              <col style={{ width: "216px" }} />{" "}
-              {/* Status — widest label: "Attention to timeline" */}
-              <col style={{ width: "176px" }} /> {/* Progress */}
-              <col style={{ width: "184px" }} /> {/* Deliverable */}
-              <col style={{ width: "40px" }} /> {/* Chevron */}
+              <col style={{ width: "136px" }} />
+              <col style={{ width: "216px" }} />
+              <col style={{ width: "176px" }} />
+              <col style={{ width: "184px" }} />
+              <col style={{ width: "40px" }} />
             </colgroup>
             <thead className="sticky top-0 z-10">
               <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">

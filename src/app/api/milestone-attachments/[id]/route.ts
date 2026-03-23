@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
 import path from "path";
-import { getCurrentUser } from "@/features/auth/service";
-import { query } from "@/lib/db/db";
+import { queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
+import { requireAdmin } from "@/features/auth/lib/permissions";
 
 const UPLOAD_DIR = "uploads/milestone-attachments";
 
@@ -16,23 +16,16 @@ export async function GET(
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
   }
 
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const adminCheck = await query<{ user_role: string }>(
-    `SELECT user_role FROM ${DB_SCHEMA}.approved_users WHERE LOWER(email) = LOWER($1)`,
-    [user.email],
-  );
-  if (adminCheck[0]?.user_role !== "Admin") {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
     return NextResponse.json(
-      { error: "Documents are only accessible to admins" },
+      { error: auth.error ?? "Unauthorized" },
       { status: 403 },
     );
   }
 
-  const rows = await query<{ file_path: string; file_name: string }>(
+  const rows = await queryWithUser<{ file_path: string; file_name: string }>(
+    auth.user.email,
     `SELECT file_path, file_name FROM ${DB_SCHEMA}.milestone_attachments WHERE id = $1`,
     [id],
   );

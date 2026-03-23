@@ -1,6 +1,6 @@
 "use server";
 
-import { query } from "@/lib/db/db";
+import { query, queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { getCurrentUser } from "@/features/auth/service";
 
@@ -20,8 +20,11 @@ export interface InsertActivityEntryInput {
 export async function insertActivityEntry(
   input: InsertActivityEntryInput,
 ): Promise<{ success: boolean; id?: string }> {
+  const user = await getCurrentUser();
+  if (!user) return { success: false };
+  if (input.user_id !== user.id) return { success: false };
   try {
-    const rows = await query<{ id: string }>(
+    const rows = await queryWithUser<{ id: string }>(user.email,
       `INSERT INTO ${DB_SCHEMA}.activity_entries
        (type, action_id, action_sub_id, milestone_id, title, description, user_id)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -52,7 +55,7 @@ export async function markActivityRead(
     const user = await getCurrentUser();
     if (!user) return { success: false, error: "Not authenticated" };
 
-    await query(
+    await queryWithUser(user.email,
       `INSERT INTO ${DB_SCHEMA}.activity_read (activity_id, user_id, read_at)
        VALUES ($1, $2, NOW())
        ON CONFLICT (activity_id, user_id) DO UPDATE SET read_at = NOW()`,
@@ -77,7 +80,7 @@ export async function markActivityUnread(
     const user = await getCurrentUser();
     if (!user) return { success: false, error: "Not authenticated" };
 
-    await query(
+    await queryWithUser(user.email,
       `DELETE FROM ${DB_SCHEMA}.activity_read
        WHERE activity_id = $1 AND user_id = $2`,
       [activityId, user.id],

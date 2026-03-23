@@ -1,6 +1,6 @@
 "use server";
 
-import { query } from "@/lib/db/db";
+import { queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { getCurrentUser } from "@/features/auth/service";
 import { requireAdmin } from "@/features/auth/lib/permissions";
@@ -47,9 +47,9 @@ export async function getMilestoneUpdates(
   const isAdmin = adminAuth.authorized;
   const hideInternal = !isAdmin;
 
-  const rows = await query<
+  const rows = await queryWithUser<
     MilestoneUpdate & { is_legal?: boolean; is_internal?: boolean }
-  >(
+  >(user.email,
     `SELECT
       u.id,
       u.milestone_id,
@@ -88,9 +88,12 @@ export async function getMilestoneUpdates(
 export async function getMilestoneUpdateById(
   updateId: string,
 ): Promise<MilestoneUpdate | null> {
-  const rows = await query<
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  const rows = await queryWithUser<
     MilestoneUpdate & { is_legal?: boolean; is_internal?: boolean }
-  >(
+  >(user.email,
     `SELECT
       u.id,
       u.milestone_id,

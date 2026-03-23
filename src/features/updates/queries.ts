@@ -1,7 +1,8 @@
 "use server";
 
-import { query } from "@/lib/db/db";
+import { queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
+import { getCurrentUser } from "@/features/auth/service";
 import type { ActionUpdate } from "@/types";
 
 // =========================================================
@@ -15,6 +16,9 @@ export async function getActionUpdates(
   actionId: number,
   subId?: string | null,
 ): Promise<ActionUpdate[]> {
+  const user = await getCurrentUser();
+  if (!user) return [];
+
   const whereClause =
     subId !== undefined
       ? "WHERE u.action_id = $1 AND (u.action_sub_id IS NOT DISTINCT FROM $2)"
@@ -22,7 +26,8 @@ export async function getActionUpdates(
 
   const params = subId !== undefined ? [actionId, subId] : [actionId];
 
-  const rows = await query<ActionUpdate>(
+  const rows = await queryWithUser<ActionUpdate>(
+    user.email,
     `SELECT
       u.id,
       u.action_id,
@@ -53,7 +58,11 @@ export async function getActionUpdates(
 export async function getUpdateById(
   updateId: string,
 ): Promise<ActionUpdate | null> {
-  const rows = await query<ActionUpdate>(
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  const rows = await queryWithUser<ActionUpdate>(
+    user.email,
     `SELECT
       u.id,
       u.action_id,
