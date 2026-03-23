@@ -50,6 +50,39 @@ export async function updateRiskAssessment(
 }
 
 /**
+ * Replace all action team member entities for an action. Admin only.
+ */
+export async function updateActionEntities(
+  actionId: number,
+  actionSubId: string | null,
+  entities: string[],
+): Promise<{ success: boolean; error?: string }> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
+
+  try {
+    await query(
+      `DELETE FROM ${DB_SCHEMA}.action_member_entities
+       WHERE action_id = $1 AND (action_sub_id IS NOT DISTINCT FROM $2)`,
+      [actionId, actionSubId ?? ""],
+    );
+    for (const entity of entities) {
+      await query(
+        `INSERT INTO ${DB_SCHEMA}.action_member_entities (action_id, action_sub_id, entity)
+         VALUES ($1, $2, $3)
+         ON CONFLICT DO NOTHING`,
+        [actionId, actionSubId ?? "", entity],
+      );
+    }
+    return { success: true };
+  } catch {
+    return { success: false, error: "Failed to update team members" };
+  }
+}
+
+/**
  * Update public action status for an action. Admin only.
  */
 export async function updatePublicActionStatus(

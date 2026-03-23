@@ -1,6 +1,7 @@
 "use server";
 
 import { query } from "@/lib/db/db";
+import { DB_SCHEMA } from "@/lib/db/config";
 import { getActionMilestones } from "@/features/milestones/queries";
 import type {
   Action,
@@ -136,6 +137,17 @@ const ACTION_SELECT = `
   JOIN work_packages wp ON a.work_package_id = wp.id
   JOIN workstreams ws ON wp.workstream_id = ws.id
 `;
+
+/**
+ * Fetch all available entities for the team members editor
+ */
+export async function getAllEntities(): Promise<string[]> {
+  const rows = await query<{ entity: string }>(
+    `SELECT entity FROM ${DB_SCHEMA}.entities ORDER BY entity`,
+    [],
+  );
+  return rows.map((r) => r.entity);
+}
 
 // =========================================================
 // PRIVATE HELPER FUNCTIONS

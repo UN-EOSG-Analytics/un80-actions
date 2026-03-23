@@ -2,12 +2,12 @@ import { Pool } from "pg";
 
 const globalForDb = global as unknown as { pool: Pool | undefined };
 
-// APP_DATABASE_URL takes precedence to avoid conflicts with Replit's injected DATABASE_URL
+// DATABASE_URL_APP takes precedence to avoid conflicts with Replit's injected DATABASE_URL
 const connectionString =
-  process.env.APP_DATABASE_URL || process.env.DATABASE_URL;
+  process.env.DATABASE_URL_APP || process.env.DATABASE_URL;
 if (!connectionString)
   throw new Error(
-    "Missing required environment variable: APP_DATABASE_URL or DATABASE_URL",
+    "Missing required environment variable: DATABASE_URL_APP or DATABASE_URL",
   );
 
 // Connects via PgBouncer (port 6432, transaction mode) on Azure PostgreSQL Flexible Server.

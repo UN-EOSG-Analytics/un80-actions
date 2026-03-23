@@ -461,7 +461,7 @@ export default function ActionModal({
           {/* Tab Content - only mount the active tab to avoid loading all tab data on open */}
           <div className="min-h-0 flex-1 overflow-hidden">
             <div className="h-full overflow-y-auto overscroll-contain p-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {activeTab === "overview" && <OverviewTab action={action} />}
+              {activeTab === "overview" && <OverviewTab action={action} isAdmin={isAdmin} />}
               {activeTab === "milestones" && (
                 <MilestonesTab action={action} isAdmin={isAdmin} />
               )}

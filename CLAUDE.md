@@ -92,11 +92,11 @@ pnpm format
 
 ## Connecting to the Database (CLI)
 
-The `DATABASE_URL` in `.env` includes `uselibpqcompat=true` which psql doesn't support. Strip it before connecting:
+The `DATABASE_URL_APP` in `.env` includes `uselibpqcompat=true` which psql doesn't support. Strip it before connecting:
 
 ```bash
 export $(grep -v '^#' .env | xargs)
-DB_URL=$(echo "$DATABASE_URL" | sed 's/&uselibpqcompat=true//')
+DB_URL=$(echo "$DATABASE_URL_APP" | sed 's/&uselibpqcompat=true//')
 psql "$DB_URL" -c "SELECT ..."
 ```
 
@@ -115,8 +115,8 @@ psql "$DB_URL" -c "SELECT id, header, question_date FROM un80actions.action_ques
 
 ## Environment Variables
 
-Required: `DATABASE_URL`, `AUTH_SECRET`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_FROM`, `SMTP_PASS`, `AZURE_STORAGE_ACCOUNT_NAME`, `AZURE_STORAGE_ACCOUNT_KEY`, `AZURE_STORAGE_CONTAINER_NAME`
-Optional: `DB_SCHEMA` (default: `un80actions`)
+Required: `DATABASE_URL_APP`, `AUTH_SECRET`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_FROM`, `SMTP_PASS`, `AZURE_STORAGE_ACCOUNT_NAME`, `AZURE_STORAGE_ACCOUNT_KEY`, `AZURE_STORAGE_CONTAINER_NAME`
+Optional: `DATABASE_URL` (fallback if `DATABASE_URL_APP` not set), `DB_SCHEMA` (default: `un80actions`)
 
 The PostgreSQL database is hosted on Azure. Database name: `un80actions`. All app tables live in the `un80actions` schema within that database.
 
