@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import ActionModal from "@/features/actions/ui/ActionModal";
 import { getActionByNumber } from "@/features/actions/queries";
 import { checkCanEditAction } from "@/features/auth/lib/permissions";
@@ -10,6 +10,7 @@ import type { Action } from "@/types";
 
 // Session storage key for return URL (set by ActionCard before opening modal)
 const RETURN_URL_KEY = "actionModalReturnUrl";
+const FILTERED_ACTION_IDS_KEY = "filteredActionIds";
 
 export default function ModalHandler({
   isAdmin = false,
@@ -84,6 +85,33 @@ export default function ModalHandler({
     loadAction();
   }, [actionParam, milestoneParam]);
 
+  // Read filtered action IDs from sessionStorage for prev/next navigation
+  const { prevAction, nextAction } = useMemo(() => {
+    if (!actionParam) return { prevAction: null, nextAction: null };
+    try {
+      const stored = sessionStorage.getItem(FILTERED_ACTION_IDS_KEY);
+      if (!stored) return { prevAction: null, nextAction: null };
+      const ids: string[] = JSON.parse(stored);
+      const currentIndex = ids.indexOf(actionParam);
+      if (currentIndex === -1) return { prevAction: null, nextAction: null };
+      return {
+        prevAction: currentIndex > 0 ? ids[currentIndex - 1] : null,
+        nextAction:
+          currentIndex < ids.length - 1 ? ids[currentIndex + 1] : null,
+      };
+    } catch {
+      return { prevAction: null, nextAction: null };
+    }
+  }, [actionParam]);
+
+  const navigateToAction = (actionId: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("action", actionId);
+    params.delete("tab");
+    params.delete("milestone");
+    router.replace(`?${params.toString()}`, { scroll: false });
+  };
+
   const handleClose = () => {
     // Get stored return URL and clear it
     const returnUrl = sessionStorage.getItem(RETURN_URL_KEY) || "/actions";
@@ -104,6 +132,8 @@ export default function ModalHandler({
       isAdmin={isAdmin}
       userEntity={userEntity}
       canEdit={canEdit}
+      onPrev={prevAction ? () => navigateToAction(prevAction) : undefined}
+      onNext={nextAction ? () => navigateToAction(nextAction) : undefined}
     />
   );
 }

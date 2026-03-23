@@ -1,31 +1,32 @@
 "use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import OverviewTab from "@/features/actions/ui/OverviewTab";
-import MilestonesTab from "@/features/milestones/ui/MilestonesTab";
-import NotesTab from "@/features/notes/ui/NotesTab";
-import QuestionsTab from "@/features/questions/ui/QuestionsTab";
-import { getActionQuestions } from "@/features/questions/queries";
-import { getActionNotes } from "@/features/notes/queries";
-import { getActionLegalComments } from "@/features/legal-comments/queries";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  exportActionToWord,
-  exportActionToMarkdown,
-  type ExportTab,
-  type ExportFormat,
+    exportActionToMarkdown,
+    exportActionToWord,
+    type ExportFormat,
+    type ExportTab,
 } from "@/features/actions/lib/export-action-document";
+import OverviewTab from "@/features/actions/ui/OverviewTab";
+import { getActionLegalComments } from "@/features/legal-comments/queries";
+import MilestonesTab from "@/features/milestones/ui/MilestonesTab";
+import { getActionNotes } from "@/features/notes/queries";
+import NotesTab from "@/features/notes/ui/NotesTab";
+import { getActionQuestions } from "@/features/questions/queries";
+import QuestionsTab from "@/features/questions/ui/QuestionsTab";
 import type { Action } from "@/types";
 import {
-  Calendar,
-  Check,
-  ChevronRight,
-  MessageCircle,
-  StickyNote,
-  Target,
-  X,
+    Calendar,
+    Check,
+    ChevronLeft,
+    ChevronRight,
+    MessageCircle,
+    StickyNote,
+    Target,
+    X,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 // =========================================================
@@ -61,6 +62,8 @@ interface ActionModalProps {
   isAdmin?: boolean;
   userEntity?: string | null;
   canEdit?: boolean;
+  onPrev?: () => void;
+  onNext?: () => void;
 }
 
 export default function ActionModal({
@@ -71,6 +74,8 @@ export default function ActionModal({
   isAdmin = false,
   userEntity = null,
   canEdit = false,
+  onPrev,
+  onNext,
 }: ActionModalProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -137,17 +142,24 @@ export default function ActionModal({
     }, 300);
   }, [onClose]);
 
-  // Close modal on escape key
+  // Keyboard navigation: Escape to close, arrow keys for prev/next
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
+      // Don't navigate when typing in inputs/textareas/selects
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
       if (e.key === "Escape") {
         handleClose();
+      } else if (e.key === "ArrowLeft" && onPrev) {
+        onPrev();
+      } else if (e.key === "ArrowRight" && onNext) {
+        onNext();
       }
     };
 
     document.addEventListener("keydown", handleKeyPress);
     return () => document.removeEventListener("keydown", handleKeyPress);
-  }, [handleClose]);
+  }, [handleClose, onPrev, onNext]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -255,8 +267,8 @@ export default function ActionModal({
     [action, activeTab],
   );
 
-  // Render loading state
-  if (loading) {
+  // Render initial loading state (no action data yet)
+  if (loading && !action) {
     return (
       <div
         className={`fixed inset-0 z-50 flex justify-end bg-black/50 transition-opacity duration-300 ${
@@ -279,9 +291,7 @@ export default function ActionModal({
           {/* Header */}
           <div className="shrink-0 border-b border-slate-200 bg-white px-6 py-4">
             <div className="flex items-start justify-between gap-4">
-              <p className="text-base font-semibold text-slate-700">
-                Loading...
-              </p>
+              <div className="h-5 w-32 animate-pulse rounded bg-slate-200" />
               <button
                 onClick={handleClose}
                 className="shrink-0 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
@@ -433,13 +443,35 @@ export default function ActionModal({
                 )}
               </h2>
             </div>
-            <button
-              onClick={handleClose}
-              className="shrink-0 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-              aria-label="Close modal"
-            >
-              <X size={20} />
-            </button>
+            <div className="flex shrink-0 items-center gap-1">
+              {(onPrev || onNext) && (
+                <>
+                  <button
+                    onClick={onPrev}
+                    disabled={!onPrev}
+                    className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 disabled:pointer-events-none disabled:opacity-30"
+                    aria-label="Previous action"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  <button
+                    onClick={onNext}
+                    disabled={!onNext}
+                    className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 disabled:pointer-events-none disabled:opacity-30"
+                    aria-label="Next action"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </>
+              )}
+              <button
+                onClick={handleClose}
+                className="shrink-0 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                aria-label="Close modal"
+              >
+                <X size={20} />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -476,7 +508,7 @@ export default function ActionModal({
 
           {/* Tab Content - only mount the active tab to avoid loading all tab data on open */}
           <div className="min-h-0 flex-1 overflow-hidden">
-            <div className="h-full overflow-y-auto overscroll-contain p-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className={`h-full overflow-y-auto overscroll-contain p-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden transition-opacity duration-150 ${loading ? "pointer-events-none opacity-40" : ""}`}>
               {activeTab === "overview" && (
                 <OverviewTab
                   action={action}

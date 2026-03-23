@@ -713,6 +713,14 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     }
   };
 
+  // Store the filtered action list in sessionStorage so the modal can navigate between actions
+  useEffect(() => {
+    const actionIds = sortedActions.map((a) =>
+      a.action_sub_id ? `${a.action_id}${a.action_sub_id}` : `${a.action_id}`,
+    );
+    sessionStorage.setItem("filteredActionIds", JSON.stringify(actionIds));
+  }, [sortedActions]);
+
   const handleActionClick = (actionId: number, actionSubId: string | null) => {
     sessionStorage.setItem("actionModalReturnUrl", window.location.href);
     const actionParam = actionSubId
