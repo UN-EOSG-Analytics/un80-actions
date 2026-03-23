@@ -392,3 +392,20 @@ create table if not exists un80actions.attachment_comments (
 );
 create index if not exists idx_attachment_comments_attachment_id on un80actions.attachment_comments (attachment_id);
 create index if not exists idx_attachment_comments_created_at on un80actions.attachment_comments (created_at);
+create table if not exists un80actions.notifications (
+    id uuid default gen_random_uuid() not null primary key,
+    user_id uuid not null references un80actions.users on delete cascade,
+    type text not null,
+    action_id integer not null,
+    action_sub_id text default ''::text not null,
+    title text not null,
+    body text not null,
+    actor_email text,
+    reference_id uuid,
+    reference_type text,
+    read_at timestamp with time zone,
+    created_at timestamp with time zone default now() not null
+);
+create index if not exists idx_notifications_user_unread on un80actions.notifications (user_id, created_at desc)
+where (read_at IS NULL);
+create index if not exists idx_notifications_user_all on un80actions.notifications (user_id, created_at desc);

@@ -10,3 +10,6 @@
 ## Feature List
 
 - Revisit action PDF export
+- Caching?
+- Security checks
+- DB safety and performance

@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserMenu } from "../features/auth/ui/UserMenu";
-import { ActivityFeed } from "../features/activity/ui/ActivityFeed";
+import { NotificationBell } from "../features/notifications/ui/NotificationBell";
 
 function NavLink({
   href,
@@ -94,7 +94,7 @@ export function Header({
                 </NavLink>
               </nav>
               <div className="h-5 w-px bg-gray-200" />
-              <ActivityFeed />
+              <NotificationBell />
               <UserMenu
                 email={user.email}
                 entity={user.entity}

@@ -931,13 +931,14 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
     setSearchInput("");
   };
 
-  const handleRowClick = (actionId: number, actionSubId: string | null) => {
+  const handleRowClick = (actionId: number, actionSubId: string | null, milestoneId?: string) => {
     const sp = searchParamsRef.current;
     const param = actionSubId ? `${actionId}${actionSubId}` : `${actionId}`;
     // Build return URL with current filter params but without modal params
     const returnParams = new URLSearchParams(sp.toString());
     returnParams.delete("action");
     returnParams.delete("tab");
+    returnParams.delete("milestone");
     const returnStr = returnParams.toString();
     sessionStorage.setItem(
       "actionModalReturnUrl",
@@ -947,6 +948,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
     const modalParams = new URLSearchParams(sp.toString());
     modalParams.set("action", param);
     modalParams.set("tab", "milestones");
+    if (milestoneId) modalParams.set("milestone", milestoneId);
     router.push(`${pathname}?${modalParams.toString()}`, { scroll: false });
   };
 
@@ -1364,7 +1366,7 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                     <tr
                       key={r.milestone_id}
                       onClick={() =>
-                        handleRowClick(r.action_id, r.action_sub_id)
+                        handleRowClick(r.action_id, r.action_sub_id, r.milestone_id)
                       }
                       className={`cursor-pointer transition-colors ${r.is_public ? "bg-un-blue/[3%] hover:bg-un-blue/[6%]" : "hover:bg-sky-50/50"}`}
                     >

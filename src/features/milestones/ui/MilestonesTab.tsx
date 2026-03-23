@@ -51,7 +51,8 @@ import {
 } from "@/features/milestones/updates-queries";
 import type { Action, ActionAttachment, ActionMilestone } from "@/types";
 import { Plus } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   MilestoneCreateForm,
   type NewMilestoneForm,
@@ -230,6 +231,22 @@ export default function MilestonesTab({
     milestones.forEach((m) => loadMilestoneUpdates(m.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [milestoneIds]);
+
+  // ── Deep link: scroll to + highlight a specific milestone ────────────────
+  const searchParams = useSearchParams();
+  const highlightedRef = useRef(false);
+  useEffect(() => {
+    if (highlightedRef.current || milestones.length === 0) return;
+    const targetId = searchParams.get("milestone");
+    if (!targetId) return;
+    const el = document.querySelector(`[data-milestone-id="${targetId}"]`);
+    if (!el) return;
+    highlightedRef.current = true;
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.classList.add("ring-2", "ring-un-blue", "ring-offset-2");
+    });
+  }, [milestones, searchParams]);
 
   const loadMilestoneUpdates = async (milestoneId: string) => {
     try {

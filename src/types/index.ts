@@ -456,3 +456,38 @@ export type ActionsTableTab =
   | "action_updates"
   | "notes"
   | "questions";
+
+// =========================================================
+// NOTIFICATIONS
+// =========================================================
+
+export type NotificationType =
+  | "milestone_submitted"
+  | "milestone_status_changed"
+  | "milestone_approved"
+  | "milestone_rejected"
+  | "note_added"
+  | "question_added"
+  | "question_answered"
+  | "update_added";
+
+export type NotificationReferenceType =
+  | "milestone"
+  | "note"
+  | "question"
+  | "update";
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  type: NotificationType;
+  action_id: number;
+  action_sub_id: string;
+  title: string;
+  body: string;
+  actor_email: string | null;
+  reference_id: string | null;
+  reference_type: NotificationReferenceType | null;
+  read_at: Date | null;
+  created_at: Date;
+}

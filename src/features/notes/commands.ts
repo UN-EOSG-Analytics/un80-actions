@@ -4,6 +4,7 @@ import { query, queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { getNoteById } from "./queries";
 import { requireAdmin } from "@/features/auth/lib/permissions";
+import { notifyActionStakeholders } from "@/features/notifications/commands";
 import type { NoteCreateInput, NoteUpdateInput, NoteResult } from "./types";
 
 // =========================================================
@@ -51,6 +52,18 @@ export async function createNote(input: NoteCreateInput): Promise<NoteResult> {
     );
 
     const note = await getNoteById(rows[0].id);
+
+    notifyActionStakeholders({
+      type: "note_added",
+      actionId: input.action_id,
+      actionSubId: input.action_sub_id ?? "",
+      title: "Note added",
+      body: input.header.trim(),
+      actorEmail: user.email,
+      referenceId: rows[0].id,
+      referenceType: "note",
+    }).catch(() => {});
+
     return { success: true, note: note || undefined };
   } catch (e) {
     return {

@@ -4,6 +4,7 @@ import { query, queryWithUser } from "@/lib/db/db";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { getQuestionById } from "./queries";
 import { requireAdmin } from "@/features/auth/lib/permissions";
+import { notifyActionStakeholders } from "@/features/notifications/commands";
 import type {
   QuestionCreateInput,
   QuestionUpdateInput,
@@ -57,6 +58,18 @@ export async function createQuestion(
     );
 
     const question = await getQuestionById(rows[0].id);
+
+    notifyActionStakeholders({
+      type: "question_added",
+      actionId: input.action_id,
+      actionSubId: input.action_sub_id ?? "",
+      title: "Question added",
+      body: input.header.trim(),
+      actorEmail: user.email,
+      referenceId: rows[0].id,
+      referenceType: "question",
+    }).catch(() => {});
+
     return { success: true, question: question || undefined };
   } catch (e) {
     return {
@@ -165,6 +178,18 @@ export async function answerQuestion(
     );
 
     const updated = await getQuestionById(questionId);
+
+    notifyActionStakeholders({
+      type: "question_answered",
+      actionId: question.action_id,
+      actionSubId: question.action_sub_id ?? "",
+      title: "Question answered",
+      body: question.header || "Question",
+      actorEmail: user.email,
+      referenceId: questionId,
+      referenceType: "question",
+    }).catch(() => {});
+
     return { success: true, question: updated || undefined };
   } catch (e) {
     return {

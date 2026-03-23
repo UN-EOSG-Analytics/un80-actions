@@ -31,7 +31,8 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { updateNote } from "@/features/notes/commands";
 
 // =========================================================
@@ -95,6 +96,22 @@ export default function NotesTab({
   const [tagsByNoteId, setTagsByNoteId] = useState<Record<string, Tag[]>>({});
   const [sortBy, setSortBy] = useState<"date" | "updated">("date");
   const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
+  const searchParams = useSearchParams();
+  const highlightedRef = useRef(false);
+
+  // Scroll to and highlight a specific note when linked via ?note=<id>
+  useEffect(() => {
+    if (highlightedRef.current || notes.length === 0) return;
+    const targetId = searchParams.get("note");
+    if (!targetId) return;
+    const el = document.querySelector(`[data-note-id="${targetId}"]`);
+    if (!el) return;
+    highlightedRef.current = true;
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.classList.add("ring-2", "ring-un-blue", "ring-offset-2");
+    });
+  }, [notes, searchParams]);
 
   const loadNotes = async () => {
     if (!isAdmin) return; // Notes are admin-only
@@ -418,6 +435,7 @@ export default function NotesTab({
                 return (
                   <div
                     key={note.id}
+                    data-note-id={note.id}
                     className={`rounded-xl border bg-white transition-all duration-150 ${isEditing ? "border-slate-200 shadow-[0_2px_12px_0_rgba(0,0,0,0.07)]" : "border-slate-100 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)] hover:border-slate-200 hover:shadow-[0_2px_10px_0_rgba(0,0,0,0.07)]"}`}
                   >
                     {/* Card content — always visible */}

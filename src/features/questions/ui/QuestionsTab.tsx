@@ -44,6 +44,7 @@ import {
   ArrowDown,
 } from "lucide-react";
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 
 // =========================================================
 // HELPER COMPONENTS
@@ -400,6 +401,22 @@ export default function QuestionsTab({
     "Other",
   ];
   const MILESTONE_NONE_VALUE = "__none__";
+  const searchParams = useSearchParams();
+  const highlightedRef = useRef(false);
+
+  // Scroll to and highlight a specific question when linked via ?question=<id>
+  useEffect(() => {
+    if (highlightedRef.current || questions.length === 0) return;
+    const targetId = searchParams.get("question");
+    if (!targetId) return;
+    const el = document.querySelector(`[data-question-id="${targetId}"]`);
+    if (!el) return;
+    highlightedRef.current = true;
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.classList.add("ring-2", "ring-un-blue", "ring-offset-2");
+    });
+  }, [questions, searchParams]);
 
   const loadQuestions = async () => {
     if (!isAdmin) return; // Questions are admin-only
@@ -805,6 +822,7 @@ export default function QuestionsTab({
                 return (
                   <div
                     key={q.id}
+                    data-question-id={q.id}
                     className={`rounded-xl border bg-white transition-all duration-150 ${isEditing ? "border-slate-200 shadow-[0_2px_12px_0_rgba(0,0,0,0.07)]" : "border-slate-100 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)] hover:border-slate-200 hover:shadow-[0_2px_10px_0_rgba(0,0,0,0.07)]"}`}
                   >
                     {/* Card content — always visible */}

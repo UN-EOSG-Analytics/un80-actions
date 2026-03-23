@@ -9,7 +9,7 @@ import {
   requireAdmin,
   requireWriteAccess,
 } from "@/features/auth/lib/permissions";
-import { insertActivityEntry } from "@/features/activity/commands";
+import { notifyActionStakeholders } from "@/features/notifications/commands";
 
 function getMilestoneStatusLabel(m: ActionMilestone): string {
   if (m.is_draft) return "Draft";
@@ -285,17 +285,19 @@ export async function approveMilestoneContent(
       [auth.user.id, milestoneId],
     );
 
-    await insertActivityEntry({
-      type: "milestone_status",
-      action_id: milestone.action_id,
-      action_sub_id: milestone.action_sub_id,
-      milestone_id: milestoneId,
-      title: "Milestone status changed",
-      description: `${previousStatus} → Approved`,
-      user_id: auth.user.id,
-    });
-
     const updated = await getMilestoneById(milestoneId);
+
+    notifyActionStakeholders({
+      type: "milestone_status_changed",
+      actionId: milestone.action_id,
+      actionSubId: milestone.action_sub_id ?? "",
+      title: "Milestone status changed",
+      body: `${previousStatus} → Approved`,
+      actorEmail: auth.user.email,
+      referenceId: milestoneId,
+      referenceType: "milestone",
+    }).catch(() => {});
+
     return { success: true, milestone: updated || undefined };
   } catch (e) {
     return {
@@ -342,17 +344,19 @@ export async function requestMilestoneChanges(
       [auth.user.id, milestoneId],
     );
 
-    await insertActivityEntry({
-      type: "milestone_status",
-      action_id: milestone.action_id,
-      action_sub_id: milestone.action_sub_id,
-      milestone_id: milestoneId,
-      title: "Milestone status changed",
-      description: `${previousStatus} → Needs Attention`,
-      user_id: auth.user.id,
-    });
-
     const updated = await getMilestoneById(milestoneId);
+
+    notifyActionStakeholders({
+      type: "milestone_status_changed",
+      actionId: milestone.action_id,
+      actionSubId: milestone.action_sub_id ?? "",
+      title: "Milestone status changed",
+      body: `${previousStatus} → Needs Attention`,
+      actorEmail: auth.user.email,
+      referenceId: milestoneId,
+      referenceType: "milestone",
+    }).catch(() => {});
+
     return { success: true, milestone: updated || undefined };
   } catch (e) {
     return {
@@ -396,17 +400,19 @@ export async function setMilestoneToDraft(
       [milestoneId],
     );
 
-    await insertActivityEntry({
-      type: "milestone_status",
-      action_id: milestone.action_id,
-      action_sub_id: milestone.action_sub_id,
-      milestone_id: milestoneId,
-      title: "Milestone status changed",
-      description: `${previousStatus} → Draft`,
-      user_id: auth.user.id,
-    });
-
     const updated = await getMilestoneById(milestoneId);
+
+    notifyActionStakeholders({
+      type: "milestone_status_changed",
+      actionId: milestone.action_id,
+      actionSubId: milestone.action_sub_id ?? "",
+      title: "Milestone status changed",
+      body: `${previousStatus} → Draft`,
+      actorEmail: auth.user.email,
+      referenceId: milestoneId,
+      referenceType: "milestone",
+    }).catch(() => {});
+
     return { success: true, milestone: updated || undefined };
   } catch (e) {
     return {
@@ -452,17 +458,19 @@ export async function setMilestoneNeedsOlaReview(
       [milestoneId],
     );
 
-    await insertActivityEntry({
-      type: "milestone_status",
-      action_id: milestone.action_id,
-      action_sub_id: milestone.action_sub_id,
-      milestone_id: milestoneId,
-      title: "Milestone status changed",
-      description: `${previousStatus} → Needs OLA review`,
-      user_id: auth.user.id,
-    });
-
     const updated = await getMilestoneById(milestoneId);
+
+    notifyActionStakeholders({
+      type: "milestone_status_changed",
+      actionId: milestone.action_id,
+      actionSubId: milestone.action_sub_id ?? "",
+      title: "Milestone status changed",
+      body: `${previousStatus} → Needs OLA review`,
+      actorEmail: auth.user.email,
+      referenceId: milestoneId,
+      referenceType: "milestone",
+    }).catch(() => {});
+
     return { success: true, milestone: updated || undefined };
   } catch (e) {
     return {
@@ -505,17 +513,19 @@ export async function setMilestoneReviewedByOla(
       [milestoneId],
     );
 
-    await insertActivityEntry({
-      type: "milestone_status",
-      action_id: milestone.action_id,
-      action_sub_id: milestone.action_sub_id,
-      milestone_id: milestoneId,
-      title: "Milestone status changed",
-      description: `${previousStatus} → Reviewed by OLA`,
-      user_id: auth.user.id,
-    });
-
     const updated = await getMilestoneById(milestoneId);
+
+    notifyActionStakeholders({
+      type: "milestone_status_changed",
+      actionId: milestone.action_id,
+      actionSubId: milestone.action_sub_id ?? "",
+      title: "Milestone status changed",
+      body: `${previousStatus} → Reviewed by OLA`,
+      actorEmail: auth.user.email,
+      referenceId: milestoneId,
+      referenceType: "milestone",
+    }).catch(() => {});
+
     return { success: true, milestone: updated || undefined };
   } catch (e) {
     return {
@@ -560,17 +570,19 @@ export async function setMilestoneFinalized(
       [milestoneId],
     );
 
-    await insertActivityEntry({
-      type: "milestone_status",
-      action_id: milestone.action_id,
-      action_sub_id: milestone.action_sub_id,
-      milestone_id: milestoneId,
-      title: "Milestone status changed",
-      description: `${previousStatus} → Finalized`,
-      user_id: auth.user.id,
-    });
-
     const updated = await getMilestoneById(milestoneId);
+
+    notifyActionStakeholders({
+      type: "milestone_status_changed",
+      actionId: milestone.action_id,
+      actionSubId: milestone.action_sub_id ?? "",
+      title: "Milestone status changed",
+      body: `${previousStatus} → Finalized`,
+      actorEmail: auth.user.email,
+      referenceId: milestoneId,
+      referenceType: "milestone",
+    }).catch(() => {});
+
     return { success: true, milestone: updated || undefined };
   } catch (e) {
     return {
@@ -615,17 +627,19 @@ export async function setMilestoneAttentionToTimeline(
       [milestoneId],
     );
 
-    await insertActivityEntry({
-      type: "milestone_status",
-      action_id: milestone.action_id,
-      action_sub_id: milestone.action_sub_id,
-      milestone_id: milestoneId,
-      title: "Milestone status changed",
-      description: `${previousStatus} → Attention to timeline`,
-      user_id: auth.user.id,
-    });
-
     const updated = await getMilestoneById(milestoneId);
+
+    notifyActionStakeholders({
+      type: "milestone_status_changed",
+      actionId: milestone.action_id,
+      actionSubId: milestone.action_sub_id ?? "",
+      title: "Milestone status changed",
+      body: `${previousStatus} → Attention to timeline`,
+      actorEmail: auth.user.email,
+      referenceId: milestoneId,
+      referenceType: "milestone",
+    }).catch(() => {});
+
     return { success: true, milestone: updated || undefined };
   } catch (e) {
     return {
@@ -671,17 +685,19 @@ export async function setMilestoneConfirmationNeeded(
       [milestoneId],
     );
 
-    await insertActivityEntry({
-      type: "milestone_status",
-      action_id: milestone.action_id,
-      action_sub_id: milestone.action_sub_id,
-      milestone_id: milestoneId,
-      title: "Milestone status changed",
-      description: `${previousStatus} → Confirmation needed`,
-      user_id: auth.user.id,
-    });
-
     const updated = await getMilestoneById(milestoneId);
+
+    notifyActionStakeholders({
+      type: "milestone_status_changed",
+      actionId: milestone.action_id,
+      actionSubId: milestone.action_sub_id ?? "",
+      title: "Milestone status changed",
+      body: `${previousStatus} → Confirmation needed`,
+      actorEmail: auth.user.email,
+      referenceId: milestoneId,
+      referenceType: "milestone",
+    }).catch(() => {});
+
     return { success: true, milestone: updated || undefined };
   } catch (e) {
     return {
@@ -806,6 +822,18 @@ export async function submitMilestone(
     );
 
     const updated = await getMilestoneById(milestoneId);
+
+    notifyActionStakeholders({
+      type: "milestone_submitted",
+      actionId: milestone.action_id,
+      actionSubId: milestone.action_sub_id ?? "",
+      title: "Milestone submitted",
+      body: `${milestone.is_public ? "Public" : "Internal"} milestone #${milestone.serial_number} submitted for review`,
+      actorEmail: user.email,
+      referenceId: milestoneId,
+      referenceType: "milestone",
+    }).catch(() => {});
+
     return { success: true, milestone: updated || undefined };
   } catch (e) {
     return {
@@ -906,6 +934,18 @@ export async function approveMilestone(
     );
 
     const updated = await getMilestoneById(milestoneId);
+
+    notifyActionStakeholders({
+      type: "milestone_approved",
+      actionId: milestone.action_id,
+      actionSubId: milestone.action_sub_id ?? "",
+      title: "Milestone approved",
+      body: `${milestone.is_public ? "Public" : "Internal"} milestone #${milestone.serial_number} has been approved`,
+      actorEmail: auth.user.email,
+      referenceId: milestoneId,
+      referenceType: "milestone",
+    }).catch(() => {});
+
     return { success: true, milestone: updated || undefined };
   } catch (e) {
     return {
@@ -955,6 +995,18 @@ export async function rejectMilestone(
     );
 
     const updated = await getMilestoneById(milestoneId);
+
+    notifyActionStakeholders({
+      type: "milestone_rejected",
+      actionId: milestone.action_id,
+      actionSubId: milestone.action_sub_id ?? "",
+      title: "Milestone rejected",
+      body: `${milestone.is_public ? "Public" : "Internal"} milestone #${milestone.serial_number} has been rejected${feedback ? `: ${feedback}` : ""}`,
+      actorEmail: auth.user.email,
+      referenceId: milestoneId,
+      referenceType: "milestone",
+    }).catch(() => {});
+
     return { success: true, milestone: updated || undefined };
   } catch (e) {
     return {

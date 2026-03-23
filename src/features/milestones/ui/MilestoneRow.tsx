@@ -136,6 +136,7 @@ export function MilestoneRow({
 
   return (
     <div
+      data-milestone-id={milestone.id}
       className={`rounded-xl border bg-white transition-all duration-150 ${isOpen ? "border-slate-200 shadow-[0_2px_12px_0_rgba(0,0,0,0.07)]" : "border-slate-100 shadow-[0_1px_3px_0_rgba(0,0,0,0.04)] hover:border-slate-200 hover:shadow-[0_2px_10px_0_rgba(0,0,0,0.07)]"}`}
     >
       <MilestoneCard

@@ -4,6 +4,7 @@ import { query, queryWithUser } from "@/lib/db/db";
 import { getCurrentUser } from "@/features/auth/service";
 import { DB_SCHEMA } from "@/lib/db/config";
 import { checkIsAdmin } from "@/features/auth/lib/permissions";
+import { notifyActionStakeholders } from "@/features/notifications/commands";
 import type { ActionUpdate } from "@/types";
 import { getUpdateById } from "./queries";
 
@@ -116,6 +117,18 @@ export async function createUpdate(
   );
 
   const update = await getUpdateById(rows[0].id);
+
+  notifyActionStakeholders({
+    type: "update_added",
+    actionId: input.action_id,
+    actionSubId: input.action_sub_id ?? "",
+    title: "Update added",
+    body: input.content.trim().slice(0, 120),
+    actorEmail: user.email,
+    referenceId: rows[0].id,
+    referenceType: "update",
+  }).catch(() => {});
+
   return { success: true, update: update || undefined };
 }
 
