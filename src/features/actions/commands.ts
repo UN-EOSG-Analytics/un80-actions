@@ -50,6 +50,31 @@ export async function updateRiskAssessment(
 }
 
 /**
+ * Create a new entity in the entities table. Admin only.
+ */
+export async function createEntity(
+  entity: string,
+): Promise<{ success: boolean; error?: string }> {
+  const auth = await requireAdmin();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
+
+  const trimmed = entity.trim();
+  if (!trimmed) return { success: false, error: "Entity name cannot be empty" };
+
+  try {
+    await query(
+      `INSERT INTO ${DB_SCHEMA}.entities (entity) VALUES ($1) ON CONFLICT DO NOTHING`,
+      [trimmed],
+    );
+    return { success: true };
+  } catch {
+    return { success: false, error: "Failed to create entity" };
+  }
+}
+
+/**
  * Replace all action team member entities for an action. Admin only.
  */
 export async function updateActionEntities(

@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { getStatusStyles } from "@/constants/actionStatus";
 import { getAllEntities } from "@/features/actions/queries";
-import { updateActionEntities } from "@/features/actions/commands";
+import { createEntity, updateActionEntities } from "@/features/actions/commands";
 import type { Action } from "@/types";
 import { Check, Clock, FileText, Lightbulb, Pencil, Target, X } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
@@ -66,6 +66,8 @@ export default function OverviewTab({
   const [selected, setSelected] = useState<string[]>(action.action_entities ?? []);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
+  const [newEntity, setNewEntity] = useState("");
+  const [addingNew, setAddingNew] = useState(false);
 
   useEffect(() => {
     setSelected(action.action_entities ?? []);
@@ -99,6 +101,19 @@ export default function OverviewTab({
   const cancel = () => {
     setSelected(action.action_entities ?? []);
     setEditing(false);
+  };
+
+  const addNew = async () => {
+    const trimmed = newEntity.trim();
+    if (!trimmed) return;
+    setAddingNew(true);
+    const result = await createEntity(trimmed);
+    if (result.success) {
+      setAllEntities((prev) => [...prev, trimmed].sort());
+      setSelected((prev) => [...prev, trimmed]);
+      setNewEntity("");
+    }
+    setAddingNew(false);
   };
 
   const filtered = allEntities.filter((e) =>
@@ -237,6 +252,23 @@ export default function OverviewTab({
                     ))}
                   </div>
                 )}
+                <div className="flex gap-1.5">
+                  <input
+                    type="text"
+                    value={newEntity}
+                    onChange={(e) => setNewEntity(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && addNew()}
+                    placeholder="Add new entity…"
+                    className="min-w-0 flex-1 rounded border border-slate-200 px-2 py-1 text-sm text-slate-700 placeholder:text-slate-400"
+                  />
+                  <button
+                    onClick={addNew}
+                    disabled={addingNew || !newEntity.trim()}
+                    className="rounded border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-40"
+                  >
+                    Add
+                  </button>
+                </div>
                 <div className="flex gap-2">
                   <button
                     onClick={save}
