@@ -123,24 +123,23 @@ export default function OverviewTab({ action }: { action: Action }) {
               </div>
             </InfoRow>
           )}
-          {action.action_entities && (
-            <InfoRow label="Entities">
+          <InfoRow label="Action Team Members">
+            {action.action_entities && action.action_entities.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
-                {action.action_entities
-                  .split(";")
-                  .filter(Boolean)
-                  .map((entity) => (
-                    <Badge
-                      key={entity}
-                      variant="outline"
-                      className="bg-slate-50 text-slate-600"
-                    >
-                      {entity.trim()}
-                    </Badge>
-                  ))}
+                {action.action_entities.map((entity) => (
+                  <Badge
+                    key={entity}
+                    variant="outline"
+                    className="bg-slate-50 text-slate-600"
+                  >
+                    {entity}
+                  </Badge>
+                ))}
               </div>
-            </InfoRow>
-          )}
+            ) : (
+              <span className="text-slate-400 italic">Not applicable</span>
+            )}
+          </InfoRow>
         </div>
       </SectionCard>
 

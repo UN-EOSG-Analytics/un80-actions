@@ -301,7 +301,7 @@ export interface Action {
   action_focal_points: string[]; // Emails from action_focal_points
   action_support_persons: string[]; // Emails from action_support_persons
   action_member_persons: string[]; // Emails from action_member_persons
-  action_entities: string; // Semicolon-separated entities from action_member_entities
+  action_entities: string[]; // Entity names from action_member_entities
 
   // Milestone info (simplified for card/list display)
   upcoming_milestone: string | null;

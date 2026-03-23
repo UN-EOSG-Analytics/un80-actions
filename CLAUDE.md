@@ -85,8 +85,9 @@ pnpm typecheck          # tsc --noEmit — also runs automatically as pre-commit
 pnpm lint --fix
 pnpm format
 
+# Always use `uv run python` for Python scripts (never plain `python` or `python3`)
 # ⚠️ Python ETL scripts are for reference only — do NOT run against the production DB
-# uv run python python/prepare_actions_data.py
+# uv run python python/misc/update_action_entities.py
 ```
 
 ## Connecting to the Database (CLI)

@@ -27,10 +27,14 @@ create table if not exists systemchart.entities (
     entity varchar(255) not null primary key,
     entity_long text
 );
+create table if not exists un80actions.entities (
+    entity varchar(255) not null primary key,
+    entity_long text
+);
 create table if not exists un80actions.approved_users (
     email text not null primary key,
     full_name text,
-    entity text references systemchart.entities on delete restrict,
+    entity text references un80actions.entities on delete restrict,
     user_status un80actions.user_status,
     user_role un80actions.user_roles,
     created_at timestamp with time zone default now() not null
@@ -38,7 +42,7 @@ create table if not exists un80actions.approved_users (
 comment on table un80actions.approved_users is 'Pre-approval registry. Users must have an entry here to authenticate. Email links to users table.';
 create table if not exists un80actions.leads (
     name text not null primary key,
-    entity text references systemchart.entities on delete restrict
+    entity text references un80actions.entities on delete restrict
 );
 create table if not exists un80actions.approved_user_leads (
     user_email text not null references un80actions.approved_users on delete cascade,
@@ -112,7 +116,7 @@ create table if not exists un80actions.action_milestones (
         content_reviewed_at timestamp with time zone,
         submitted_by uuid references un80actions.users on delete
     set null,
-        submitted_by_entity text references systemchart.entities on delete
+        submitted_by_entity text references un80actions.entities on delete
     set null,
         submitted_at timestamp with time zone,
         reviewed_by uuid references un80actions.users on delete
@@ -215,7 +219,7 @@ create table if not exists un80actions.action_support_persons (
 create table if not exists un80actions.action_member_entities (
     action_id integer not null,
     action_sub_id text default ''::text not null,
-    entity text not null references systemchart.entities on delete restrict,
+    entity text not null references un80actions.entities on delete restrict,
     unique (action_id, action_sub_id, entity),
     foreign key (action_id, action_sub_id) references un80actions.actions on delete cascade
 );

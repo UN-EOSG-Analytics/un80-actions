@@ -272,3 +272,8 @@ uploads/
 # next-agents-md
 .next-docs/
 .idea
+
+
+data/
+
+.claude/

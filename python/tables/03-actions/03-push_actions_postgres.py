@@ -236,7 +236,7 @@ try:
             print(f"Found {len(existing_leads)} existing leads")
 
             # Fetch existing entities to validate foreign keys
-            cur.execute("SELECT entity FROM systemchart.entities")
+            cur.execute("SELECT entity FROM un80actions.entities")
             existing_entities = {row[0] for row in cur.fetchall()}
             print(f"Found {len(existing_entities)} existing entities")
 

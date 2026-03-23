@@ -98,13 +98,13 @@ const ACTION_SELECT = `
          AND (amp.action_sub_id IS NOT DISTINCT FROM a.sub_id)),
       ARRAY[]::text[]
     ) as action_member_persons,
-    -- Aggregated member entities (semicolon-separated)
+    -- Aggregated member entities
     COALESCE(
-      (SELECT string_agg(DISTINCT ame.entity, ';')
+      (SELECT array_agg(DISTINCT ame.entity ORDER BY ame.entity)
        FROM action_member_entities ame
        WHERE ame.action_id = a.id
          AND (ame.action_sub_id IS NOT DISTINCT FROM a.sub_id)),
-      ''
+      ARRAY[]::text[]
     ) as action_entities,
     -- Upcoming milestone (most recent with 'upcoming' type or earliest non-completed)
     (SELECT am.description
@@ -171,7 +171,7 @@ interface ActionRow {
   action_focal_points: string[] | null;
   action_support_persons: string[] | null;
   action_member_persons: string[] | null;
-  action_entities: string;
+  action_entities: string[] | null;
   upcoming_milestone: string | null;
   delivery_date: string | null;
   updates: string | null;
@@ -212,7 +212,7 @@ function rowToAction(row: ActionRow): Action {
     action_focal_points: row.action_focal_points ?? [],
     action_support_persons: row.action_support_persons ?? [],
     action_member_persons: row.action_member_persons ?? [],
-    action_entities: row.action_entities ?? "",
+    action_entities: row.action_entities ?? [],
     upcoming_milestone: row.upcoming_milestone,
     delivery_date: row.delivery_date,
     updates: row.updates,
