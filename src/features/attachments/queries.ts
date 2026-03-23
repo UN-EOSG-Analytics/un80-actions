@@ -20,7 +20,8 @@ export async function getActionAttachments(
   const user = await getCurrentUser();
   if (!user) return [];
 
-  const rows = await queryWithUser<ActionAttachment>(user.email,
+  const rows = await queryWithUser<ActionAttachment>(
+    user.email,
     `SELECT 
       aa.id,
       aa.action_id,
@@ -60,7 +61,8 @@ export async function getActionAttachmentCount(
   const user = await getCurrentUser();
   if (!user) return 0;
 
-  const result = await queryWithUser<{ count: string }>(user.email,
+  const result = await queryWithUser<{ count: string }>(
+    user.email,
     `SELECT COUNT(*) as count
     FROM un80actions.action_attachments
     WHERE action_id = $1 
@@ -80,7 +82,8 @@ export async function getAttachmentById(
   const user = await getCurrentUser();
   if (!user) return null;
 
-  const rows = await queryWithUser<ActionAttachment>(user.email,
+  const rows = await queryWithUser<ActionAttachment>(
+    user.email,
     `SELECT 
       aa.id,
       aa.action_id,
@@ -136,7 +139,8 @@ export async function getAttachmentComments(
     comment: string;
     is_legal?: boolean;
     created_at: Date;
-  }>(user.email,
+  }>(
+    user.email,
     `SELECT
       c.id,
       c.attachment_id,

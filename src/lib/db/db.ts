@@ -53,9 +53,10 @@ export async function queryWithUser<T = unknown>(
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    await client.query("SELECT set_config('app.current_user_email', $1, true)", [
-      userEmail.toLowerCase(),
-    ]);
+    await client.query(
+      "SELECT set_config('app.current_user_email', $1, true)",
+      [userEmail.toLowerCase()],
+    );
     const result = await client.query(text, params);
     await client.query("COMMIT");
     return result.rows;

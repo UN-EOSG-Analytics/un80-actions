@@ -2,7 +2,15 @@
 
 import { logout, toggleAdminRole } from "@/features/auth/commands";
 import { Badge } from "../../../components/ui/badge";
-import { LogOut, ShieldCheck, ShieldOff } from "lucide-react";
+import {
+  LogOut,
+  ShieldCheck,
+  Scale,
+  Star,
+  Compass,
+  LifeBuoy,
+  UserCheck,
+} from "lucide-react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 
@@ -18,6 +26,26 @@ const ROLE_STYLES: Record<string, string> = {
 function getRoleStyle(role: string | null | undefined): string {
   if (!role) return "bg-gray-100 text-gray-400";
   return ROLE_STYLES[role] ?? "bg-gray-100 text-gray-500";
+}
+
+function getRoleIcon(role: string | null | undefined) {
+  const cls = "h-3 w-3";
+  switch (role) {
+    case "Admin":
+      return <ShieldCheck className={cls} />;
+    case "Legal":
+      return <Scale className={cls} />;
+    case "Principal":
+      return <Star className={cls} />;
+    case "Focal Point":
+      return <Compass className={cls} />;
+    case "Support":
+      return <LifeBuoy className={cls} />;
+    case "Assistant":
+      return <UserCheck className={cls} />;
+    default:
+      return null;
+  }
 }
 
 function getRoleLabel(role: string | null | undefined): string {
@@ -63,18 +91,24 @@ export function UserMenu({ email, entity, isAdmin, userRole }: Props) {
             onClick={handleToggleAdmin}
             disabled={isPending}
             className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors ${roleStyle} ${
-              isPending ? "cursor-wait opacity-50" : "cursor-pointer hover:opacity-80"
+              isPending
+                ? "cursor-wait opacity-50"
+                : "cursor-pointer hover:opacity-80"
             }`}
-            title={isAdmin ? "Click to switch to User view" : "Click to switch to Admin view"}
+            title={
+              isAdmin
+                ? "Click to switch to User view"
+                : "Click to switch to Admin view"
+            }
           >
-            {isAdmin ? <ShieldCheck className="h-3 w-3" /> : <ShieldOff className="h-3 w-3" />}
+            {getRoleIcon(userRole)}
             {roleLabel}
           </button>
         ) : (
           <span
             className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${roleStyle}`}
           >
-            {isAdmin ? <ShieldCheck className="h-3 w-3" /> : null}
+            {getRoleIcon(userRole)}
             {roleLabel}
           </span>
         )}

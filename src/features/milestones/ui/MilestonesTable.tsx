@@ -1335,7 +1335,19 @@ export function MilestonesTable({ rows }: MilestonesTableProps) {
                     colSpan={10}
                     className="px-4 py-12 text-center text-gray-400"
                   >
-                    No milestones found
+                    {rows.length === 0 ? (
+                      <>
+                        You don&rsquo;t have any milestones assigned to your
+                        account yet.
+                        <br />
+                        <span className="text-gray-300">
+                          Please reach out to the UN80 Secretariat if you have
+                          any questions.
+                        </span>
+                      </>
+                    ) : (
+                      "No milestones match your current filters."
+                    )}
                   </td>
                 </tr>
               ) : (

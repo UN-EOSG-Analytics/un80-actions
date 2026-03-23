@@ -42,7 +42,8 @@ export async function getActionMilestones(
 
   const params = subId !== undefined ? [actionId, subId] : [actionId];
 
-  return queryWithUser(user.email,
+  return queryWithUser(
+    user.email,
     `SELECT
       m.id,
       m.action_id,
@@ -95,7 +96,8 @@ export async function getMilestoneById(
   const user = await getCurrentUser();
   if (!user) return null;
 
-  const rows = await queryWithUser<ActionMilestone>(user.email,
+  const rows = await queryWithUser<ActionMilestone>(
+    user.email,
     `SELECT
       m.id,
       m.action_id,
@@ -146,7 +148,8 @@ export async function getMilestoneVersions(
   const user = await getCurrentUser();
   if (!user) return [];
 
-  const rows = await queryWithUser<MilestoneVersion>(user.email,
+  const rows = await queryWithUser<MilestoneVersion>(
+    user.email,
     `SELECT
       mv.id,
       mv.milestone_id,

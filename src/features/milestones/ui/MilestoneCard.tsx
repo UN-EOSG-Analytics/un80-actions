@@ -46,6 +46,7 @@ interface MilestoneCardProps {
   onPublicProgressChange?: (value: PublicProgressValue) => void;
   publicProgress?: "completed" | "in_progress" | "delayed" | null;
   isAdmin?: boolean;
+  canEdit?: boolean;
 }
 
 export function MilestoneCard({
@@ -62,6 +63,7 @@ export function MilestoneCard({
   onPublicProgressChange,
   publicProgress = null,
   isAdmin = false,
+  canEdit = false,
 }: MilestoneCardProps) {
   // Determine display status
   // dot color + label text — consistent badge system
@@ -535,7 +537,7 @@ export function MilestoneCard({
               </span>
             )}
           </button>
-          {isAdmin && (
+          {(isAdmin || canEdit) && (
             <button
               onClick={(e) => {
                 e.stopPropagation();

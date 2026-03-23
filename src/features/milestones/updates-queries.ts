@@ -49,7 +49,8 @@ export async function getMilestoneUpdates(
 
   const rows = await queryWithUser<
     MilestoneUpdate & { is_legal?: boolean; is_internal?: boolean }
-  >(user.email,
+  >(
+    user.email,
     `SELECT
       u.id,
       u.milestone_id,
@@ -93,7 +94,8 @@ export async function getMilestoneUpdateById(
 
   const rows = await queryWithUser<
     MilestoneUpdate & { is_legal?: boolean; is_internal?: boolean }
-  >(user.email,
+  >(
+    user.email,
     `SELECT
       u.id,
       u.milestone_id,

@@ -37,9 +37,10 @@ Example: adding a note → `features/notes/commands.ts`; display → `features/n
 ## Database Conventions
 
 - All tables live in the `un80actions` schema; use `DB_SCHEMA` constant from `@/lib/db/config` — never hardcode the schema name
-- Use the `query<T>()` helper from `@/lib/db/db` for all SQL — it handles pool management and connection release
+- Use `query<T>()` from `@/lib/db/db` for reads and writes on non-RLS tables. Use `queryWithUser<T>(email, sql, params)` for any query that touches RLS-protected tables — it wraps the query in a transaction with `set_config('app.current_user_email', ...)` so RLS policies can resolve the current user
 - Pool tuned for serverless: max 1 connection, `search_path` set to `un80actions,systemchart,public`; uses PgBouncer on Azure port 6432 in transaction mode
 - Actions have a composite PK `(id, sub_id)` — always filter on both: `WHERE id = $1 AND (sub_id IS NOT DISTINCT FROM $2)`
+- **`sub_id` is always an empty string `''`, never `NULL`** — this is a critical recurring bug source. The DB stores `sub_id` as `''` for actions without a sub-identifier (e.g., action 1) and `'(a)'`/`'(b)'` for those with one. **Never coerce with `|| null` or `?? null`** — pass the value as-is. `IS NOT DISTINCT FROM` comparing `null` to `''` returns `false`, silently breaking queries. When extracting `sub_id` from URL params or regex matches, use `actionMatch[2] || ""` (fallback to empty string), not `actionMatch[2] || null`.
 - Schema enums (e.g. `milestone_status`, `user_roles`, `risk_assessment`) mirror the TypeScript types in `src/types/index.ts`
 - To add a DB feature: write the migration SQL in `sql/migrations/` and update `sql/schema/un80actions_schema.sql`. Run migrations manually via DataGrip, ensuring the correct database and schema are selected.
 
@@ -61,12 +62,24 @@ Example: adding a note → `features/notes/commands.ts`; display → `features/n
 
 **Permission helpers** in `features/auth/lib/permissions.ts`:
 
-- `requireAdmin()` — returns `AdminCheckResult`; use in commands that require `Admin` or `Legal`
+- `requireAdmin()` — returns `AdminCheckResult`; use in commands that only `Admin` or `Legal` may execute
 - `checkIsAdmin()` — returns `boolean`; use for conditional query filtering (e.g. hiding `is_internal` updates)
+- `requireWriteAccess(actionId, actionSubId)` — returns `WriteAccessResult` with `{ user: { id, email, isAdmin } }`; grants access to ranks 0–4 (Admin/Legal, WP leads, WP focal points, action leads, action focal points). Use for action-scoped write operations like milestone create/edit.
+- `checkCanEditAction(actionId, actionSubId)` — returns `boolean`; UI helper wrapping `requireWriteAccess`
 
-**Lead assignment**: Users can be linked to one or more leads via `approved_user_leads` (user_email → lead_name). Leads are associated with work packages and actions — this is the foundation for scoped access (users seeing only their assigned work packages/actions). This scope filtering is **not yet fully enforced** in the app layer.
+**Rank hierarchy** (6 assignment paths from user to action):
+- **Rank 0**: Admin / Legal (via `approved_users.user_role`)
+- **Rank 1**: WP lead (user → `approved_user_leads` → `work_package_leads` → `actions`)
+- **Rank 2**: WP focal point (user → `work_package_focal_points` → `actions`)
+- **Rank 3**: Action lead (user → `approved_user_leads` → `action_leads`)
+- **Rank 4**: Action focal point (user → `action_focal_points`)
+- **Rank 5–6**: Member/support persons — read-only, no write access
 
-**PostgreSQL RLS**: `sql/policies/rls_policies.sql` exists but is currently empty — all access control is enforced in application-layer server actions/queries, not at the DB level. RLS is a future consideration.
+**Lead assignment**: Users can be linked to one or more leads via `approved_user_leads` (user_email → lead_name). Leads are associated with work packages and actions.
+
+**PostgreSQL RLS**: Active on all 13 core tables. Policies defined in `sql/policies/rls_policies.sql`. Defense-in-depth: access control is enforced both in application-layer server actions (`requireAdmin`/`requireWriteAccess`) and at the DB level via RLS policies. All `commands.ts` write operations use `queryWithUser()` to set the RLS session context. Queries that JOIN through RLS-protected tables (e.g., checking write access via `actions` table) must also use `queryWithUser()`.
+
+**Public milestone locking**: Non-admin users (ranks 1–4) cannot edit public milestones after submission (only `draft`/`rejected` status is editable). Enforced in both app layer (`updateMilestone` in `milestones/commands.ts`) and RLS (`017_public_milestone_lock.sql` WITH CHECK clause).
 
 **Auth files**: `features/auth/service.ts` (tokens/sessions), `commands.ts` (orchestration), `mail.ts` (SMTP email), `lib/permissions.ts` (role helpers).
 

@@ -3,9 +3,21 @@
 import { Badge } from "@/components/ui/badge";
 import { getStatusStyles } from "@/constants/actionStatus";
 import { getAllEntities } from "@/features/actions/queries";
-import { createEntity, toggleOwnEntityOnAction, updateActionEntities } from "@/features/actions/commands";
+import {
+  createEntity,
+  toggleOwnEntityOnAction,
+  updateActionEntities,
+} from "@/features/actions/commands";
 import type { Action } from "@/types";
-import { Check, Clock, FileText, Lightbulb, Pencil, Target, X } from "lucide-react";
+import {
+  Check,
+  Clock,
+  FileText,
+  Lightbulb,
+  Pencil,
+  Target,
+  X,
+} from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -65,7 +77,9 @@ export default function OverviewTab({
 
   const [editing, setEditing] = useState(false);
   const [allEntities, setAllEntities] = useState<string[]>([]);
-  const [selected, setSelected] = useState<string[]>(action.action_entities ?? []);
+  const [selected, setSelected] = useState<string[]>(
+    action.action_entities ?? [],
+  );
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
   const [newEntity, setNewEntity] = useState("");
@@ -86,13 +100,19 @@ export default function OverviewTab({
 
   const toggle = (entity: string) => {
     setSelected((prev) =>
-      prev.includes(entity) ? prev.filter((e) => e !== entity) : [...prev, entity],
+      prev.includes(entity)
+        ? prev.filter((e) => e !== entity)
+        : [...prev, entity],
     );
   };
 
   const save = async () => {
     setSaving(true);
-    const result = await updateActionEntities(action.id, action.sub_id, selected);
+    const result = await updateActionEntities(
+      action.id,
+      action.sub_id,
+      selected,
+    );
     setSaving(false);
     if (result.success) {
       setEditing(false);
@@ -111,10 +131,16 @@ export default function OverviewTab({
   const toggleOwn = async () => {
     if (!userEntity) return;
     setTogglingOwn(true);
-    const result = await toggleOwnEntityOnAction(action.id, action.sub_id, !ownIsListed);
+    const result = await toggleOwnEntityOnAction(
+      action.id,
+      action.sub_id,
+      !ownIsListed,
+    );
     if (result.success) {
       setSelected((prev) =>
-        ownIsListed ? prev.filter((e) => e !== userEntity) : [...prev, userEntity],
+        ownIsListed
+          ? prev.filter((e) => e !== userEntity)
+          : [...prev, userEntity],
       );
       router.refresh();
     }
@@ -218,7 +244,7 @@ export default function OverviewTab({
               {isAdmin && !editing && (
                 <button
                   onClick={openEditor}
-                  className="text-slate-400 hover:text-un-blue transition-colors"
+                  className="text-slate-400 transition-colors hover:text-un-blue"
                   title="Edit team members"
                 >
                   <Pencil className="h-3 w-3" />
@@ -249,21 +275,32 @@ export default function OverviewTab({
                             : "border-slate-300"
                         }`}
                       >
-                        {selected.includes(entity) && <Check className="h-2.5 w-2.5" />}
+                        {selected.includes(entity) && (
+                          <Check className="h-2.5 w-2.5" />
+                        )}
                       </span>
                       <span className="text-slate-700">{entity}</span>
                     </button>
                   ))}
                   {filtered.length === 0 && (
-                    <p className="px-3 py-2 text-sm text-slate-400">No matches</p>
+                    <p className="px-3 py-2 text-sm text-slate-400">
+                      No matches
+                    </p>
                   )}
                 </div>
                 {selected.length > 0 && (
                   <div className="flex flex-wrap gap-1">
                     {selected.map((e) => (
-                      <Badge key={e} variant="outline" className="bg-slate-50 text-slate-600 gap-1">
+                      <Badge
+                        key={e}
+                        variant="outline"
+                        className="gap-1 bg-slate-50 text-slate-600"
+                      >
                         {e}
-                        <button onClick={() => toggle(e)} className="text-slate-400 hover:text-slate-600">
+                        <button
+                          onClick={() => toggle(e)}
+                          className="text-slate-400 hover:text-slate-600"
+                        >
                           <X className="h-2.5 w-2.5" />
                         </button>
                       </Badge>
@@ -306,31 +343,45 @@ export default function OverviewTab({
             ) : (
               <div className="space-y-2 text-sm text-slate-700">
                 <div className="flex flex-wrap gap-1.5">
-                  {selected.map((entity) => (
+                  {selected.map((entity) =>
                     !isAdmin && entity === userEntity ? (
-                      <Badge key={entity} variant="outline" className="bg-slate-50 text-slate-600 gap-1">
+                      <Badge
+                        key={entity}
+                        variant="outline"
+                        className="gap-1 bg-slate-50 text-slate-600"
+                      >
                         {entity}
-                        <button onClick={toggleOwn} disabled={togglingOwn} className="text-slate-400 hover:text-slate-600 disabled:opacity-50">
+                        <button
+                          onClick={toggleOwn}
+                          disabled={togglingOwn}
+                          className="text-slate-400 hover:text-slate-600 disabled:opacity-50"
+                        >
                           <X className="h-2.5 w-2.5" />
                         </button>
                       </Badge>
                     ) : (
-                      <Badge key={entity} variant="outline" className="bg-slate-50 text-slate-600">
+                      <Badge
+                        key={entity}
+                        variant="outline"
+                        className="bg-slate-50 text-slate-600"
+                      >
                         {entity}
                       </Badge>
-                    )
-                  ))}
+                    ),
+                  )}
                   {!isAdmin && userEntity && !ownIsListed && (
                     <button
                       onClick={toggleOwn}
                       disabled={togglingOwn}
-                      className="inline-flex items-center rounded-full border border-dashed border-slate-400 px-2.5 py-0.5 text-xs text-slate-500 hover:border-un-blue hover:text-un-blue transition-colors disabled:opacity-50"
+                      className="inline-flex items-center rounded-full border border-dashed border-slate-400 px-2.5 py-0.5 text-xs text-slate-500 transition-colors hover:border-un-blue hover:text-un-blue disabled:opacity-50"
                     >
                       + Add {userEntity}
                     </button>
                   )}
                   {selected.length === 0 && (isAdmin || !userEntity) && (
-                    <span className="text-slate-400 italic">Not applicable</span>
+                    <span className="text-slate-400 italic">
+                      Not applicable
+                    </span>
                   )}
                 </div>
               </div>

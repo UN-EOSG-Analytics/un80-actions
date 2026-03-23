@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import ActionModal from "@/features/actions/ui/ActionModal";
 import { getActionByNumber } from "@/features/actions/queries";
+import { checkCanEditAction } from "@/features/auth/lib/permissions";
 import { decodeUrlParam } from "@/lib/utils";
 import type { Action } from "@/types";
 
@@ -22,6 +23,7 @@ export default function ModalHandler({
   const actionParam = searchParams.get("action");
   const milestoneParam = searchParams.get("milestone");
   const [action, setAction] = useState<Action | null>(null);
+  const [canEdit, setCanEdit] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,6 +31,7 @@ export default function ModalHandler({
     // If there's no action param, clear state
     if (!actionParam) {
       setAction(null);
+      setCanEdit(false);
       setError(null);
       setLoading(false);
       return;
@@ -67,6 +70,8 @@ export default function ModalHandler({
           setAction(null);
         } else {
           setAction(foundAction);
+          const editAccess = await checkCanEditAction(actionId, actionSubId);
+          setCanEdit(editAccess);
         }
       } catch {
         setError("Failed to load action");
@@ -98,6 +103,7 @@ export default function ModalHandler({
       error={error}
       isAdmin={isAdmin}
       userEntity={userEntity}
+      canEdit={canEdit}
     />
   );
 }

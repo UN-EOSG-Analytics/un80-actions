@@ -50,7 +50,8 @@ export async function createMilestoneUpdate(
   try {
     const rows = await queryWithUser<
       MilestoneUpdate & { is_legal?: boolean; is_internal?: boolean }
-    >(user.email,
+    >(
+      user.email,
       `INSERT INTO ${DB_SCHEMA}.milestone_updates (milestone_id, user_id, content, reply_to, is_legal, is_internal)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
@@ -95,7 +96,8 @@ export async function toggleMilestoneUpdateResolved(
   }
 
   try {
-    await queryWithUser(auth.user.email,
+    await queryWithUser(
+      auth.user.email,
       `UPDATE ${DB_SCHEMA}.milestone_updates
        SET is_resolved = NOT is_resolved
        WHERE id = $1`,
@@ -127,7 +129,8 @@ export async function deleteMilestoneUpdate(
   const isAdmin = adminAuth.authorized;
 
   try {
-    const checkRows = await queryWithUser<{ user_id: string | null }>(user.email,
+    const checkRows = await queryWithUser<{ user_id: string | null }>(
+      user.email,
       `SELECT user_id FROM ${DB_SCHEMA}.milestone_updates WHERE id = $1`,
       [updateId],
     );
@@ -141,9 +144,11 @@ export async function deleteMilestoneUpdate(
       return { success: false, error: "You can only delete your own comments" };
     }
 
-    await queryWithUser(user.email, `DELETE FROM ${DB_SCHEMA}.milestone_updates WHERE id = $1`, [
-      updateId,
-    ]);
+    await queryWithUser(
+      user.email,
+      `DELETE FROM ${DB_SCHEMA}.milestone_updates WHERE id = $1`,
+      [updateId],
+    );
 
     return { success: true };
   } catch (err) {
@@ -170,7 +175,8 @@ export async function updateMilestoneUpdate(
   const isAdmin = adminAuth.authorized;
 
   try {
-    const checkRows = await queryWithUser<{ user_id: string | null }>(user.email,
+    const checkRows = await queryWithUser<{ user_id: string | null }>(
+      user.email,
       `SELECT user_id FROM ${DB_SCHEMA}.milestone_updates WHERE id = $1`,
       [updateId],
     );
@@ -184,7 +190,8 @@ export async function updateMilestoneUpdate(
       return { success: false, error: "You can only edit your own comments" };
     }
 
-    const rows = await queryWithUser<MilestoneUpdate & { is_legal?: boolean }>(user.email,
+    const rows = await queryWithUser<MilestoneUpdate & { is_legal?: boolean }>(
+      user.email,
       `UPDATE ${DB_SCHEMA}.milestone_updates
        SET content = $1, updated_at = NOW()
        WHERE id = $2

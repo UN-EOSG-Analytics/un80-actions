@@ -316,9 +316,11 @@ export async function deleteQuestion(
       return { success: false, error: "Question not found" };
     }
 
-    await queryWithUser(auth.user.email, `DELETE FROM ${DB_SCHEMA}.action_questions WHERE id = $1`, [
-      questionId,
-    ]);
+    await queryWithUser(
+      auth.user.email,
+      `DELETE FROM ${DB_SCHEMA}.action_questions WHERE id = $1`,
+      [questionId],
+    );
     return { success: true };
   } catch (e) {
     return {

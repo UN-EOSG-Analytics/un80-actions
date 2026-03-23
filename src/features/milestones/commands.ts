@@ -5,7 +5,10 @@ import { DB_SCHEMA } from "@/lib/db/config";
 import type { ActionMilestone } from "@/types";
 import { getMilestoneById } from "./queries";
 import { getCurrentUser } from "@/features/auth/service";
-import { requireAdmin } from "@/features/auth/lib/permissions";
+import {
+  requireAdmin,
+  requireWriteAccess,
+} from "@/features/auth/lib/permissions";
 import { insertActivityEntry } from "@/features/activity/commands";
 
 function getMilestoneStatusLabel(m: ActionMilestone): string {
@@ -56,7 +59,10 @@ export interface MilestoneResult {
 export async function createMilestone(
   input: MilestoneCreateInput,
 ): Promise<MilestoneResult> {
-  const auth = await requireAdmin();
+  const auth = await requireWriteAccess(
+    input.action_id,
+    input.action_sub_id ?? "",
+  );
   if (!auth.authorized) {
     return { success: false, error: auth.error };
   }
@@ -137,10 +143,6 @@ export async function updateMilestone(
   milestoneId: string,
   input: MilestoneUpdateInput,
 ): Promise<MilestoneResult> {
-  const auth = await requireAdmin();
-  if (!auth.authorized) {
-    return { success: false, error: auth.error };
-  }
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -150,6 +152,27 @@ export async function updateMilestone(
     const milestone = await getMilestoneById(milestoneId);
     if (!milestone) {
       return { success: false, error: "Milestone not found" };
+    }
+
+    const auth = await requireWriteAccess(
+      milestone.action_id,
+      milestone.action_sub_id,
+    );
+    if (!auth.authorized) {
+      return { success: false, error: auth.error };
+    }
+
+    // Public milestones lock after submission — only admin can edit
+    if (
+      milestone.is_public &&
+      !auth.user.isAdmin &&
+      !["draft", "rejected"].includes(milestone.status)
+    ) {
+      return {
+        success: false,
+        error:
+          "Public milestones are locked after submission. An admin must approve or reject first.",
+      };
     }
 
     const updates: string[] = [];
@@ -830,9 +853,11 @@ export async function deleteMilestone(
       return { success: false, error: "Milestone not found" };
     }
 
-    await queryWithUser(auth.user.email, `DELETE FROM ${DB_SCHEMA}.action_milestones WHERE id = $1`, [
-      milestoneId,
-    ]);
+    await queryWithUser(
+      auth.user.email,
+      `DELETE FROM ${DB_SCHEMA}.action_milestones WHERE id = $1`,
+      [milestoneId],
+    );
 
     return { success: true };
   } catch (e) {

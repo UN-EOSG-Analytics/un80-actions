@@ -73,7 +73,8 @@ export async function uploadActionAttachment(
     await uploadBlob(blobName, buffer, file.type);
 
     // Store metadata in database
-    const result = await queryWithUser<{ id: string }>(user.email,
+    const result = await queryWithUser<{ id: string }>(
+      user.email,
       `INSERT INTO un80actions.action_attachments (
         action_id,
         action_sub_id,
@@ -134,7 +135,8 @@ export async function deleteActionAttachment(
     // Get attachment details
     const rows = await queryWithUser<{
       blob_name: string;
-    }>(user.email,
+    }>(
+      user.email,
       `SELECT blob_name
        FROM un80actions.action_attachments 
        WHERE id = $1`,
@@ -151,9 +153,11 @@ export async function deleteActionAttachment(
     await deleteBlob(attachment.blob_name);
 
     // Delete from database
-    await queryWithUser(user.email, `DELETE FROM un80actions.action_attachments WHERE id = $1`, [
-      attachmentId,
-    ]);
+    await queryWithUser(
+      user.email,
+      `DELETE FROM un80actions.action_attachments WHERE id = $1`,
+      [attachmentId],
+    );
 
     revalidatePath("/");
 
@@ -181,7 +185,8 @@ export async function updateAttachmentMetadata(
   const user = await getCurrentUser();
   if (!user) return { success: false, error: "Unauthorized" };
   try {
-    await queryWithUser(user.email,
+    await queryWithUser(
+      user.email,
       `UPDATE un80actions.action_attachments 
        SET title = $1, description = $2
        WHERE id = $3`,
@@ -211,7 +216,11 @@ export async function getAttachmentDownloadUrl(
   }
   try {
     // Get blob name from database
-    const rows = await queryWithUser<{ blob_name: string; original_filename: string }>(user.email,
+    const rows = await queryWithUser<{
+      blob_name: string;
+      original_filename: string;
+    }>(
+      user.email,
       `SELECT blob_name, original_filename 
        FROM un80actions.action_attachments 
        WHERE id = $1`,
@@ -278,7 +287,8 @@ export async function createAttachmentComment(
     }
 
     // Verify attachment exists and belongs to an action the user can access (same action context is assumed via UI)
-    const attachmentRows = await queryWithUser<{ id: string }>(user.email,
+    const attachmentRows = await queryWithUser<{ id: string }>(
+      user.email,
       `SELECT id FROM un80actions.action_attachments WHERE id = $1`,
       [attachmentId],
     );
@@ -295,7 +305,8 @@ export async function createAttachmentComment(
       comment: string;
       is_legal?: boolean;
       created_at: Date;
-    }>(user.email,
+    }>(
+      user.email,
       `INSERT INTO un80actions.attachment_comments (attachment_id, user_id, comment, is_legal)
        VALUES ($1, $2, $3, $4)
        RETURNING id, attachment_id, user_id, comment, is_legal, created_at`,

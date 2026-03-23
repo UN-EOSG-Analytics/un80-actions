@@ -342,8 +342,10 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
     // Preserve modal params
     const action = current.get("action");
     const milestone = current.get("milestone");
+    const tab = current.get("tab");
     if (action) params.set("action", action);
     if (milestone) params.set("milestone", milestone);
+    if (tab) params.set("tab", tab);
     // Filter params
     if (searchInput) params.set("q", searchInput);
     if (sortField) params.set("sort", sortField);
@@ -1277,7 +1279,19 @@ export function ActionsTable({ data, isAdmin = false }: ActionsTableProps) {
                   colSpan={isAdmin ? 7 : 6}
                   className="px-4 py-12 text-center text-gray-400"
                 >
-                  No actions found
+                  {allActions.length === 0 ? (
+                    <>
+                      You don&rsquo;t have any actions assigned to your account
+                      yet.
+                      <br />
+                      <span className="text-gray-300">
+                        Please reach out to the UN80 Secretariat if you have any
+                        questions.
+                      </span>
+                    </>
+                  ) : (
+                    "No actions match your current filters."
+                  )}
                 </td>
               </tr>
             ) : (

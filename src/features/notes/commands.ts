@@ -163,9 +163,11 @@ export async function deleteNote(noteId: string): Promise<NoteResult> {
       return { success: false, error: "Note not found" };
     }
 
-    await queryWithUser(auth.user.email, `DELETE FROM ${DB_SCHEMA}.action_notes WHERE id = $1`, [
-      noteId,
-    ]);
+    await queryWithUser(
+      auth.user.email,
+      `DELETE FROM ${DB_SCHEMA}.action_notes WHERE id = $1`,
+      [noteId],
+    );
 
     return { success: true };
   } catch (e) {

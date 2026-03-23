@@ -45,7 +45,8 @@ export async function getRecentActivity(
     created_at: Date;
     updated_at: Date | null;
     header: string | null;
-  }>(currentUser.email,
+  }>(
+    currentUser.email,
     `SELECT 
       n.id,
       n.action_id,
@@ -86,7 +87,8 @@ export async function getRecentActivity(
     created_at: Date;
     updated_at: Date | null;
     header: string | null;
-  }>(currentUser.email,
+  }>(
+    currentUser.email,
     `SELECT 
       q.id,
       q.action_id,
@@ -132,7 +134,8 @@ export async function getRecentActivity(
     submitted_at: Date | null;
     reviewed_at: Date | null;
     approved_at: Date | null;
-  }>(currentUser.email,
+  }>(
+    currentUser.email,
     `SELECT 
       m.id,
       m.action_id,
@@ -206,7 +209,8 @@ export async function getRecentActivity(
     user_email: string | null;
     created_at: Date;
     updated_at: Date | null;
-  }>(currentUser.email,
+  }>(
+    currentUser.email,
     `SELECT 
       mu.id,
       mu.milestone_id,
@@ -246,7 +250,8 @@ export async function getRecentActivity(
     id: string;
     name: string;
     created_at: Date;
-  }>(currentUser.email,
+  }>(
+    currentUser.email,
     `SELECT id, name, created_at
     FROM ${DB_SCHEMA}.tags
     ORDER BY created_at DESC
@@ -278,7 +283,8 @@ export async function getRecentActivity(
       description: string;
       user_email: string | null;
       created_at: Date;
-    }>(currentUser.email,
+    }>(
+      currentUser.email,
       `SELECT 
         e.id,
         e.action_id,
@@ -319,7 +325,11 @@ export async function getRecentActivity(
   // Attach read_at for current user
   if (currentUser) {
     try {
-      const readRows = await queryWithUser<{ activity_id: string; read_at: Date }>(currentUser.email,
+      const readRows = await queryWithUser<{
+        activity_id: string;
+        read_at: Date;
+      }>(
+        currentUser.email,
         `SELECT activity_id, read_at FROM ${DB_SCHEMA}.activity_read WHERE user_id = $1`,
         [currentUser.id],
       );

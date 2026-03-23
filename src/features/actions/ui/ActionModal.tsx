@@ -60,6 +60,7 @@ interface ActionModalProps {
   error?: string | null;
   isAdmin?: boolean;
   userEntity?: string | null;
+  canEdit?: boolean;
 }
 
 export default function ActionModal({
@@ -69,6 +70,7 @@ export default function ActionModal({
   error = null,
   isAdmin = false,
   userEntity = null,
+  canEdit = false,
 }: ActionModalProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -323,7 +325,9 @@ export default function ActionModal({
           {/* Header */}
           <div className="shrink-0 border-b border-slate-200 bg-white px-6 py-4">
             <div className="flex items-start justify-between gap-4">
-              <p className="text-base font-semibold text-slate-700">Error</p>
+              <p className="text-base font-semibold text-slate-700">
+                Action unavailable
+              </p>
               <button
                 onClick={handleClose}
                 className="shrink-0 rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
@@ -337,8 +341,18 @@ export default function ActionModal({
           {/* Content */}
           <div className="flex min-h-0 flex-1 items-center justify-center px-6">
             <div className="text-center">
-              <p className="mb-4 text-lg text-slate-500">
-                {error || "Action not found"}
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+                <X className="h-6 w-6 text-slate-400" />
+              </div>
+              <p className="mb-2 text-lg font-medium text-slate-700">
+                {error === "Failed to load action"
+                  ? "Failed to load action"
+                  : "Action not available"}
+              </p>
+              <p className="mb-6 text-sm text-slate-500">
+                {error === "Failed to load action"
+                  ? "Something went wrong. Please try again."
+                  : "This action does not exist or you do not have permission to view it. Please reach out to the UN80 Secretariat if you have any questions."}
               </p>
               <button
                 onClick={handleClose}
@@ -463,9 +477,19 @@ export default function ActionModal({
           {/* Tab Content - only mount the active tab to avoid loading all tab data on open */}
           <div className="min-h-0 flex-1 overflow-hidden">
             <div className="h-full overflow-y-auto overscroll-contain p-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {activeTab === "overview" && <OverviewTab action={action} isAdmin={isAdmin} userEntity={userEntity} />}
+              {activeTab === "overview" && (
+                <OverviewTab
+                  action={action}
+                  isAdmin={isAdmin}
+                  userEntity={userEntity}
+                />
+              )}
               {activeTab === "milestones" && (
-                <MilestonesTab action={action} isAdmin={isAdmin} />
+                <MilestonesTab
+                  action={action}
+                  isAdmin={isAdmin}
+                  canEdit={canEdit}
+                />
               )}
               {activeTab === "questions" && isAdmin && (
                 <QuestionsTab

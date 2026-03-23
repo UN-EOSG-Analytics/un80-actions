@@ -364,7 +364,8 @@ export async function getActionById(
 
   const params = subId ? [id, subId] : [id];
 
-  const rows = await queryWithUser<ActionRow>(user.email,
+  const rows = await queryWithUser<ActionRow>(
+    user.email,
     `${ACTION_SELECT} ${whereClause}`,
     params,
   );
@@ -388,7 +389,8 @@ export async function getActionByNumber(
 
   // Match exact action by id and sub_id (empty string for no sub_id)
   // TODO: Use firstMilestone to filter or highlight specific milestone
-  const rows = await queryWithUser<ActionRow>(user.email,
+  const rows = await queryWithUser<ActionRow>(
+    user.email,
     `${ACTION_SELECT}
      WHERE a.id = $1
        AND a.sub_id = $2
@@ -414,7 +416,13 @@ export async function getActions(
   sort?: SortOptions,
 ): Promise<ActionsResponse> {
   const user = await getCurrentUser();
-  if (!user) return { actions: [], total: 0, limit: pagination.limit ?? 50, offset: pagination.offset ?? 0 };
+  if (!user)
+    return {
+      actions: [],
+      total: 0,
+      limit: pagination.limit ?? 50,
+      offset: pagination.offset ?? 0,
+    };
 
   const { limit = 50, offset = 0 } = pagination;
 
@@ -431,7 +439,11 @@ export async function getActions(
     ${whereClause}
   `;
 
-  const countResult = await queryWithUser<{ total: string }>(user.email, countQuery, filterParams);
+  const countResult = await queryWithUser<{ total: string }>(
+    user.email,
+    countQuery,
+    filterParams,
+  );
   const total = parseInt(countResult[0]?.total || "0", 10);
 
   // Get paginated results
@@ -705,7 +717,9 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
         update_id: string;
         update_content: string;
         update_created_at: Date;
-      }>(user.email, `
+      }>(
+        user.email,
+        `
         SELECT
           a.id AS action_id,
           a.sub_id AS action_sub_id,
@@ -720,7 +734,8 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
         LEFT JOIN action_updates u ON u.action_id = a.id
           AND (u.action_sub_id IS NOT DISTINCT FROM a.sub_id)
         ORDER BY a.work_package_id, a.id, a.sub_id, u.created_at
-      `),
+      `,
+      ),
       queryWithUser<{
         action_id: number;
         action_sub_id: string | null;
@@ -730,7 +745,9 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
         note_id: string;
         note_content: string;
         note_created_at: Date;
-      }>(user.email, `
+      }>(
+        user.email,
+        `
         SELECT
           a.id AS action_id,
           a.sub_id AS action_sub_id,
@@ -745,7 +762,8 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
         LEFT JOIN action_notes n ON n.action_id = a.id
           AND (n.action_sub_id IS NOT DISTINCT FROM a.sub_id)
         ORDER BY a.work_package_id, a.id, a.sub_id, n.created_at
-      `),
+      `,
+      ),
       queryWithUser<{
         action_id: number;
         action_sub_id: string | null;
@@ -756,7 +774,9 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
         q_question: string;
         q_answer: string | null;
         q_created_at: Date;
-      }>(user.email, `
+      }>(
+        user.email,
+        `
         SELECT
           a.id AS action_id,
           a.sub_id AS action_sub_id,
@@ -772,7 +792,8 @@ export async function getActionsTableData(): Promise<ActionsTableData> {
         LEFT JOIN action_questions q ON q.action_id = a.id
           AND (q.action_sub_id IS NOT DISTINCT FROM a.sub_id)
         ORDER BY a.work_package_id, a.id, a.sub_id, q.created_at
-      `),
+      `,
+      ),
     ]);
 
     const workPackagesMap = new Map<number, WorkPackageWithActions>();

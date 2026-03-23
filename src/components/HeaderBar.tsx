@@ -38,7 +38,13 @@ interface Props {
   maxWidth?: "6xl" | "7xl";
 }
 
-export function Header({ user, isAdmin, userRole, children, maxWidth = "7xl" }: Props) {
+export function Header({
+  user,
+  isAdmin,
+  userRole,
+  children,
+  maxWidth = "7xl",
+}: Props) {
   const pathname = usePathname();
   const isLoggedIn = !!user;
   const isLoginPage = pathname === "/login";

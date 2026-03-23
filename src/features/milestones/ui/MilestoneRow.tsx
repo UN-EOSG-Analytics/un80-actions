@@ -25,6 +25,7 @@ interface MilestoneRowProps {
   openPanel: MilestonePanel;
   isAdmin: boolean;
   currentUserId: string | null;
+  canEdit?: boolean;
   documentSubmitted: boolean;
   publicProgress: "completed" | "in_progress" | "delayed" | null | undefined;
 
@@ -91,6 +92,7 @@ export function MilestoneRow({
   loadingVersions,
   openPanel,
   isAdmin,
+  canEdit,
   currentUserId,
   documentSubmitted,
   publicProgress,
@@ -141,6 +143,7 @@ export function MilestoneRow({
         updates={updates}
         activePanel={openPanel}
         isAdmin={isAdmin}
+        canEdit={canEdit}
         documentSubmitted={documentSubmitted}
         publicProgress={publicProgress}
         onEdit={onOpenEdit}

@@ -117,9 +117,11 @@ const EmptyState = ({ message }: { message: string }) => (
 export default function MilestonesTab({
   action,
   isAdmin = false,
+  canEdit = false,
 }: {
   action: Action;
   isAdmin?: boolean;
+  canEdit?: boolean;
 }) {
   // ── Milestones ────────────────────────────────────────────────────────────
   const [milestones, setMilestones] = useState<ActionMilestone[]>([]);
@@ -632,95 +634,109 @@ export default function MilestonesTab({
 
   // ── Shared row props builder ───────────────────────────────────────────────
 
-  const rowProps = (milestone: ActionMilestone) => ({
-    milestone,
-    updates: milestoneUpdates[milestone.id] ?? [],
-    versions: versions[milestone.id] ?? [],
-    loadingVersions: loadingVersions[milestone.id] ?? false,
-    openPanel: openPanels[milestone.id] ?? null,
-    isAdmin,
-    currentUserId,
-    documentSubmitted: !milestone.is_public
-      ? (milestoneDocumentSubmitted[milestone.id] ??
-        milestone.milestone_document_submitted ??
-        false)
-      : false,
-    publicProgress: milestone.is_public ? milestone.public_progress : undefined,
+  const rowProps = (milestone: ActionMilestone) => {
+    const canEditMilestone =
+      (isAdmin || canEdit) &&
+      !(
+        milestone.is_public &&
+        !isAdmin &&
+        milestone.status !== "draft" &&
+        milestone.status !== "rejected"
+      );
 
-    editForm,
-    editSaving,
-    editError,
-    onEditFormChange: setEditForm,
-    onEditSave: () => handleEditSave(milestone.id),
-
-    addingCommentId,
-    replyingToId,
-    commentText,
-    commentIsLegal,
-    commentIsInternal,
-    commentSaving,
-    commentError,
-    editingUpdateId,
-    editingContent,
-
-    onOpenEdit: () => handleOpenEdit(milestone),
-    onOpenHistory: () => handleOpenHistory(milestone),
-    onOpenComments: () => handleOpenComments(milestone),
-    onClosePanel: () => closePanel(milestone.id),
-
-    onCommentTextChange: setCommentText,
-    onIsLegalChange: setCommentIsLegal,
-    onIsInternalChange: setCommentIsInternal,
-    onSubmitComment: handleAddComment,
-    onReply: startReply,
-    onCancelReply: cancelReply,
-    onToggleResolved: handleToggleResolved,
-    onStartEditComment: (u: MilestoneUpdate) => {
-      setEditingUpdateId(u.id);
-      setEditingContent(u.content);
-    },
-    onCancelEditComment: () => {
-      setEditingUpdateId(null);
-      setEditingContent("");
-    },
-    onEditingContentChange: setEditingContent,
-    onSaveEditComment: handleSaveEditComment,
-    onDeleteComment: (milestoneId: string, updateId: string) =>
-      setPendingDeleteComment({ milestoneId, updateId }),
-
-    onDelete: isAdmin
-      ? () => setPendingDeleteMilestoneId(milestone.id)
-      : undefined,
-    onStatusChange: isAdmin
-      ? (status: MilestoneStatus) => handleStatusChange(milestone.id, status)
-      : undefined,
-    onDocumentSubmittedChange:
-      isAdmin && !milestone.is_public
-        ? async (milestoneId: string, submitted: boolean) => {
-            setMilestoneDocumentSubmitted((prev) => ({
-              ...prev,
-              [milestoneId]: submitted,
-            }));
-            await updateMilestoneDocumentSubmitted(milestoneId, submitted);
-            await loadMilestones();
-          }
+    return {
+      milestone,
+      updates: milestoneUpdates[milestone.id] ?? [],
+      versions: versions[milestone.id] ?? [],
+      loadingVersions: loadingVersions[milestone.id] ?? false,
+      openPanel: openPanels[milestone.id] ?? null,
+      isAdmin,
+      canEdit: canEditMilestone,
+      currentUserId,
+      documentSubmitted: !milestone.is_public
+        ? (milestoneDocumentSubmitted[milestone.id] ??
+          milestone.milestone_document_submitted ??
+          false)
+        : false,
+      publicProgress: milestone.is_public
+        ? milestone.public_progress
         : undefined,
-    onPublicProgressChange:
-      isAdmin && milestone.is_public
-        ? async (value: PublicProgressValue) => {
-            const result = await updateMilestonePublicProgress(
-              milestone.id,
-              value,
-            );
-            if (result.success) await loadMilestones();
-          }
+
+      editForm,
+      editSaving,
+      editError,
+      onEditFormChange: setEditForm,
+      onEditSave: () => handleEditSave(milestone.id),
+
+      addingCommentId,
+      replyingToId,
+      commentText,
+      commentIsLegal,
+      commentIsInternal,
+      commentSaving,
+      commentError,
+      editingUpdateId,
+      editingContent,
+
+      onOpenEdit: () => handleOpenEdit(milestone),
+      onOpenHistory: () => handleOpenHistory(milestone),
+      onOpenComments: () => handleOpenComments(milestone),
+      onClosePanel: () => closePanel(milestone.id),
+
+      onCommentTextChange: setCommentText,
+      onIsLegalChange: setCommentIsLegal,
+      onIsInternalChange: setCommentIsInternal,
+      onSubmitComment: handleAddComment,
+      onReply: startReply,
+      onCancelReply: cancelReply,
+      onToggleResolved: handleToggleResolved,
+      onStartEditComment: (u: MilestoneUpdate) => {
+        setEditingUpdateId(u.id);
+        setEditingContent(u.content);
+      },
+      onCancelEditComment: () => {
+        setEditingUpdateId(null);
+        setEditingContent("");
+      },
+      onEditingContentChange: setEditingContent,
+      onSaveEditComment: handleSaveEditComment,
+      onDeleteComment: (milestoneId: string, updateId: string) =>
+        setPendingDeleteComment({ milestoneId, updateId }),
+
+      onDelete: isAdmin
+        ? () => setPendingDeleteMilestoneId(milestone.id)
         : undefined,
-  });
+      onStatusChange: isAdmin
+        ? (status: MilestoneStatus) => handleStatusChange(milestone.id, status)
+        : undefined,
+      onDocumentSubmittedChange:
+        isAdmin && !milestone.is_public
+          ? async (milestoneId: string, submitted: boolean) => {
+              setMilestoneDocumentSubmitted((prev) => ({
+                ...prev,
+                [milestoneId]: submitted,
+              }));
+              await updateMilestoneDocumentSubmitted(milestoneId, submitted);
+              await loadMilestones();
+            }
+          : undefined,
+      onPublicProgressChange:
+        isAdmin && milestone.is_public
+          ? async (value: PublicProgressValue) => {
+              const result = await updateMilestonePublicProgress(
+                milestone.id,
+                value,
+              );
+              if (result.success) await loadMilestones();
+            }
+          : undefined,
+    };
+  };
 
   // ── Render ────────────────────────────────────────────────────────────────
 
   if (loading) return <LoadingState />;
-  if (milestones.length === 0)
+  if (milestones.length === 0 && !isAdmin && !canEdit)
     return <EmptyState message="No milestones have been added yet." />;
 
   return (
@@ -739,7 +755,7 @@ export default function MilestonesTab({
           <MilestoneRow key={m.id} {...rowProps(m)} />
         ))}
 
-        {isAdmin && !creatingNew && (
+        {(isAdmin || canEdit) && !creatingNew && (
           <button
             onClick={() => {
               setNewMilestoneForm({
@@ -757,7 +773,7 @@ export default function MilestonesTab({
           </button>
         )}
 
-        {isAdmin && creatingNew && newMilestoneForm.is_public && (
+        {(isAdmin || canEdit) && creatingNew && newMilestoneForm.is_public && (
           <MilestoneCreateForm
             form={newMilestoneForm}
             saving={createSaving}
@@ -788,7 +804,7 @@ export default function MilestonesTab({
           <MilestoneRow key={m.id} {...rowProps(m)} />
         ))}
 
-        {isAdmin && !creatingNew && (
+        {(isAdmin || canEdit) && !creatingNew && (
           <button
             onClick={() => {
               setNewMilestoneForm({
@@ -806,7 +822,7 @@ export default function MilestonesTab({
           </button>
         )}
 
-        {isAdmin && creatingNew && !newMilestoneForm.is_public && (
+        {(isAdmin || canEdit) && creatingNew && !newMilestoneForm.is_public && (
           <MilestoneCreateForm
             form={newMilestoneForm}
             saving={createSaving}
