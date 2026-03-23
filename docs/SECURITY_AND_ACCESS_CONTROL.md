@@ -91,6 +91,8 @@ A single user can have multiple assignments through different paths simultaneous
 | -------------------------- | ----------- | ---------------------- | --------- |
 | View assigned actions      | All         | Yes                    | Yes       |
 | View milestones            | All         | Yes                    | Yes       |
+| View/download attachments  | All         | Yes                    | Yes       |
+| Upload attachments         | Yes         | No                     | No        |
 | Create milestones          | Yes         | Yes                    | No        |
 | Edit milestones            | Yes         | Yes (with public lock) | No        |
 | Delete milestones          | Yes         | No                     | No        |
