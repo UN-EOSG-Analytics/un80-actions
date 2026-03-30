@@ -32,6 +32,7 @@ import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
 import { BoldText } from "@/features/shared/markdown-bold";
 import { NoteEditor, isNoteContentEmpty } from "@/features/notes/ui/NoteEditor";
 import { CopyLinkButton } from "@/components/CopyLinkButton";
+import { CopyContentButton } from "@/components/CopyContentButton";
 import {
   Loader2,
   MessageCircle,
@@ -45,7 +46,7 @@ import {
   ArrowDown,
 } from "lucide-react";
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // =========================================================
 // HELPER COMPONENTS
@@ -402,8 +403,16 @@ export default function QuestionsTab({
     "Other",
   ];
   const MILESTONE_NONE_VALUE = "__none__";
+  const router = useRouter();
   const searchParams = useSearchParams();
   const highlightedRef = useRef(false);
+
+  const navigateToMilestone = (milestoneId: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", "milestones");
+    params.set("milestone", milestoneId);
+    router.replace(`?${params.toString()}`, { scroll: false });
+  };
 
   // Scroll to and highlight a specific question when linked via ?question=<id>
   useEffect(() => {
@@ -852,9 +861,13 @@ export default function QuestionsTab({
                                   ? `${milestone.action_id}${milestone.action_sub_id}.${milestone.serial_number}`
                                   : `${milestone.action_id}.${milestone.serial_number}`;
                                 return (
-                                  <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
+                                  <button
+                                    type="button"
+                                    onClick={() => navigateToMilestone(milestone.id)}
+                                    className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500 transition-colors hover:bg-un-blue/10 hover:text-un-blue"
+                                  >
                                     Milestone {milestoneId}
-                                  </span>
+                                  </button>
                                 );
                               }
                               return null;
@@ -883,6 +896,32 @@ export default function QuestionsTab({
                               }))
                             }
                             hideInlineTags
+                          />
+                          <CopyContentButton
+                            meta={[
+                              q.header,
+                              q.question_date ? formatUNDate(q.question_date) : null,
+                              q.milestone_id
+                                ? (() => {
+                                    const m = milestones.find(
+                                      (m) => m.id === q.milestone_id,
+                                    );
+                                    if (!m) return null;
+                                    return `Milestone ${m.action_sub_id ? `${m.action_id}${m.action_sub_id}` : m.action_id}.${m.serial_number}`;
+                                  })()
+                                : null,
+                            ]
+                              .filter(Boolean)
+                              .join(" · ")}
+                            sections={[
+                              ...(q.comment && !isNoteContentEmpty(q.comment)
+                                ? [{ label: "Context", content: q.comment }]
+                                : []),
+                              { label: "Questions", content: q.question },
+                              ...(q.answer
+                                ? [{ label: "Answer", content: q.answer }]
+                                : []),
+                            ]}
                           />
                           <CopyLinkButton
                             searchParams={`action=${action.action_display_id}&tab=questions&question=${q.id}`}

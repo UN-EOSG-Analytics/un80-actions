@@ -21,6 +21,7 @@ import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
 import { BoldText } from "@/features/shared/markdown-bold";
 import { NoteEditor, isNoteContentEmpty } from "@/features/notes/ui/NoteEditor";
 import { CopyLinkButton } from "@/components/CopyLinkButton";
+import { CopyContentButton } from "@/components/CopyContentButton";
 import {
   Loader2,
   Plus,
@@ -479,6 +480,15 @@ export default function NotesTab({
                               }))
                             }
                             hideInlineTags
+                          />
+                          <CopyContentButton
+                            meta={[
+                              note.header,
+                              note.note_date ? formatUNDate(note.note_date) : null,
+                            ]
+                              .filter(Boolean)
+                              .join(" · ")}
+                            sections={[{ content: note.content }]}
                           />
                           <CopyLinkButton
                             searchParams={`action=${action.action_display_id}&tab=notes&note=${note.id}`}
