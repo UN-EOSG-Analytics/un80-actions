@@ -20,6 +20,7 @@ import type { Action, ActionNote } from "@/types";
 import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
 import { BoldText } from "@/features/shared/markdown-bold";
 import { NoteEditor, isNoteContentEmpty } from "@/features/notes/ui/NoteEditor";
+import { CopyLinkButton } from "@/components/CopyLinkButton";
 import {
   Loader2,
   Plus,
@@ -455,7 +456,7 @@ export default function NotesTab({
                             </span>
                           )}
                         </div>
-                        {/* Tags */}
+                        {/* Tags + copy link */}
                         <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
                           {(tagsByNoteId[note.id] ?? []).map((t) => (
                             <Badge
@@ -478,6 +479,9 @@ export default function NotesTab({
                               }))
                             }
                             hideInlineTags
+                          />
+                          <CopyLinkButton
+                            searchParams={`action=${action.action_display_id}&tab=notes&note=${note.id}`}
                           />
                         </div>
                       </div>

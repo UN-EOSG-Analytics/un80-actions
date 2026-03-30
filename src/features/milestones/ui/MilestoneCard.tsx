@@ -15,6 +15,7 @@ import {
   MessageSquare,
   Pencil,
 } from "lucide-react";
+import { CopyLinkButton } from "@/components/CopyLinkButton";
 import { formatShortDate } from "@/lib/format-date";
 import type { ActionMilestone } from "@/types";
 import type { MilestoneUpdate } from "@/features/milestones/updates-queries";
@@ -47,6 +48,7 @@ interface MilestoneCardProps {
   publicProgress?: "completed" | "in_progress" | "delayed" | null;
   isAdmin?: boolean;
   canEdit?: boolean;
+  deepLinkSearchParams?: string;
 }
 
 export function MilestoneCard({
@@ -64,6 +66,7 @@ export function MilestoneCard({
   publicProgress = null,
   isAdmin = false,
   canEdit = false,
+  deepLinkSearchParams,
 }: MilestoneCardProps) {
   // Determine display status
   // dot color + label text — consistent badge system
@@ -537,6 +540,9 @@ export function MilestoneCard({
               </span>
             )}
           </button>
+          {deepLinkSearchParams && (
+            <CopyLinkButton searchParams={deepLinkSearchParams} variant="icon" />
+          )}
           {(isAdmin || canEdit) && (
             <button
               onClick={(e) => {

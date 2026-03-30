@@ -68,6 +68,7 @@ interface MilestoneRowProps {
   onDeleteComment: (milestoneId: string, updateId: string) => void;
 
   // milestone card callbacks
+  deepLinkSearchParams?: string;
   onDelete?: () => void;
   onStatusChange?: (
     status:
@@ -126,6 +127,7 @@ export function MilestoneRow({
   onEditingContentChange,
   onSaveEditComment,
   onDeleteComment,
+  deepLinkSearchParams,
   onDelete,
   onStatusChange,
   onDocumentSubmittedChange,
@@ -147,6 +149,7 @@ export function MilestoneRow({
         canEdit={canEdit}
         documentSubmitted={documentSubmitted}
         publicProgress={publicProgress}
+        deepLinkSearchParams={deepLinkSearchParams}
         onEdit={onOpenEdit}
         onDelete={onDelete}
         onComment={onOpenComments}

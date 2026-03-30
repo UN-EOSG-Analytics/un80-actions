@@ -203,7 +203,7 @@ export function TagSelector({
             className="h-7 gap-1 text-xs text-slate-600"
           >
             <Tags className="h-3 w-3" />
-            Add tags
+            Tags
           </Button>
         </PopoverTrigger>
         <PopoverContent align="start" className="w-64 p-3">

@@ -663,6 +663,7 @@ export default function MilestonesTab({
 
     return {
       milestone,
+      deepLinkSearchParams: `action=${action.action_display_id}&tab=milestones&milestone=${milestone.id}`,
       updates: milestoneUpdates[milestone.id] ?? [],
       versions: versions[milestone.id] ?? [],
       loadingVersions: loadingVersions[milestone.id] ?? false,

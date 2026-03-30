@@ -31,6 +31,7 @@ import type { Action, ActionQuestion, ActionMilestone } from "@/types";
 import { formatUNDate, formatUNDateTime } from "@/lib/format-date";
 import { BoldText } from "@/features/shared/markdown-bold";
 import { NoteEditor, isNoteContentEmpty } from "@/features/notes/ui/NoteEditor";
+import { CopyLinkButton } from "@/components/CopyLinkButton";
 import {
   Loader2,
   MessageCircle,
@@ -859,7 +860,7 @@ export default function QuestionsTab({
                               return null;
                             })()}
                         </div>
-                        {/* Tags */}
+                        {/* Tags + copy link */}
                         <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
                           {(tagsByQuestionId[q.id] ?? []).map((t) => (
                             <Badge
@@ -882,6 +883,9 @@ export default function QuestionsTab({
                               }))
                             }
                             hideInlineTags
+                          />
+                          <CopyLinkButton
+                            searchParams={`action=${action.action_display_id}&tab=questions&question=${q.id}`}
                           />
                         </div>
                       </div>
