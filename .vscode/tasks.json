@@ -1,12 +1,12 @@
 {
-	"version": "2.0.0",
-	"tasks": [
+    "version": "2.0.0",
+    "tasks": [
         {
             "type": "shell",
             "command": "pnpm dev:local",
             "label": "dev",
             "detail": "next dev",
-            "problemMatcher": [],
+            "problemMatcher": [ ],
             "isBackground": true
         },
         {
@@ -14,14 +14,14 @@
             "command": "pnpm build",
             "label": "build",
             "detail": "next build",
-            "problemMatcher": []
+            "problemMatcher": [ ]
         },
         {
             "type": "shell",
             "command": "pnpm install",
             "label": "install",
             "detail": "pnpm install",
-            "problemMatcher": [],
+            "problemMatcher": [ ],
             "isBackground": true
         },
         {
@@ -29,7 +29,7 @@
             "command": "pnpm update",
             "label": "update",
             "detail": "pnpm update",
-            "problemMatcher": [],
+            "problemMatcher": [ ],
             "isBackground": true
         },
         {
@@ -37,7 +37,7 @@
             "command": "pnpm start",
             "label": "start",
             "detail": "next start",
-            "problemMatcher": [],
+            "problemMatcher": [ ],
             "isBackground": true
         },
         {
@@ -63,22 +63,28 @@
             "command": "pnpm format",
             "label": "format",
             "detail": "prettier --write",
-            "problemMatcher": []
+            "problemMatcher": [ ]
         },
         {
             "type": "shell",
             "command": "uv run python python/prepare_actions_data.py",
             "label": "Process Actions Data",
             "detail": "Run Python data processing pipeline",
-            "problemMatcher": []
+            "problemMatcher": [ ]
         },
         {
             "label": "Run Data Pipeline",
             "type": "shell",
             "command": "./run_pipeline.sh",
             "isBackground": false,
-            "problemMatcher": [],
+            "problemMatcher": [ ],
             "group": "build"
+        },
+        {
+            "label": "kill dev processes",
+            "type": "shell",
+            "command": "lsof -ti:3000,3001 | xargs kill -9 2>/dev/null || true",
+            "problemMatcher": [ ]
         }
     ]
 }

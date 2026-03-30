@@ -60,4 +60,7 @@ CREATE POLICY notifications_delete ON un80actions.notifications
         )
     );
 
+-- Grant app user access
+GRANT SELECT, INSERT, UPDATE, DELETE ON un80actions.notifications TO un80actions_app_user;
+
 COMMIT;
