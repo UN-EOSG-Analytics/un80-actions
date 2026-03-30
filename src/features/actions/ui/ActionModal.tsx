@@ -145,9 +145,15 @@ export default function ActionModal({
   // Keyboard navigation: Escape to close, arrow keys for prev/next
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      // Don't navigate when typing in inputs/textareas/selects
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      // Don't navigate when typing in inputs/textareas/selects, or in contenteditable (TipTap)
+      const target = e.target as HTMLElement;
+      if (
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.tagName === "SELECT" ||
+        target?.isContentEditable
+      )
+        return;
       if (e.key === "Escape") {
         handleClose();
       } else if (e.key === "ArrowLeft" && onPrev) {
