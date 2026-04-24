@@ -1,11 +1,17 @@
 import type {
   Actions,
   WorkPackage,
+  WorkPackageProgress,
   WorkPackageStats,
   NextMilestone,
 } from "@/types";
 import { ACTION_STATUS } from "@/constants/actionStatus";
 import { parseDate, formatDate, normalizeLeaderName } from "./utils";
+import progressData from "@data/actions_progress.json";
+
+const progressByWp = new Map<number, WorkPackageProgress>(
+  (progressData as WorkPackageProgress[]).map((p) => [p.workPackageNumber, p]),
+);
 
 /**
  * Group actions by work package number, combining across reports
@@ -35,8 +41,9 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
         number: action.work_package_number || "",
         name: action.work_package_name,
         leads: leads,
-        goal: action.work_package_goal || null,
+        objective: progressByWp.get(action.work_package_number)?.objective || null,
         bigTicket: isBigTicket,
+        progressToDate: progressByWp.get(action.work_package_number)?.progressToDate || null,
         actions: [],
       });
     }
@@ -58,11 +65,6 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
         wp.leads.push(lead);
       }
     });
-
-    // Update goal if not set or if this action has a goal
-    if (action.work_package_goal && !wp.goal) {
-      wp.goal = action.work_package_goal;
-    }
 
     // Update big_ticket status based on work package number (1-21 = big ticket)
     const wpNumber = action.work_package_number || 0;
