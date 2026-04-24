@@ -8,7 +8,6 @@ import {
   WPLeadsBadge,
 } from "@/components/Badges";
 import { HelpTooltip } from "@/components/HelpTooltip";
-import { MilestoneTimeline } from "@/components/MilestoneTimeline";
 import {
   Tooltip,
   TooltipCollisionBoundaryProvider,
@@ -333,41 +332,33 @@ export default function ActionModal({
               />
             </div>
 
-            {/* Upcoming Milestone */}
+            {/* Next Steps */}
             {action.upcoming_milestone && (
               <>
                 <div className="my-3 border-t border-slate-200"></div>
                 <h3 className="mb-3 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
-                  Upcoming Milestone
-                  <HelpTooltip content="Steps which will be taken towards the delivery of the proposal concerned. Completed milestones are crossed out." />
+                  Next Steps
                 </h3>
-                <div className="mt-2">
-                  <MilestoneTimeline
-                    milestones={[
-                      {
-                        label: action.upcoming_milestone,
-                        deliveryDate: action.delivery_date ?? null,
-                        isReached: false,
-                      },
-                    ]}
-                  />
-                </div>
+                <p className="text-sm leading-relaxed text-slate-700">
+                  {action.upcoming_milestone}
+                </p>
               </>
             )}
 
-            {/* Updates Section */}
-            <div className="my-6 border-t border-slate-200"></div>
-            <h3 className="mb-4 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
-              Updates
-              <HelpTooltip content="A summary of recent progress on the action." />
-            </h3>
-            <div className="text-xs leading-relaxed text-slate-600 sm:text-sm">
-              {action.updates && action.updates.trim() ? (
-                <p className="whitespace-pre-wrap">{action.updates}</p>
-              ) : (
-                <p className="text-slate-400 italic">Updates forthcoming</p>
-              )}
-            </div>
+            {action.written_products && action.written_products.length > 0 && (
+              <>
+                <div className="my-3 border-t border-slate-200"></div>
+                <h3 className="mb-3 text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
+                  Forthcoming Written Products
+                </h3>
+                <ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed text-slate-700">
+                  {action.written_products.map((product, i) => (
+                    <li key={i}>{product}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+
           </div>
         </SectionCard>
 

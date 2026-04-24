@@ -74,6 +74,9 @@ export interface Action {
   /** Sub-action details description or null (for subactions) */
   sub_action_details: string | null;
 
+  /** Forthcoming written products or null */
+  written_products: string[] | null;
+
   /** Action leads array */
   action_leads: string[];
 }
@@ -91,7 +94,7 @@ export interface ActionProgressTableRow {
   action: string;
   pathwayToDecision: string;
   intergovernmentalConsideration: string;
-  writtenProducts: string;
+  writtenProducts: string[];
 }
 
 export interface ActionProgressSection {
@@ -158,8 +161,9 @@ export interface WorkPackage {
   number: number | "";
   name: string;
   leads: string[];
-  goal: string | null;
+  objective: string | null;
   bigTicket: boolean;
+  progressToDate: string | null;
   actions: WorkPackageAction[];
 }
 

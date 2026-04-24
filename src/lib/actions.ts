@@ -1,7 +1,38 @@
-import type { Action, Actions } from "@/types";
+import type { Action, Actions, WorkPackageProgress } from "@/types";
 import { normalizeLeaderName } from "./utils";
 // Import JSON directly - data is bundled at build time (no network request)
 import actionsData from "@data/actions.json";
+import progressData from "@data/actions_progress.json";
+
+// Build lookups from progress reports
+const nextStepsByAction = new Map<number, string>();
+const writtenProductsByAction = new Map<number, string[]>();
+for (const wp of progressData as WorkPackageProgress[]) {
+  for (const item of wp.nextStepsAndDecisions) {
+    if (!item.actionNumbers || !item.text) continue;
+    const nums = item.actionNumbers.match(/\d+/g);
+    if (nums) {
+      for (const n of nums) {
+        nextStepsByAction.set(Number(n), item.text);
+      }
+    }
+  }
+  for (const row of wp.summaryTable) {
+    const products = row.writtenProducts.filter(
+      (p) => p.trim() && p.trim() !== "-",
+    );
+    if (products.length === 0) continue;
+    const prefix = row.action.match(
+      /^(?:Actions?\s+)?([\d,\s]+(?:and\s+\d+)?)/,
+    );
+    const nums = prefix ? prefix[0].match(/\d+/g) : null;
+    if (nums) {
+      for (const n of nums) {
+        writtenProductsByAction.set(Number(n), products);
+      }
+    }
+  }
+}
 
 /**
  * Get filtered actions data
@@ -12,13 +43,26 @@ import actionsData from "@data/actions.json";
  */
 export function getActions(): Actions {
   const allActions = actionsData as unknown as Actions;
-  // Include regular actions and subactions for actions 94 and 95
-  return allActions.filter(
-    (action) =>
-      !action.is_subaction ||
-      action.action_number === 94 ||
-      action.action_number === 95,
-  );
+  return allActions
+    .filter(
+      (action) =>
+        !action.is_subaction ||
+        action.action_number === 94 ||
+        action.action_number === 95,
+    )
+    .map((action) => {
+      const nextStep = nextStepsByAction.get(action.action_number);
+      const writtenProducts =
+        writtenProductsByAction.get(action.action_number) ?? null;
+      return {
+        ...action,
+        ...(nextStep && {
+          upcoming_milestone: nextStep,
+          delivery_date: null,
+        }),
+        written_products: writtenProducts,
+      };
+    });
 }
 
 /**

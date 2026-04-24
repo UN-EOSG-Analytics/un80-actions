@@ -58,17 +58,25 @@ def parse_action_section(text: str) -> tuple[str, str]:
 def parse_table(table) -> list[dict]:
     rows = []
     for ri, row in enumerate(table.rows):
-        cells = [accept_revisions_text(cell._element) for cell in row.cells]
+        cells_text = [accept_revisions_text(cell._element) for cell in row.cells]
         if ri == 0:
             continue
-        if not any(cells):
+        if not any(cells_text):
             continue
+        # Written products column: extract per-paragraph bullet points
+        wp_cell = row.cells[3] if len(row.cells) > 3 else None
+        written_products = []
+        if wp_cell:
+            for p in wp_cell.paragraphs:
+                t = accept_revisions_text(p._element)
+                if t:
+                    written_products.append(t)
         rows.append(
             {
-                "action": cells[0] if len(cells) > 0 else "",
-                "pathwayToDecision": cells[1] if len(cells) > 1 else "",
-                "intergovernmentalConsideration": cells[2] if len(cells) > 2 else "",
-                "writtenProducts": cells[3] if len(cells) > 3 else "",
+                "action": cells_text[0] if len(cells_text) > 0 else "",
+                "pathwayToDecision": cells_text[1] if len(cells_text) > 1 else "",
+                "intergovernmentalConsideration": cells_text[2] if len(cells_text) > 2 else "",
+                "writtenProducts": written_products,
             }
         )
     return rows

@@ -273,14 +273,14 @@ export function WorkPackageItem({
             )}
           </div>
 
-          {/* Goal from work package data */}
-          {wp.goal && (
+          {/* Objective from progress report */}
+          {wp.objective && (
             <div className="mb-3 flex items-stretch gap-2.5 text-left sm:mb-4">
               <div className="w-0.75 shrink-0 rounded-full bg-un-blue" />
               <p className="py-0.5 text-xs leading-snug font-medium text-slate-600 sm:text-sm md:text-base">
-                <span className="font-semibold text-un-blue">Goal:</span>{" "}
+                <span className="font-semibold text-un-blue">Objective:</span>{" "}
                 <HighlightedText
-                  text={formatGoalText(wp.goal)}
+                  text={formatGoalText(wp.objective)}
                   query={searchQuery}
                 />
               </p>
@@ -384,6 +384,15 @@ export function WorkPackageItem({
 
         {/* Collapsible Content */}
         <CollapsibleContent className="px-4 pb-4 sm:px-6 sm:pb-6">
+          {wp.progressToDate && (
+            <div className="mb-3 flex items-stretch gap-2.5 pt-2">
+              <div className="w-0.75 shrink-0 rounded-full bg-un-blue" />
+              <p className="py-0.5 text-xs leading-snug font-medium text-slate-600 sm:text-sm md:text-base">
+                <span className="font-semibold text-un-blue">Progress:</span>{" "}
+                {wp.progressToDate}
+              </p>
+            </div>
+          )}
           <div className="pt-2">
             <WorkPackageActions
               actions={wp.actions}
