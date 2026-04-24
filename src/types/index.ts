@@ -84,6 +84,34 @@ export interface Action {
 export type Actions = Action[];
 
 // ============================================================================
+// Work Package Progress Report Types (from data/input/actions_progress/)
+// ============================================================================
+
+export interface ActionProgressTableRow {
+  action: string;
+  pathwayToDecision: string;
+  intergovernmentalConsideration: string;
+  writtenProducts: string;
+}
+
+export interface ActionProgressSection {
+  actionNumbers: string;
+  text: string;
+}
+
+export interface WorkPackageProgress {
+  workPackageNumber: number;
+  workPackageName: string;
+  wordCount: number | null;
+  objective: string;
+  howWeGetThere: ActionProgressSection[];
+  progressToDate: string;
+  nextStepsAndDecisions: ActionProgressSection[];
+  summaryTable: ActionProgressTableRow[];
+  sourceFile: string;
+}
+
+// ============================================================================
 // Work Package Types
 // ============================================================================
 
