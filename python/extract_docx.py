@@ -5,9 +5,27 @@ import re
 from pathlib import Path
 
 from docx import Document
+from lxml.etree import _Element
 
 INPUT_DIR = Path("data/input/actions_progress")
 OUTPUT_PATH = Path("public/data/actions_progress.json")
+
+W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+
+
+def accept_revisions_text(element: _Element) -> str:
+    """Extract paragraph text with tracked changes accepted.
+
+    Includes text from <w:ins> (insertions), excludes <w:del> (deletions).
+    python-docx's .text property ignores both, giving incomplete results.
+    """
+    parts: list[str] = []
+    for node in element.iter():
+        if node.tag == f"{{{W_NS}}}delText":
+            continue
+        if node.tag == f"{{{W_NS}}}t":
+            parts.append(node.text or "")
+    return "".join(parts).strip()
 
 
 def parse_title(text: str) -> tuple[int, str, int | None]:
@@ -40,7 +58,7 @@ def parse_action_section(text: str) -> tuple[str, str]:
 def parse_table(table) -> list[dict]:
     rows = []
     for ri, row in enumerate(table.rows):
-        cells = [cell.text.strip() for cell in row.cells]
+        cells = [accept_revisions_text(cell._element) for cell in row.cells]
         if ri == 0:
             continue
         if not any(cells):
@@ -73,7 +91,7 @@ def extract_document(filepath: Path) -> dict:
     }
 
     for para in doc.paragraphs:
-        text = para.text.strip()
+        text = accept_revisions_text(para._element)
         style = para.style.name
 
         if style == "Heading 1":
