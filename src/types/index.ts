@@ -114,6 +114,7 @@ export interface WorkPackageProgress {
   progressPerAction?: ActionProgressSection[];
   nextStepsAndDecisions: ActionProgressSection[];
   summaryTable?: ActionProgressTableRow[];
+  pdfPage?: number;
 }
 
 // ============================================================================
@@ -166,6 +167,7 @@ export interface WorkPackage {
   objective: string | null;
   bigTicket: boolean;
   progressToDate: string | null;
+  pdfPage: number | null;
   actions: WorkPackageAction[];
 }
 
