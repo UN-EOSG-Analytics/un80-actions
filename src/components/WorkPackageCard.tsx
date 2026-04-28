@@ -13,7 +13,7 @@ import {
   isDecisionTaken,
 } from "@/constants/actionStatus";
 import { actionMatchesProductMonths } from "@/lib/productsTimeline";
-import { formatGoalText } from "@/lib/utils";
+
 import type { WorkPackage, WorkPackageAction } from "@/types";
 import { ChevronDown, FileText, Menu } from "lucide-react";
 
@@ -265,10 +265,10 @@ export function WorkPackageItem({
           {wp.objective && (
             <div className="mb-3 flex items-stretch gap-2.5 text-left sm:mb-4">
               <div className="w-0.75 shrink-0 rounded-full bg-un-blue" />
-              <p className="py-0.5 text-xs leading-snug font-medium text-slate-600 sm:text-sm md:text-base">
+              <p className="py-0.5 text-sm leading-snug font-medium text-slate-900 sm:text-[15px]">
                 <span className="font-semibold text-un-blue">Objective:</span>{" "}
                 <HighlightedText
-                  text={formatGoalText(wp.objective)}
+                  text={wp.objective}
                   query={searchQuery}
                 />
               </p>
