@@ -105,13 +105,12 @@ export interface ActionProgressSection {
 export interface WorkPackageProgress {
   workPackageNumber: number;
   workPackageName: string;
-  wordCount: number | null;
   objective: string;
   howWeGetThere: ActionProgressSection[];
   progressToDate: string;
+  progressPerAction?: ActionProgressSection[];
   nextStepsAndDecisions: ActionProgressSection[];
-  summaryTable: ActionProgressTableRow[];
-  sourceFile: string;
+  summaryTable?: ActionProgressTableRow[];
 }
 
 // ============================================================================
