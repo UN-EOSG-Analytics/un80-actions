@@ -33,6 +33,24 @@
         "actionNumbers": "Action 14",
         "text": "The concept and roadmap will be finalized and submitted to the Secretary-General in June. An update will be provided to Member States through a Secretary-General's information brief in July. No decision of an intergovernmental organ is envisaged at this stage."
       }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 15: Conduct a comprehensive review of the future of United Nations peace operations",
+        "pathwayToDecision": "Work package leads → Secretary-General → General Assembly and Security Council, as relevant",
+        "intergovernmentalConsideration": "As relevant, for consideration of General Assembly (eightieth session) and Security Council (2026)",
+        "writtenProducts": [
+          "Secretary-General’s peace operations review (June)"
+        ]
+      },
+      {
+        "action": "Action 14: Delegate relevant programmatic tasks to UN system entities",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (July)"
+        ]
+      }
     ]
   },
   {
@@ -121,6 +139,46 @@
         "actionNumbers": "Actions 22, 23, 25",
         "text": "Alignment of agency responsibilities across food security, mobility and displacement, and health and nutrition will continue through 2026, including finalization of a Rome-based agencies collaboration blueprint, pilot-country rollout and further development of joint approaches and interoperability solutions. A Secretary-General's information brief will provide updates on progress in September. No decision of an intergovernmental organ is envisaged at this stage."
       }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 16: Simplify Humanitarian Needs and Response Plans",
+        "pathwayToDecision": "Work package lead → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Finalized 2026 Humanitarian Needs and Response Plans (HNRPs) available on humanitarianaction.info"
+        ]
+      },
+      {
+        "action": "Actions 17, 18: Integrate supply chains and scale common services",
+        "pathwayToDecision": "Work package lead → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (June)"
+        ]
+      },
+      {
+        "action": "Actions 20, 24: Strengthen humanitarian data and interoperability",
+        "pathwayToDecision": "Work package lead → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (June)"
+        ]
+      },
+      {
+        "action": "Action 21: Coordinate humanitarian diplomacy effort",
+        "pathwayToDecision": "Work package lead → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": []
+      },
+      {
+        "action": "Actions 22, 23, 25: Align agency responsibilities",
+        "pathwayToDecision": "Work package lead → Entities / relevant governing bodies",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (September)"
+        ]
+      }
     ]
   },
   {
@@ -144,6 +202,16 @@
       {
         "actionNumbers": "Action 26",
         "text": "UNDP and UNOPS are currently developing a joint evidence-based assessment of the potential benefits of a merger to help determine whether a merger would strengthen the UN development system's ability to deliver results with greater scale and impact. Relevant information will be available for the Executive Board meetings in May and June. Subsequently, the Secretary-General will consider the submission of a report to the General Assembly, including proposals."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 26: Conduct thorough assessment of potential benefits of a UNDP/UNOPS merger Executive Board; General Assembly",
+        "pathwayToDecision": "",
+        "intergovernmentalConsideration": "",
+        "writtenProducts": [
+          "Secretary-General’s report For General Assembly consideration"
+        ]
       }
     ]
   },
@@ -181,6 +249,22 @@
         "actionNumbers": "Action 28",
         "text": "The analysis considered the division of labour between UNFPA and DESA appropriate and recommended no structural change."
       }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 27: Conduct thorough assessment of potential benefits of UNFPA-UN Women merger",
+        "pathwayToDecision": "Work package leads → Executive Boards; Secretary-General → General Assembly",
+        "intergovernmentalConsideration": "For General Assembly consideration",
+        "writtenProducts": [
+          "Secretary-General’s report"
+        ]
+      },
+      {
+        "action": "Action 28: Consider options to optimize population functions",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": []
+      }
     ]
   },
   {
@@ -216,6 +300,29 @@
       {
         "actionNumbers": "Action 40",
         "text": "Relevant proposals to strengthen the Resident Coordinator system will be finalized for the Secretary-General's consideration. They will inform the ongoing recalibration of the Resident Coordinator system that will be presented to the ECOSOC Operational Activities Segment. The General Assembly will also consider the review and financing of the Resident Coordinator system at its eighty-first session, in line with General Assembly resolution 79/258."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 39: Reconfigure UN country teams",
+        "pathwayToDecision": "Work package lead → Secretary-General → ECOSOC and General Assembly, as relevant",
+        "intergovernmentalConsideration": "As relevant, for consideration of ECOSOC at the Operational Activities for Development Segment (2026 session) and General Assembly (eighty-first session)",
+        "writtenProducts": [
+          "Secretary-General’s report on QCPR implementation (May)",
+          "UNSDG Chair report (May)",
+          "Supplementary information (Jun–Dec)"
+        ]
+      },
+      {
+        "action": "Action 40: Strengthen and recalibrate the RC system",
+        "pathwayToDecision": "Work package lead → Secretary-General → ECOSOC and General Assembly, as relevant",
+        "intergovernmentalConsideration": "As relevant, for consideration of ECOSOC at the Operational Activities for Development Segment (2026 session) and General Assembly (eighty-first session)",
+        "writtenProducts": [
+          "Secretary-General’s report on QCPR implementation (May)",
+          "UNSDG Chair's report (May)",
+          "Supplementary information (Jun–Dec)",
+          "Secretary-General’s report on the fni ancing and governance of the RC system (2026)"
+        ]
       }
     ]
   },
@@ -261,6 +368,27 @@
         "actionNumbers": "Action 37",
         "text": "Proposals for locating regional capacities in the premises of Regional Commissions will be advanced through the same process."
       }
+    ],
+    "summaryTable": [
+      {
+        "action": "Actions 36, 48, 50: Develop proposal for a regional reset",
+        "pathwayToDecision": "Work package leads → Secretary-General → ECOSOC and General Assembly, as relevant",
+        "intergovernmentalConsideration": "As relevant, for consideration of ECOSOC at the Operational Activities for Development Segment (2026 session) and General Assembly (eighty-first session)",
+        "writtenProducts": [
+          "Secretary-General’s report on QCPR implementation (May)",
+          "Supplementary information (Jun–Dec)"
+        ]
+      },
+      {
+        "action": "Action 37: Host regional capacities in Regional Commissions",
+        "pathwayToDecision": "Work package leads → Secretary-General → ECOSOC and General Assembly, as relevant",
+        "intergovernmentalConsideration": "As relevant, for consideration of ECOSOC at the Operational Activities for Development Segment (2026 session) and General Assembly (eighty-first session)",
+        "writtenProducts": [
+          "Secretary-General’s report on QCPR implementation (May)",
+          "UNSDG Chair's report (May)",
+          "Supplementary information (Jun–Dec)"
+        ]
+      }
     ]
   },
   {
@@ -284,6 +412,17 @@
       {
         "actionNumbers": "Action 33",
         "text": "Implementation plans for each pilot hub will be submitted to the Secretary-General by May. The hubs will be reflected in the Secretary-General's QCPR report in May, with further details to be provided in a Secretary-General's information brief by July. The pilot phase will continue until September, with the aim of demonstrating practical results and learning lessons for the next phase. Two additional hubs, on climate change and on science, technology and innovation, are under consideration for phase 2. No decision of an intergovernmental organ is envisaged."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 33: Establish joint knowledge hubs",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s report on QCPR implementation (May)",
+          "Secretary-General’s information brief (July)"
+        ]
       }
     ]
   },
@@ -313,6 +452,17 @@
         "actionNumbers": "Actions 34, 54",
         "text": "Work will continue on the catalogue, access protocols and standard administrative arrangements. The mechanism will be reflected in the Secretary-General's QCPR report in May, with further details to be provided in a Secretary-General's information brief by September. Initial pilots for the first UN country team will be rolled out by June with support from the Joint SDG Fund. This will be followed by refinement and system-wide operationalization by September. No decision of an intergovernmental organ is envisaged."
       }
+    ],
+    "summaryTable": [
+      {
+        "action": "Actions 34, 54: Establish expertise- on-demand mechanism",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s report on QCPR implementation (May)",
+          "Secretary-General’s information brief (September)"
+        ]
+      }
     ]
   },
   {
@@ -336,6 +486,16 @@
       {
         "actionNumbers": "Action 42",
         "text": "The Group will hold its first meeting in May. Member States will receive an information brief in June."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 42: Establish a Human Rights Group",
+        "pathwayToDecision": "-",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (June)"
+        ]
       }
     ]
   },
@@ -377,6 +537,24 @@
         "actionNumbers": "Action 46",
         "text": "Recommendations to rationalize the wider portfolio of other interagency coordination mechanisms and task forces will also be submitted to the Secretary-General by September. No decision of an intergovernmental organ is envisaged."
       }
+    ],
+    "summaryTable": [
+      {
+        "action": "Actions 43, 44: Assess senior management coordination fora",
+        "pathwayToDecision": "Work package lead → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (October)"
+        ]
+      },
+      {
+        "action": "Action 46: Rationalize interagency task forces",
+        "pathwayToDecision": "Work package lead → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (October)"
+        ]
+      }
     ]
   },
   {
@@ -413,6 +591,22 @@
         "actionNumbers": "Action 38",
         "text": "No further action is required."
       }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 45: Review special envoy, representative, coordinator and adviser roles",
+        "pathwayToDecision": "Work package lead → Secretary-General → General Assembly, as relevant",
+        "intergovernmentalConsideration": "As relevant, for General Assembly consideration (eighty-first session), as part of the regular programme budget process2",
+        "writtenProducts": [
+          "Proposed Programme Budget for 2027 (May)"
+        ]
+      },
+      {
+        "action": "Action 38: Abolish Sahel Coordinator post",
+        "pathwayToDecision": "-",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": []
+      }
     ]
   },
   {
@@ -448,6 +642,25 @@
       {
         "actionNumbers": "Action 57",
         "text": "Building on the simplification of Humanitarian Response Plans and improved Cooperation Framework guidance, a dedicated effort will be made to streamline overlapping planning processes. Member States will be informed through a Secretary-General's information brief. No decision of an intergovernmental organ is envisaged at this stage."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 19: Initiate the Shared Platform Initiative",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (May)",
+          "Secretary-General’s report on QCPR implementation (May)"
+        ]
+      },
+      {
+        "action": "Action 57: Simplify planning tools",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief"
+        ]
       }
     ]
   },
@@ -513,6 +726,41 @@
         "actionNumbers": "Action 67",
         "text": "Cost-transparency tools and methods will be rolled out across more country operations by June. No decision of an intergovernmental organ is envisaged at this stage."
       }
+    ],
+    "summaryTable": [
+      {
+        "action": "Actions 63, 65: Develop a Unified Services Roadmap",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "",
+        "writtenProducts": [
+          "Secretary-General’s information brief (June)",
+          "Public dashboard (June)"
+        ]
+      },
+      {
+        "action": "Action 64: Integrate supply chains as part of the Humanitarian Compact",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "",
+        "writtenProducts": [
+          "Secretary-General’s information brief (June)"
+        ]
+      },
+      {
+        "action": "Action 66: Scale common back-office rollout at the country level",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "",
+        "writtenProducts": [
+          "Secretary-General’s information brief (June)"
+        ]
+      },
+      {
+        "action": "Action 67: Improve cost transparency",
+        "pathwayToDecision": "",
+        "intergovernmentalConsideration": "",
+        "writtenProducts": [
+          "Secretary-General’s information brief (June)"
+        ]
+      }
     ]
   },
   {
@@ -548,6 +796,24 @@
       {
         "actionNumbers": "Action 62",
         "text": "An initial outline of the TAP concept will be prepared in May. Detailed proposals and implementation plans for the endorsed use cases, including governance, staffing and financing, will be submitted to the Secretary-General by July, for an information brief for Member States in July. Subject to approval and available resources, initial use cases will be active by September. No decision of an intergovernmental organ is envisaged at this stage."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 61: Expand shared ICT services",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief, as part of the Unified Services Roadmap (June)"
+        ]
+      },
+      {
+        "action": "Action 62: Establish a Technology Accelerator Platform (TAP)",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (July)"
+        ]
       }
     ]
   },
@@ -588,6 +854,24 @@
       {
         "actionNumbers": "Actions 74, 75",
         "text": "The joint programme proposal will be shared for consideration by participating entities, potential partners and the Secretary-General by July, with phased implementation beginning thereafter, including an information brief in September. No decision of an intergovernmental organ is envisaged at this stage."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 73: Build a shared UN System Data Commons platform",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (September)"
+        ]
+      },
+      {
+        "action": "Action 74, 75: Establish a sustainable Joint UN System Data Commons Programme",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (September)"
+        ]
       }
     ]
   },
@@ -636,6 +920,32 @@
       {
         "actionNumbers": "Action 72",
         "text": "The joint system-wide coordination mechanism is being developed by UNU and UNITAR, with a proposed blueprint to be submitted for the Secretary-General's consideration in May. An information brief for Member States will follow in July. No decision of an intergovernmental organ is envisaged."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 68: Merge UNSSC into UNITAR",
+        "pathwayToDecision": "Work package lead → Boards → Secretary-General → General Assembly",
+        "intergovernmentalConsideration": "For General Assembly decision (eightieth session)",
+        "writtenProducts": [
+          "Secretary-General’s report (July)"
+        ]
+      },
+      {
+        "action": "Action 69: Integrate UNRISD into UNU",
+        "pathwayToDecision": "Work package lead → Governing bodies → Secretary-General → UNU Council",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (July)"
+        ]
+      },
+      {
+        "action": "Action 72: Establish joint coordination mechanism",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (July)"
+        ]
       }
     ]
   },
@@ -689,6 +999,33 @@
         "actionNumbers": "Action 91",
         "text": "Recommendations contained in the Secretary-General's report on QCPR implementation in May will be considered during the ECOSOC Operational Activities Segment."
       }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 76, 77: Assess pooled funding and develop recommendations",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (July)"
+        ]
+      },
+      {
+        "action": "Action 78: Develop proposals on core funding",
+        "pathwayToDecision": "Work package lead → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (July)"
+        ]
+      },
+      {
+        "action": "Action 91: Map Funding Compact review mechanisms",
+        "pathwayToDecision": "Work package lead → Secretary-General → ECOSOC and General Assembly, as relevant",
+        "intergovernmentalConsideration": "As relevant, for consideration of ECOSOC at the Operational Activities for Development Segment (2026 session) and General Assembly (eighty-first session)",
+        "writtenProducts": [
+          "Secretary-General’s report on QCPR implementation (May)",
+          "Secretary-General’s information brief (July)"
+        ]
+      }
     ]
   },
   {
@@ -728,6 +1065,24 @@
       {
         "actionNumbers": "Action 81",
         "text": "A public-facing platform to improve visibility across mandating organs will be initiated in May, with full rollout by August."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 80, 83: Enhance support for mandate creation",
+        "pathwayToDecision": "Work package leads → Secretary-General; Ad Hoc Working Group",
+        "intergovernmentalConsideration": "For consideration of the Ad Hoc Working Group, as relevant",
+        "writtenProducts": [
+          "As requested in GA resolution 80/251 (starting May)"
+        ]
+      },
+      {
+        "action": "Action 81: Enhance visibility across mandating organs",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Rollout of consolidated webpage (May–August)"
+        ]
       }
     ]
   },
@@ -777,6 +1132,32 @@
         "actionNumbers": "Action 92",
         "text": "The Proposed Programme Budget for 2027 will show the resulting evolution of deliverables."
       }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 88: Assess internal strategic oversight and coordination",
+        "pathwayToDecision": "Work package lead → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (October)"
+        ]
+      },
+      {
+        "action": "Action 89: Review mandate citations",
+        "pathwayToDecision": "Work package lead → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Proposed Programme Budget for 2027 (May)"
+        ]
+      },
+      {
+        "action": "Action 92: Streamline deliverables",
+        "pathwayToDecision": "Work package lead → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Proposed Programme Budget for 2027 (May)"
+        ]
+      }
     ]
   },
   {
@@ -800,6 +1181,16 @@
       {
         "actionNumbers": "Action 93",
         "text": "The action plan will be finalized for consideration by the Secretary-General by June, in implementation of resolution A/RES/80/251. A Secretary-General's information brief is planned for July. No decision of an intergovernmental organ is envisaged at this stage."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 93: Develop action plan to strengthen system-wide results management",
+        "pathwayToDecision": "Work package lead → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (July)"
+        ]
       }
     ]
   },
@@ -917,6 +1308,54 @@
         "actionNumbers": "Action 55",
         "text": "A comprehensive mapping of PBPSO surge capacities will be completed and reflected in a Secretary-General's information brief in July. No decision by an intergovernmental organ is envisaged at this stage."
       }
+    ],
+    "summaryTable": [
+      {
+        "action": "Actions 1, 2, 6, 7, 11: Streamline and consolidate structures in DPPA and DPO",
+        "pathwayToDecision": "-",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": []
+      },
+      {
+        "action": "Action 3: Establish a mechanism to link cross-cutting functions",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": []
+      },
+      {
+        "action": "Action 8: Integrate the UNMHA into OSESGY",
+        "pathwayToDecision": "-",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": []
+      },
+      {
+        "action": "Action 9: Streamline and align UNOCA and the Office of the Special Envoy for the Great Lakes",
+        "pathwayToDecision": "Work package leads → Secretary-General → Security Council, as relevant",
+        "intergovernmentalConsideration": "As relevant, for Security Council decision",
+        "writtenProducts": [
+          "Secretary-General's report (May)"
+        ]
+      },
+      {
+        "action": "Action 10: Streamline and align the Office of the Special Adviser on Cyprus with the UNFICYP",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "",
+        "writtenProducts": []
+      },
+      {
+        "action": "Actions 49, 58: Host regional PDAs in Regional Commissions and integrate PDA support in relevant RCOs",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "",
+        "writtenProducts": []
+      },
+      {
+        "action": "Action 55: Align surge capacity for peace and security, rule of law, DDR, SSR, small arms control, transitions, prevention of extremist violence",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "",
+        "writtenProducts": [
+          "Secretary-General's information brief (July)"
+        ]
+      }
     ]
   },
   {
@@ -952,6 +1391,24 @@
       {
         "actionNumbers": "Action 53",
         "text": "Proposals for co-location arrangements of the regional disarmament centres with Regional Commissions will be developed in the context of the Regional Reset (Work Package 6), with the possibility of inclusion in the Proposed Programme Budget for 2028."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 5: Integrate UNIDIR into ODA",
+        "pathwayToDecision": "Work package lead → Secretary-General → General Assembly, as relevant",
+        "intergovernmentalConsideration": "As relevant, for General Assembly consideration",
+        "writtenProducts": [
+          "Secretary-General’s report, as relevant"
+        ]
+      },
+      {
+        "action": "Action 53: Co-locate regional disarmament centres with Regional Commissions",
+        "pathwayToDecision": "Work package lead → Secretary-General → General Assembly, as relevant",
+        "intergovernmentalConsideration": "As relevant, for General Assembly consideration (eighty-second session), as part of the regular programme budget process2",
+        "writtenProducts": [
+          "Proposed Programme Budget for 2028"
+        ]
       }
     ]
   },
@@ -1001,6 +1458,29 @@
         "actionNumbers": "Action 13",
         "text": "The Secretary-General will take a decision on the reporting lines."
       }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 4: Integrate UNICRI into UNODC",
+        "pathwayToDecision": "Work package lead → CCPCJ → ECOSOC; Secretary-General → General Assembly",
+        "intergovernmentalConsideration": "For CCPCJ consideration (thirty-fifth session); ECOSOC decision (2027 session); General Assembly consideration (eighty-second session), as part of the regular programme budget process2",
+        "writtenProducts": [
+          "Integration proposal (May)",
+          "Proposed Programme Budget for 2028"
+        ]
+      },
+      {
+        "action": "Action 12: Reinforce cooperation",
+        "pathwayToDecision": "Work package leads → Compact Committee → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": []
+      },
+      {
+        "action": "Action 13: Establish reporting line",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": []
+      }
     ]
   },
   {
@@ -1024,6 +1504,18 @@
       {
         "actionNumbers": "Action 29",
         "text": "The PCB will hold formal multistakeholder consultations, bringing together Member States, civil society and implementing partners in May and September. An interim report of the PCB working group will be discussed by the PCB in June, with a view to preparing a final transformation plan for PCB consideration by October. The outcome would then be transmitted to ECOSOC for decision in November. Separately, specialized agencies that are UNAIDS cosponsoring organizations would be invited to take corresponding decisions regarding their participation."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 29: Develop and implement a transition plan to sunset UNAIDS and integrate its capacity and expertise into relevant entities of the UN development system",
+        "pathwayToDecision": "PCB working group → PCB → ECOSOC and specialized agencies",
+        "intergovernmentalConsideration": "For decisions by ECOSOC and specialized agencies",
+        "writtenProducts": [
+          "Working Group interim report to the PCB (June)",
+          "Working Group report on final transformation plan to the PCB (October)",
+          "PCB outcome (November)"
+        ]
       }
     ]
   },
@@ -1049,6 +1541,14 @@
         "actionNumbers": "Action 32",
         "text": "The Secretary-General stands ready to provide analysis and support on other potential mergers."
       }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 32: Provide support for other merger proposals",
+        "pathwayToDecision": "No proposal currently under consideration",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": []
+      }
     ]
   },
   {
@@ -1072,6 +1572,16 @@
       {
         "actionNumbers": "Action 35",
         "text": "The analysis and mapping will be completed in April and the assessment by June for presentation to the Secretary-General. The Secretary-General will issue an information brief on the relevant issues arising from the assessment in September. Eventual proposals may be submitted for consideration by intergovernmental organs."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 35: Assess arrangements on environmental issues and make proposals",
+        "pathwayToDecision": "Work package leads → Secretary-General → Intergovernmental organs if relevant",
+        "intergovernmentalConsideration": "If relevant, depending on the Secretary-General’s proposals",
+        "writtenProducts": [
+          "Secretary-General’s information brief (September)"
+        ]
       }
     ]
   },
@@ -1109,6 +1619,24 @@
         "actionNumbers": "Action 31",
         "text": "A proposal for a more coherent support architecture for LDCs, LLDCs and SIDS, including options on governance and division of labour, will be submitted to the Secretary-General by July, followed by an information brief. No decision of an intergovernmental organ is envisaged at this stage."
       }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 30: Realign macroeconomic analysis capacities",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (September)"
+        ]
+      },
+      {
+        "action": "Action 31: Realign support for LDCs, LLDCs and SIDS",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Secretary-General’s information brief (July)"
+        ]
+      }
     ]
   },
   {
@@ -1144,6 +1672,24 @@
       {
         "actionNumbers": "Action 82",
         "text": "Additional digital tools will be introduced in stages, including an improved online chart of the UN system by June, as well as common data standards for registries by December, as requested in A/RES/80/251."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 79: Strengthen mandate registry",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Updated mandates.un.org (starting June)"
+        ]
+      },
+      {
+        "action": "Action 82: Develop additional digital tools",
+        "pathwayToDecision": "Work package leads → Secretary-General; Ad Hoc Working Group",
+        "intergovernmentalConsideration": "For consideration of the Ad Hoc Working Group, as relevant",
+        "writtenProducts": [
+          "Additional digital tools (starting June)"
+        ]
       }
     ]
   },
@@ -1197,6 +1743,30 @@
         "actionNumbers": "Action 87",
         "text": "Document download counts will be displayed on UN ODS and the UN Digital Library websites starting in May. No decision of an intergovernmental organ is envisaged."
       }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 84, 86: Update internal reporting guidelines",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": []
+      },
+      {
+        "action": "Action 85: Streamline reporting",
+        "pathwayToDecision": "Work package leads → Secretary-General; Ad Hoc Working Group",
+        "intergovernmentalConsideration": "For consideration of the Ad Hoc Working Group",
+        "writtenProducts": [
+          "Secretary-General’s proposals (June)"
+        ]
+      },
+      {
+        "action": "Action 87: Display report download counts",
+        "pathwayToDecision": "Work package leads → Secretary-General",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Display report download counts (starting May)"
+        ]
+      }
     ]
   },
   {
@@ -1232,6 +1802,24 @@
       {
         "actionNumbers": "Action 95",
         "text": "Analytical work will continue for the consolidation of travel processing, ICT, human resources administration and other administrative processes in 2026. Proposals will be reflected in future budget proposals for consideration of the General Assembly."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Action 94: Implement actions approved in 2026 budget cycle",
+        "pathwayToDecision": "-",
+        "intergovernmentalConsideration": "-",
+        "writtenProducts": [
+          "Progress update in Proposed Programme Budget for 2027 and 2028"
+        ]
+      },
+      {
+        "action": "Action 95: Advance services consolidation",
+        "pathwayToDecision": "Work package leads → Secretary-General → General Assembly",
+        "intergovernmentalConsideration": "For General Assembly decision (eighty-first and eighty-second sessions), as part of the regular programme budget process2",
+        "writtenProducts": [
+          "Future Proposed Programme Budgets"
+        ]
       }
     ]
   }
