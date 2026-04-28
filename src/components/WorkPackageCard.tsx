@@ -369,7 +369,7 @@ export function WorkPackageItem({
         <div className="absolute top-3 right-3 flex items-center gap-1.5">
           {wp.pdfPage && (
             <a
-              href={`/data/actions_progress.pdf#page=${wp.pdfPage}`}
+              href={`/data/progress/wp${wp.number}.pdf`}
               target="_blank"
               rel="noopener noreferrer"
               className="!flex !size-9 !max-h-9 !min-h-9 !max-w-9 !min-w-9 items-center justify-center rounded-md bg-slate-500 !p-0 text-white transition-colors hover:bg-slate-600 sm:!h-auto sm:!max-h-none sm:!min-h-0 sm:!w-auto sm:!max-w-none sm:!min-w-0 sm:gap-1.5 sm:rounded-[6px] sm:!px-3 sm:!py-1.5"
