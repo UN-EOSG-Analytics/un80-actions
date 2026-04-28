@@ -51,7 +51,8 @@
           "Secretary-General’s information brief (July)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 7
   },
   {
     "workPackageNumber": 2,
@@ -179,7 +180,8 @@
           "Secretary-General’s information brief (September)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 12
   },
   {
     "workPackageNumber": 3,
@@ -213,7 +215,8 @@
           "Secretary-General’s report For General Assembly consideration"
         ]
       }
-    ]
+    ],
+    "pdfPage": 14
   },
   {
     "workPackageNumber": 4,
@@ -265,7 +268,8 @@
         "intergovernmentalConsideration": "-",
         "writtenProducts": []
       }
-    ]
+    ],
+    "pdfPage": 15
   },
   {
     "workPackageNumber": 5,
@@ -324,15 +328,16 @@
           "Secretary-General’s report on the fni ancing and governance of the RC system (2026)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 16
   },
   {
     "workPackageNumber": 6,
-    "workPackageName": "Regional Reset and Regional Platforms",
+    "workPackageName": "Regional Reset",
     "objective": "To reorganize regional capacities of the UN development system for more effective delivery, better linking global mandates, regional strategies and country-level implementation.",
     "howWeGetThere": [
       {
-        "actionNumbers": "Actions 36, 48, 50",
+        "actionNumbers": "Action 36",
         "text": "Develop proposals for a regional reset of capacities for sustainable development, including the establishment of Regional Platforms for Integration (RPI), building upon the existing Regional Collaborative Platforms, to improve internal coordination."
       },
       {
@@ -347,21 +352,13 @@
         "text": "Principles, building blocks and recommendations for the regional reset are being developed for the Secretary-General's consideration. In-depth data analysis and consultations with Member States in bilateral, regional group and plenary settings, as well as across the UN system and Resident Coordinators, have informed this process. Co-leads of other relevant work packages have also been consulted."
       },
       {
-        "actionNumbers": "Action 48",
-        "text": "Principles, building blocks and recommendations for the regional reset are being developed for the Secretary-General's consideration. In-depth data analysis and consultations with Member States in bilateral, regional group and plenary settings, as well as across the UN system and Resident Coordinators, have informed this process. Co-leads of other relevant work packages have also been consulted."
-      },
-      {
-        "actionNumbers": "Action 50",
-        "text": "Principles, building blocks and recommendations for the regional reset are being developed for the Secretary-General's consideration. In-depth data analysis and consultations with Member States in bilateral, regional group and plenary settings, as well as across the UN system and Resident Coordinators, have informed this process. Co-leads of other relevant work packages have also been consulted."
-      },
-      {
         "actionNumbers": "Action 37",
         "text": null
       }
     ],
     "nextStepsAndDecisions": [
       {
-        "actionNumbers": "Actions 36, 48, 50",
+        "actionNumbers": "Action 36",
         "text": "Recommendations for the regional reset will be finalized by the end of April for the Secretary-General's review and reflected in his report on QCPR implementation to ECOSOC in May for Member State consideration."
       },
       {
@@ -371,7 +368,7 @@
     ],
     "summaryTable": [
       {
-        "action": "Actions 36, 48, 50: Develop proposal for a regional reset",
+        "action": "Action 36: Develop proposal for a regional reset",
         "pathwayToDecision": "Work package leads → Secretary-General → ECOSOC and General Assembly, as relevant",
         "intergovernmentalConsideration": "As relevant, for consideration of ECOSOC at the Operational Activities for Development Segment (2026 session) and General Assembly (eighty-first session)",
         "writtenProducts": [
@@ -389,7 +386,8 @@
           "Supplementary information (Jun–Dec)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 17
   },
   {
     "workPackageNumber": 7,
@@ -424,7 +422,8 @@
           "Secretary-General’s information brief (July)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 18
   },
   {
     "workPackageNumber": 8,
@@ -463,7 +462,8 @@
           "Secretary-General’s information brief (September)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 19
   },
   {
     "workPackageNumber": 9,
@@ -497,7 +497,8 @@
           "Secretary-General’s information brief (June)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 24
   },
   {
     "workPackageNumber": 10,
@@ -555,7 +556,8 @@
           "Secretary-General’s information brief (October)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 25
   },
   {
     "workPackageNumber": 11,
@@ -607,7 +609,48 @@
         "intergovernmentalConsideration": "-",
         "writtenProducts": []
       }
-    ]
+    ],
+    "pdfPage": 26
+  },
+  {
+    "workPackageNumber": 12,
+    "workPackageName": "Regional Platforms",
+    "objective": "To reorganize regional capacities of the UN development system for more effective delivery, better linking global mandates, regional strategies and country-level implementation.",
+    "howWeGetThere": [
+      {
+        "actionNumbers": "Actions 48, 50",
+        "text": "Develop proposals for a regional reset of capacities for sustainable development, including the establishment of Regional Platforms for Integration (RPI), building upon the existing Regional Collaborative Platforms, to improve internal coordination."
+      }
+    ],
+    "progressToDate": "Principles, building blocks and recommendations for the regional reset are being developed for the Secretary-General's consideration. In-depth data analysis and consultations with Member States in bilateral, regional group and plenary settings, as well as across the UN system and Resident Coordinators, have informed this process. Co-leads of other relevant work packages have also been consulted.",
+    "progressPerAction": [
+      {
+        "actionNumbers": "Action 48",
+        "text": "Principles, building blocks and recommendations for the regional reset are being developed for the Secretary-General’s consideration. In-depth data analysis and consultations with Member States in bilateral, regional group and plenary settings, as well as across the UN system and Resident Coordinators, have informed this process. Co-leads of other relevant work packages have also been consulted."
+      },
+      {
+        "actionNumbers": "Action 50",
+        "text": "Principles, building blocks and recommendations for the regional reset are being developed for the Secretary-General’s consideration. In-depth data analysis and consultations with Member States in bilateral, regional group and plenary settings, as well as across the UN system and Resident Coordinators, have informed this process. Co-leads of other relevant work packages have also been consulted."
+      }
+    ],
+    "nextStepsAndDecisions": [
+      {
+        "actionNumbers": "Actions 48, 50",
+        "text": "Recommendations for the regional reset will be finalized by the end of April for the Secretary-General's review and reflected in his report on QCPR implementation to ECOSOC in May for Member State consideration."
+      }
+    ],
+    "summaryTable": [
+      {
+        "action": "Actions 48, 50: Establish Regional Platforms for Integration",
+        "pathwayToDecision": "Work package leads → Secretary-General → ECOSOC and General Assembly, as relevant",
+        "intergovernmentalConsideration": "As relevant, for consideration of ECOSOC at the Operational Activities for Development Segment (2026 session) and General Assembly (eighty-first session)",
+        "writtenProducts": [
+          "Secretary-General’s report on QCPR implementation (May)",
+          "Supplementary information (Jun–Dec)"
+        ]
+      }
+    ],
+    "pdfPage": 17
   },
   {
     "workPackageNumber": 13,
@@ -662,7 +705,8 @@
           "Secretary-General’s information brief"
         ]
       }
-    ]
+    ],
+    "pdfPage": 27
   },
   {
     "workPackageNumber": 14,
@@ -761,7 +805,8 @@
           "Secretary-General’s information brief (June)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 28
   },
   {
     "workPackageNumber": 15,
@@ -815,7 +860,8 @@
           "Secretary-General’s information brief (July)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 30
   },
   {
     "workPackageNumber": 16,
@@ -873,7 +919,8 @@
           "Secretary-General’s information brief (September)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 31
   },
   {
     "workPackageNumber": 17,
@@ -947,7 +994,8 @@
           "Secretary-General’s information brief (July)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 32
   },
   {
     "workPackageNumber": 18,
@@ -1026,7 +1074,8 @@
           "Secretary-General’s information brief (July)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 33
   },
   {
     "workPackageNumber": 19,
@@ -1084,7 +1133,8 @@
           "Rollout of consolidated webpage (May–August)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 35
   },
   {
     "workPackageNumber": 20,
@@ -1158,7 +1208,8 @@
           "Proposed Programme Budget for 2027 (May)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 36
   },
   {
     "workPackageNumber": 21,
@@ -1192,7 +1243,8 @@
           "Secretary-General’s information brief (July)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 37
   },
   {
     "workPackageNumber": 22,
@@ -1356,7 +1408,8 @@
           "Secretary-General's information brief (July)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 8
   },
   {
     "workPackageNumber": 23,
@@ -1410,7 +1463,8 @@
           "Proposed Programme Budget for 2028"
         ]
       }
-    ]
+    ],
+    "pdfPage": 10
   },
   {
     "workPackageNumber": 24,
@@ -1481,7 +1535,8 @@
         "intergovernmentalConsideration": "-",
         "writtenProducts": []
       }
-    ]
+    ],
+    "pdfPage": 11
   },
   {
     "workPackageNumber": 25,
@@ -1517,7 +1572,8 @@
           "PCB outcome (November)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 20
   },
   {
     "workPackageNumber": 26,
@@ -1549,7 +1605,8 @@
         "intergovernmentalConsideration": "-",
         "writtenProducts": []
       }
-    ]
+    ],
+    "pdfPage": 21
   },
   {
     "workPackageNumber": 27,
@@ -1583,7 +1640,8 @@
           "Secretary-General’s information brief (September)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 22
   },
   {
     "workPackageNumber": 28,
@@ -1637,7 +1695,8 @@
           "Secretary-General’s information brief (July)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 23
   },
   {
     "workPackageNumber": 29,
@@ -1691,7 +1750,8 @@
           "Additional digital tools (starting June)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 38
   },
   {
     "workPackageNumber": 30,
@@ -1767,7 +1827,8 @@
           "Display report download counts (starting May)"
         ]
       }
-    ]
+    ],
+    "pdfPage": 39
   },
   {
     "workPackageNumber": 31,
@@ -1821,6 +1882,7 @@
           "Future Proposed Programme Budgets"
         ]
       }
-    ]
+    ],
+    "pdfPage": 41
   }
 ]

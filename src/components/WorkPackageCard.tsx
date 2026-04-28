@@ -15,7 +15,7 @@ import {
 import { actionMatchesProductMonths } from "@/lib/productsTimeline";
 import { formatGoalText } from "@/lib/utils";
 import type { WorkPackage, WorkPackageAction } from "@/types";
-import { ChevronDown, Menu } from "lucide-react";
+import { ChevronDown, FileText, Menu } from "lucide-react";
 
 interface WorkPackageActionsProps {
   actions: WorkPackageAction[];
@@ -365,20 +365,35 @@ export function WorkPackageItem({
           </div>
         )}
 
-        {/* Details Button */}
-        <button
-          type="button"
-          className="absolute top-3 right-3 !flex !size-9 !max-h-9 !min-h-9 !max-w-9 !min-w-9 items-center justify-center rounded-md bg-slate-500 !p-0 text-white transition-colors hover:bg-slate-600 sm:!h-auto sm:!max-h-none sm:!min-h-0 sm:!w-auto sm:!max-w-none sm:!min-w-0 sm:gap-1.5 sm:rounded-[6px] sm:!px-3 sm:!py-1.5"
-          aria-label="Details"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onToggle();
-          }}
-        >
-          <Menu className="size-4 shrink-0 sm:size-3.5" aria-hidden="true" />
-          <span className="hidden text-sm font-medium sm:inline" aria-hidden="true">Details</span>
-        </button>
+        {/* Top-right buttons */}
+        <div className="absolute top-3 right-3 flex items-center gap-1.5">
+          {wp.pdfPage && (
+            <a
+              href={`/data/actions_progress.pdf#page=${wp.pdfPage}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="!flex !size-9 !max-h-9 !min-h-9 !max-w-9 !min-w-9 items-center justify-center rounded-md bg-slate-500 !p-0 text-white transition-colors hover:bg-slate-600 sm:!h-auto sm:!max-h-none sm:!min-h-0 sm:!w-auto sm:!max-w-none sm:!min-w-0 sm:gap-1.5 sm:rounded-[6px] sm:!px-3 sm:!py-1.5"
+              aria-label="Progress report PDF"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <FileText className="size-4 shrink-0 sm:size-3.5" aria-hidden="true" />
+              <span className="hidden text-sm font-medium sm:inline" aria-hidden="true">PDF</span>
+            </a>
+          )}
+          <button
+            type="button"
+            className="!flex !size-9 !max-h-9 !min-h-9 !max-w-9 !min-w-9 items-center justify-center rounded-md bg-slate-500 !p-0 text-white transition-colors hover:bg-slate-600 sm:!h-auto sm:!max-h-none sm:!min-h-0 sm:!w-auto sm:!max-w-none sm:!min-w-0 sm:gap-1.5 sm:rounded-[6px] sm:!px-3 sm:!py-1.5"
+            aria-label="Details"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onToggle();
+            }}
+          >
+            <Menu className="size-4 shrink-0 sm:size-3.5" aria-hidden="true" />
+            <span className="hidden text-sm font-medium sm:inline" aria-hidden="true">Details</span>
+          </button>
+        </div>
 
         {/* Collapsible Content */}
         <CollapsibleContent className="px-4 pb-4 sm:px-6 sm:pb-6">

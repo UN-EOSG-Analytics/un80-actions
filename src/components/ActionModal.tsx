@@ -17,6 +17,7 @@ import { ACTION_STATUS } from "@/constants/actionStatus";
 import { getDocumentReference, getDocumentUrl } from "@/constants/documents";
 import { normalizeTeamMemberForDisplay, encodeUrlParam } from "@/lib/utils";
 import type { Action } from "@/types";
+import progressData from "@data/actions_progress.json";
 import { ChevronRight, FileText, X } from "lucide-react";
 import Link from "next/link";
 import {
@@ -455,6 +456,22 @@ export default function ActionModal({
                   <WPLeadsBadge leads={action.work_package_leads} />
                 </div>
               )}
+            {(() => {
+              const progress = progressData.find(
+                (p) => p.workPackageNumber === action.work_package_number,
+              );
+              return progress?.pdfPage ? (
+                <a
+                  href={`/data/actions_progress.pdf#page=${progress.pdfPage}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-un-blue hover:underline"
+                >
+                  <FileText className="size-3.5" />
+                  View in progress report (PDF)
+                </a>
+              ) : null;
+            })()}
           </div>
         </SectionCard>
       </div>

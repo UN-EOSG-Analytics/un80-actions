@@ -44,6 +44,7 @@ export function groupActionsByWorkPackage(actions: Actions): WorkPackage[] {
         objective: progressByWp.get(action.work_package_number)?.objective || null,
         bigTicket: isBigTicket,
         progressToDate: progressByWp.get(action.work_package_number)?.progressToDate || null,
+        pdfPage: progressByWp.get(action.work_package_number)?.pdfPage || null,
         actions: [],
       });
     }
