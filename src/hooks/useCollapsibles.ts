@@ -19,8 +19,6 @@ export function useCollapsibles() {
     useState<boolean>(false);
   const [showAllUpcomingMilestones, setShowAllUpcomingMilestones] =
     useState<boolean>(false);
-  const [showAllMilestonesPerMonth, setShowAllMilestonesPerMonth] =
-    useState<boolean>(false);
   const [showAllLeaderChecklist, setShowAllLeaderChecklist] =
     useState<boolean>(false);
 
@@ -86,8 +84,6 @@ export function useCollapsibles() {
     setShowAllWorkpackages,
     showAllUpcomingMilestones,
     setShowAllUpcomingMilestones,
-    showAllMilestonesPerMonth,
-    setShowAllMilestonesPerMonth,
     showAllLeaderChecklist,
     setShowAllLeaderChecklist,
   };

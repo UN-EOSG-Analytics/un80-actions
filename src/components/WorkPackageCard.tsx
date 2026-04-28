@@ -12,6 +12,7 @@ import {
   getStatusStyles,
   isDecisionTaken,
 } from "@/constants/actionStatus";
+import { actionMatchesProductMonths } from "@/lib/productsTimeline";
 import { formatGoalText } from "@/lib/utils";
 import type { WorkPackage, WorkPackageAction } from "@/types";
 import { ChevronDown, Menu } from "lucide-react";
@@ -21,7 +22,7 @@ interface WorkPackageActionsProps {
   workPackageNumber: number | "";
   searchQuery?: string;
   selectedActionStatus?: string[];
-  selectedMilestoneMonth?: string[];
+  selectedProductMonth?: string[];
 }
 
 /**
@@ -54,27 +55,12 @@ function actionMatchesStatus(
     (status) => status.toLowerCase() === actionStatusLower,
   );
 }
-/**
- * Helper to check if an action matches the milestone month filter
- */
-function actionMatchesMilestoneMonth(
-  action: WorkPackageAction,
-  selectedMonths: string[],
-): boolean {
-  if (selectedMonths.length === 0) return true;
-  if (!action.deliveryDate) return false;
-  const deliveryDate = new Date(action.deliveryDate);
-  const monthName = deliveryDate.toLocaleDateString("en-US", {
-    month: "long",
-  });
-  return selectedMonths.includes(monthName);
-}
 function WorkPackageActions({
   actions,
   workPackageNumber,
   searchQuery = "",
   selectedActionStatus = [],
-  selectedMilestoneMonth = [],
+  selectedProductMonth = [],
 }: WorkPackageActionsProps) {
   const [showUnmatched, setShowUnmatched] = useState(false);
 
@@ -88,28 +74,26 @@ function WorkPackageActions({
     );
   }
 
-  // Separate matched and unmatched actions based on search, status, and milestone month filters
   const hasActiveSearch = searchQuery.trim().length > 0;
   const hasActiveStatusFilter = selectedActionStatus.length > 0;
-  const hasActiveMilestoneMonthFilter = selectedMilestoneMonth.length > 0;
+  const hasActiveProductMonthFilter = selectedProductMonth.length > 0;
   const hasActiveFilter =
-    hasActiveSearch || hasActiveStatusFilter || hasActiveMilestoneMonthFilter;
+    hasActiveSearch || hasActiveStatusFilter || hasActiveProductMonthFilter;
+
+  const actionMatchesAll = (action: WorkPackageAction) =>
+    actionMatchesSearch(action, searchQuery) &&
+    actionMatchesStatus(action, selectedActionStatus) &&
+    actionMatchesProductMonths(
+      action.actionNumber,
+      workPackageNumber,
+      selectedProductMonth,
+    );
 
   const matchedActions = hasActiveFilter
-    ? actions.filter(
-        (action) =>
-          actionMatchesSearch(action, searchQuery) &&
-          actionMatchesStatus(action, selectedActionStatus) &&
-          actionMatchesMilestoneMonth(action, selectedMilestoneMonth),
-      )
+    ? actions.filter(actionMatchesAll)
     : actions;
   const unmatchedActions = hasActiveFilter
-    ? actions.filter(
-        (action) =>
-          !actionMatchesSearch(action, searchQuery) ||
-          !actionMatchesStatus(action, selectedActionStatus) ||
-          !actionMatchesMilestoneMonth(action, selectedMilestoneMonth),
-      )
+    ? actions.filter((a) => !actionMatchesAll(a))
     : [];
 
   return (
@@ -172,7 +156,7 @@ interface WorkPackageItemProps {
   selectedActions?: string[];
   selectedTeamMembers?: string[];
   selectedActionStatus?: string[];
-  selectedMilestoneMonth?: string[];
+  selectedProductMonth?: string[];
   originalActionsCount?: number;
 }
 
@@ -187,7 +171,7 @@ export function WorkPackageItem({
   selectedActions = [],
   selectedTeamMembers = [],
   selectedActionStatus = [],
-  selectedMilestoneMonth = [],
+  selectedProductMonth = [],
   originalActionsCount,
 }: WorkPackageItemProps) {
   // Calculate animation duration: base 150ms + 30ms per action, capped at 400ms
@@ -204,13 +188,13 @@ export function WorkPackageItem({
   // Calculate matched actions for filter display
   const hasActiveSearch = searchQuery.trim().length > 0;
   const hasActiveStatusFilter = selectedActionStatus.length > 0;
-  const hasActiveMilestoneMonthFilter = selectedMilestoneMonth.length > 0;
+  const hasActiveProductMonthFilter = selectedProductMonth.length > 0;
   const hasActiveActionFilter = selectedActions.length > 0;
   const hasActiveTeamMemberFilter = selectedTeamMembers.length > 0;
   const hasActiveFilter =
     hasActiveSearch ||
     hasActiveStatusFilter ||
-    hasActiveMilestoneMonthFilter ||
+    hasActiveProductMonthFilter ||
     hasActiveActionFilter ||
     hasActiveTeamMemberFilter;
 
@@ -219,7 +203,11 @@ export function WorkPackageItem({
         (action) =>
           actionMatchesSearch(action, searchQuery) &&
           actionMatchesStatus(action, selectedActionStatus) &&
-          actionMatchesMilestoneMonth(action, selectedMilestoneMonth),
+          actionMatchesProductMonths(
+            action.actionNumber,
+            wp.number,
+            selectedProductMonth,
+          ),
       ).length
     : wp.actions.length;
 
@@ -400,7 +388,7 @@ export function WorkPackageItem({
               workPackageNumber={wp.number}
               searchQuery={searchQuery}
               selectedActionStatus={selectedActionStatus}
-              selectedMilestoneMonth={selectedMilestoneMonth}
+              selectedProductMonth={selectedProductMonth}
             />
           </div>
         </CollapsibleContent>

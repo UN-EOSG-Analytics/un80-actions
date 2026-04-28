@@ -47,8 +47,8 @@ export function useFilters() {
   const selectedActionStatus = decodeUrlParamArray(
     effectiveParams.get("action_status"),
   );
-  const selectedMilestoneMonth = decodeUrlParamArray(
-    effectiveParams.get("milestone_month"),
+  const selectedProductMonth = decodeUrlParamArray(
+    effectiveParams.get("product_month"),
   );
   const sortOption = effectiveParams.get("sort") || "number-asc";
 
@@ -205,13 +205,13 @@ export function useFilters() {
     [updateUrl],
   );
 
-  const setSelectedMilestoneMonth = useCallback(
+  const setSelectedProductMonth = useCallback(
     (value: string[]) => {
       updateUrl((params) => {
         if (value.length > 0) {
-          params.milestone_month = encodeUrlParamArray(value);
+          params.product_month = encodeUrlParamArray(value);
         } else {
-          delete params.milestone_month;
+          delete params.product_month;
         }
       });
     },
@@ -242,7 +242,7 @@ export function useFilters() {
       selectedAction,
       selectedTeamMember,
       selectedActionStatus,
-      selectedMilestoneMonth,
+      selectedProductMonth,
       sortOption,
     }),
     [
@@ -255,7 +255,7 @@ export function useFilters() {
       selectedAction,
       selectedTeamMember,
       selectedActionStatus,
-      selectedMilestoneMonth,
+      selectedProductMonth,
       sortOption,
     ],
   );
@@ -292,8 +292,8 @@ export function useFilters() {
     setSelectedTeamMember,
     selectedActionStatus,
     setSelectedActionStatus,
-    selectedMilestoneMonth,
-    setSelectedMilestoneMonth,
+    selectedProductMonth,
+    setSelectedProductMonth,
     sortOption,
     setSortOption,
     handleResetFilters,

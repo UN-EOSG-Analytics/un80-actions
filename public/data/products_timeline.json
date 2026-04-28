@@ -1,0 +1,137 @@
+[
+  {
+    "category": "Secretary-General's and other official reports",
+    "description": "In particular where a decision of an intergovernmental organ is envisaged",
+    "items": [
+      {
+        "month": "May",
+        "entries": [
+          { "workPackages": [5, 6, 7, 8, 12, 13, 18], "text": "Secretary-General's report on QCPR of operational activities for development of the UN System" },
+          { "workPackages": [5, 6], "text": "UNSDG Chair's report on DCO/RC system" },
+          { "workPackages": [11, 20, 31], "text": "Proposed Programme Budget for 2027" },
+          { "workPackages": [22], "text": "Secretary-General's report on (UNOCA)" }
+        ]
+      },
+      {
+        "month": "June",
+        "entries": [
+          { "workPackages": [1], "text": "Secretary-General's peace operations review" }
+        ]
+      },
+      {
+        "month": "July",
+        "entries": [
+          { "workPackages": [17], "text": "Secretary-General's report (UNITAR/UNSSC)" }
+        ]
+      },
+      {
+        "month": "November",
+        "entries": [
+          { "workPackages": [25], "text": "Secretary-General's report on UNAIDS" }
+        ]
+      },
+      {
+        "month": "December",
+        "entries": [
+          { "workPackages": [5], "text": "Secretary-General's report on the financing and governance of the RC system" }
+        ]
+      },
+      {
+        "month": "Later or TBD",
+        "entries": [
+          { "workPackages": [3], "text": "Secretary-General's report (UNDP/UNOPS)" },
+          { "workPackages": [4], "text": "Secretary-General's report (UNFPA/UN Women)" },
+          { "workPackages": [23], "text": "Secretary-General's report (UNIDIR/ODA)" },
+          { "workPackages": [23, 24, 31], "text": "Proposed Programme Budget for 2028" }
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Secretary-General's information briefs",
+    "description": "Providing further updates and information on specific work packages",
+    "items": [
+      {
+        "month": "May",
+        "entries": [
+          { "workPackages": [13], "text": "Shared Platform Initiative", "actions": [19] },
+          { "workPackages": [24], "text": "Drugs, Crime, Counter-Terrorism", "actions": [4], "note": "Integration proposal" }
+        ]
+      },
+      {
+        "month": "June",
+        "entries": [
+          { "workPackages": [2], "text": "New Humanitarian Compact", "actions": [17, 18, 20, 24] },
+          { "workPackages": [5], "text": "UNCT Reconfiguration", "actions": [39, 40], "note": "Suppl. info (starting June)" },
+          { "workPackages": [6, 12], "text": "Regional Reset", "actions": [36, 37, 48, 50], "note": "Suppl. info (starting June)" },
+          { "workPackages": [9], "text": "Human Rights Group", "actions": [42] },
+          { "workPackages": [14, 15], "text": "Unified Services Roadmap", "actions": [63, 64, 65, 66, 67, 61] }
+        ]
+      },
+      {
+        "month": "July",
+        "entries": [
+          { "workPackages": [1], "text": "Peace Operations", "actions": [14] },
+          { "workPackages": [7], "text": "Joint Knowledge Hubs", "actions": [33] },
+          { "workPackages": [15], "text": "Technology", "actions": [62] },
+          { "workPackages": [17], "text": "Training and Research", "actions": [69, 72] },
+          { "workPackages": [18], "text": "Funding Mechanisms", "actions": [76, 77, 78, 91] },
+          { "workPackages": [21], "text": "System-wide Results-Management", "actions": [93] },
+          { "workPackages": [22], "text": "Peacebuilding", "actions": [55] },
+          { "workPackages": [28], "text": "Other UN Secretariat Realignments", "actions": [31] }
+        ]
+      },
+      {
+        "month": "September",
+        "entries": [
+          { "workPackages": [2], "text": "New Humanitarian Compact", "actions": [22, 23, 25] },
+          { "workPackages": [8], "text": "Expertise-on-Demand", "actions": [34, 54] },
+          { "workPackages": [16], "text": "UN System Data Commons", "actions": [74, 75] },
+          { "workPackages": [27], "text": "Environment", "actions": [35] },
+          { "workPackages": [28], "text": "Other UN Secretariat Realignments", "actions": [30] }
+        ]
+      },
+      {
+        "month": "October",
+        "entries": [
+          { "workPackages": [10], "text": "Senior Management Coordination Fora", "actions": [43, 44, 46] },
+          { "workPackages": [20], "text": "Budget and Programme Management", "actions": [88] }
+        ]
+      },
+      {
+        "month": "Later or TBD",
+        "entries": [
+          { "workPackages": [2], "text": "New Humanitarian Compact", "actions": [16], "note": "Finalized 2026 Humanitarian Needs and Response Plans (HNRPs) available online" },
+          { "workPackages": [13], "text": "Shared Platform Initiative", "actions": [57] }
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Operational tools and products",
+    "description": "Including online platforms, registries, analytical tools and operational guidance",
+    "items": [
+      {
+        "month": "May",
+        "entries": [
+          { "workPackages": [19], "text": "Mandate Creation Support", "actions": [80, 81, 83] },
+          { "workPackages": [30], "text": "Secretary-General's Reports", "actions": [87] }
+        ]
+      },
+      {
+        "month": "June",
+        "entries": [
+          { "workPackages": [14], "text": "Unified Services Roadmap", "actions": [63, 65], "note": "Dashboard" },
+          { "workPackages": [29], "text": "Mandate Registries and Tools", "actions": [79, 82], "note": "Starting June" },
+          { "workPackages": [30], "text": "Secretary-General's Reports", "actions": [85] }
+        ]
+      },
+      {
+        "month": "November",
+        "entries": [
+          { "workPackages": [16], "text": "UN System Data Commons", "actions": [73] }
+        ]
+      }
+    ]
+  }
+]

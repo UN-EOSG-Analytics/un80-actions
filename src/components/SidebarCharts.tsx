@@ -15,6 +15,7 @@ import type {
   WorkPackageChartEntry,
   WorkstreamChartEntry,
 } from "@/types";
+import { getProductMonths } from "@/lib/productsTimeline";
 import { Activity, CalendarDays, Flag, Layers, Users } from "lucide-react";
 import { SidebarChart, SidebarChartEntry } from "./SidebarChart";
 
@@ -53,13 +54,9 @@ interface SidebarChartsProps {
   showAllUpcomingMilestones: boolean;
   onToggleShowAllUpcomingMilestones: () => void;
 
-  // Milestones per month chart
-  milestonesPerMonthSearchQuery: string;
-  onMilestonesPerMonthSearchChange: (query: string) => void;
-  showAllMilestonesPerMonth: boolean;
-  onToggleShowAllMilestonesPerMonth: () => void;
-  selectedMilestoneMonth: string[];
-  onSelectMilestoneMonth: (month: string[]) => void;
+  // Products per month chart
+  selectedProductMonth: string[];
+  onSelectProductMonth: (month: string[]) => void;
 
   // Action Status filter
   selectedActionStatus: string[];
@@ -79,9 +76,8 @@ export function SidebarCharts({
   selectedWorkstream,
   onSelectWorkstream,
   upcomingMilestonesData,
-  milestonesPerMonthSearchQuery,
-  selectedMilestoneMonth,
-  onSelectMilestoneMonth,
+  selectedProductMonth,
+  onSelectProductMonth,
   selectedActionStatus,
   onSelectActionStatus,
   actions,
@@ -95,6 +91,14 @@ export function SidebarCharts({
     isDecisionTaken(a.public_action_status),
   ).length;
   const furtherWorkCount = totalActions - decisionTakenCount;
+
+  const productMonthEntries: SidebarChartEntry[] = getProductMonths().map(
+    (entry) => ({
+      label: entry.month,
+      count: entry.count,
+      value: entry.month,
+    }),
+  );
 
   const leadsChartEntries: SidebarChartEntry[] = leadsData.map((entry) => ({
     label: entry.lead,
@@ -184,60 +188,6 @@ export function SidebarCharts({
           workPackageName: entry.workPackageName,
         };
       });
-
-  // Calculate milestones per month
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  const milestonesPerMonthMap = new Map<number, number>();
-
-  upcomingMilestonesData.forEach((entry) => {
-    if (entry.deliveryDate) {
-      const deliveryDate = new Date(entry.deliveryDate);
-      const month = deliveryDate.getMonth();
-      milestonesPerMonthMap.set(
-        month,
-        (milestonesPerMonthMap.get(month) || 0) + entry.count,
-      );
-    }
-  });
-
-  // TODO: replace with real data — hardcoded for now
-  const decisionTakenPerMonthMap = new Map<number, number>([
-    [0, 8], // January 2026
-    [1, 2], // February 2026
-  ]);
-
-  const milestonesPerMonthEntries: SidebarChartEntry[] = Array.from(
-    milestonesPerMonthMap.entries(),
-  )
-    .sort((a, b) => a[0] - b[0]) // Sort by month number
-    .filter(([, count]) => count > 0) // Only include months with milestones
-    .filter(([monthIndex]) => {
-      // Filter by search query if provided
-      if (!milestonesPerMonthSearchQuery) return true;
-      const monthName = monthNames[monthIndex];
-      return monthName
-        ?.toLowerCase()
-        .includes(milestonesPerMonthSearchQuery.toLowerCase());
-    })
-    .map(([monthIndex, count]) => ({
-      label: monthNames[monthIndex],
-      count: count,
-      value: monthNames[monthIndex],
-      secondaryCount: decisionTakenPerMonthMap.get(monthIndex),
-    }));
 
   return (
     <div className="flex w-full min-w-0 shrink-0 flex-col divide-y divide-slate-200 lg:w-[320px] lg:max-w-[320px] lg:border-l lg:pl-6">
@@ -345,16 +295,16 @@ export function SidebarCharts({
         </div>
       )}
 
-      {/* Upcoming Milestones by Month */}
-      {milestonesPerMonthEntries.length > 0 && (
+      {/* Products by Month */}
+      {productMonthEntries.length > 0 && (
         <div className="py-5">
           <SidebarChart
-            title="Upcoming Milestones by Month"
-            description="Number of milestones by month"
+            title="Products by Month"
+            description="Work packages with expected products"
             icon={<CalendarDays />}
-            data={milestonesPerMonthEntries}
-            selectedValue={selectedMilestoneMonth}
-            onSelectValue={onSelectMilestoneMonth}
+            data={productMonthEntries}
+            selectedValue={selectedProductMonth}
+            onSelectValue={onSelectProductMonth}
             barWidth={105}
             maxHeight={155}
           />

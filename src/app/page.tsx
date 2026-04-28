@@ -46,8 +46,8 @@ export function WorkPackagesPageContent() {
     setSelectedTeamMember,
     selectedActionStatus,
     setSelectedActionStatus,
-    selectedMilestoneMonth,
-    setSelectedMilestoneMonth,
+    selectedProductMonth,
+    setSelectedProductMonth,
     sortOption,
     setSortOption,
     handleResetFilters,
@@ -72,8 +72,6 @@ export function WorkPackagesPageContent() {
     setShowAllWorkpackages,
     showAllUpcomingMilestones,
     setShowAllUpcomingMilestones,
-    showAllMilestonesPerMonth,
-    setShowAllMilestonesPerMonth,
   } = useCollapsibles();
 
   const {
@@ -85,8 +83,6 @@ export function WorkPackagesPageContent() {
     setWorkpackageChartSearchQuery,
     upcomingMilestonesChartSearchQuery,
     setUpcomingMilestonesChartSearchQuery,
-    milestonesPerMonthSearchQuery,
-    setMilestonesPerMonthSearchQuery,
   } = useChartSearch();
 
   // Compute work package data using custom hook
@@ -380,7 +376,7 @@ export function WorkPackagesPageContent() {
                     selectedActions={selectedAction}
                     selectedTeamMembers={selectedTeamMember}
                     selectedActionStatus={selectedActionStatus}
-                    selectedMilestoneMonth={selectedMilestoneMonth}
+                    selectedProductMonth={selectedProductMonth}
                     showProgress={false}
                     searchQuery={searchQuery}
                   />
@@ -424,16 +420,8 @@ export function WorkPackagesPageContent() {
                   onToggleShowAllUpcomingMilestones={() =>
                     setShowAllUpcomingMilestones(!showAllUpcomingMilestones)
                   }
-                  milestonesPerMonthSearchQuery={milestonesPerMonthSearchQuery}
-                  onMilestonesPerMonthSearchChange={
-                    setMilestonesPerMonthSearchQuery
-                  }
-                  showAllMilestonesPerMonth={showAllMilestonesPerMonth}
-                  onToggleShowAllMilestonesPerMonth={() =>
-                    setShowAllMilestonesPerMonth(!showAllMilestonesPerMonth)
-                  }
-                  selectedMilestoneMonth={selectedMilestoneMonth}
-                  onSelectMilestoneMonth={setSelectedMilestoneMonth}
+                  selectedProductMonth={selectedProductMonth}
+                  onSelectProductMonth={setSelectedProductMonth}
                   selectedActionStatus={selectedActionStatus}
                   onSelectActionStatus={setSelectedActionStatus}
                   actions={actions}
