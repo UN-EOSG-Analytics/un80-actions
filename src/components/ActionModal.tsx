@@ -462,7 +462,7 @@ export default function ActionModal({
               );
               return progress?.pdfPage ? (
                 <a
-                  href={`/data/actions_progress.pdf#page=${progress.pdfPage}`}
+                  href={`/data/progress/wp${action.work_package_number}.pdf`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-un-blue hover:underline"
