@@ -276,14 +276,14 @@ export function WorkPackageItem({
           )}
 
           {/* Progress summary - only when expanded */}
-          {isOpen && wp.progressToDate && (
+          {/* {isOpen && wp.progressToDate && (
             <div className="mb-3 rounded-lg border border-slate-200 bg-white px-4 pt-3 pb-4 text-left sm:mb-4 sm:px-5 sm:pt-3.5 sm:pb-5">
               <span className="text-[10px] font-semibold tracking-wider text-slate-500 uppercase sm:text-xs">Progress</span>
               <p className="mt-1 text-xs leading-snug text-slate-700 sm:text-sm">
                 {wp.progressToDate}
               </p>
             </div>
-          )}
+          )} */}
 
           {/* Report Labels and Work Package Leads */}
           <div className="flex w-full flex-wrap items-center gap-1.5">
