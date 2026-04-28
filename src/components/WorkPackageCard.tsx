@@ -287,6 +287,16 @@ export function WorkPackageItem({
             </div>
           )}
 
+          {/* Progress summary - only when expanded */}
+          {isOpen && wp.progressToDate && (
+            <div className="mb-3 rounded-lg border border-slate-200 bg-white p-4 text-left sm:mb-4 sm:p-5">
+              <span className="text-[10px] font-semibold tracking-wider text-slate-500 uppercase sm:text-xs">Progress</span>
+              <p className="mt-1 text-xs leading-snug text-slate-700 sm:text-sm">
+                {wp.progressToDate}
+              </p>
+            </div>
+          )}
+
           {/* Report Labels and Work Package Leads */}
           <div className="flex w-full flex-wrap items-center gap-1.5">
             {/* Workstream Labels */}
@@ -384,15 +394,6 @@ export function WorkPackageItem({
 
         {/* Collapsible Content */}
         <CollapsibleContent className="px-4 pb-4 sm:px-6 sm:pb-6">
-          {wp.progressToDate && (
-            <div className="mb-3 flex items-stretch gap-2.5 pt-2">
-              <div className="w-0.75 shrink-0 rounded-full bg-un-blue" />
-              <p className="py-0.5 text-xs leading-snug font-medium text-slate-600 sm:text-sm md:text-base">
-                <span className="font-semibold text-un-blue">Progress:</span>{" "}
-                {wp.progressToDate}
-              </p>
-            </div>
-          )}
           <div className="pt-2">
             <WorkPackageActions
               actions={wp.actions}
