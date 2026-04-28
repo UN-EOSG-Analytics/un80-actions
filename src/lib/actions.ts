@@ -7,7 +7,17 @@ import progressData from "@data/actions_progress.json";
 // Build lookups from progress reports
 const nextStepsByAction = new Map<number, string>();
 const writtenProductsByAction = new Map<number, string[]>();
+const progressByAction = new Map<number, string>();
 for (const wp of progressData as WorkPackageProgress[]) {
+  for (const item of wp.progressPerAction ?? []) {
+    if (!item.actionNumbers || !item.text) continue;
+    const nums = item.actionNumbers.match(/\d+/g);
+    if (nums) {
+      for (const n of nums) {
+        progressByAction.set(Number(n), item.text);
+      }
+    }
+  }
   for (const item of wp.nextStepsAndDecisions ?? []) {
     if (!item.actionNumbers || !item.text) continue;
     const nums = item.actionNumbers.match(/\d+/g);
@@ -54,6 +64,8 @@ export function getActions(): Actions {
       const nextStep = nextStepsByAction.get(action.action_number);
       const writtenProducts =
         writtenProductsByAction.get(action.action_number) ?? null;
+      const progressToDate =
+        progressByAction.get(action.action_number) ?? null;
       return {
         ...action,
         ...(nextStep && {
@@ -61,6 +73,7 @@ export function getActions(): Actions {
           delivery_date: null,
         }),
         written_products: writtenProducts,
+        progress_to_date: progressToDate,
       };
     });
 }
