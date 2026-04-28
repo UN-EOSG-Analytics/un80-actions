@@ -7,7 +7,6 @@ import {
   TeamBadge,
   WPLeadsBadge,
 } from "@/components/Badges";
-import { HelpTooltip } from "@/components/HelpTooltip";
 import {
   Tooltip,
   TooltipCollisionBoundaryProvider,
@@ -362,7 +361,7 @@ export default function ActionModal({
               <>
                 <div className="my-3 border-t border-slate-200"></div>
                 <h3 className="mb-3 text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
-                  Forthcoming Written Products
+                  Forthcoming Products
                 </h3>
                 <ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed text-slate-700">
                   {action.written_products.map((product, i) => {
