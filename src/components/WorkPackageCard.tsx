@@ -265,7 +265,7 @@ export function WorkPackageItem({
           {wp.objective && (
             <div className="mb-3 flex items-stretch gap-2.5 text-left sm:mb-4">
               <div className="w-0.75 shrink-0 rounded-full bg-un-blue" />
-              <p className="py-0.5 text-sm leading-snug font-medium text-slate-900 sm:text-[15px]">
+              <p className="py-0.5 text-xs leading-snug font-medium text-slate-900 sm:text-sm md:text-base">
                 <span className="font-semibold text-un-blue">Objective:</span>{" "}
                 <HighlightedText
                   text={wp.objective}
@@ -277,7 +277,7 @@ export function WorkPackageItem({
 
           {/* Progress summary - only when expanded */}
           {isOpen && wp.progressToDate && (
-            <div className="mb-3 rounded-lg border border-slate-200 bg-white p-4 text-left sm:mb-4 sm:p-5">
+            <div className="mb-3 rounded-lg border border-slate-200 bg-white px-4 pt-3 pb-4 text-left sm:mb-4 sm:px-5 sm:pt-3.5 sm:pb-5">
               <span className="text-[10px] font-semibold tracking-wider text-slate-500 uppercase sm:text-xs">Progress</span>
               <p className="mt-1 text-xs leading-snug text-slate-700 sm:text-sm">
                 {wp.progressToDate}
