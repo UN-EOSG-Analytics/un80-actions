@@ -1,4 +1,5 @@
 import { WorkPackageItem } from "@/components/WorkPackageCard";
+import { actionMatchesProductMonths } from "@/lib/productsTimeline";
 import type { WorkPackage } from "@/types";
 import { normalizeTeamMember } from "@/lib/utils";
 
@@ -11,7 +12,7 @@ interface WorkPackageListProps {
   selectedActions?: string[];
   selectedTeamMembers?: string[];
   selectedActionStatus?: string[];
-  selectedMilestoneMonth?: string[];
+  selectedProductMonth?: string[];
   showProgress?: boolean;
   searchQuery?: string;
 }
@@ -25,7 +26,7 @@ export function WorkPackageList({
   selectedActions = [],
   selectedTeamMembers = [],
   selectedActionStatus = [],
-  selectedMilestoneMonth = [],
+  selectedProductMonth = [],
   showProgress = false,
   searchQuery = "",
 }: WorkPackageListProps) {
@@ -94,24 +95,23 @@ export function WorkPackageList({
             );
           });
 
-        // Check if any actions match the milestone month filter (to determine if work package should show)
-        const hasMatchingMilestoneMonth =
-          selectedMilestoneMonth.length === 0 ||
-          filteredActions.some((action) => {
-            if (!action.deliveryDate) return false;
-            const deliveryDate = new Date(action.deliveryDate);
-            const monthName = deliveryDate.toLocaleDateString("en-US", {
-              month: "long",
-            });
-            return selectedMilestoneMonth.includes(monthName);
-          });
+        // Check if any action in the WP matches the product month filter
+        const hasMatchingProductMonth =
+          selectedProductMonth.length === 0 ||
+          filteredActions.some((action) =>
+            actionMatchesProductMonths(
+              action.actionNumber,
+              wp.number,
+              selectedProductMonth,
+            ),
+          );
 
         // If there are no actions to display, don't render an (empty) collapsible
         if (
           !filteredActions ||
           filteredActions.length === 0 ||
           !hasMatchingStatusAction ||
-          !hasMatchingMilestoneMonth
+          !hasMatchingProductMonth
         ) {
           return null;
         }
@@ -127,7 +127,7 @@ export function WorkPackageList({
         const hasActiveFilters =
           searchQuery.trim().length > 0 ||
           selectedActionStatus.length > 0 ||
-          selectedMilestoneMonth.length > 0;
+          selectedProductMonth.length > 0;
         const shouldBeOpen = hasActiveFilters || isOpen;
 
         return (
@@ -144,7 +144,7 @@ export function WorkPackageList({
             selectedActions={selectedActions}
             selectedTeamMembers={selectedTeamMembers}
             selectedActionStatus={selectedActionStatus}
-            selectedMilestoneMonth={selectedMilestoneMonth}
+            selectedProductMonth={selectedProductMonth}
             originalActionsCount={wp.actions.length}
           />
         );

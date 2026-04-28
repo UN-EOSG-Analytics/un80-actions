@@ -186,7 +186,7 @@ export interface FilterState {
   selectedAction: string[];
   selectedTeamMember: string[];
   selectedActionStatus: string[];
-  selectedMilestoneMonth: string[];
+  selectedProductMonth: string[];
   sortOption: string;
 }
 
@@ -253,6 +253,5 @@ export interface ChartSearchState {
   workstreamChartSearchQuery: string;
   workpackageChartSearchQuery: string;
   upcomingMilestonesChartSearchQuery: string;
-  milestonesPerMonthSearchQuery: string;
   leaderChecklistSearchQuery: string;
 }
