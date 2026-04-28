@@ -79,6 +79,9 @@ export interface Action {
 
   /** Action leads array */
   action_leads: string[];
+
+  /** Progress to date text from progress report */
+  progress_to_date: string | null;
 }
 
 /**

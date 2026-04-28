@@ -332,6 +332,19 @@ export default function ActionModal({
               />
             </div>
 
+            {/* Progress to Date */}
+            {action.progress_to_date && (
+              <>
+                <div className="my-3 border-t border-slate-200"></div>
+                <h3 className="mb-3 text-xs font-semibold tracking-wide text-slate-700 sm:text-sm">
+                  Progress to Date
+                </h3>
+                <p className="text-sm leading-relaxed text-slate-700">
+                  {action.progress_to_date}
+                </p>
+              </>
+            )}
+
             {/* Next Steps */}
             {action.upcoming_milestone && (
               <>
