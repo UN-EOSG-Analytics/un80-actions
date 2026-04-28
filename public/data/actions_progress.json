@@ -169,7 +169,7 @@
       },
       {
         "actionNumbers": "Action 28",
-        "text": "n/a"
+        "text": null
       }
     ],
     "nextStepsAndDecisions": [
@@ -249,7 +249,7 @@
       },
       {
         "actionNumbers": "Action 37",
-        "text": "n/a"
+        "text": null
       }
     ],
     "nextStepsAndDecisions": [
@@ -437,7 +437,7 @@
       },
       {
         "actionNumbers": "Action 57",
-        "text": "n/a"
+        "text": null
       }
     ],
     "nextStepsAndDecisions": [
@@ -485,7 +485,7 @@
       },
       {
         "actionNumbers": "Action 64",
-        "text": "n/a"
+        "text": null
       },
       {
         "actionNumbers": "Action 66",
@@ -661,19 +661,19 @@
     "progressPerAction": [
       {
         "actionNumbers": "Action 76",
-        "text": "System-wide mapping and analysis have been completed across pooled funding. This work has been supported by consultations with Member States, contributors and UN system entities. Initial findings show fragmentation across pooled funds, uneven costing and governance."
+        "text": "System-wide mapping and analysis have been completed across pooled funding, core funding and Funding Compact review mechanisms. This work has been supported by consultations with Member States, contributors and UN system entities. Initial findings show fragmentation across pooled funds, uneven costing and governance, structural disadvantages affecting core funding, and gaps in current Funding Compact review arrangements."
       },
       {
         "actionNumbers": "Action 77",
-        "text": "System-wide mapping and analysis have been completed across pooled funding. This work has been supported by consultations with Member States, contributors and UN system entities. Initial findings show fragmentation across pooled funds, uneven costing and governance."
+        "text": "System-wide mapping and analysis have been completed across pooled funding, core funding and Funding Compact review mechanisms. This work has been supported by consultations with Member States, contributors and UN system entities. Initial findings show fragmentation across pooled funds, uneven costing and governance, structural disadvantages affecting core funding, and gaps in current Funding Compact review arrangements."
       },
       {
         "actionNumbers": "Action 78",
-        "text": "System-wide mapping and analysis have been completed across core funding. This work has been supported by consultations with Member States, contributors and UN system entities. Initial findings show structural disadvantages affecting core funding."
+        "text": "System-wide mapping and analysis have been completed across pooled funding, core funding and Funding Compact review mechanisms. This work has been supported by consultations with Member States, contributors and UN system entities. Initial findings show fragmentation across pooled funds, uneven costing and governance, structural disadvantages affecting core funding, and gaps in current Funding Compact review arrangements."
       },
       {
         "actionNumbers": "Action 91",
-        "text": "System-wide mapping and analysis have been completed across Funding Compact review mechanisms. This work has been supported by consultations with Member States, contributors and UN system entities. Initial findings show gaps in current Funding Compact review arrangements."
+        "text": "System-wide mapping and analysis have been completed across pooled funding, core funding and Funding Compact review mechanisms. This work has been supported by consultations with Member States, contributors and UN system entities. Initial findings show fragmentation across pooled funds, uneven costing and governance, structural disadvantages affecting core funding, and gaps in current Funding Compact review arrangements."
       }
     ],
     "nextStepsAndDecisions": [
@@ -869,7 +869,7 @@
       },
       {
         "actionNumbers": "Action 9",
-        "text": "n/a"
+        "text": null
       },
       {
         "actionNumbers": "Action 10",
@@ -885,7 +885,7 @@
       },
       {
         "actionNumbers": "Action 55",
-        "text": "A criticality assessment is regularly conducted by DPPA, UNDP and DCO to determine countries where PDAs are posted, subject to funding availability."
+        "text": null
       }
     ],
     "nextStepsAndDecisions": [
@@ -1129,11 +1129,11 @@
     "progressPerAction": [
       {
         "actionNumbers": "Action 79",
-        "text": "The pilot version of mandates.un.org was launched in October. It gives Member States a clearer view of nearly 4,000 mandate sources cited by UN entities in support of their Proposed Programme Budget for 2026. Since then, new features have been added. More than 100 entities have reviewed the citations for their Proposed Programme Plans for 2027, leading to significant reductions in citations."
+        "text": "The pilot version of mandates.un.org was launched in October. It gives Member States a clearer view of nearly 4,000 mandate sources cited by UN entities in support of their Proposed Programme Budget for 2026. Since then, new features have been added, including tools to compare successive versions of resolutions. More than 100 entities have reviewed the citations for their Proposed Programme Plans for 2027, leading to significant reductions in citations."
       },
       {
         "actionNumbers": "Action 82",
-        "text": "New features have been added, including tools to compare successive versions of resolutions. Work is under way on additional digital tools, in line with the requests by Member States in A/RES/80/251."
+        "text": "Work is under way on additional digital tools, in line with the requests by Member States in A/RES/80/251."
       }
     ],
     "nextStepsAndDecisions": [
