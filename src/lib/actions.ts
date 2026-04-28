@@ -8,7 +8,7 @@ import progressData from "@data/actions_progress.json";
 const nextStepsByAction = new Map<number, string>();
 const writtenProductsByAction = new Map<number, string[]>();
 for (const wp of progressData as WorkPackageProgress[]) {
-  for (const item of wp.nextStepsAndDecisions) {
+  for (const item of wp.nextStepsAndDecisions ?? []) {
     if (!item.actionNumbers || !item.text) continue;
     const nums = item.actionNumbers.match(/\d+/g);
     if (nums) {
@@ -17,7 +17,7 @@ for (const wp of progressData as WorkPackageProgress[]) {
       }
     }
   }
-  for (const row of wp.summaryTable) {
+  for (const row of wp.summaryTable ?? []) {
     const products = row.writtenProducts.filter(
       (p) => p.trim() && p.trim() !== "-",
     );
