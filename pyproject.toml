@@ -8,6 +8,7 @@ dependencies = [
     "docx>=0.2.4",
     "ipykernel>=7.1.0",
     "pandas>=2.3.3",
+    "pymupdf>=1.27.2.3",
     "python-dotenv>=1.2.1",
     "requests>=2.32.5",
 ]

@@ -365,9 +365,26 @@ export default function ActionModal({
                   Forthcoming Written Products
                 </h3>
                 <ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed text-slate-700">
-                  {action.written_products.map((product, i) => (
-                    <li key={i}>{product}</li>
-                  ))}
+                  {action.written_products.map((product, i) => {
+                    const dateMatch = product.match(
+                      /\s*\(([A-Za-z\d][A-Za-z\d\s–\-]*)\)\s*$/,
+                    );
+                    const name = dateMatch
+                      ? product.slice(0, dateMatch.index).trim()
+                      : product;
+                    const date = dateMatch ? dateMatch[1] : null;
+                    return (
+                      <li key={i}>
+                        {name}
+                        {date && (
+                          <span className="text-slate-400">
+                            {" "}
+                            · <span className="italic">{date}</span>
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </>
             )}
