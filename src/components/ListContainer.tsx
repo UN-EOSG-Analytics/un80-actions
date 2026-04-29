@@ -1,5 +1,8 @@
 import { WorkPackageItem } from "@/components/WorkPackageCard";
-import { actionMatchesProductMonths } from "@/lib/productsTimeline";
+import {
+  actionMatchesProductMonths,
+  actionMatchesProductCategories,
+} from "@/lib/productsTimeline";
 import type { WorkPackage } from "@/types";
 import { normalizeTeamMember } from "@/lib/utils";
 
@@ -13,6 +16,7 @@ interface WorkPackageListProps {
   selectedTeamMembers?: string[];
   selectedActionStatus?: string[];
   selectedProductMonth?: string[];
+  selectedProductType?: string[];
   showProgress?: boolean;
   searchQuery?: string;
 }
@@ -27,6 +31,7 @@ export function WorkPackageList({
   selectedTeamMembers = [],
   selectedActionStatus = [],
   selectedProductMonth = [],
+  selectedProductType = [],
   showProgress = false,
   searchQuery = "",
 }: WorkPackageListProps) {
@@ -106,12 +111,24 @@ export function WorkPackageList({
             ),
           );
 
+        // Check if any action in the WP matches the product type filter
+        const hasMatchingProductType =
+          selectedProductType.length === 0 ||
+          filteredActions.some((action) =>
+            actionMatchesProductCategories(
+              action.actionNumber,
+              wp.number,
+              selectedProductType,
+            ),
+          );
+
         // If there are no actions to display, don't render an (empty) collapsible
         if (
           !filteredActions ||
           filteredActions.length === 0 ||
           !hasMatchingStatusAction ||
-          !hasMatchingProductMonth
+          !hasMatchingProductMonth ||
+          !hasMatchingProductType
         ) {
           return null;
         }
@@ -127,7 +144,8 @@ export function WorkPackageList({
         const hasActiveFilters =
           searchQuery.trim().length > 0 ||
           selectedActionStatus.length > 0 ||
-          selectedProductMonth.length > 0;
+          selectedProductMonth.length > 0 ||
+          selectedProductType.length > 0;
         const shouldBeOpen = hasActiveFilters || isOpen;
 
         return (
@@ -145,6 +163,7 @@ export function WorkPackageList({
             selectedTeamMembers={selectedTeamMembers}
             selectedActionStatus={selectedActionStatus}
             selectedProductMonth={selectedProductMonth}
+            selectedProductType={selectedProductType}
             originalActionsCount={wp.actions.length}
           />
         );

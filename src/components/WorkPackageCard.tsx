@@ -12,7 +12,10 @@ import {
   getStatusStyles,
   isDecisionTaken,
 } from "@/constants/actionStatus";
-import { actionMatchesProductMonths } from "@/lib/productsTimeline";
+import {
+  actionMatchesProductMonths,
+  actionMatchesProductCategories,
+} from "@/lib/productsTimeline";
 
 import type { WorkPackage, WorkPackageAction } from "@/types";
 import { ChevronDown, FileText, Menu } from "lucide-react";
@@ -23,6 +26,7 @@ interface WorkPackageActionsProps {
   searchQuery?: string;
   selectedActionStatus?: string[];
   selectedProductMonth?: string[];
+  selectedProductType?: string[];
 }
 
 /**
@@ -61,6 +65,7 @@ function WorkPackageActions({
   searchQuery = "",
   selectedActionStatus = [],
   selectedProductMonth = [],
+  selectedProductType = [],
 }: WorkPackageActionsProps) {
   const [showUnmatched, setShowUnmatched] = useState(false);
 
@@ -77,8 +82,12 @@ function WorkPackageActions({
   const hasActiveSearch = searchQuery.trim().length > 0;
   const hasActiveStatusFilter = selectedActionStatus.length > 0;
   const hasActiveProductMonthFilter = selectedProductMonth.length > 0;
+  const hasActiveProductTypeFilter = selectedProductType.length > 0;
   const hasActiveFilter =
-    hasActiveSearch || hasActiveStatusFilter || hasActiveProductMonthFilter;
+    hasActiveSearch ||
+    hasActiveStatusFilter ||
+    hasActiveProductMonthFilter ||
+    hasActiveProductTypeFilter;
 
   const actionMatchesAll = (action: WorkPackageAction) =>
     actionMatchesSearch(action, searchQuery) &&
@@ -87,6 +96,11 @@ function WorkPackageActions({
       action.actionNumber,
       workPackageNumber,
       selectedProductMonth,
+    ) &&
+    actionMatchesProductCategories(
+      action.actionNumber,
+      workPackageNumber,
+      selectedProductType,
     );
 
   const matchedActions = hasActiveFilter
@@ -157,6 +171,7 @@ interface WorkPackageItemProps {
   selectedTeamMembers?: string[];
   selectedActionStatus?: string[];
   selectedProductMonth?: string[];
+  selectedProductType?: string[];
   originalActionsCount?: number;
 }
 
@@ -172,6 +187,7 @@ export function WorkPackageItem({
   selectedTeamMembers = [],
   selectedActionStatus = [],
   selectedProductMonth = [],
+  selectedProductType = [],
   originalActionsCount,
 }: WorkPackageItemProps) {
   // Calculate animation duration: base 150ms + 30ms per action, capped at 400ms
@@ -189,12 +205,14 @@ export function WorkPackageItem({
   const hasActiveSearch = searchQuery.trim().length > 0;
   const hasActiveStatusFilter = selectedActionStatus.length > 0;
   const hasActiveProductMonthFilter = selectedProductMonth.length > 0;
+  const hasActiveProductTypeFilter = selectedProductType.length > 0;
   const hasActiveActionFilter = selectedActions.length > 0;
   const hasActiveTeamMemberFilter = selectedTeamMembers.length > 0;
   const hasActiveFilter =
     hasActiveSearch ||
     hasActiveStatusFilter ||
     hasActiveProductMonthFilter ||
+    hasActiveProductTypeFilter ||
     hasActiveActionFilter ||
     hasActiveTeamMemberFilter;
 
@@ -207,6 +225,11 @@ export function WorkPackageItem({
             action.actionNumber,
             wp.number,
             selectedProductMonth,
+          ) &&
+          actionMatchesProductCategories(
+            action.actionNumber,
+            wp.number,
+            selectedProductType,
           ),
       ).length
     : wp.actions.length;
@@ -404,6 +427,7 @@ export function WorkPackageItem({
               searchQuery={searchQuery}
               selectedActionStatus={selectedActionStatus}
               selectedProductMonth={selectedProductMonth}
+              selectedProductType={selectedProductType}
             />
           </div>
         </CollapsibleContent>

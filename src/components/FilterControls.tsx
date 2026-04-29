@@ -21,6 +21,7 @@ import {
   Package,
   ListTodo,
   Activity,
+  FileText,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -53,6 +54,8 @@ interface FilterControlsProps {
   onSelectTeamMember: (value: string[]) => void;
   selectedActionStatus: string[];
   onSelectActionStatus: (value: string[]) => void;
+  selectedProductType: string[];
+  onSelectProductType: (value: string[]) => void;
 
   // Search
   searchQuery: string;
@@ -65,6 +68,7 @@ interface FilterControlsProps {
   uniqueActions: Array<{ text: string; actionNumber: string }>;
   uniqueTeamMembers: string[];
   availableBigTicketOptions: Array<{ key: string; label: string }>;
+  availableProductTypeOptions: Array<{ key: string; label: string }>;
 
   // Reset
   onResetFilters: () => void;
@@ -102,6 +106,8 @@ export function FilterControls({
   onSelectTeamMember,
   selectedActionStatus,
   onSelectActionStatus,
+  selectedProductType,
+  onSelectProductType,
   searchQuery,
   onSearchChange,
   uniqueWorkPackages,
@@ -110,6 +116,7 @@ export function FilterControls({
   uniqueActions,
   uniqueTeamMembers,
   availableBigTicketOptions,
+  availableProductTypeOptions,
   onResetFilters,
   onExpandAll,
   onCollapseAll,
@@ -143,7 +150,8 @@ export function FilterControls({
     selectedBigTicket.length > 0 ||
     selectedAction.length > 0 ||
     selectedTeamMember.length > 0 ||
-    selectedActionStatus.length > 0
+    selectedActionStatus.length > 0 ||
+    selectedProductType.length > 0
   );
 
   const hasActiveAdvancedFilters = !!(
@@ -153,7 +161,8 @@ export function FilterControls({
     selectedBigTicket.length > 0 ||
     selectedAction.length > 0 ||
     selectedTeamMember.length > 0 ||
-    selectedActionStatus.length > 0
+    selectedActionStatus.length > 0 ||
+    selectedProductType.length > 0
   );
 
   return (
@@ -595,6 +604,35 @@ export function FilterControls({
               onSelectActionStatus(newSelected);
             }}
             ariaLabel="Filter by action status"
+          />
+
+          {/* Product Type Filter */}
+          <FilterDropdown
+            open={openFilterCollapsibles.has("productType")}
+            onOpenChange={(open) =>
+              onToggleFilterCollapsible("productType", open)
+            }
+            icon={<FileText className="h-4 w-4 text-un-blue" />}
+            triggerText={
+              selectedProductType.length === 0
+                ? "Select product type"
+                : selectedProductType.length === 1
+                  ? (availableProductTypeOptions.find(
+                      (o) => o.key === selectedProductType[0],
+                    )?.label || selectedProductType[0])
+                  : `${selectedProductType.length} product types selected`
+            }
+            isFiltered={selectedProductType.length > 0}
+            allActive={false}
+            options={availableProductTypeOptions}
+            selectedKeys={new Set(selectedProductType)}
+            onToggle={(key) => {
+              const newSelected = selectedProductType.includes(key)
+                ? selectedProductType.filter((t) => t !== key)
+                : [...selectedProductType, key];
+              onSelectProductType(newSelected);
+            }}
+            ariaLabel="Filter by product type"
           />
         </div>
       )}

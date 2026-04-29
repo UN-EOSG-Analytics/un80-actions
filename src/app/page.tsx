@@ -14,6 +14,7 @@ import { useChartSearch } from "@/hooks/useChartSearch";
 import { useCollapsibles } from "@/hooks/useCollapsibles";
 import { useFilters, useFilterSync } from "@/hooks/useFilters";
 import { useWorkPackageData } from "@/hooks/useWorkPackageData";
+import { getProductCategories } from "@/lib/productsTimeline";
 import { normalizeTeamMemberForDisplay } from "@/lib/utils";
 import {
     Briefcase as BriefcaseIcon,
@@ -48,6 +49,8 @@ export function WorkPackagesPageContent() {
     setSelectedActionStatus,
     selectedProductMonth,
     setSelectedProductMonth,
+    selectedProductType,
+    setSelectedProductType,
     sortOption,
     setSortOption,
     handleResetFilters,
@@ -346,6 +349,8 @@ export function WorkPackagesPageContent() {
                     onSelectTeamMember={setSelectedTeamMember}
                     selectedActionStatus={selectedActionStatus}
                     onSelectActionStatus={setSelectedActionStatus}
+                    selectedProductType={selectedProductType}
+                    onSelectProductType={setSelectedProductType}
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
                     uniqueWorkPackages={uniqueWorkPackages}
@@ -354,6 +359,7 @@ export function WorkPackagesPageContent() {
                     uniqueActions={uniqueActions}
                     uniqueTeamMembers={uniqueTeamMembers}
                     availableBigTicketOptions={availableBigTicketOptions}
+                    availableProductTypeOptions={getProductCategories()}
                     onResetFilters={handleResetFilters}
                     onExpandAll={() => {
                       const allKeys = filteredWorkPackages.map(
@@ -377,6 +383,7 @@ export function WorkPackagesPageContent() {
                     selectedTeamMembers={selectedTeamMember}
                     selectedActionStatus={selectedActionStatus}
                     selectedProductMonth={selectedProductMonth}
+                    selectedProductType={selectedProductType}
                     showProgress={false}
                     searchQuery={searchQuery}
                   />

@@ -189,6 +189,7 @@ export interface FilterState {
   selectedTeamMember: string[];
   selectedActionStatus: string[];
   selectedProductMonth: string[];
+  selectedProductType: string[];
   sortOption: string;
 }
 

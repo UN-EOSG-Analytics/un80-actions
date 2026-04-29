@@ -50,6 +50,9 @@ export function useFilters() {
   const selectedProductMonth = decodeUrlParamArray(
     effectiveParams.get("product_month"),
   );
+  const selectedProductType = decodeUrlParamArray(
+    effectiveParams.get("product_type"),
+  );
   const sortOption = effectiveParams.get("sort") || "number-asc";
 
   // Helper to build a clean, human-readable query string
@@ -218,6 +221,19 @@ export function useFilters() {
     [updateUrl],
   );
 
+  const setSelectedProductType = useCallback(
+    (value: string[]) => {
+      updateUrl((params) => {
+        if (value.length > 0) {
+          params.product_type = encodeUrlParamArray(value);
+        } else {
+          delete params.product_type;
+        }
+      });
+    },
+    [updateUrl],
+  );
+
   const setSortOption = useCallback(
     (value: string) => {
       updateUrl((params) => {
@@ -243,6 +259,7 @@ export function useFilters() {
       selectedTeamMember,
       selectedActionStatus,
       selectedProductMonth,
+      selectedProductType,
       sortOption,
     }),
     [
@@ -256,6 +273,7 @@ export function useFilters() {
       selectedTeamMember,
       selectedActionStatus,
       selectedProductMonth,
+      selectedProductType,
       sortOption,
     ],
   );
@@ -294,6 +312,8 @@ export function useFilters() {
     setSelectedActionStatus,
     selectedProductMonth,
     setSelectedProductMonth,
+    selectedProductType,
+    setSelectedProductType,
     sortOption,
     setSortOption,
     handleResetFilters,
