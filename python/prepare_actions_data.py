@@ -17,7 +17,7 @@ with open(input_path, "r", encoding="utf-8") as f:
 df = pd.DataFrame(data)
 
 print(f"\nLoaded {len(df)} records from {input_path}")
-assert len(df) == 91
+assert len(df) == 90
 
 # Replace empty strings with None for proper null handling
 df = df.replace("", None)
@@ -174,7 +174,7 @@ if num_subactions != 5:
 # Expected counts from UI DataCards (excluding subactions)
 EXPECTED_WORKSTREAMS = 3
 EXPECTED_WORK_PACKAGES = 31
-EXPECTED_ACTIONS = 86  # 91 total - 5 subactions
+EXPECTED_ACTIONS = 85  # 90 total - 5 subactions
 EXPECTED_LEADS = 34
 
 # Calculate actual counts (excluding subactions for actions count)
