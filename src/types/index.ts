@@ -103,6 +103,12 @@ export interface ActionProgressTableRow {
 export interface ActionProgressSection {
   actionNumbers: string;
   text: string;
+  /**
+   * Explicit marker that the action has no remaining next steps.
+   * Distinguishes "deliberately cleared" from "text missing/failed to extract":
+   * without it, an empty text silently falls back to the Excel `upcoming_milestone`.
+   */
+  noFurtherSteps?: boolean;
 }
 
 export interface WorkPackageProgress {

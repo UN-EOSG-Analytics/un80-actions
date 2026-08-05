@@ -8,6 +8,9 @@ import progressData from "@data/actions_progress.json";
 const nextStepsByAction = new Map<number, string>();
 const writtenProductsByAction = new Map<number, string[]>();
 const progressByAction = new Map<number, string>();
+// Actions whose next steps are explicitly cleared (completed), so that the
+// "Next Steps" section is suppressed rather than falling back to the Excel milestone
+const noNextStepsActions = new Set<number>();
 for (const wp of progressData as WorkPackageProgress[]) {
   for (const item of wp.progressPerAction ?? []) {
     if (!item.actionNumbers || !item.text) continue;
@@ -19,12 +22,18 @@ for (const wp of progressData as WorkPackageProgress[]) {
     }
   }
   for (const item of wp.nextStepsAndDecisions ?? []) {
-    if (!item.actionNumbers || !item.text) continue;
+    if (!item.actionNumbers) continue;
     const nums = item.actionNumbers.match(/\d+/g);
-    if (nums) {
+    if (!nums) continue;
+    if (item.noFurtherSteps) {
       for (const n of nums) {
-        nextStepsByAction.set(Number(n), item.text);
+        noNextStepsActions.add(Number(n));
       }
+      continue;
+    }
+    if (!item.text) continue;
+    for (const n of nums) {
+      nextStepsByAction.set(Number(n), item.text);
     }
   }
   for (const row of wp.summaryTable ?? []) {
@@ -64,12 +73,12 @@ export function getActions(): Actions {
       const nextStep = nextStepsByAction.get(action.action_number);
       const writtenProducts =
         writtenProductsByAction.get(action.action_number) ?? null;
-      const progressToDate =
-        progressByAction.get(action.action_number) ?? null;
+      const progressToDate = progressByAction.get(action.action_number) ?? null;
+      const noNextSteps = noNextStepsActions.has(action.action_number);
       return {
         ...action,
-        ...(nextStep && {
-          upcoming_milestone: nextStep,
+        ...((nextStep || noNextSteps) && {
+          upcoming_milestone: noNextSteps ? null : nextStep,
           delivery_date: null,
         }),
         written_products: writtenProducts,

@@ -1775,11 +1775,11 @@
     "progressPerAction": [
       {
         "actionNumbers": "Action 84",
-        "text": "New internal guidelines have been prepared for word limits and report formats, guided by A/RES/80/251."
+        "text": "Internal guidance on word limits and report formats has been issued, guided by A/RES/80/251."
       },
       {
         "actionNumbers": "Action 86",
-        "text": "New internal guidelines have been prepared for word limits and report formats, guided by A/RES/80/251."
+        "text": "Internal guidance on word limits and report formats has been issued, guided by A/RES/80/251."
       },
       {
         "actionNumbers": "Action 85",
@@ -1787,13 +1787,14 @@
       },
       {
         "actionNumbers": "Action 87",
-        "text": "Steps were completed to launch the display of download counts."
+        "text": "Document download counts are now displayed on UN ODS and the UN Digital Library websites."
       }
     ],
     "nextStepsAndDecisions": [
       {
         "actionNumbers": "Actions 84, 86",
-        "text": "Internal guidance on word limits and reporting formats will be finalized and disseminated to staff in May. No decision of an intergovernmental organ is envisaged."
+        "text": "",
+        "noFurtherSteps": true
       },
       {
         "actionNumbers": "Action 85",
@@ -1801,7 +1802,8 @@
       },
       {
         "actionNumbers": "Action 87",
-        "text": "Document download counts will be displayed on UN ODS and the UN Digital Library websites starting in May. No decision of an intergovernmental organ is envisaged."
+        "text": "",
+        "noFurtherSteps": true
       }
     ],
     "summaryTable": [
@@ -1823,9 +1825,7 @@
         "action": "Action 87: Display report download counts",
         "pathwayToDecision": "Work package leads → Secretary-General",
         "intergovernmentalConsideration": "-",
-        "writtenProducts": [
-          "Display report download counts (starting May)"
-        ]
+        "writtenProducts": []
       }
     ],
     "pdfPage": 39
