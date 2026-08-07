@@ -221,6 +221,59 @@ print("\n✓ All data counts match expected values")
 
 ##############################################################################
 
+## Manual Override Guard ##
+
+# Statuses that were set by hand in public/data/actions.json because the Excel
+# workbook had not caught up. Regenerating from the workbook would silently
+# revert them, so fail loudly instead of writing the file.
+# Remove an entry once the workbook agrees (the check then passes by itself) or
+# once the override is no longer wanted.
+MANUAL_STATUS_OVERRIDES = {
+    84: "Decision taken",
+    86: "Decision taken",
+    87: "Decision taken",
+}
+
+override_conflicts = []
+
+for action_number, expected_status in MANUAL_STATUS_OVERRIDES.items():
+    rows = df_non_subactions[df_non_subactions["action_number"] == action_number]
+    if rows.empty:
+        override_conflicts.append(
+            f"Action {action_number}: overridden here but missing from the workbook export"
+        )
+        continue
+    for actual_status in rows["public_action_status"]:
+        if actual_status != expected_status:
+            override_conflicts.append(
+                f"Action {action_number}: workbook says {actual_status!r}, "
+                f"repo override says {expected_status!r}"
+            )
+
+if override_conflicts:
+    error_message = "\n" + "=" * 60 + "\n"
+    error_message += "MANUAL OVERRIDE CONFLICT\n"
+    error_message += "=" * 60 + "\n"
+    for conflict in override_conflicts:
+        error_message += f"❌ {conflict}\n"
+    error_message += "=" * 60 + "\n"
+    error_message += (
+        "public/data/actions.json was edited by hand and regenerating from the\n"
+        "workbook would revert it. Nothing has been written. Resolve by either:\n"
+        "  - setting public_action_status in the Excel workbook (preferred), or\n"
+        "  - deleting the entry from MANUAL_STATUS_OVERRIDES in this script,\n"
+        "    which lets the workbook win."
+    )
+    raise AssertionError(error_message)
+
+if MANUAL_STATUS_OVERRIDES:
+    print(
+        f"\n✓ Workbook agrees with all {len(MANUAL_STATUS_OVERRIDES)} manual status "
+        "override(s) — they are now redundant and can be deleted from this script"
+    )
+
+##############################################################################
+
 ## Export ##
 
 # Ensure output folder exists
